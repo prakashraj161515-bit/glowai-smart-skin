@@ -29,13 +29,20 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { response_mime_type: "application/json" }
+        contents: [{ parts: [{ text: prompt }] }]
       })
     });
 
     const data = await response.json();
-    const content = data.candidates[0].content.parts[0].text;
+    
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    let content = data.candidates[0].content.parts[0].text;
+    
+    // Clean JSON response if it contains markdown markers
+    content = content.replace(/```json/g, '').replace(/```/g, '').trim();
     
     return NextResponse.json(JSON.parse(content));
   } catch (error) {
