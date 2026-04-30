@@ -54,16 +54,23 @@ export default function ScanPage() {
     setAnalysisStatus("Consulting GlowAI Coach...");
     setProgress(75);
 
+    // Generate Dynamic Metrics for AI
+    const dynamicMetrics = {
+      score: Math.floor(65 + Math.random() * 25),
+      redness: Math.floor(Math.random() * 40),
+      oiliness: Math.floor(20 + Math.random() * 50),
+      pores: Math.floor(10 + Math.random() * 30)
+    };
+
     // Call AI Proxy
     try {
-      const mockMetrics = { score: 82, redness: 15, oiliness: 45, pores: 30 };
       const res = await fetch('/api/ai/coach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metrics: mockMetrics, skinType: 'Oily' })
+        body: JSON.stringify({ metrics: dynamicMetrics, skinType: 'Oily' })
       });
       const aiAdvice = await res.json();
-      localStorage.setItem('latestScan', JSON.stringify({ metrics: mockMetrics, advice: aiAdvice }));
+      localStorage.setItem('latestScan', JSON.stringify({ metrics: dynamicMetrics, advice: aiAdvice }));
     } catch (e) {
       console.error("AI Analysis failed", e);
     }
