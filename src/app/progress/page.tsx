@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
-import { TrendingUp, AlertTriangle, CheckCircle2, ChevronRight, Award } from "lucide-react";
+import { TrendingUp, AlertTriangle, CheckCircle2, ChevronRight, Award, Zap } from "lucide-react";
 
 const data = [
   { day: "Mon", score: 65 },
