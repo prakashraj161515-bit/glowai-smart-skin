@@ -1,37 +1,46 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Sparkles, Plus } from "lucide-react";
+import { Send, Bot, User, Sparkles, Plus, RefreshCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CoachPage() {
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hi! I'm your GlowAI Coach. How can I help you with your skin today? ✨" },
   ]);
-  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
     
-    const userMessage = { role: "user", content: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMessage = { role: "user", parts: [{ text: input }] };
+    setMessages((prev) => [...prev, { role: 'user', content: input }]);
     setInput("");
+    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage = { 
-        role: "assistant", 
-        content: "That's a great question! For your skin type (Oily), I recommend using a Salicylic Acid based cleanser in the morning. It helps to clear out pores and reduce excess sebum. Would you like a product suggestion? 🧴" 
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    }, 1000);
+    try {
+      // Prepare history for API
+      const history = messages.map(m => ({
+        role: m.role === 'user' ? 'user' : 'model',
+        parts: [{ text: m.content }]
+      }));
+
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input, history })
+      });
+      
+      const data = await res.json();
+      if (data.text) {
+        setMessages((prev) => [...prev, { role: 'assistant', content: data.text }]);
+      }
+    } catch (e) {
+      setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Please try again." }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,6 +81,15 @@ export default function CoachPage() {
             </div>
           </motion.div>
         ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="p-3 glass-card text-sm rounded-tl-none flex gap-1">
+              <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></span>
+              <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+              <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
@@ -82,13 +100,15 @@ export default function CoachPage() {
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask anything about skincare..."
-          className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 pr-12 text-sm focus:outline-none focus:border-purple-500/50 transition-colors"
+          disabled={isLoading}
+          className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 pr-12 text-sm focus:outline-none focus:border-purple-500/50 transition-colors disabled:opacity-50"
         />
         <button 
           onClick={handleSend}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30"
+          disabled={isLoading}
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30 disabled:opacity-50"
         >
-          <Send size={18} />
+          {isLoading ? <RefreshCcw size={18} className="animate-spin" /> : <Send size={18} />}
         </button>
       </div>
     </div>
