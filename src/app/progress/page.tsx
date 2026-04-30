@@ -19,14 +19,28 @@ export default function ProgressPage() {
   const [scanData, setScanData] = useState<any>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('latestScan');
-    if (saved) {
-      setScanData(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('latestScan');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          setScanData(parsed);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to parse scan data", e);
     }
   }, []);
 
   const metrics = scanData?.metrics || { score: 0, redness: 0, oiliness: 0, pores: 0 };
-  const advice = scanData?.advice || {};
+  const advice = scanData?.advice || {
+    skin_analysis: "",
+    diet: [],
+    morning_routine: [],
+    night_routine: [],
+    lifestyle_tips: [],
+    improvement_forecast: ""
+  };
 
   return (
     <div className="space-y-6">
