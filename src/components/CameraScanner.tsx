@@ -1,149 +1,89 @@
 "use client";
 
-import { useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Camera, RefreshCcw, Sparkles } from 'lucide-react';
+import { useRef, useEffect, useState } from "react";
+import * as tf from "@tensorflow/tfjs";
+import * as blazeface from "@tensorflow-models/blazeface";
+import { Camera, Sparkles } from "lucide-react";
 
-interface CameraScannerProps {
-  onCapture: (canvas: HTMLCanvasElement) => void;
-}
-
-export default function CameraScanner({ onCapture }: CameraScannerProps) {
+export default function CameraScanner({ onAnalyze }: { onAnalyze: (canvas: HTMLCanvasElement) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [model, setModel] = useState<any>(null);
+  const [isScanning, setIsScanning] = useState(false);
 
   useEffect(() => {
-    // Load MediaPipe scripts dynamically
-    const scripts = [
-      'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js',
-      'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
-      'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'
-    ];
-
-    const loadScripts = async () => {
-      for (const src of scripts) {
-        await new Promise((resolve) => {
-          const script = document.createElement('script');
-          script.src = src;
-          script.onload = resolve;
-          document.head.appendChild(script);
-        });
-      }
-      initFaceMesh();
-    };
-
-    loadScripts();
-    return () => stopCamera();
+    async function loadModel() {
+      await tf.ready();
+      const loadedModel = await blazeface.load();
+      setModel(loadedModel);
+      startCamera();
+    }
+    loadModel();
   }, []);
 
-  const initFaceMesh = () => {
-    // @ts-ignore
-    const faceMesh = new window.FaceMesh({
-      locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
-    });
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+      if (videoRef.current) videoRef.current.srcObject = stream;
+    } catch (err) {
+      console.error("Camera access denied", err);
+    }
+  }
 
-    faceMesh.setOptions({
-      maxNumFaces: 1,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
-
-    faceMesh.onResults((results: any) => {
-      if (!canvasRef.current || !videoRef.current) return;
-      const canvasCtx = canvasRef.current.getContext('2d');
-      if (!canvasCtx) return;
-
-      canvasCtx.save();
-      canvasCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-      
-      if (results.multiFaceLandmarks) {
-        for (const landmarks of results.multiFaceLandmarks) {
-          // @ts-ignore
-          window.drawConnectors(canvasCtx, landmarks, window.FACEMESH_TESSELATION, {color: '#C0C0C070', lineWidth: 1});
+  const runDetection = async () => {
+    if (model && videoRef.current && canvasRef.current) {
+      const predictions = await model.estimateFaces(videoRef.current, false);
+      const ctx = canvasRef.current.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        if (predictions.length > 0) {
+          predictions.forEach((prediction: any) => {
+            const start = prediction.topLeft;
+            const end = prediction.bottomRight;
+            const size = [end[0] - start[0], end[1] - start[1]];
+            ctx.strokeStyle = "#8B5CF6";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(start[0], start[1], size[0], size[1]);
+          });
         }
       }
-      canvasCtx.restore();
-    });
-
-    startCamera(faceMesh);
-  };
-
-  const startCamera = async (faceMesh: any) => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user', width: 640, height: 480 },
-        audio: false 
-      });
-      setStream(mediaStream);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-        // @ts-ignore
-        const camera = new window.Camera(videoRef.current, {
-          onFrame: async () => {
-            await faceMesh.send({image: videoRef.current!});
-          },
-          width: 640,
-          height: 480,
-        });
-        camera.start();
-        setIsReady(true);
-      }
-    } catch (err) {
-      console.error("Camera error:", err);
     }
+    if (isScanning) requestAnimationFrame(runDetection);
   };
 
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+  useEffect(() => {
+    if (model && !isScanning) {
+      setIsScanning(true);
+      runDetection();
     }
-  };
+  }, [model]);
 
-  const capture = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-    const ctx = canvasRef.current.getContext('2d');
-    if (!ctx) return;
-
-    canvasRef.current.width = videoRef.current.videoWidth;
-    canvasRef.current.height = videoRef.current.videoHeight;
-    ctx.drawImage(videoRef.current, 0, 0);
-    onCapture(canvasRef.current);
+  const handleCapture = () => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(videoRef.current, 0, 0);
+      onAnalyze(canvas);
+    }
   };
 
   return (
     <div className="relative w-full max-w-md mx-auto aspect-[3/4] rounded-3xl overflow-hidden glass-card border-2 border-purple-500/30">
-      <video 
-        ref={videoRef} 
-        autoPlay 
-        playsInline 
-        muted 
-        className="w-full h-full object-cover grayscale-[0.3]"
-      />
+      <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
       
-      {/* Face Overlay Guide */}
-      <div className="absolute inset-0 border-[40px] border-black/40 pointer-events-none">
-        <div className="w-full h-full border-2 border-dashed border-purple-400/50 rounded-[20%] animate-pulse" />
-      </div>
-
-      <div className="absolute bottom-8 inset-x-0 flex justify-center px-6">
+      <div className="absolute bottom-8 inset-x-0 flex justify-center">
         <button 
-          onClick={capture}
-          disabled={!isReady}
-          className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-xl border-4 border-white flex items-center justify-center shadow-2xl active:scale-95 transition-transform disabled:opacity-50"
+          onClick={handleCapture}
+          className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-xl border-4 border-white flex items-center justify-center shadow-2xl active:scale-95 transition-transform"
         >
           <div className="w-14 h-14 rounded-full bg-purple-500 flex items-center justify-center text-white">
             <Camera size={32} />
           </div>
         </button>
       </div>
-
-      <canvas 
-        ref={canvasRef} 
-        className="absolute inset-0 w-full h-full object-cover z-10" 
-      />
     </div>
   );
 }

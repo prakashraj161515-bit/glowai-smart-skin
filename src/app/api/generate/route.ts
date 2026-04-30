@@ -17,24 +17,20 @@ export async function POST(req: NextRequest) {
       Pigmentation: ${pigmentation}/100
 
       Give:
-      1. Diet (Indian foods only)
-      2. Morning routine
-      3. Night routine
-      4. 5 tips
+      - Diet (Indian foods)
+      - Morning routine
+      - Night routine
+      - 5 skin tips
       
-      Keep it very concise. Format as JSON with keys: diet, morning, night, tips.
+      Keep it concise and professional. Format as JSON.
     `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    let text = response.text();
-    
-    // Clean JSON if needed
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    const text = result.response.text().replace(/```json/g, '').replace(/```/g, '').trim();
     
     return NextResponse.json(JSON.parse(text));
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return NextResponse.json({ error: "Failed to generate recommendations" }, { status: 500 });
+    console.error("AI Error:", error);
+    return NextResponse.json({ error: "Generation failed" }, { status: 500 });
   }
 }

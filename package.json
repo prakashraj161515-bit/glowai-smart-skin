@@ -18,10 +18,8 @@
     "tailwind-merge": "^2.5.2",
     "@tensorflow/tfjs": "^4.21.0",
     "@mediapipe/face_mesh": "^0.4.1633502334",
-    "recharts": "^2.12.7",
-    "firebase": "^10.14.0",
-    "i18next": "^23.15.1",
-    "react-i18next": "^15.0.2",
+    "@tensorflow/tfjs": "^4.21.0",
+    "@tensorflow-models/blazeface": "^0.0.7",
     "@google/generative-ai": "^0.21.0"
   },
   "devDependencies": {

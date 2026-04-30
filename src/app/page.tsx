@@ -1,182 +1,117 @@
 "use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import CameraScanner from '@/components/CameraScanner';
-import { analyzeSkin, SkinAnalysisResult } from '@/lib/analyze';
-import { Sparkles, Activity, PieChart, Info, CheckCircle2 } from 'lucide-react';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import CameraScanner from "@/components/CameraScanner";
+import { analyzeSkin, SkinAnalysisResult } from "@/lib/analyze";
+import { Sparkles, Activity, ShieldCheck, Heart } from "lucide-react";
 
 export default function Home() {
-  const [step, setStep] = useState<'camera' | 'analyzing' | 'results'>('camera');
-  const [results, setResults] = useState<SkinAnalysisResult | null>(null);
-  const [aiAdvice, setAiAdvice] = useState<any>(null);
+  const [step, setStep] = useState<"camera" | "analyzing" | "results">("camera");
+  const [analysis, setAnalysis] = useState<SkinAnalysisResult | null>(null);
+  const [aiReport, setAiReport] = useState<any>(null);
 
-  const handleCapture = async (canvas: HTMLCanvasElement) => {
-    setStep('analyzing');
-    
+  const handleAnalyze = async (canvas: HTMLCanvasElement) => {
+    setStep("analyzing");
+    const ctx = canvas.getContext("2d")!;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const result = analyzeSkin(imageData);
+    setAnalysis(result);
+
     try {
-      const ctx = canvas.getContext('2d')!;
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const analysis = await analyzeSkin(imageData);
-      setResults(analysis);
-
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(analysis)
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result),
       });
-      const advice = await res.json();
-      setAiAdvice(advice);
-      
-      setStep('results');
+      const report = await res.json();
+      setAiReport(report);
+      setStep("results");
     } catch (err) {
       console.error(err);
-      setStep('camera');
+      setStep("camera");
     }
   };
 
   return (
     <main className="min-h-screen bg-[#050505] text-white p-6 font-outfit">
       <AnimatePresence mode="wait">
-        {step === 'camera' && (
-          <motion.div 
-            key="camera"
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
-            className="space-y-8 pt-10"
-          >
-            <div className="text-center space-y-2">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">GlowAI Scan</h1>
-              <p className="text-slate-400">Position your face in the guide for AI analysis</p>
+        {step === "camera" && (
+          <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-10">
+            <div className="text-center mb-10">
+              <h1 className="text-4xl font-bold mb-2">GlowAI</h1>
+              <p className="text-slate-400">AI Skin Scanner & Coach</p>
             </div>
-            <CameraScanner onCapture={handleCapture} />
+            <CameraScanner onAnalyze={handleAnalyze} />
           </motion.div>
         )}
 
-        {step === 'analyzing' && (
-          <motion.div 
-            key="analyzing"
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center min-h-[70vh] space-y-6"
-          >
-            <div className="relative w-24 h-24">
-              <div className="absolute inset-0 border-4 border-purple-500/20 rounded-full" />
-              <div className="absolute inset-0 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-              <Sparkles className="absolute inset-0 m-auto text-purple-400 animate-pulse" size={32} />
-            </div>
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold">Analyzing Skin Layers...</h2>
-              <p className="text-slate-400 text-sm animate-pulse">Consulting Gemini AI Coach</p>
-            </div>
+        {step === "analyzing" && (
+          <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center min-h-[80vh]">
+            <div className="w-20 h-20 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-6" />
+            <h2 className="text-2xl font-bold">AI is Analyzing...</h2>
+            <p className="text-slate-400">Deep scanning skin layers</p>
           </motion.div>
         )}
 
-        {step === 'results' && results && (
-          <motion.div 
-            key="results"
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            className="space-y-6 pt-6 pb-24"
-          >
-            <header className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Analysis Report</h1>
-              <button 
-                onClick={() => setStep('camera')}
-                className="text-sm text-purple-400 font-bold"
-              >
-                Scan Again
-              </button>
+        {step === "results" && analysis && aiReport && (
+          <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="pb-24">
+            <header className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">Skin Report</h2>
+              <button onClick={() => setStep("camera")} className="text-purple-400 text-sm font-bold">New Scan</button>
             </header>
 
-            {/* Score Card */}
-            <div className="glass-card p-6 bg-gradient-to-br from-purple-600/20 to-transparent border-purple-500/30">
-              <div className="flex justify-between items-center mb-4">
-                <div>
-                  <p className="text-sm text-slate-400">Glow Score</p>
-                  <p className="text-5xl font-bold">{results.score}<span className="text-xl text-slate-500">/100</span></p>
-                </div>
-                <div className="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 border border-purple-500/40">
-                  <Activity size={32} />
-                </div>
-              </div>
-              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${results.score}%` }}
-                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                />
+            <div className="glass-card p-6 mb-6 bg-gradient-to-br from-purple-500/20 to-transparent border-purple-500/30">
+              <p className="text-sm text-slate-400 mb-1">Overall Health Score</p>
+              <h3 className="text-6xl font-bold">{analysis.score}<span className="text-xl font-normal text-slate-600">/100</span></h3>
+              <div className="h-1.5 w-full bg-white/10 rounded-full mt-4">
+                <div className="h-full bg-purple-500 rounded-full" style={{ width: `${analysis.score}%` }} />
               </div>
             </div>
 
-            {/* Metrics Grid */}
-            <div className="grid grid-cols-1 gap-4">
-              {[
-                { label: 'Acne', val: results.acne, color: 'text-red-400' },
-                { label: 'Oiliness', val: results.oil, color: 'text-yellow-400' },
-                { label: 'Pigmentation', val: results.pigmentation, color: 'text-blue-400' },
-              ].map((m) => (
-                <div key={m.label} className="glass-card p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 rounded-full bg-current ${m.color}`} />
-                    <span className="font-bold text-sm">{m.label}</span>
-                  </div>
-                  <span className={`font-bold ${m.color}`}>{m.val}%</span>
-                </div>
-              ))}
+            <div className="grid grid-cols-1 gap-4 mb-8">
+              <MetricBar label="Acne" value={analysis.acne} color="bg-red-500" />
+              <MetricBar label="Oiliness" value={analysis.oil} color="bg-yellow-500" />
+              <MetricBar label="Pigmentation" value={analysis.pigmentation} color="bg-blue-500" />
             </div>
 
-            {/* AI Advice */}
-            {aiAdvice && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold flex items-center gap-2">
-                  <Sparkles size={20} className="text-purple-400" />
-                  AI Coach Suggestions
-                </h3>
-                
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="glass-card p-5 border-l-4 border-green-500">
-                    <p className="text-xs font-bold text-green-400 uppercase tracking-widest mb-3">Indian Diet</p>
-                    <ul className="space-y-2">
-                      {aiAdvice.diet?.map((d: string) => (
-                        <li key={d} className="text-sm text-slate-300 flex items-start gap-2">
-                          <CheckCircle2 size={14} className="text-green-500 mt-1 shrink-0" />
-                          {d}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="glass-card p-5 border-l-4 border-blue-500">
-                    <p className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3">Daily Routine</p>
-                    <div className="space-y-4">
-                      <div>
-                        <p className="text-xs font-bold text-slate-500 uppercase mb-1">Morning</p>
-                        <p className="text-sm text-slate-300">{aiAdvice.morning?.join(', ')}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-500 uppercase mb-1">Night</p>
-                        <p className="text-sm text-slate-300">{aiAdvice.night?.join(', ')}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="glass-card p-5 bg-purple-500/10 border-purple-500/20">
-                    <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-3">Expert Tips</p>
-                    <ul className="space-y-2">
-                      {aiAdvice.tips?.map((t: string) => (
-                        <li key={t} className="text-sm text-slate-300">• {t}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
+            <div className="space-y-6">
+              <ReportSection title="Indian Diet Plan" icon={<Heart size={18}/>} items={aiReport.diet || []} />
+              <ReportSection title="Daily Routine" icon={<ShieldCheck size={18}/>} items={[...(aiReport.morning || []), ...(aiReport.night || [])]} />
+              <ReportSection title="AI Tips" icon={<Sparkles size={18}/>} items={aiReport.tips || []} />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </main>
+  );
+}
+
+function MetricBar({ label, value, color }: any) {
+  return (
+    <div className="glass-card p-4 flex items-center justify-between">
+      <span className="text-sm font-bold">{label}</span>
+      <div className="flex items-center gap-3">
+        <div className="w-32 h-1 bg-white/10 rounded-full">
+          <div className={`h-full ${color} rounded-full`} style={{ width: `${value}%` }} />
+        </div>
+        <span className="text-xs font-bold w-8 text-right">{value}%</span>
+      </div>
+    </div>
+  );
+}
+
+function ReportSection({ title, icon, items }: any) {
+  return (
+    <div className="glass-card p-5">
+      <h4 className="flex items-center gap-2 font-bold mb-4 text-purple-400">
+        {icon} {title}
+      </h4>
+      <ul className="space-y-2">
+        {items.map((item: string, i: number) => (
+          <li key={i} className="text-sm text-slate-300 leading-relaxed">• {item}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
