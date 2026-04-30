@@ -11,15 +11,11 @@ export const metadata: Metadata = {
   description: "AI-powered personalized skin analysis and coaching app.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`${inter.variable} ${outfit.variable} font-sans bg-[#050505] min-h-screen pb-20`}>
-        {children}
+        <main>{children}</main>
         <BottomNav />
       </body>
     </html>

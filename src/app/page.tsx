@@ -58,7 +58,7 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white p-6 font-outfit max-w-lg mx-auto">
+    <div className="min-h-screen bg-[#050505] text-white p-6 font-outfit max-w-lg mx-auto">
       <header className="text-center mb-10 pt-6">
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
@@ -183,7 +183,7 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
-    </main>
+    </div>
   );
 }
 
