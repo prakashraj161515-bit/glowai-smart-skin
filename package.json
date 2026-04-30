@@ -21,7 +21,8 @@
     "recharts": "^2.12.7",
     "firebase": "^10.14.0",
     "i18next": "^23.15.1",
-    "react-i18next": "^15.0.2"
+    "react-i18next": "^15.0.2",
+    "@google/generative-ai": "^0.21.0"
   },
   "devDependencies": {
     "typescript": "^5",
