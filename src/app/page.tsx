@@ -25,7 +25,6 @@ export default function Home() {
 
       setAnalysis(result);
 
-    try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
