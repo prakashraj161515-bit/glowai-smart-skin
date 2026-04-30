@@ -77,10 +77,14 @@ export default function Home() {
               <MetricBar label="Pigmentation" value={analysis.pigmentation} color="bg-blue-500" />
             </div>
 
-            <div className="space-y-6">
-              <ReportSection title="Indian Diet Plan" icon={<Heart size={18}/>} items={aiReport.diet || []} />
-              <ReportSection title="Daily Routine" icon={<ShieldCheck size={18}/>} items={[...(aiReport.morning || []), ...(aiReport.night || [])]} />
-              <ReportSection title="AI Tips" icon={<Sparkles size={18}/>} items={aiReport.tips || []} />
+            {/* AI Report */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold flex items-center gap-2 text-purple-400">
+                <Sparkles size={20} /> AI Coach Analysis
+              </h3>
+              <div className="glass-card p-6 whitespace-pre-wrap text-sm leading-relaxed text-slate-300 border-t-2 border-purple-500/30">
+                {aiReport.text}
+              </div>
             </div>
           </motion.div>
         )}
