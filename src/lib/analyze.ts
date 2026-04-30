@@ -1,41 +1,56 @@
-/**
- * GlowAI Skin Analysis (TensorFlow/BlazeFace compatible)
- */
+import * as tf from "@tensorflow/tfjs";
+import * as blazeface from "@tensorflow-models/blazeface";
 
 export interface SkinAnalysisResult {
-  acne: number;
-  oil: number;
-  pigmentation: number;
-  score: number;
+  acne?: number;
+  oil?: number;
+  pigmentation?: number;
+  score?: number;
+  error?: string;
 }
 
-export function analyzeSkin(imageData: ImageData): SkinAnalysisResult {
-  // Pixel-based heuristics for MVP
-  const data = imageData.data;
-  let redness = 0;
-  let brightness = 0;
-  let darkSpots = 0;
+let model: any;
 
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
+async function loadModel() {
+  if (!model) {
+    await tf.ready();
+    model = await blazeface.load();
+  }
+  return model;
+}
 
-    // Redness (Acne)
-    if (r > g * 1.5 && r > b * 1.5) redness++;
-    // Brightness (Oil/Shine)
-    if (r > 200 && g > 200 && b > 200) brightness++;
-    // Dark spots (Pigmentation)
-    if (r < 60 && g < 60 && b < 60) darkSpots++;
+export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalysisResult> {
+  const faceModel = await loadModel();
+  const predictions = await faceModel.estimateFaces(canvas, false);
+
+  if (predictions.length === 0) {
+    return { error: "No face detected" };
   }
 
-  const pixelCount = data.length / 4;
-  
-  const acne = Math.min(100, Math.round((redness / pixelCount) * 1000));
-  const oil = Math.min(100, Math.round((brightness / pixelCount) * 500));
-  const pigmentation = Math.min(100, Math.round((darkSpots / pixelCount) * 800));
-  
-  const score = Math.max(0, 100 - Math.round((acne + oil + pigmentation) / 3));
+  const ctx = canvas.getContext("2d")!;
+  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = img.data;
+
+  let redness = 0, brightness = 0, dark = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+
+    // Redness (Acne)
+    if (r > g + 20 && r > b + 20) redness++;
+    // Brightness (Oil/Shine)
+    brightness += (r + g + b) / 3;
+    // Dark spots (Pigmentation)
+    if (r < 60 && g < 60 && b < 60) dark++;
+  }
+
+  const total = data.length / 4;
+
+  const acne = Math.min(100, Math.floor((redness / total) * 500));
+  const oil = Math.min(100, Math.floor((brightness / total) / 2));
+  const pigmentation = Math.min(100, Math.floor((dark / total) * 400));
+
+  const score = Math.max(0, 100 - Math.floor((acne + oil + pigmentation) / 3));
 
   return { acne, oil, pigmentation, score };
 }

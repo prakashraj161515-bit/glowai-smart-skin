@@ -13,10 +13,17 @@ export default function Home() {
 
   const handleAnalyze = async (canvas: HTMLCanvasElement) => {
     setStep("analyzing");
-    const ctx = canvas.getContext("2d")!;
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const result = analyzeSkin(imageData);
-    setAnalysis(result);
+    
+    try {
+      const result = await analyzeSkin(canvas);
+      
+      if (result.error) {
+        alert(result.error);
+        setStep("camera");
+        return;
+      }
+
+      setAnalysis(result);
 
     try {
       const res = await fetch("/api/generate", {
