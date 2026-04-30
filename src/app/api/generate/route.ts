@@ -2,30 +2,41 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "API key missing" }, { status: 500 });
+    }
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash"
-  });
+    const genAI = new GoogleGenerativeAI(apiKey);
 
-  const prompt = `
-User skin:
-Acne: ${body.acne}
-Oil: ${body.oil}
-Pigmentation: ${body.pigmentation}
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash"
+    });
 
-Give:
-- Diet (Indian)
-- Morning routine
-- Night routine
-- Tips
+    const userMessage = body.message || "Give skincare tips";
+
+    const prompt = `
+You are a skincare expert.
+
+User says: ${userMessage}
+
+Give helpful skincare advice in simple language.
 `;
 
-  const result = await model.generateContent(prompt);
+    const result = await model.generateContent(prompt);
 
-  return NextResponse.json({
-    text: result.response.text()
-  });
+    return NextResponse.json({
+      text: result.response.text()
+    });
+
+  } catch (err: any) {
+    console.error(err);
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    );
+  }
 }
