@@ -10,6 +10,7 @@ export default function ScanPage() {
   const [scanning, setScanning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<string>("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
 
@@ -40,21 +41,39 @@ export default function ScanPage() {
     }
   };
 
-  const handleScan = () => {
+  const handleScan = async () => {
     setScanning(true);
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 5;
-      setProgress(currentProgress);
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setScanning(false);
-        // Simulate navigation to report
-        setTimeout(() => {
-          router.push("/progress");
-        }, 800);
-      }
-    }, 150);
+    setAnalysisStatus("Detecting face landmarks...");
+    setProgress(10);
+    
+    await new Promise(r => setTimeout(r, 1000));
+    setAnalysisStatus("Analyzing pore texture & redness...");
+    setProgress(40);
+    
+    await new Promise(r => setTimeout(r, 1500));
+    setAnalysisStatus("Consulting GlowAI Coach...");
+    setProgress(75);
+
+    // Call AI Proxy
+    try {
+      const mockMetrics = { score: 82, redness: 15, oiliness: 45, pores: 30 };
+      const res = await fetch('/api/ai/coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ metrics: mockMetrics, skinType: 'Oily' })
+      });
+      const aiAdvice = await res.json();
+      localStorage.setItem('latestScan', JSON.stringify({ metrics: mockMetrics, advice: aiAdvice }));
+    } catch (e) {
+      console.error("AI Analysis failed", e);
+    }
+
+    setProgress(100);
+    setAnalysisStatus("Analysis Complete! ✨");
+    setTimeout(() => {
+      setScanning(false);
+      router.push("/progress");
+    }, 1000);
   };
 
   return (
@@ -107,7 +126,7 @@ export default function ScanPage() {
             <div className="absolute inset-x-0 bottom-12 px-8 z-30">
               <div className="glass-card p-4 bg-background/80">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-bold text-purple-400">Analyzing Skin Layers...</span>
+                  <span className="text-xs font-bold text-purple-400">{analysisStatus}</span>
                   <span className="text-xs font-bold">{progress}%</span>
                 </div>
                 <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
