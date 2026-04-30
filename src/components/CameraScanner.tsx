@@ -15,11 +15,63 @@ export default function CameraScanner({ onCapture }: CameraScannerProps) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    startCamera();
+    // Load MediaPipe scripts dynamically
+    const scripts = [
+      'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js'
+    ];
+
+    const loadScripts = async () => {
+      for (const src of scripts) {
+        await new Promise((resolve) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          document.head.appendChild(script);
+        });
+      }
+      initFaceMesh();
+    };
+
+    loadScripts();
     return () => stopCamera();
   }, []);
 
-  const startCamera = async () => {
+  const initFaceMesh = () => {
+    // @ts-ignore
+    const faceMesh = new window.FaceMesh({
+      locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    faceMesh.onResults((results: any) => {
+      if (!canvasRef.current || !videoRef.current) return;
+      const canvasCtx = canvasRef.current.getContext('2d');
+      if (!canvasCtx) return;
+
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      
+      if (results.multiFaceLandmarks) {
+        for (const landmarks of results.multiFaceLandmarks) {
+          // @ts-ignore
+          window.drawConnectors(canvasCtx, landmarks, window.FACEMESH_TESSELATION, {color: '#C0C0C070', lineWidth: 1});
+        }
+      }
+      canvasCtx.restore();
+    });
+
+    startCamera(faceMesh);
+  };
+
+  const startCamera = async (faceMesh: any) => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'user', width: 640, height: 480 },
@@ -28,6 +80,15 @@ export default function CameraScanner({ onCapture }: CameraScannerProps) {
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        // @ts-ignore
+        const camera = new window.Camera(videoRef.current, {
+          onFrame: async () => {
+            await faceMesh.send({image: videoRef.current!});
+          },
+          width: 640,
+          height: 480,
+        });
+        camera.start();
         setIsReady(true);
       }
     } catch (err) {
@@ -79,7 +140,10 @@ export default function CameraScanner({ onCapture }: CameraScannerProps) {
         </button>
       </div>
 
-      <canvas ref={canvasRef} className="hidden" />
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full object-cover z-10" 
+      />
     </div>
   );
 }
