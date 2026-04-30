@@ -10,11 +10,7 @@ export interface SkinAnalysisResult {
   score: number;
 }
 
-export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalysisResult> {
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  if (!ctx) throw new Error("Could not get canvas context");
-
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+export async function analyzeSkin(imageData: ImageData): Promise<SkinAnalysisResult> {
   const data = imageData.data;
 
   let rSum = 0, gSum = 0, bSum = 0;

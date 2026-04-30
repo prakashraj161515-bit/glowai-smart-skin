@@ -15,7 +15,9 @@ export default function Home() {
     setStep('analyzing');
     
     try {
-      const analysis = await analyzeSkin(canvas);
+      const ctx = canvas.getContext('2d')!;
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const analysis = await analyzeSkin(imageData);
       setResults(analysis);
 
       const res = await fetch('/api/generate', {
