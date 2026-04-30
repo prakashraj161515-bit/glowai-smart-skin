@@ -1,39 +1,42 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSecureKey } from '@/lib/api-key-manager';
+import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { message, history } = await req.json();
-    const apiKey = getSecureKey();
-    
-    // Using Gemini with tools (Google Search grounding)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          ...history,
-          { role: 'user', parts: [{ text: message }] }
-        ],
-        tools: [
-          {
-            google_search_retrieval: {} // Enables live internet search
-          }
-        ]
-      })
-    });
+    const body = await req.json();
 
-    const data = await response.json();
-    
-    if (data.error) {
-      throw new Error(data.error.message);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "API key missing" }, { status: 500 });
     }
 
-    const aiText = data.candidates[0].content.parts[0].text;
-    
-    return NextResponse.json({ text: aiText });
-  } catch (error) {
-    console.error("AI Chat Error:", error);
-    return NextResponse.json({ error: "Failed to connect to AI Coach" }, { status: 500 });
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash"
+    });
+
+    const userMessage = body.message || "Give skincare tips";
+
+    const prompt = `
+You are a skincare expert.
+
+User says: ${userMessage}
+
+Give helpful skincare advice in simple language.
+`;
+
+    const result = await model.generateContent(prompt);
+
+    return NextResponse.json({
+      text: result.response.text()
+    });
+
+  } catch (err: any) {
+    console.error(err);
+    return NextResponse.json(
+      { error: err.message },
+      { status: 500 }
+    );
   }
 }
