@@ -5,9 +5,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    // ✅ API KEY CHECK
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: "API key missing" }, { status: 500 });
+      return NextResponse.json(
+        { error: "API key missing" },
+        { status: 500 }
+      );
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -16,26 +20,57 @@ export async function POST(req: Request) {
       model: "gemini-1.5-flash"
     });
 
-    const userMessage = body.message || "Give skincare tips";
+    // ✅ HANDLE BOTH CASES (chat + scan)
+    let prompt = "";
 
-    const prompt = `
+    if (body.message) {
+      // Chat mode
+      prompt = `
 You are a skincare expert.
 
-User says: ${userMessage}
+User says: ${body.message}
 
-Give helpful skincare advice in simple language.
+Give simple, useful skincare advice.
 `;
+    } else {
+      // Scan mode
+      const acne = body.acne ?? 0;
+      const oil = body.oil ?? 0;
+      const pigmentation = body.pigmentation ?? 0;
+
+      prompt = `
+User Skin Analysis:
+Acne: ${acne}%
+Oil: ${oil}%
+Pigmentation: ${pigmentation}%
+
+Give:
+- Diet (Indian)
+- Morning routine
+- Night routine
+- Tips
+`;
+    }
 
     const result = await model.generateContent(prompt);
 
-    return NextResponse.json({
-      text: result.response.text()
-    });
+    const text = result?.response?.text();
+
+    // ✅ SAFE CHECK
+    if (!text) {
+      return NextResponse.json(
+        { error: "No AI response" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ text });
 
   } catch (err: any) {
-    console.error(err);
+    console.error("🔥 ERROR:", err);
+
     return NextResponse.json(
-      { error: err.message },
+      { error: err.message || "Server error" },
       { status: 500 }
     );
   }
