@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "glowai-smart-skin – Skin & Face Coach",
-  description: "AI-powered personalized skin and face coaching app.",
+  title: "GlowAI – Smart Skin Analysis",
+  description: "AI-powered personalized skin analysis and coaching app.",
 };
 
 export default function RootLayout({
@@ -18,10 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${outfit.variable} font-sans bg-background min-h-screen pb-20`}>
-        <main className="max-w-lg mx-auto px-4 pt-8">
-          {children}
-        </main>
+      <body className={`${inter.variable} ${outfit.variable} font-sans bg-[#050505] min-h-screen pb-20`}>
+        {children}
         <BottomNav />
       </body>
     </html>

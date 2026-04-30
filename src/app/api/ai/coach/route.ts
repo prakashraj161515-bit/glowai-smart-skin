@@ -1,53 +1,50 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getSecureKey } from '@/lib/api-key-manager';
+import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const { metrics, skinType } = await req.json();
-    const apiKey = getSecureKey();
-    
-    const prompt = `
-      You are the GlowAI Smart Skin Coach. Analyze these metrics and provide a comprehensive skin report:
-      - Overall Score: ${metrics.score}/100
-      - Redness (Acne): ${metrics.redness}%
-      - Oiliness: ${metrics.oiliness}%
-      - Pores: ${metrics.pores}%
-      - Skin Type: ${skinType}
 
-      As a "Fully AI" coach, generate a detailed 7-day personalized plan in JSON:
-      {
-        "skin_analysis": "Detailed AI observation",
-        "diet": ["Day 1: ...", "Day 2: ...", "..."],
-        "morning_routine": ["Step 1: ...", "..."],
-        "night_routine": ["Step 1: ...", "..."],
-        "lifestyle_tips": ["Tip 1", "Tip 2"],
-        "improvement_forecast": "What to expect in 2 weeks"
-      }
-      Provide Indian food names and culturally relevant tips.
-    `;
-
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
-    });
-
-    const data = await response.json();
-    
-    if (data.error) {
-      throw new Error(data.error.message);
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "API key missing" }, { status: 500 });
     }
 
-    let content = data.candidates[0].content.parts[0].text;
-    
-    // Clean JSON response if it contains markdown markers
-    content = content.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    return NextResponse.json(JSON.parse(content));
-  } catch (error) {
-    console.error("AI Proxy Error:", error);
-    return NextResponse.json({ error: "Failed to generate AI recommendations" }, { status: 500 });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+You are the GlowAI Smart Skin Coach. Analyze these metrics and provide a comprehensive skin report:
+- Overall Score: ${metrics?.score ?? 70}/100
+- Redness (Acne): ${metrics?.redness ?? 0}%
+- Oiliness: ${metrics?.oiliness ?? 0}%
+- Pores: ${metrics?.pores ?? 0}%
+- Skin Type: ${skinType ?? "Normal"}
+
+As a "Fully AI" coach, generate a detailed personalized plan in JSON:
+{
+  "skin_analysis": "Detailed AI observation",
+  "diet": ["Tip 1", "Tip 2", "Tip 3"],
+  "morning_routine": ["Step 1", "Step 2"],
+  "night_routine": ["Step 1", "Step 2"],
+  "lifestyle_tips": ["Tip 1", "Tip 2"],
+  "improvement_forecast": "What to expect in 2 weeks"
+}
+Provide Indian food names and culturally relevant tips. Return ONLY valid JSON, no markdown.
+`;
+
+    const result = await model.generateContent(prompt);
+    let text = result.response.text();
+
+    // Clean any markdown code blocks
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+    return NextResponse.json(JSON.parse(text));
+  } catch (err: any) {
+    console.error("AI Coach Error:", err);
+    return NextResponse.json(
+      { error: err.message || "Server error" },
+      { status: 500 }
+    );
   }
 }

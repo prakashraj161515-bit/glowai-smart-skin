@@ -1,12 +1,11 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { Camera, Sparkles, RefreshCcw } from "lucide-react";
+import { Camera, RefreshCcw } from "lucide-react";
 import { analyzeSkin } from "../lib/analyze";
 
 export default function CameraScanner({ onResult }: { onResult: (result: any) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isReady, setIsReady] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -51,13 +50,13 @@ export default function CameraScanner({ onResult }: { onResult: (result: any) =>
         autoPlay 
         playsInline 
         muted 
-        className="w-full h-full object-cover grayscale-[0.2]" 
+        className="w-full h-full object-cover" 
       />
       
       {/* Face Guide Overlay */}
       <div className="absolute inset-0 border-[30px] border-black/40 pointer-events-none">
         <div className="w-full h-full border-2 border-dashed border-purple-500/40 rounded-[20%] animate-pulse flex items-center justify-center">
-           <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent absolute animate-[scan_2s_linear_infinite]" />
+          <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent absolute scan-line" />
         </div>
       </div>
 
@@ -79,14 +78,6 @@ export default function CameraScanner({ onResult }: { onResult: (result: any) =>
           {isAnalyzing ? "AI Analyzing..." : "Scan Skin"}
         </p>
       </div>
-
-      <style jsx>{`
-        @keyframes scan {
-          0% { top: 20%; }
-          50% { top: 80%; }
-          100% { top: 20%; }
-        }
-      `}</style>
     </div>
   );
 }
