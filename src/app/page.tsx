@@ -11,20 +11,16 @@ export default function Home() {
   const [analysis, setAnalysis] = useState<SkinAnalysisResult | null>(null);
   const [aiReport, setAiReport] = useState<any>(null);
 
-  const handleAnalyze = async (canvas: HTMLCanvasElement) => {
+  const handleScanResult = async (result: SkinAnalysisResult) => {
+    if (result.error) {
+      alert(result.error);
+      return;
+    }
+
     setStep("analyzing");
-    
+    setAnalysis(result);
+
     try {
-      const result = await analyzeSkin(canvas);
-      
-      if (result.error) {
-        alert(result.error);
-        setStep("camera");
-        return;
-      }
-
-      setAnalysis(result);
-
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -45,10 +41,10 @@ export default function Home() {
         {step === "camera" && (
           <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-10">
             <div className="text-center mb-10">
-              <h1 className="text-4xl font-bold mb-2">GlowAI</h1>
-              <p className="text-slate-400">AI Skin Scanner & Coach</p>
+              <h1 className="text-4xl font-bold mb-2 tracking-tighter">GlowAI</h1>
+              <p className="text-slate-400 text-sm font-medium">AI Skin Scanner & Coach</p>
             </div>
-            <CameraScanner onAnalyze={handleAnalyze} />
+            <CameraScanner onResult={handleScanResult} />
           </motion.div>
         )}
 
