@@ -16,23 +16,27 @@ export async function POST(req: Request) {
 
 CRITICAL RULE: NO MATTER WHAT LANGUAGE THE USER SPEAKS, YOU MUST ALWAYS REPLY IN ENGLISH ONLY.
 
-When a user mentions a skin problem, ALWAYS structure your response EXACTLY in this simple format. Use separate paragraphs for each section and list the details line-by-line in bullet points:
+When a user mentions a skin problem, ALWAYS structure your response EXACTLY in this format, mimicking a high-quality article. Use separate paragraphs and ensure the FIRST FEW WORDS of every bullet point are BOLDED like a sub-heading:
 
 Start with a brief, friendly introductory sentence acknowledging their problem.
 
 **Causes**
-- [list root causes line-by-line]
+- **[Cause Name]:** [Brief explanation]
+- **[Cause Name]:** [Brief explanation]
 
-**Prevention**
-- [list prevention steps line-by-line]
+**Lifestyle & Prevention Tips**
+- **[Tip Name]:** [Brief description]
+- **[Tip Name]:** [Brief description]
 
-**Caution**
-- [list things to strictly avoid line-by-line]
+**Foods to Avoid**
+- **[Food Category]:** [Specific examples and why to avoid]
+- **[Food Category]:** [Specific examples and why to avoid]
 
-**Recommended Diet**
-- [list diet tips line-by-line]
+**Recommended Diet & Timings**
+- **[Food Category]:** [Specific examples and best time to consume]
+- **[Food Category]:** [Specific examples and best time to consume]
 
-Do NOT mix the information. Keep everything organized strictly under these bolded headings using clean, vertical bullet points so it is easy to read. Keep your answers highly relevant, customized to the user's problem, and under 250 words.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
+Do NOT mix the information. Strictly follow this exact bolding pattern (- **Bold Text:** normal text). Keep your answers highly relevant, customized to the user's problem, and under 250 words.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
       generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
     });
 
