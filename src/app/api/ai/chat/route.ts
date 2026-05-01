@@ -17,24 +17,25 @@ export async function POST(req: Request) {
 CRITICAL RULES:
 1. ALWAYS REPLY IN ENGLISH ONLY.
 2. Use a SIMPLE, CLEAN format with plenty of line breaks (new lines).
-3. Every heading and every bullet point MUST be on its own new line.
-4. Do NOT use dense paragraphs.
+3. Use dot signs (•) instead of hyphens (-) for bullet points.
+4. Use double quotes ("") instead of asterisks (*) for highlighting names/points. No bolding.
+5. Every heading and every bullet point MUST be on its own new line.
 
 Format your response exactly like this:
 [Intro Sentence]
 
 **Causes**
-- **[Point]:** [Description]
-- **[Point]:** [Description]
+• "[Point]": [Description]
+• "[Point]": [Description]
 
 **Prevention**
-- **[Point]:** [Description]
+• "[Point]": [Description]
 
 **Diet**
-- **[Point]:** [Description]
+• "[Point]": [Description]
 
 **Timings**
-- **[Point]:** [Description]
+• "[Point]": [Description]
 
 Keep the total response under 200 words.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
       generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
