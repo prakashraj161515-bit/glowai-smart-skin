@@ -42,6 +42,8 @@ export default function CoachPage() {
       const data = await res.json();
       if (data.text) {
         setMessages((prev) => [...prev, { role: 'assistant', content: data.text }]);
+      } else {
+        setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${data.error || "Invalid response"}` }]);
       }
     } catch (e) {
       setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Please try again." }]);
