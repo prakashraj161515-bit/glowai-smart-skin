@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Camera, Home, BarChart2, MessageSquare, User } from "lucide-react";
+import { Camera, Home, BarChart2, MessageSquare, User, Apple } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ export function BottomNav() {
   const navItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Scan", href: "/scan", icon: Camera },
-    { name: "Progress", href: "/progress", icon: BarChart2 },
+    { name: "Diet", href: "/diet", icon: Apple },
     { name: "Coach", href: "/coach", icon: MessageSquare },
     { name: "Profile", href: "/profile", icon: User },
   ];
