@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite-preview",
       systemInstruction: `You are GlowAI Expert Coach, a helpful, professional skincare assistant. 
 
 CRITICAL RULE: NO MATTER WHAT LANGUAGE THE USER SPEAKS, YOU MUST ALWAYS REPLY IN ENGLISH ONLY.
