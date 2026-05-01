@@ -20,37 +20,37 @@ async function loadModel() {
 }
 
 export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalysisResult> {
-  try {
-    // Resize for AI: Create a small temporary canvas
-    const tempCanvas = document.createElement("canvas");
-    const ctx = tempCanvas.getContext("2d")!;
-    
-    // Target size for fast processing
-    const width = 300;
-    const height = (canvas.height / canvas.width) * width;
-    tempCanvas.width = width;
-    tempCanvas.height = height;
-    
-    ctx.drawImage(canvas, 0, 0, width, height);
-    const imageData = tempCanvas.toDataURL("image/jpeg", 0.4);
-    
-    console.log("📤 Sending optimized image...");
-    
-    const response = await fetch("/api/ai/vision", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: imageData })
-    });
+  const faceModel = await loadModel();
+  const predictions = await faceModel.estimateFaces(canvas, false);
 
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.error || "Vision analysis failed");
-    }
-    
-    return data;
-  } catch (err: any) {
-    console.error("Analysis Error:", err);
-    return { error: err.message || "Failed to connect to Vision AI" };
+  if (predictions.length === 0) {
+    return { error: "No face detected" };
   }
+
+  const ctx = canvas.getContext("2d")!;
+  const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = img.data;
+
+  let redness = 0, brightness = 0, dark = 0;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i+1], b = data[i+2];
+
+    // Redness (Acne)
+    if (r > g + 20 && r > b + 20) redness++;
+    // Brightness (Oil/Shine)
+    brightness += (r + g + b) / 3;
+    // Dark spots (Pigmentation)
+    if (r < 60 && g < 60 && b < 60) dark++;
+  }
+
+  const total = data.length / 4;
+
+  const acne = Math.min(100, Math.floor((redness / total) * 500));
+  const oil = Math.min(100, Math.floor((brightness / total) / 2));
+  const pigmentation = Math.min(100, Math.floor((dark / total) * 400));
+
+  const score = Math.max(0, 100 - Math.floor((acne + oil + pigmentation) / 3));
+
+  return { acne, oil, pigmentation, score };
 }
