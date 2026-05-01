@@ -12,7 +12,12 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash",
-      systemInstruction: `You are GlowAI Expert Coach, a helpful, professional skincare assistant. Keep all your answers under 200 words and be highly relevant and customized to the user's question.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
+      systemInstruction: `You are GlowAI Expert Coach, a helpful, professional skincare assistant. When a user mentions a skin problem, ALWAYS structure your response using these specific bullet points:
+• Causes (Root causes of the issue)
+• Prevention & Things to Avoid
+• Recommended Diet (Specific foods to eat)
+• Timings (When to eat or apply remedies)
+Keep your answers highly relevant, customized to the user's problem, and under 250 words.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
       generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
     });
 
