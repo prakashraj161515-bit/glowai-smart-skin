@@ -11,7 +11,20 @@ import {
 
 export default function ProfilePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "otp">("login");
+  
+  useEffect(() => {
+    const saved = localStorage.getItem("glowai_is_logged_in");
+    if (saved === "true") setIsLoggedIn(true);
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("glowai_is_logged_in", isLoggedIn ? "true" : "false");
+    }
+  }, [isLoggedIn, isLoaded]);
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [skinType, setSkinType] = useState("Oily");

@@ -10,22 +10,31 @@ export default function CameraScanner({ onResult }: { onResult: (result: any) =>
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   useEffect(() => {
-    startCamera();
-  }, []);
-
-  async function startCamera() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user", width: 640, height: 480 } 
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsReady(true);
+    let streamRef: MediaStream | null = null;
+    
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: "user", width: 640, height: 480 } 
+        });
+        streamRef = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          setIsReady(true);
+        }
+      } catch (err) {
+        console.error("Camera access denied", err);
       }
-    } catch (err) {
-      console.error("Camera access denied", err);
     }
-  }
+
+    startCamera();
+
+    return () => {
+      if (streamRef) {
+        streamRef.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   async function scan() {
     if (!videoRef.current || isAnalyzing) return;

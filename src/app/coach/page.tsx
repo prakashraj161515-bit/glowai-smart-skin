@@ -188,7 +188,7 @@ export default function CoachPage() {
       {/* Chat Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-24"
+        className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-32"
       >
         {messages.map((msg, i) => (
           <motion.div
@@ -252,7 +252,7 @@ export default function CoachPage() {
       </div>
 
       {/* Input Area */}
-      <div className="mt-4 relative bg-slate-900/80 backdrop-blur-xl p-2 rounded-2xl border border-white/10">
+      <div className="fixed bottom-[90px] left-6 right-6 z-40 bg-slate-900/90 backdrop-blur-2xl p-2 rounded-2xl border border-white/10 shadow-2xl">
         {editingId && (
           <div className="flex items-center justify-between px-2 py-1 mb-1 text-[10px] text-purple-400 font-bold uppercase">
             <span>Editing Message</span>
