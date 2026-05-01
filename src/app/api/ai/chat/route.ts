@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-1.5-flash",
       generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
     });
 
@@ -29,6 +29,6 @@ Analyze the user's question carefully and provide a highly relevant, customized 
     return NextResponse.json({ text: result.response.text() });
   } catch (err: any) {
     console.error("🔥 Chat API Error:", err);
-    return NextResponse.json({ error: "Connection failed" }, { status: 500 });
+    return NextResponse.json({ error: err.message || "Connection failed" }, { status: 500 });
   }
 }
