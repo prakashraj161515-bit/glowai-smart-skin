@@ -118,7 +118,7 @@ export default function CoachPage() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
-            <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
+            <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-wrap ${
               msg.role === 'user' 
                 ? 'bg-purple-600 text-white rounded-tr-none' 
                 : 'glass-card text-slate-200 rounded-tl-none'
