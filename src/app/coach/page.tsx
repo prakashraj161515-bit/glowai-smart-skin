@@ -1,18 +1,42 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User, Sparkles, Plus, RefreshCcw } from "lucide-react";
+import { Send, Bot, User, Sparkles, Plus, RefreshCcw, Trash2, Edit2, X, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CoachPage() {
-  const [messages, setMessages] = useState<{role: string, content: string, isError?: boolean}[]>([
-    { role: "assistant", content: "Hi! I'm your GlowAI Coach. How can I help you with your skin today? ✨" },
-  ]);
+  const [messages, setMessages] = useState<{id: string, role: string, content: string, isError?: boolean, timestamp: number}[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [longPressId, setLongPressId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Load and clean up old messages
   useEffect(() => {
+    const saved = localStorage.getItem("glowai_chat_history");
+    const initialMsg = { id: '1', role: "assistant", content: "Hi! I'm your GlowAI Coach. How can I help you today? ✨", timestamp: Date.now() };
+    
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const filtered = parsed.filter((m: any) => m.timestamp > oneWeekAgo);
+        setMessages(filtered.length > 0 ? filtered : [initialMsg]);
+      } catch (e) {
+        setMessages([initialMsg]);
+      }
+    } else {
+      setMessages([initialMsg]);
+    }
+  }, []);
+
+  // Save messages
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("glowai_chat_history", JSON.stringify(messages));
+    }
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
@@ -23,7 +47,17 @@ export default function CoachPage() {
 
     let currentMessages = messages;
     if (!isRetry) {
-      currentMessages = [...messages, { role: 'user', content: textToSend }];
+      if (editingId) {
+        // Handle Edit
+        const newMsgs = messages.map(m => m.id === editingId ? { ...m, content: textToSend } : m);
+        setMessages(newMsgs);
+        setEditingId(null);
+        setInput("");
+        setIsLoading(false);
+        return; 
+      }
+      const newMsg = { id: Date.now().toString(), role: 'user', content: textToSend, timestamp: Date.now() };
+      currentMessages = [...messages, newMsg];
       setMessages(currentMessages);
       setInput("");
     } else {
@@ -63,11 +97,11 @@ export default function CoachPage() {
       
       const data = await res.json();
       if (data.text) {
-        setMessages((prev) => [...prev, { role: 'assistant', content: data.text }]);
+        setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'assistant', content: data.text, timestamp: Date.now() }]);
       } else {
-        const isBusy = data.error && (data.error.includes("503") || data.error.includes("429") || data.error.includes("high demand") || data.error.includes("quota"));
+        const isBusy = data.error && (data.error.includes("503") || data.error.includes("429"));
         const errorMsg = isBusy ? "Server is currently busy. Please try again." : `Error: ${data.error || "Invalid response"}`;
-        setMessages((prev) => [...prev, { role: 'assistant', content: errorMsg, isError: true }]);
+        setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'assistant', content: errorMsg, isError: true, timestamp: Date.now() }]);
       }
     } catch (e) {
       setMessages((prev) => [...prev, { role: 'assistant', content: "Server is currently busy. Please try again.", isError: true }]);
@@ -83,10 +117,31 @@ export default function CoachPage() {
 
   const handleRetry = () => {
     if (isLoading) return;
-    const lastUserMsg = messages.slice().reverse().find(m => m.role === 'user');
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
     if (lastUserMsg) {
       executeSend(lastUserMsg.content, true);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setMessages(prev => prev.filter(m => m.id !== id));
+    setLongPressId(null);
+  };
+
+  const handleEditInit = (id: string, content: string) => {
+    setEditingId(id);
+    setInput(content);
+    setLongPressId(null);
+  };
+
+  const startPress = (id: string) => {
+    timerRef.current = setTimeout(() => {
+      setLongPressId(id);
+    }, 600);
+  };
+
+  const endPress = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
   };
 
   const formatMessage = (content: string) => {
@@ -128,30 +183,56 @@ export default function CoachPage() {
       {/* Chat Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar"
+        className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-20"
       >
         {messages.map((msg, i) => (
           <motion.div
-            key={i}
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            key={msg.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} relative group`}
+            onPointerDown={() => startPress(msg.id)}
+            onPointerUp={endPress}
+            onPointerLeave={endPress}
           >
-            <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-wrap ${
+            <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-wrap transition-all ${
+              longPressId === msg.id ? 'ring-2 ring-purple-500 scale-[0.98]' : ''
+            } ${
               msg.role === 'user' 
-                ? 'bg-purple-600 text-white rounded-tr-none' 
+                ? 'bg-purple-600 text-white rounded-tr-none shadow-lg shadow-purple-600/20' 
                 : 'glass-card text-slate-200 rounded-tl-none'
             }`}>
               {formatMessage(msg.content)}
               {msg.isError && (
-                <button 
-                  onClick={handleRetry}
-                  className="mt-2 flex items-center gap-1 text-xs bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-colors"
-                >
+                <button onClick={handleRetry} className="mt-2 flex items-center gap-1 text-xs bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-colors">
                   <RefreshCcw size={12} /> Retry
                 </button>
               )}
             </div>
+
+            {/* Long Press Menu Overlay */}
+            <AnimatePresence>
+              {longPressId === msg.id && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="absolute z-50 bg-slate-900 border border-white/10 p-1 rounded-xl shadow-2xl flex gap-1 -top-12 left-1/2 -translate-x-1/2"
+                >
+                  {msg.role === 'user' && (
+                    <button onClick={() => handleEditInit(msg.id, msg.content)} className="p-2 hover:bg-white/5 rounded-lg text-purple-400">
+                      <Edit2 size={16} />
+                    </button>
+                  )}
+                  <button onClick={() => handleDelete(msg.id)} className="p-2 hover:bg-red-500/10 rounded-lg text-red-400">
+                    <Trash2 size={16} />
+                  </button>
+                  <button onClick={() => setLongPressId(null)} className="p-2 hover:bg-white/5 rounded-lg text-slate-400">
+                    <X size={16} />
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         ))}
         {isLoading && (
@@ -166,23 +247,31 @@ export default function CoachPage() {
       </div>
 
       {/* Input Area */}
-      <div className="mt-4 relative">
-        <input 
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask anything about skincare..."
-          disabled={isLoading}
-          className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-4 pr-12 text-sm focus:outline-none focus:border-purple-500/50 transition-colors disabled:opacity-50"
-        />
-        <button 
-          onClick={handleSend}
-          disabled={isLoading}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30 disabled:opacity-50"
-        >
-          {isLoading ? <RefreshCcw size={18} className="animate-spin" /> : <Send size={18} />}
-        </button>
+      <div className="mt-4 relative bg-slate-900/80 backdrop-blur-xl p-2 rounded-2xl border border-white/10">
+        {editingId && (
+          <div className="flex items-center justify-between px-2 py-1 mb-1 text-[10px] text-purple-400 font-bold uppercase">
+            <span>Editing Message</span>
+            <button onClick={() => { setEditingId(null); setInput(""); }} className="text-red-400">Cancel</button>
+          </div>
+        )}
+        <div className="flex items-center gap-2">
+          <input 
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            placeholder={editingId ? "Update your message..." : "Ask anything about skincare..."}
+            disabled={isLoading}
+            className="flex-1 bg-transparent px-3 py-3 text-sm focus:outline-none disabled:opacity-50"
+          />
+          <button 
+            onClick={handleSend}
+            disabled={isLoading}
+            className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-purple-500/30 disabled:opacity-50 transition-all hover:scale-105 active:scale-95"
+          >
+            {isLoading ? <RefreshCcw size={18} className="animate-spin" /> : (editingId ? <CheckCircle2 size={18} /> : <Send size={18} />)}
+          </button>
+        </div>
       </div>
     </div>
   );

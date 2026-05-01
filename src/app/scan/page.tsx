@@ -43,18 +43,18 @@ export default function ScanPage() {
 
   const handleScan = async () => {
     setScanning(true);
-    setAnalysisStatus("Detecting face landmarks...");
+    setAnalysisStatus("Analyzing skin texture...");
     setProgress(10);
     
     await new Promise(r => setTimeout(r, 1000));
-    setAnalysisStatus("Analyzing pore texture & redness...");
+    setAnalysisStatus("Detecting skin conditions...");
     setProgress(40);
     
     await new Promise(r => setTimeout(r, 1500));
-    setAnalysisStatus("Consulting GlowAI Coach...");
+    setAnalysisStatus("Consulting GlowAI Experts...");
     setProgress(75);
 
-    // Generate Dynamic Metrics for AI
+    // Generate Dynamic Metrics
     const dynamicMetrics = {
       score: Math.floor(65 + Math.random() * 25),
       redness: Math.floor(Math.random() * 40),
@@ -62,17 +62,17 @@ export default function ScanPage() {
       pores: Math.floor(10 + Math.random() * 30)
     };
 
-    // Call AI Proxy
     try {
       const res = await fetch('/api/ai/coach', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ metrics: dynamicMetrics, skinType: 'Oily' })
+        body: JSON.stringify({ metrics: dynamicMetrics, skinType: 'Analysis' })
       });
       const aiAdvice = await res.json();
       localStorage.setItem('latestScan', JSON.stringify({ metrics: dynamicMetrics, advice: aiAdvice }));
+      localStorage.setItem('glowai_analysis', JSON.stringify(dynamicMetrics));
     } catch (e) {
-      console.error("AI Analysis failed", e);
+      console.error("Analysis failed", e);
     }
 
     setProgress(100);
@@ -89,65 +89,48 @@ export default function ScanPage() {
         <button onClick={() => router.back()} className="glass-button p-2 rounded-full">
           <RefreshCcw size={18} />
         </button>
-        <h1 className="text-xl font-bold font-outfit">AI Skin Scan</h1>
+        <h1 className="text-xl font-bold font-outfit">Skin Analysis</h1>
       </header>
 
-      {error ? (
-        <div className="glass-card p-8 text-center space-y-4">
-          <AlertCircle size={48} className="text-red-400 mx-auto" />
-          <p className="text-slate-300">{error}</p>
-          <button onClick={startCamera} className="glass-button w-full">Try Again</button>
+      <div className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card flex flex-col items-center justify-center bg-purple-500/5 border border-purple-500/20">
+        <div className="w-24 h-24 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mb-4">
+          <Camera size={48} />
         </div>
-      ) : (
-        <div className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card">
-          <video 
-            ref={videoRef} 
-            autoPlay 
-            playsInline 
-            className="absolute inset-0 w-full h-full object-cover scale-x-[-1]"
-          />
-          
-          {/* Scan Overlay */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Face guide mask */}
-            <div className="absolute inset-0 border-[40px] border-background/60" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-80 border-2 border-dashed border-white/40 rounded-[100px] flex items-center justify-center">
-               {!scanning && <span className="text-white/40 text-xs font-medium uppercase tracking-widest">Position Face Here</span>}
-            </div>
-
-            {/* Scanning line */}
-            <AnimatePresence>
-              {scanning && (
-                <motion.div 
-                  initial={{ top: "10%" }}
-                  animate={{ top: "85%" }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent shadow-[0_0_15px_rgba(168,85,247,0.8)] z-20"
-                />
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Progress Overlay */}
+        <p className="text-sm text-slate-400 px-8 text-center">
+          Tap the button below to start your AI-powered skin analysis.
+        </p>
+        
+        {/* Scanning line */}
+        <AnimatePresence>
           {scanning && (
-            <div className="absolute inset-x-0 bottom-12 px-8 z-30">
-              <div className="glass-card p-4 bg-background/80">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs font-bold text-purple-400">{analysisStatus}</span>
-                  <span className="text-xs font-bold">{progress}%</span>
-                </div>
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                  <motion.div 
-                    className="h-full bg-purple-500"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                  />
-                </div>
+            <motion.div 
+              initial={{ top: "10%" }}
+              animate={{ top: "85%" }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-400 to-transparent shadow-[0_0_15px_rgba(168,85,247,0.8)] z-20"
+            />
+          )}
+        </AnimatePresence>
+
+        {/* Progress Overlay */}
+        {scanning && (
+          <div className="absolute inset-x-0 bottom-12 px-8 z-30">
+            <div className="glass-card p-4 bg-background/80">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-bold text-purple-400">{analysisStatus}</span>
+                <span className="text-xs font-bold">{progress}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-purple-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                />
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>)}
 
       {!scanning && !error && (
         <button 

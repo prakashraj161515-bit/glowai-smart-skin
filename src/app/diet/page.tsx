@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function DietPage() {
   const [dietPlan, setDietPlan] = useState("");
+  const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,11 +23,13 @@ export default function DietPage() {
       }
     } catch (e) {}
 
+    const fullContext = `${scanContext}${userInput ? `\nUser's specific concerns/disease: ${userInput}` : ""}`;
+
     try {
       const res = await fetch("/api/ai/diet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context: scanContext }),
+        body: JSON.stringify({ context: fullContext }),
       });
       const data = await res.json();
       if (data.text) {
@@ -81,8 +84,17 @@ export default function DietPage() {
           </div>
           <h2 className="text-lg font-bold mb-2">Ready to Glow?</h2>
           <p className="text-sm text-slate-400 mb-6">
-            Generate a 7-day diet plan tailored to your recent skin scan results and health metrics.
+            Tell us about your skin conditions or disease, and we'll generate a personalized 7-day plan.
           </p>
+          
+          <div className="mb-6">
+            <textarea 
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              placeholder="E.g. I have severe acne, eczema, or dark spots..."
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm focus:outline-none focus:border-purple-500/50 transition-colors h-32 resize-none"
+            />
+          </div>
           <button 
             onClick={generateDietPlan}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30"
