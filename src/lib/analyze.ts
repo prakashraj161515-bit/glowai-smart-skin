@@ -21,7 +21,8 @@ async function loadModel() {
 
 export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalysisResult> {
   try {
-    const imageData = canvas.toDataURL("image/jpeg", 0.8);
+    // Reduced quality to 0.5 to keep payload small
+    const imageData = canvas.toDataURL("image/jpeg", 0.5);
     
     const response = await fetch("/api/ai/vision", {
       method: "POST",
@@ -29,12 +30,15 @@ export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalys
       body: JSON.stringify({ image: imageData })
     });
 
-    if (!response.ok) throw new Error("Vision analysis failed");
-    
     const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || "Vision analysis failed");
+    }
+    
     return data;
-  } catch (err) {
+  } catch (err: any) {
     console.error("Analysis Error:", err);
-    return { error: "Failed to connect to Vision AI" };
+    return { error: err.message || "Failed to connect to Vision AI" };
   }
 }

@@ -17,6 +17,7 @@ export async function POST(req: Request) {
 
     // Clean base64 string
     const base64Data = image.split(",")[1];
+    console.log("📸 Image received, length:", base64Data.length);
 
     const prompt = `
       Analyze this face skin image for a professional skincare report.
@@ -34,6 +35,7 @@ export async function POST(req: Request) {
       }
     `;
 
+    console.log("🤖 Calling Gemini Vision API...");
     const result = await model.generateContent([
       prompt,
       {
@@ -46,15 +48,20 @@ export async function POST(req: Request) {
 
     const response = await result.response;
     const text = response.text();
+    console.log("✅ AI Response received:", text);
     
     try {
       const data = JSON.parse(text);
       return NextResponse.json(data);
     } catch (e) {
+      console.error("❌ JSON Parse Error:", text);
       throw new Error("Failed to parse AI JSON response");
     }
   } catch (err: any) {
     console.error("🔥 Vision AI Error:", err);
-    return NextResponse.json({ error: "Failed to analyze image" }, { status: 500 });
+    return NextResponse.json({ 
+      error: err.message || "Failed to analyze image",
+      details: err.stack 
+    }, { status: 500 });
   }
 }
