@@ -28,10 +28,15 @@ export default function CoachPage() {
 
     try {
       // Prepare history for API
-      const history = messages.map(m => ({
+      let history = messages.map(m => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
       }));
+
+      // Gemini requires history to start with a 'user' role
+      if (history.length > 0 && history[0].role === 'model') {
+        history = history.slice(1);
+      }
 
       let scanContext = "";
       try {
