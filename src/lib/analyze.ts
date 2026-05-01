@@ -21,8 +21,20 @@ async function loadModel() {
 
 export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalysisResult> {
   try {
-    // Reduced quality to 0.5 to keep payload small
-    const imageData = canvas.toDataURL("image/jpeg", 0.5);
+    // Resize for AI: Create a small temporary canvas
+    const tempCanvas = document.createElement("canvas");
+    const ctx = tempCanvas.getContext("2d")!;
+    
+    // Target size for fast processing
+    const width = 300;
+    const height = (canvas.height / canvas.width) * width;
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    
+    ctx.drawImage(canvas, 0, 0, width, height);
+    const imageData = tempCanvas.toDataURL("image/jpeg", 0.4);
+    
+    console.log("📤 Sending optimized image...");
     
     const response = await fetch("/api/ai/vision", {
       method: "POST",
