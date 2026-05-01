@@ -31,19 +31,25 @@ export async function POST(req: Request) {
       const { acne = 0, oil = 0, pigmentation = 0, score = 0 } = body;
       prompt = `
         You are GlowAI, a world-class dermatological assistant. 
-        Analyze these skin metrics:
+        MANDATORY: Provide a report STRICTLY based on these metrics:
         - Glow Score: ${score}/100
         - Acne Level: ${acne}%
         - Oiliness: ${oil}%
         - Pigmentation: ${pigmentation}%
 
-        Based on these, provide:
-        1. 🥗 A specific Indian Diet Plan (focusing on antioxidants and hydration).
-        2. ☀️ Morning Skincare Routine.
-        3. 🌙 Night Skincare Routine.
-        4. ✨ 3 Pro-tips for long-term skin health.
+        Rules:
+        - Use • for bullet points (no - or *).
+        - Use "" for highlighting key items/products.
+        - Use **HEADER NAME** in all caps for sections.
+        - Provide highly personalized advice for the specific levels detected.
+
+        Sections to include:
+        1. **DIET RECOMMENDATIONS** (Specific foods for these metrics).
+        2. **MORNING ROUTINE** (Products/Ingredients for these metrics).
+        3. **NIGHT ROUTINE** (Repair steps).
+        4. **PRO GLOW TIPS** (3 specific tips).
         
-        Use a professional yet encouraging tone. Mention specific Indian foods like Amla, Turmeric, or Curd where relevant.
+        Tone: Professional, expert, and data-driven.
       `;
     }
 

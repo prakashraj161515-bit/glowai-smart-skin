@@ -59,6 +59,20 @@ export default function Home() {
     }
   }
 
+  const formatText = (content: string) => {
+    const lines = content.split('\n');
+    return lines.map((line, i) => {
+      if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
+        return (
+          <div key={i} className="text-[16px] font-black text-purple-400 mt-6 mb-2 tracking-tight uppercase border-b border-purple-500/20 pb-1">
+            {line.replace(/\*\*/g, '')}
+          </div>
+        );
+      }
+      return <div key={i} className="mb-1 text-slate-300 text-sm leading-relaxed">{line}</div>;
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#050505] text-white p-6 font-outfit max-w-lg mx-auto">
       <header className="text-center mb-8 pt-6">
@@ -196,9 +210,9 @@ export default function Home() {
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="whitespace-pre-wrap text-sm leading-relaxed text-slate-300"
+                    className="whitespace-pre-wrap"
                   >
-                    {ai || "Waiting for AI analysis..."}
+                    {formatText(ai) || "Waiting for AI analysis..."}
                   </motion.div>
                 )}
               </div>
