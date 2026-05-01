@@ -33,10 +33,19 @@ export default function CoachPage() {
         parts: [{ text: m.content }]
       }));
 
+      let scanContext = "";
+      try {
+        const scanData = localStorage.getItem("glowai_analysis");
+        if (scanData) {
+          const parsed = JSON.parse(scanData);
+          scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.redness}%, Oiliness ${parsed.oiliness}%, Pores ${parsed.pores}%.`;
+        }
+      } catch (e) {}
+
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, history })
+        body: JSON.stringify({ message: input, history, context: scanContext })
       });
       
       const data = await res.json();

@@ -15,12 +15,16 @@ export async function POST(req: Request) {
       generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
     });
 
-    const prompt = `
-      You are GlowAI Expert Coach. The user is asking: "${body.message}"
-      Provide a helpful, professional skincare response. Keep it under 200 words.
-    `;
+    const chat = model.startChat({
+      history: body.history || [],
+    });
 
-    const result = await model.generateContent(prompt);
+    const prompt = `You are GlowAI Expert Coach. 
+${body.context ? `User's Skin Context: ${body.context}\n` : ""}
+Please provide a helpful, professional skincare response to the following user message: "${body.message}". 
+Analyze the user's question carefully and provide a highly relevant, customized answer. Keep it under 200 words.`;
+
+    const result = await chat.sendMessage(prompt);
     
     return NextResponse.json({ text: result.response.text() });
   } catch (err: any) {
