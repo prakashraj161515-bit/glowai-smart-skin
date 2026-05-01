@@ -1,6 +1,7 @@
 "use client";
 
-import { Apple, Utensils, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Apple, Utensils, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function DietPage() {
