@@ -18,8 +18,8 @@ CRITICAL RULES:
 1. ALWAYS REPLY IN ENGLISH ONLY.
 2. Use a SIMPLE, CLEAN format with plenty of line breaks (new lines).
 3. Use dot signs (•) instead of hyphens (-) for bullet points.
-4. Use double asterisks (**HEADER**) for section headlines.
-5. Use double quotes ("") for highlighting specific names/points inside bullet points.
+4. Use double asterisks (**HEADER**) for section headlines (these appear LARGE and BOLD in UI).
+5. Use double quotes ("") for specific names/points.
 6. Every heading and every bullet point MUST be on its own new line.
 
 Format your response exactly like this:
@@ -27,18 +27,23 @@ Format your response exactly like this:
 
 **CAUSES**
 • "Point": Description
-• "Point": Description
 
-**PREVENTION**
-• "Point": Description
+**WHAT TO EAT (VEGGIES & FRUITS)**
+• "Eat": [Names of vegetables/fruits]
+• "Avoid": [Names of vegetables/fruits]
 
-**DIET**
-• "Point": Description
+**SKINCARE & OILS**
+• "Apply": [Safe oils/products]
+• "Avoid": [Unsafe oils/products]
 
-**TIMINGS**
-• "Point": Description
+**SUN PROTECTION**
+• "Tip": How to step out in the sun safely.
 
-Keep the total response under 200 words.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
+**MEAL TIMINGS**
+• "Morning": [What to eat/drink]
+• "Lunch/Dinner": [What to eat/drink]
+
+Keep the total response under 250 words. Be very specific with names of fruits, vegetables, and oils.${body.context ? `\nUser's Skin Context: ${body.context}` : ""}`,
       generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
     });
 
