@@ -10,7 +10,10 @@ export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
 
     // Clean base64 string
     const base64Data = image.split(",")[1];
@@ -44,14 +47,12 @@ export async function POST(req: Request) {
     const response = await result.response;
     const text = response.text();
     
-    // Extract JSON from response
-    const jsonMatch = text.match(/\{.*\}/s);
-    if (jsonMatch) {
-      const data = JSON.parse(jsonMatch[0]);
+    try {
+      const data = JSON.parse(text);
       return NextResponse.json(data);
+    } catch (e) {
+      throw new Error("Failed to parse AI JSON response");
     }
-
-    throw new Error("Invalid AI response");
   } catch (err: any) {
     console.error("🔥 Vision AI Error:", err);
     return NextResponse.json({ error: "Failed to analyze image" }, { status: 500 });

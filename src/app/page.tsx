@@ -16,6 +16,12 @@ export default function Home() {
 
   // Called after skin scan is complete
   async function handleResult(res: any) {
+    if (res.error) {
+      alert(res.error);
+      setShowScanner(false);
+      return;
+    }
+
     setData(res);
     setShowScanner(false);
     setIsGenerating(true);
@@ -30,6 +36,7 @@ export default function Home() {
       setAi(j.text);
     } catch (err) {
       console.error(err);
+      setAi("⚠️ Server is busy. Report generation failed, but your metrics are shown above.");
     } finally {
       setIsGenerating(false);
     }
