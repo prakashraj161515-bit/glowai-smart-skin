@@ -5,7 +5,7 @@ import { Send, Bot, User, Sparkles, Plus, RefreshCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CoachPage() {
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<{role: string, content: string, isError?: boolean}[]>([
     { role: "assistant", content: "Hi! I'm your GlowAI Coach. How can I help you with your skin today? ✨" },
   ]);
   const [input, setInput] = useState("");
@@ -18,17 +18,22 @@ export default function CoachPage() {
     }
   }, [messages, isLoading]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    
-    const userMessage = { role: "user", parts: [{ text: input }] };
-    setMessages((prev) => [...prev, { role: 'user', content: input }]);
-    setInput("");
+  const executeSend = async (textToSend: string, isRetry = false) => {
     setIsLoading(true);
+
+    let currentMessages = messages;
+    if (!isRetry) {
+      currentMessages = [...messages, { role: 'user', content: textToSend }];
+      setMessages(currentMessages);
+      setInput("");
+    } else {
+      currentMessages = messages.filter(m => !m.isError);
+      setMessages(currentMessages);
+    }
 
     try {
       // Prepare history for API
-      let history = messages.map(m => ({
+      let history = currentMessages.map(m => ({
         role: m.role === 'user' ? 'user' : 'model',
         parts: [{ text: m.content }]
       }));
@@ -37,6 +42,9 @@ export default function CoachPage() {
       if (history.length > 0 && history[0].role === 'model') {
         history = history.slice(1);
       }
+      
+      // Remove the last user message from history because we are sending it as the new prompt
+      history.pop();
 
       let scanContext = "";
       try {
@@ -50,19 +58,34 @@ export default function CoachPage() {
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, history, context: scanContext })
+        body: JSON.stringify({ message: textToSend, history, context: scanContext })
       });
       
       const data = await res.json();
       if (data.text) {
         setMessages((prev) => [...prev, { role: 'assistant', content: data.text }]);
       } else {
-        setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${data.error || "Invalid response"}` }]);
+        const isBusy = data.error && (data.error.includes("503") || data.error.includes("429") || data.error.includes("high demand") || data.error.includes("quota"));
+        const errorMsg = isBusy ? "Server is currently busy. Please try again." : `Error: ${data.error || "Invalid response"}`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: errorMsg, isError: true }]);
       }
     } catch (e) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Please try again." }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: "Server is currently busy. Please try again.", isError: true }]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSend = () => {
+    if (!input.trim() || isLoading) return;
+    executeSend(input, false);
+  };
+
+  const handleRetry = () => {
+    if (isLoading) return;
+    const lastUserMsg = messages.slice().reverse().find(m => m.role === 'user');
+    if (lastUserMsg) {
+      executeSend(lastUserMsg.content, true);
     }
   };
 
@@ -101,6 +124,14 @@ export default function CoachPage() {
                 : 'glass-card text-slate-200 rounded-tl-none'
             }`}>
               {msg.content}
+              {msg.isError && (
+                <button 
+                  onClick={handleRetry}
+                  className="mt-2 flex items-center gap-1 text-xs bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg hover:bg-red-500/30 transition-colors"
+                >
+                  <RefreshCcw size={12} /> Retry
+                </button>
+              )}
             </div>
           </motion.div>
         ))}
