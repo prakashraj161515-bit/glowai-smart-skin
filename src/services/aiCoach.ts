@@ -1,19 +1,17 @@
-import { getSecureKey } from "@/lib/api-key-manager";
-
 /**
  * AI Coach Service
- * Connects to Gemini API using the obfuscated key.
+ * Connects to Gemini API using env variable.
  */
 
 export async function askCoach(question: string) {
-  const apiKey = getSecureKey();
+  const apiKey = process.env.GEMINI_API_KEY;
   
   // In a real production app, you would use this key to call the Gemini API
   // Example: 
   // const genAI = new GoogleGenerativeAI(apiKey);
   // const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
   
-  console.log("Calling AI Coach with secured key...");
+  console.log("Calling AI Coach with env key...");
   
   // Mock response for demo
   await new Promise(resolve => setTimeout(resolve, 1500));
