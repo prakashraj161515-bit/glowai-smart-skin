@@ -189,10 +189,16 @@ export default function DietPage() {
       )}
 
       {error && (
-        <div className="glass-card p-6 border-red-500/30 text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <button onClick={generateDietPlan} className="flex items-center gap-2 mx-auto text-purple-400 font-bold hover:text-purple-300">
-            <RefreshCcw size={18} /> Try Again
+        <div className="glass-card p-6 border-red-500/30 text-center space-y-4">
+          <div className="flex flex-col items-center gap-2 text-red-400">
+            <AlertCircle size={32} />
+            <p className="font-bold">Server is busy Please try again</p>
+          </div>
+          <button 
+            onClick={generateDietPlan} 
+            className="flex items-center gap-2 mx-auto bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-purple-600/20"
+          >
+            <RefreshCcw size={18} /> Retry Now
           </button>
         </div>
       )}
