@@ -89,6 +89,21 @@ export default function CoachPage() {
     }
   };
 
+  const formatMessage = (content: string) => {
+    const lines = content.split('\n');
+    return lines.map((line, i) => {
+      // Check if the line is a **HEADER**
+      if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
+        return (
+          <div key={i} className="text-[15px] font-black text-purple-400 mt-4 mb-1 tracking-tight uppercase">
+            {line.replace(/\*\*/g, '')}
+          </div>
+        );
+      }
+      return <div key={i} className="mb-0.5">{line}</div>;
+    });
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-140px)]">
       <header className="flex items-center justify-between mb-6">
@@ -127,7 +142,7 @@ export default function CoachPage() {
                 ? 'bg-purple-600 text-white rounded-tr-none' 
                 : 'glass-card text-slate-200 rounded-tl-none'
             }`}>
-              {msg.content}
+              {formatMessage(msg.content)}
               {msg.isError && (
                 <button 
                   onClick={handleRetry}
