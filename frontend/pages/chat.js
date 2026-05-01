@@ -5,34 +5,28 @@ export default function Chat() {
   const [msg, setMsg] = useState("");
   const [reply, setReply] = useState("");
 
-  const ask = async () => {
-    if (!msg.trim()) return;
-    try {
-      const res = await axios.post("http://localhost:8000/chat", {message: msg});
-      setReply(res.data.reply);
-    } catch (err) {
-      console.error(err);
-      setReply("Error: Could not connect to AI Coach");
-    }
+  const send = async () => {
+    const res = await axios.post("http://localhost:8000/chat", {
+      message: msg
+    });
+
+    setReply(res.data.reply);
   };
 
   return (
     <div style={{textAlign:"center", marginTop:50}}>
-      <h2>AI Coach</h2>
-      <input 
-        type="text" 
-        onChange={(e)=>setMsg(e.target.value)}
-        style={{padding: 10, borderRadius: 5, border: "1px solid #ccc", width: "300px"}}
-        placeholder="Ask something about skincare..."
-      />
-      <button 
-        onClick={ask}
-        style={{padding: 10, marginLeft: 10, borderRadius: 5, background: "#0070f3", color: "white", border: "none", cursor: "pointer"}}
-      >
-        Ask
-      </button>
+      <h2>AI Skin Chat</h2>
 
-      <div style={{marginTop: 30, padding: 20, textAlign: "left", display: "inline-block", maxWidth: "500px"}}>
+      <input 
+        value={msg} 
+        onChange={(e)=>setMsg(e.target.value)} 
+        placeholder="Ask..."
+        style={{padding: 8, borderRadius: 4, border: "1px solid #ccc"}}
+      />
+
+      <button onClick={send} style={{marginLeft: 10, padding: "8px 16px"}}>Send</button>
+
+      <div style={{marginTop: 30, maxWidth: 600, margin: "30px auto", textAlign: "left"}}>
         <p style={{whiteSpace: "pre-wrap"}}>{reply}</p>
       </div>
     </div>
