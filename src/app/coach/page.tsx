@@ -105,6 +105,10 @@ export default function CoachPage() {
           <Plus size={18} />
         </button>
       </header>
+      
+      <div className="mb-4 p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl text-center">
+        <p className="text-[11px] text-purple-300 font-medium italic">Sometimes Server is busy, Please Try Again</p>
+      </div>
 
       {/* Chat Area */}
       <div 
