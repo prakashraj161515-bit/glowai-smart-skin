@@ -167,11 +167,16 @@ export default function CoachPage() {
             <Bot size={24} />
           </div>
           <div>
-            <h1 className="text-lg font-bold">Skin Coach</h1>
+            <h1 className="text-lg font-bold tracking-tight">Your Personal Coach</h1>
             <p className="text-[10px] text-green-400 font-bold uppercase tracking-widest">Always Online</p>
           </div>
         </div>
-        <button className="glass-button p-2 rounded-full">
+        <button onClick={() => {
+          if (confirm("Clear all messages?")) {
+            setMessages([{ id: '1', role: "assistant", content: "Hi! I'm your Personal Coach. How can I help you today? ✨", timestamp: Date.now() }]);
+            localStorage.removeItem("glowai_chat_history");
+          }
+        }} className="glass-button p-2 rounded-full">
           <Plus size={18} />
         </button>
       </header>
@@ -183,13 +188,13 @@ export default function CoachPage() {
       {/* Chat Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-20"
+        className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar pb-24"
       >
         {messages.map((msg, i) => (
           <motion.div
             key={msg.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} relative group`}
             onPointerDown={() => startPress(msg.id)}
             onPointerUp={endPress}

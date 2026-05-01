@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Apple, Utensils, Droplets, Sparkles, RefreshCcw, Calendar } from "lucide-react";
+import { Apple, Utensils, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function DietPage() {
@@ -9,6 +8,13 @@ export default function DietPage() {
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [savedPlans, setSavedPlans] = useState<{id: string, text: string, date: string, concern: string}[]>([]);
+  const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("glowai_saved_diets");
+    if (saved) setSavedPlans(JSON.parse(saved));
+  }, []);
 
   const generateDietPlan = async () => {
     setIsLoading(true);
@@ -44,10 +50,29 @@ export default function DietPage() {
     }
   };
 
+  const saveCurrentPlan = () => {
+    if (!dietPlan) return;
+    const newPlan = {
+      id: Date.now().toString(),
+      text: dietPlan,
+      date: new Date().toLocaleDateString(),
+      concern: userInput || "General Skin Health"
+    };
+    const updated = [newPlan, ...savedPlans];
+    setSavedPlans(updated);
+    localStorage.setItem("glowai_saved_diets", JSON.stringify(updated));
+    alert("Diet Plan Saved! 💾");
+  };
+
+  const deletePlan = (id: string) => {
+    const updated = savedPlans.filter(p => p.id !== id);
+    setSavedPlans(updated);
+    localStorage.setItem("glowai_saved_diets", JSON.stringify(updated));
+  };
+
   const formatText = (content: string) => {
     const lines = content.split('\n');
     return lines.map((line, i) => {
-      // Check for headlines wrapped in **
       if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
         return (
           <div key={i} className="text-[16px] font-black text-purple-400 mt-6 mb-2 tracking-tight uppercase border-b border-purple-500/20 pb-1">
@@ -61,17 +86,58 @@ export default function DietPage() {
 
   return (
     <div className="pb-24 px-4 pt-6">
-      <header className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
+      <header className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
             <Apple size={24} />
           </div>
           <div>
             <h1 className="text-2xl font-bold">Diet Planner</h1>
-            <p className="text-xs text-slate-400">Personalized for your skin type</p>
+            <p className="text-xs text-slate-400">Smart Meal Plans</p>
           </div>
         </div>
+        <button 
+          onClick={() => setShowSaved(!showSaved)}
+          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showSaved ? 'bg-purple-600 text-white' : 'bg-white/5 text-slate-400'}`}
+        >
+          <Bookmark size={20} />
+        </button>
       </header>
+
+      <AnimatePresence>
+        {showSaved ? (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden mb-6"
+          >
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-purple-400 flex items-center gap-2">
+                <Bookmark size={14} /> My Saved Plans
+              </h3>
+              {savedPlans.length === 0 ? (
+                <p className="text-xs text-slate-500 italic p-4 glass-card">No saved plans yet.</p>
+              ) : (
+                savedPlans.map(plan => (
+                  <div key={plan.id} className="glass-card p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-xs font-bold text-white">{plan.concern}</p>
+                        <p className="text-[10px] text-slate-500">{plan.date}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => { setDietPlan(plan.text); setShowSaved(false); }} className="text-[10px] bg-purple-500/20 text-purple-400 px-2 py-1 rounded">View</button>
+                        <button onClick={() => deletePlan(plan.id)} className="text-red-400"><Trash2 size={14} /></button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {!dietPlan && !isLoading && (
         <motion.div 
@@ -84,23 +150,24 @@ export default function DietPage() {
           </div>
           <h2 className="text-lg font-bold mb-2">Ready to Glow?</h2>
           <p className="text-sm text-slate-400 mb-6">
-            Tell us about your skin conditions or disease, and we'll generate a personalized 7-day plan.
+            Tell us about your skin conditions, and we'll generate a personalized plan.
           </p>
           
           <div className="mb-6">
             <textarea 
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              placeholder="E.g. I have severe acne, eczema, or dark spots..."
-              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm focus:outline-none focus:border-purple-500/50 transition-colors h-32 resize-none"
+              placeholder="E.g. I have severe acne, dark spots, or eczema..."
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm focus:outline-none focus:border-purple-500/50 transition-colors h-24 resize-none"
             />
           </div>
+
           <button 
             onClick={generateDietPlan}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30"
+            className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-purple-600/30"
           >
             <Sparkles size={20} />
-            Generate My Plan
+            Generate Plan
           </button>
         </motion.div>
       )}
@@ -124,35 +191,26 @@ export default function DietPage() {
       {error && (
         <div className="glass-card p-6 border-red-500/30 text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <button 
-            onClick={generateDietPlan}
-            className="flex items-center gap-2 mx-auto text-purple-400 font-bold hover:text-purple-300 transition-colors"
-          >
+          <button onClick={generateDietPlan} className="flex items-center gap-2 mx-auto text-purple-400 font-bold hover:text-purple-300">
             <RefreshCcw size={18} /> Try Again
           </button>
         </div>
       )}
 
       {dietPlan && !isLoading && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="space-y-6"
-        >
-          <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10 mb-4">
-            <div className="flex items-center gap-2 text-purple-400 font-bold">
-              <Calendar size={20} />
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/10">
+            <div className="flex items-center gap-2 text-purple-400 font-bold text-sm">
+              <Calendar size={18} />
               <span>7-Day Plan</span>
             </div>
-            <button 
-              onClick={generateDietPlan}
-              className="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-colors"
-            >
-              Regenerate
-            </button>
+            <div className="flex gap-2">
+              <button onClick={saveCurrentPlan} className="bg-purple-600 p-2 rounded-lg text-white"><Bookmark size={18} /></button>
+              <button onClick={generateDietPlan} className="bg-white/10 p-2 rounded-lg"><RefreshCcw size={18} /></button>
+            </div>
           </div>
 
-          <div className="glass-card p-6 whitespace-pre-wrap">
+          <div className="glass-card p-6 whitespace-pre-wrap shadow-xl">
             {formatText(dietPlan)}
           </div>
 
