@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getSecureKey } from "@/lib/api-key-manager";
 
 export async function POST(req: Request) {
   try {
     const { metrics, skinType } = await req.json();
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = getSecureKey();
     if (!apiKey) {
       return NextResponse.json({ error: "API key missing" }, { status: 500 });
     }
