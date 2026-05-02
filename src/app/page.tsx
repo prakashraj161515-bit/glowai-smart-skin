@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Crown, AlertCircle } from "lucide-react";
+import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Gem, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
@@ -136,10 +136,10 @@ export default function Home() {
           <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
         </div>
         {isPremium && (
-          <div className="flex items-center gap-1.5 bg-gradient-to-br from-yellow-400 via-orange-400 to-yellow-600 p-[1.5px] rounded-full shadow-lg shadow-yellow-500/30">
+          <div className="flex items-center gap-1.5 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-[1.5px] rounded-full shadow-lg shadow-purple-500/30">
             <div className="bg-white rounded-full px-3 py-1 flex items-center gap-1.5">
-              <Crown size={12} className="text-yellow-600 fill-yellow-500" />
-              <span className="text-[9px] font-black text-yellow-700 uppercase tracking-tighter">Pro</span>
+              <Gem size={12} className="text-purple-600 fill-purple-500" />
+              <span className="text-[9px] font-black text-purple-700 uppercase tracking-tighter">Pro</span>
             </div>
           </div>
         )}
@@ -155,7 +155,7 @@ export default function Home() {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <h2 className="text-[26px] font-black text-slate-900 leading-tight flex items-center gap-2">
-                  Hello, {userName}! {isPremium && <Crown size={20} className="text-yellow-500 fill-yellow-500" />}
+                  Hello, {userName}! {isPremium && <Gem size={20} className="text-purple-500 fill-purple-500" />}
                 </h2>
                 <p className="text-[13px] text-slate-600 font-medium mt-1">Let&apos;s check your skin health today 🤍</p>
                 <div className="flex gap-2 mt-4">

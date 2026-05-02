@@ -68,7 +68,7 @@ export default function PremiumPage() {
           className="text-center text-white"
         >
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md border border-white/30 shadow-2xl">
-            <Crown size={32} className="text-yellow-300 fill-yellow-300" />
+            <Gem size={32} className="text-purple-300 fill-purple-300" />
           </div>
           <h1 className="text-3xl font-black mb-2">GlowAI Premium</h1>
           <p className="text-white/80 font-bold text-sm uppercase tracking-widest">Upgrade for clinical results</p>

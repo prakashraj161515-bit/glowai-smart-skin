@@ -6,7 +6,7 @@ import {
   User, Shield, Bell, LogOut, ChevronRight, Settings, 
   Heart, Phone, Mail, Lock, BellRing, Clock, Save, 
   CheckCircle2, XCircle, AlertCircle, Camera, Sparkles,
-  Smartphone, Eye, EyeOff, ChevronLeft, Edit2, Crown
+  Smartphone, Eye, EyeOff, ChevronLeft, Edit2, Gem
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -261,10 +261,10 @@ export default function ProfilePage() {
             </div>
           )}
           {isPremium ? (
-            <div className="flex items-center gap-1.5 mt-1 bg-gradient-to-br from-yellow-400 via-orange-400 to-yellow-600 p-[1px] rounded-full shadow-lg shadow-yellow-500/20">
+            <div className="flex items-center gap-1.5 mt-1 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-[1px] rounded-full shadow-lg shadow-purple-500/20">
               <div className="bg-white rounded-full px-4 py-1 flex items-center gap-1.5">
-                <Crown size={12} className="text-yellow-600 fill-yellow-500" />
-                <p className="text-[10px] text-yellow-700 font-black uppercase tracking-widest">Premium Member</p>
+                <Gem size={12} className="text-purple-600 fill-purple-500" />
+                <p className="text-[10px] text-purple-700 font-black uppercase tracking-widest">Premium Member</p>
               </div>
             </div>
           ) : (
