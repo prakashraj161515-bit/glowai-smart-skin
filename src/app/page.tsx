@@ -87,7 +87,7 @@ export default function Home() {
       const r = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...res, gender, userName, mode: "accurate_scan", isPremium })
+        body: JSON.stringify({ ...res, gender, userName, mode: "accurate_scan", isPremium, image: res.image })
       });
       const j = await r.json();
       setAi(j.text);
@@ -102,7 +102,7 @@ export default function Home() {
       const r = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "product_scan", isPremium, userName })
+        body: JSON.stringify({ mode: "product_scan", isPremium, userName, image: res.image })
       });
       const j = await r.json();
       setAi(j.text);
