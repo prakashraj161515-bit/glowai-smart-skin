@@ -263,7 +263,7 @@ export default function Home() {
               <button onClick={()=>setView("home")} className="text-slate-400 text-sm font-bold bg-white px-4 py-2 rounded-xl shadow border border-slate-100">Cancel</button>
             </div>
             
-            <CameraScanner onResult={handleResult}/>
+            <CameraScanner onResult={handleResult} mode={scanMode}/>
 
             {/* Instructions for Product Scan */}
             {scanMode === "product" && (
