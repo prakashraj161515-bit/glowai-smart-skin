@@ -200,6 +200,22 @@ export default function Home() {
               </Link>
             )}
 
+            {/* Gender Selection */}
+            <div className="bg-white rounded-[22px] p-1.5 flex gap-1.5 border border-[#EEF0FF] shadow-sm">
+              <button 
+                onClick={() => setGender("male")}
+                className={`flex-1 py-3 rounded-[18px] text-[12px] font-black uppercase tracking-wider transition-all ${gender === "male" ? "bg-primary-gradient text-white shadow-lg shadow-purple-500/20" : "text-slate-400"}`}
+              >
+                Male
+              </button>
+              <button 
+                onClick={() => setGender("female")}
+                className={`flex-1 py-3 rounded-[18px] text-[12px] font-black uppercase tracking-wider transition-all ${gender === "female" ? "bg-primary-gradient text-white shadow-lg shadow-purple-500/20" : "text-slate-400"}`}
+              >
+                Female
+              </button>
+            </div>
+
             {/* Dual Analyze Box */}
             <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5 space-y-3">
               <p className="text-[14px] font-black text-slate-900 px-1">AI Analysis Tools</p>
