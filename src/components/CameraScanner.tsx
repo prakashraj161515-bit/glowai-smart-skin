@@ -48,7 +48,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     const ctx = canvas.getContext("2d")!;
     ctx.drawImage(video, 0, 0);
 
-    const result = await analyzeSkin(canvas);
+    const result = await analyzeSkin(canvas, mode === "product");
     onResult(result);
     setIsAnalyzing(false);
   }
@@ -67,7 +67,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(img, 0, 0);
 
-      const result = await analyzeSkin(canvas);
+      const result = await analyzeSkin(canvas, mode === "product");
       onResult(result);
       setIsAnalyzing(false);
     };

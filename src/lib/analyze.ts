@@ -7,6 +7,7 @@ export interface SkinAnalysisResult {
   pigmentation?: number;
   score?: number;
   error?: string;
+  image?: string; // Optional base64
 }
 
 let model: any;
@@ -19,12 +20,16 @@ async function loadModel() {
   return model;
 }
 
-export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalysisResult> {
-  const faceModel = await loadModel();
-  const predictions = await faceModel.estimateFaces(canvas, false);
+export async function analyzeSkin(canvas: HTMLCanvasElement, skipFaceDetection: boolean = false): Promise<SkinAnalysisResult> {
+  const imageBase64 = canvas.toDataURL("image/jpeg", 0.7);
 
-  if (predictions.length === 0) {
-    return { error: "No face detected" };
+  if (!skipFaceDetection) {
+    const faceModel = await loadModel();
+    const predictions = await faceModel.estimateFaces(canvas, false);
+
+    if (predictions.length === 0) {
+      return { error: "No face detected. Please position your face clearly." };
+    }
   }
 
   const ctx = canvas.getContext("2d")!;
@@ -52,5 +57,5 @@ export async function analyzeSkin(canvas: HTMLCanvasElement): Promise<SkinAnalys
 
   const score = Math.max(0, 100 - Math.floor((acne + oil + pigmentation) / 3));
 
-  return { acne, oil, pigmentation, score };
+  return { acne, oil, pigmentation, score, image: imageBase64 };
 }
