@@ -6,13 +6,16 @@ import {
   User, Shield, Bell, LogOut, ChevronRight, Settings, 
   Heart, Phone, Mail, Lock, BellRing, Clock, Save, 
   CheckCircle2, XCircle, AlertCircle, Camera, Sparkles,
-  Smartphone, Eye, EyeOff, ChevronLeft, Edit2
+  Smartphone, Eye, EyeOff, ChevronLeft, Edit2, Crown
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup" | "otp">("login");
   
   const [userName, setUserName] = useState("Anrudh Kumar");
@@ -24,10 +27,12 @@ export default function ProfilePage() {
     const saved = localStorage.getItem("glowai_is_logged_in");
     const savedName = localStorage.getItem("glowai_user_name");
     const savedPic = localStorage.getItem("glowai_user_pic");
+    const premium = localStorage.getItem("glowai_is_premium") === "true";
     
     if (saved === "true") setIsLoggedIn(true);
     if (savedName) setUserName(savedName);
     if (savedPic) setProfilePic(savedPic);
+    setIsPremium(premium);
     
     setIsLoaded(true);
   }, []);
@@ -221,7 +226,7 @@ export default function ProfilePage() {
       {/* Header */}
       <header className="px-6 pt-12 flex flex-col items-center text-center space-y-6">
         <div className="relative">
-          <div className="w-28 h-28 rounded-[40px] bg-primary-gradient p-1.5 rotate-3 group">
+          <div className={`w-28 h-28 rounded-[40px] p-1.5 rotate-3 group ${isPremium ? 'bg-yellow-400' : 'bg-primary-gradient'}`}>
             <div className="w-full h-full rounded-[35px] bg-white flex items-center justify-center overflow-hidden border-4 border-white -rotate-3 transition-transform group-hover:rotate-0">
               <img 
                 src={profilePic} 
@@ -239,29 +244,54 @@ export default function ProfilePage() {
         </div>
         <div className="flex flex-col items-center">
           {isEditingName ? (
-            <div className="flex items-center gap-2">
-              <input 
-                ref={nameInputRef}
-                type="text" 
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
-                onKeyPress={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                className="text-2xl font-black text-slate-900 tracking-tight bg-white border-b-2 border-purple-500 outline-none text-center px-2"
-                autoFocus
-              />
-            </div>
+            <input 
+              ref={nameInputRef}
+              type="text" 
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              onBlur={() => setIsEditingName(false)}
+              onKeyPress={(e) => e.key === 'Enter' && setIsEditingName(false)}
+              className="text-2xl font-black text-slate-900 tracking-tight bg-white border-b-2 border-purple-500 outline-none text-center px-2"
+              autoFocus
+            />
           ) : (
             <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setIsEditingName(true)}>
               <h1 className="text-2xl font-black text-slate-900 tracking-tight">{userName}</h1>
               <Edit2 size={16} className="text-slate-300 group-hover:text-purple-500 transition-colors" />
             </div>
           )}
-          <p className="text-[10px] text-purple-600 font-black uppercase tracking-[0.2em] mt-1 bg-purple-50 px-3 py-1 rounded-full inline-block">Premium Member</p>
+          {isPremium ? (
+            <div className="flex items-center gap-1.5 mt-1 bg-yellow-400/10 border border-yellow-400/20 px-4 py-1.5 rounded-full shadow-sm">
+              <Crown size={12} className="text-yellow-600 fill-yellow-600" />
+              <p className="text-[10px] text-yellow-700 font-black uppercase tracking-widest">Premium Member</p>
+            </div>
+          ) : (
+            <Link href="/premium" className="flex items-center gap-1.5 mt-1 bg-purple-50 border border-purple-100 px-4 py-1.5 rounded-full shadow-sm animate-pulse">
+              <Sparkles size={12} className="text-purple-600" />
+              <p className="text-[10px] text-purple-600 font-black uppercase tracking-widest">Free Plan • Upgrade</p>
+            </Link>
+          )}
         </div>
       </header>
 
       <div className="px-6 mt-10 space-y-8">
+        {/* Upgrade Banner for Free Users */}
+        {!isPremium && (
+          <Link href="/premium">
+            <motion.div 
+              whileTap={{ scale: 0.98 }}
+              className="bg-primary-gradient rounded-[32px] p-6 flex items-center justify-between relative overflow-hidden shadow-xl shadow-purple-500/20"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
+              <div className="z-10">
+                <h2 className="text-white font-black text-lg">Go Premium ✨</h2>
+                <p className="text-white/80 text-[11px] mt-1 font-bold">Unlock Advanced Skin Metrics & Expert Coaching</p>
+              </div>
+              <ChevronRight size={24} className="text-white/50 z-10" />
+            </motion.div>
+          </Link>
+        )}
+
         {/* Settings Groups */}
         <section className="space-y-4">
           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] px-1">My Skin Profile</h3>
@@ -342,14 +372,18 @@ export default function ProfilePage() {
         </section>
 
         <button 
-          onClick={() => setIsLoggedIn(false)}
+          onClick={() => {
+            setIsLoggedIn(false);
+            localStorage.removeItem("glowai_is_logged_in");
+            localStorage.removeItem("glowai_is_premium");
+          }}
           className="w-full h-16 premium-card flex items-center justify-center gap-3 text-red-500 font-black text-sm hover:bg-red-50 border-red-100 transition-colors mt-8 shadow-lg shadow-red-500/5"
         >
           <LogOut size={20} /> Log Out Account
         </button>
 
         <p className="text-center text-[10px] text-slate-400 font-black uppercase tracking-widest pb-10">
-          GlowAI Premium • Build v1.2.5
+          GlowAI Premium • Build v1.3.0
         </p>
       </div>
     </div>

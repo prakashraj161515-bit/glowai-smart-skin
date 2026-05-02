@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2 } from "lucide-react";
+import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Crown } from "lucide-react";
+import Link from "next/link";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
 
@@ -15,6 +16,7 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [userName, setUserName] = useState("Glow");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const h = localStorage.getItem("glowai_history");
@@ -22,6 +24,9 @@ export default function Home() {
     
     const savedName = localStorage.getItem("glowai_user_name");
     if (savedName) setUserName(savedName);
+
+    const premium = localStorage.getItem("glowai_is_premium") === "true";
+    setIsPremium(premium);
   }, []);
 
   const [skinTips, setSkinTips] = useState("");
@@ -30,19 +35,20 @@ export default function Home() {
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     
-    // Simulate Deep Scanning Process
     setView("results");
     setData(res);
     setLoading(true);
-    setDeepScanStep(1); // Comparing with database
+    setDeepScanStep(1);
 
-    // Fake delay for "Accuracy"
-    await new Promise(r => setTimeout(r, 2000));
-    setDeepScanStep(2); // Analyzing 4000+ dermatological images
-    await new Promise(r => setTimeout(r, 2500));
-    setDeepScanStep(3); // Matching patterns
-    await new Promise(r => setTimeout(r, 1500));
-    setDeepScanStep(4); // Finalizing Report
+    // If Premium, simulate a much deeper scan
+    const delay = isPremium ? 1500 : 1000;
+    
+    await new Promise(r => setTimeout(r, delay));
+    setDeepScanStep(2); 
+    await new Promise(r => setTimeout(r, delay + 500));
+    setDeepScanStep(3); 
+    await new Promise(r => setTimeout(r, delay));
+    setDeepScanStep(4); 
 
     const entry: HistoryEntry = {
       date: new Date().toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
@@ -56,7 +62,7 @@ export default function Home() {
       const r = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...res, gender, userName, mode: "accurate_scan" })
+        body: JSON.stringify({ ...res, gender, userName, mode: "accurate_scan", isPremium })
       });
       const j = await r.json();
       setAi(j.text);
@@ -91,10 +97,17 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F4F6FF] font-outfit pb-28">
 
-      {/* Header - no bell icon */}
-      <header className="px-5 pt-10 pb-4">
-        <h1 className="text-[24px] font-black">Glow<span className="text-purple-600">AI</span></h1>
-        <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
+      {/* Header */}
+      <header className="px-5 pt-10 pb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-[24px] font-black">Glow<span className="text-purple-600">AI</span></h1>
+          <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
+        </div>
+        {isPremium && (
+          <div className="bg-yellow-400 p-2 rounded-xl shadow-lg shadow-yellow-500/20">
+            <Crown size={18} className="text-white fill-white" />
+          </div>
+        )}
       </header>
 
       <AnimatePresence mode="wait">
@@ -106,7 +119,9 @@ export default function Home() {
             {/* Hero */}
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h2 className="text-[26px] font-black text-slate-900 leading-tight">Hello, {userName}! 👋</h2>
+                <h2 className="text-[26px] font-black text-slate-900 leading-tight flex items-center gap-2">
+                  Hello, {userName}! {isPremium && <Crown size={20} className="text-yellow-500 fill-yellow-500" />}
+                </h2>
                 <p className="text-[13px] text-slate-600 font-medium mt-1">Let&apos;s check your skin health today 🤍</p>
                 <div className="flex gap-2 mt-4">
                   <button onClick={()=>setGender("male")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 border transition-all ${gender==="male"?"bg-white text-slate-900 border-slate-200 shadow":"bg-slate-100 text-slate-500 border-transparent"}`}>
@@ -127,7 +142,25 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Analyze Box - clean, single button */}
+            {/* Premium Upgrade Banner for Home */}
+            {!isPremium && (
+              <Link href="/premium">
+                <div className="bg-primary-gradient rounded-[24px] p-4 flex items-center justify-between shadow-xl shadow-purple-500/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white">
+                      <Crown size={20} />
+                    </div>
+                    <div>
+                      <p className="text-white font-black text-sm">Upgrade to Premium</p>
+                      <p className="text-white/70 text-[10px] font-bold">Unlock accurate vision metrics ✨</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} className="text-white/50" />
+                </div>
+              </Link>
+            )}
+
+            {/* Analyze Box */}
             <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
               <p className="text-[15px] font-black text-slate-900 text-center mb-1">Scan Your Skin</p>
               <p className="text-[12px] text-slate-600 font-medium text-center mb-5">Get AI-powered skin analysis in seconds</p>
@@ -140,28 +173,9 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Why GlowAI */}
-            <div>
-              <p className="text-[15px] font-black text-slate-900 mb-3">Why GlowAI?</p>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  {label:"AI Powered",sub:"Advanced AI",icon:"🧠",bg:"bg-blue-50"},
-                  {label:"Accurate",sub:"Precise Results",icon:"🎯",bg:"bg-cyan-50"},
-                  {label:"Fast",sub:"In Seconds",icon:"⚡",bg:"bg-orange-50"},
-                  {label:"Private",sub:"Data Secure",icon:"🔒",bg:"bg-purple-50"},
-                ].map((f,i)=>(
-                  <div key={i} className="bg-white rounded-2xl border border-[#EEF0FF] p-2.5 flex flex-col items-center text-center shadow-sm">
-                    <div className={`w-9 h-9 rounded-xl ${f.bg} flex items-center justify-center text-lg mb-1.5`}>{f.icon}</div>
-                    <p className="text-[9px] font-black text-slate-800 leading-tight">{f.label}</p>
-                    <p className="text-[7px] text-slate-500 font-semibold mt-0.5">{f.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Know Your Skin Banner */}
             <div className="bg-primary-gradient rounded-[24px] p-5 overflow-hidden relative">
-              <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-2xl"/>
+              <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-2xl" />
               <div className="flex items-center justify-between mb-3">
                 <div className="z-10">
                   <p className="text-white font-black text-[16px] leading-snug">Know Your<br/>Skin Better</p>
@@ -207,7 +221,7 @@ export default function Home() {
         {view === "scanner" && (
           <motion.div key="scanner" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-5">
             <div className="flex justify-between items-center mb-5">
-              <h2 className="text-xl font-black">Position Your Face</h2>
+              <h2 className="text-xl font-black text-slate-900">Position Your Face</h2>
               <button onClick={()=>setView("home")} className="text-slate-400 text-sm font-bold bg-white px-4 py-2 rounded-xl shadow border border-slate-100">Cancel</button>
             </div>
             <CameraScanner onResult={handleResult}/>
@@ -224,9 +238,19 @@ export default function Home() {
                 <ArrowLeft size={18}/>
               </button>
               <h2 className="text-[17px] font-black text-slate-900">Skin Report</h2>
-              <button className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100">
-                <Download size={18}/>
-              </button>
+              {isPremium ? (
+                <button 
+                  onClick={() => alert("Downloading PDF Report...")}
+                  className="w-10 h-10 rounded-full bg-primary-gradient shadow shadow-purple-500/20 flex items-center justify-center text-white"
+                >
+                  <Download size={18} />
+                </button>
+              ) : (
+                <Link href="/premium" className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-300 border border-slate-100 relative group">
+                  <Download size={18}/>
+                  <Lock size={10} className="absolute top-1 right-1 text-purple-600" />
+                </Link>
+              )}
             </div>
 
             {/* Deep Analysis Step Logic */}
@@ -248,7 +272,7 @@ export default function Home() {
                 <div>
                   <h3 className="text-lg font-black text-slate-900 mb-2">
                     {deepScanStep === 1 && "Connecting to Clinical Database..."}
-                    {deepScanStep === 2 && "Scanning 4,000+ Skin Profiles..."}
+                    {deepScanStep === 2 && `Scanning 4,000+ ${isPremium ? 'Premium' : ''} Profiles...`}
                     {deepScanStep === 3 && "Matching Pattern Accurately..."}
                     {deepScanStep === 4 && "Compiling Dermatological Report..."}
                   </h3>
@@ -259,8 +283,8 @@ export default function Home() {
                       className="h-full bg-primary-gradient"
                     />
                   </div>
-                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest mt-4">
-                    High Accuracy Mode Active
+                  <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mt-4">
+                    {isPremium ? "Clinical Grade Accuracy Active" : "Standard Accuracy Mode Active"}
                   </p>
                 </div>
               </div>
@@ -293,12 +317,39 @@ export default function Home() {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <p className="text-[15px] font-black text-purple-600 mb-1">Expert Analysis Result</p>
-                      <p className="text-[12px] text-slate-600 leading-relaxed font-medium">Our AI compared your skin against 4,000+ clinical images to provide this accurate result.</p>
+                      <p className="text-[15px] font-black text-purple-600 mb-1">
+                        {isPremium ? "Clinical Analysis Result" : "Expert Analysis Result"}
+                      </p>
+                      <p className="text-[12px] text-slate-600 leading-relaxed font-medium">
+                        Our AI matched your patterns against {isPremium ? '4,000+ clinical' : 'standard'} profiles.
+                      </p>
                       <button className="mt-3 flex items-center gap-1 text-[11px] font-black text-purple-600 bg-purple-50 px-3 py-1.5 rounded-full">
-                        💜 Accurate Scanned
+                        {isPremium ? <><Crown size={10} /> Clinical Grade</> : "💜 Standard Scanned"}
                       </button>
                     </div>
+                  </div>
+                </div>
+
+                {/* Advanced Metrics (Premium Only) */}
+                <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-[15px] font-black text-slate-900">Advanced Metrics</p>
+                    {!isPremium && <Link href="/premium" className="text-[10px] font-black text-purple-600 bg-purple-50 px-2 py-1 rounded-md">Unlock ✨</Link>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: "Wrinkles", val: isPremium ? "Low" : "Locked", color: "text-blue-500" },
+                      { label: "Skin Age", val: isPremium ? "24 yrs" : "Locked", color: "text-orange-500" },
+                      { label: "Dark Circles", val: isPremium ? "None" : "Locked", color: "text-purple-500" },
+                      { label: "Hydration", val: isPremium ? "Optimal" : "Locked", color: "text-green-500" }
+                    ].map((m, i) => (
+                      <div key={i} className="bg-slate-50 p-4 rounded-2xl flex flex-col gap-1">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">{m.label}</p>
+                        <p className={`text-sm font-black ${isPremium ? m.color : 'text-slate-300'}`}>
+                          {m.val} {!isPremium && <Lock size={10} className="inline ml-1" />}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -382,7 +433,7 @@ export default function Home() {
               <button onClick={()=>setView(data ? "results" : "home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100">
                 <ArrowLeft size={18}/>
               </button>
-              <h2 className="text-[18px] font-black text-slate-900">Scan History</h2>
+              <h2 className="text-[18px] font-black text-slate-900 text-center flex-1 pr-10">Scan History</h2>
             </div>
             {history.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
