@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, History, Lightbulb, User } from "lucide-react";
+import { Home, Utensils, MessageCircle, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -11,8 +11,8 @@ export function BottomNav() {
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Diet", href: "/diet", icon: History },
-    { name: "Chat", href: "/coach", icon: Lightbulb },
+    { name: "Diet", href: "/diet", icon: Utensils },
+    { name: "Chat", href: "/coach", icon: MessageCircle },
     { name: "Profile", href: "/profile", icon: User },
   ];
 

@@ -53,7 +53,7 @@ export default function CameraScanner({ onResult }: { onResult: (result: any) =>
   }
 
   return (
-    <div className="relative w-full max-w-md mx-auto aspect-[3/4] rounded-3xl overflow-hidden glass-card border-2 border-purple-500/30 shadow-2xl">
+    <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-[40px] overflow-hidden bg-slate-100 border-8 border-white shadow-2xl">
       <video 
         ref={videoRef} 
         autoPlay 
@@ -63,8 +63,8 @@ export default function CameraScanner({ onResult }: { onResult: (result: any) =>
       />
       
       {/* Face Guide Overlay */}
-      <div className="absolute inset-0 border-[30px] border-black/40 pointer-events-none">
-        <div className="w-full h-full border-2 border-dashed border-purple-500/40 rounded-[20%] animate-pulse flex items-center justify-center">
+      <div className="absolute inset-0 border-[40px] border-white/50 pointer-events-none">
+        <div className="w-full h-full border-2 border-dashed border-purple-500/30 rounded-[30%] flex items-center justify-center">
           <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent absolute scan-line" />
         </div>
       </div>
@@ -73,18 +73,18 @@ export default function CameraScanner({ onResult }: { onResult: (result: any) =>
         <button 
           onClick={scan}
           disabled={!isReady || isAnalyzing}
-          className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-xl border-4 border-white flex items-center justify-center shadow-2xl active:scale-95 transition-all disabled:opacity-50"
+          className="w-20 h-20 rounded-full bg-white/80 backdrop-blur-xl border-4 border-white flex items-center justify-center shadow-xl active:scale-95 transition-all disabled:opacity-50"
         >
           {isAnalyzing ? (
-            <RefreshCcw className="text-purple-400 animate-spin" size={32} />
+            <RefreshCcw className="text-purple-600 animate-spin" size={32} />
           ) : (
-            <div className="w-14 h-14 rounded-full bg-purple-500 flex items-center justify-center text-white shadow-lg">
-              <Camera size={32} />
+            <div className="w-14 h-14 rounded-full bg-primary-gradient flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+              <Camera size={28} />
             </div>
           )}
         </button>
-        <p className="text-[10px] text-purple-300 font-bold uppercase tracking-[0.2em] bg-black/40 px-3 py-1 rounded-full backdrop-blur-md">
-          {isAnalyzing ? "AI Analyzing..." : "Scan Skin"}
+        <p className="text-[9px] text-purple-600 font-black uppercase tracking-[0.2em] bg-white/90 px-4 py-1.5 rounded-full shadow-lg border border-purple-50">
+          {isAnalyzing ? "AI Analyzing..." : "Scan My Skin"}
         </p>
       </div>
     </div>
