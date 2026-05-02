@@ -2,13 +2,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Gem, AlertCircle, BrainCircuit, Target, Zap, ShieldCheck } from "lucide-react";
+import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Gem, AlertCircle, BrainCircuit, Target, Zap, ShieldCheck, ShoppingBag, Eye } from "lucide-react";
 import Link from "next/link";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
 
 export default function Home() {
-  const [view, setView] = useState<"home"|"scanner"|"results"|"history">("home");
+  const [view, setView] = useState<"home"|"scanner"|"results"|"history"|"product_results">("home");
+  const [scanMode, setScanMode] = useState<"face"|"product">("face");
   const [data, setData] = useState<any>(null);
   const [ai, setAi] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,10 +23,8 @@ export default function Home() {
   useEffect(() => {
     const h = localStorage.getItem("glowai_history");
     if (h) setHistory(JSON.parse(h));
-    
     const savedName = localStorage.getItem("glowai_user_name");
     if (savedName) setUserName(savedName);
-
     const premium = localStorage.getItem("glowai_is_premium") === "true";
     setIsPremium(premium);
   }, []);
@@ -58,6 +57,12 @@ export default function Home() {
 
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
+    
+    if (scanMode === "product") {
+      handleProductResult(res);
+      return;
+    }
+
     incrementScanCount();
     setView("results");
     setData(res);
@@ -87,6 +92,21 @@ export default function Home() {
       setAi(j.text);
     } catch { setAi("⚠️ Could not generate AI report."); }
     finally { setLoading(false); setDeepScanStep(0); }
+  }
+
+  async function handleProductResult(res: any) {
+    setView("product_results");
+    setLoading(true);
+    try {
+      const r = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "product_scan", isPremium, userName })
+      });
+      const j = await r.json();
+      setAi(j.text);
+    } catch { setAi("⚠️ Could not analyze product."); }
+    finally { setLoading(false); }
   }
 
   async function handleLearnMore() {
@@ -119,13 +139,12 @@ export default function Home() {
           <h1 className="text-[24px] font-black">Glow<span className="text-purple-600">AI</span></h1>
           <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
         </div>
-        {!isPremium && (
+        {!isPremium ? (
           <Link href="/premium" className="bg-purple-50 border border-purple-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
             <Gem size={12} className="text-purple-600" />
             <span className="text-[10px] font-black text-purple-600 uppercase tracking-tight">Upgrade</span>
           </Link>
-        )}
-        {isPremium && (
+        ) : (
           <div className="flex items-center gap-1.5 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-[1.5px] rounded-full shadow-lg shadow-purple-500/30">
             <div className="bg-white rounded-full px-3 py-1 flex items-center gap-1.5">
               <Gem size={10} className="text-purple-600 fill-purple-500" />
@@ -148,14 +167,6 @@ export default function Home() {
                   Hello, {userName}! {isPremium && <Gem size={16} className="text-purple-500 fill-purple-500" />}
                 </h2>
                 <p className="text-[13px] text-slate-600 font-medium mt-1">Let&apos;s check your skin health today 🤍</p>
-                <div className="flex gap-2 mt-4">
-                  <button onClick={()=>setGender("male")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 border transition-all ${gender==="male"?"bg-white text-slate-900 border-slate-200 shadow":"bg-slate-100 text-slate-500 border-transparent"}`}>
-                    <span className="text-blue-500">♂</span> Male
-                  </button>
-                  <button onClick={()=>setGender("female")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 border transition-all ${gender==="female"?"bg-white text-slate-900 border-slate-200 shadow":"bg-slate-100 text-slate-500 border-transparent"}`}>
-                    <span className="text-pink-500">♀</span> Female
-                  </button>
-                </div>
               </div>
               <div className="w-24 h-24 rounded-[32px] border-4 border-white shadow-xl overflow-hidden ml-3 flex-shrink-0 rotate-2">
                 <img
@@ -185,31 +196,55 @@ export default function Home() {
               </Link>
             )}
 
-            {/* Analyze Box */}
-            <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-full -mr-12 -mt-12 opacity-50" />
-              <p className="text-[15px] font-black text-slate-900 text-center mb-1">Scan Your Skin</p>
-              <p className="text-[12px] text-slate-600 font-medium text-center mb-5">Get AI-powered skin analysis in seconds</p>
+            {/* Dual Analyze Box */}
+            <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5 space-y-3">
+              <p className="text-[14px] font-black text-slate-900 px-1">AI Analysis Tools</p>
               
-              {scanLimitReached && !isPremium ? (
-                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex flex-col items-center gap-2">
-                  <div className="flex items-center gap-2 text-red-600">
-                    <AlertCircle size={18} />
-                    <p className="text-xs font-black uppercase tracking-tight">Daily Limit Reached!</p>
-                  </div>
-                  <p className="text-[10px] text-slate-500 text-center font-medium">Free users can scan 2 times per day. Upgrade for unlimited scans.</p>
-                  <Link href="/premium" className="w-full h-11 bg-primary-gradient rounded-xl text-white font-black text-xs flex items-center justify-center shadow-lg shadow-purple-500/20">
-                    Unlock Unlimited Scans 🔓
-                  </Link>
-                </div>
-              ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {/* Face Scan */}
                 <button
-                  onClick={() => checkScanLimit() && setView("scanner")}
-                  className="w-full h-16 bg-primary-gradient rounded-2xl text-white font-black text-[17px] shadow-lg shadow-purple-500/25 flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all"
+                  onClick={() => {
+                    if (checkScanLimit()) {
+                      setScanMode("face");
+                      setView("scanner");
+                    }
+                  }}
+                  className={`p-4 rounded-[22px] flex flex-col items-center gap-2 transition-all ${scanLimitReached && !isPremium ? 'bg-slate-50 opacity-60' : 'bg-purple-50/50 hover:bg-purple-50'}`}
                 >
-                  <ScanFace size={24} strokeWidth={2.5}/>
-                  Analyze My Skin
+                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600">
+                    <ScanFace size={24} />
+                  </div>
+                  <p className="text-[11px] font-black text-slate-800 uppercase tracking-tighter">Face Scan</p>
+                  <p className="text-[8px] text-slate-400 font-bold uppercase">{isPremium ? 'Unlimited' : `${2 - parseInt(localStorage.getItem("glowai_scan_count") || "0")} left`}</p>
                 </button>
+
+                {/* Product Scan */}
+                <button
+                  onClick={() => {
+                    if (isPremium) {
+                      setScanMode("product");
+                      setView("scanner");
+                    } else {
+                      alert("Product Ingredient Scanner is a Premium feature!");
+                      window.location.href = "/premium";
+                    }
+                  }}
+                  className={`p-4 rounded-[22px] flex flex-col items-center gap-2 transition-all bg-blue-50/50 hover:bg-blue-50 relative overflow-hidden`}
+                >
+                  {!isPremium && <Lock size={10} className="absolute top-2 right-2 text-slate-400" />}
+                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-500">
+                    <ShoppingBag size={22} />
+                  </div>
+                  <p className="text-[11px] font-black text-slate-800 uppercase tracking-tighter">Scan Product</p>
+                  <p className="text-[8px] text-blue-400 font-bold uppercase">{isPremium ? 'Unlimited' : 'Premium'}</p>
+                </button>
+              </div>
+
+              {scanLimitReached && !isPremium && (
+                <div className="bg-red-50 border border-red-100 rounded-2xl p-3 flex items-center gap-3">
+                  <AlertCircle size={16} className="text-red-500" />
+                  <p className="text-[10px] text-red-600 font-bold leading-tight">Daily limit reached! Upgrade for unlimited scans.</p>
+                </div>
               )}
             </div>
 
@@ -282,14 +317,47 @@ export default function Home() {
         {view === "scanner" && (
           <motion.div key="scanner" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-5">
             <div className="flex justify-between items-center mb-5">
-              <h2 className="text-xl font-black text-slate-900">Position Your Face</h2>
+              <h2 className="text-xl font-black text-slate-900">{scanMode === "face" ? "Position Your Face" : "Scan Product Label"}</h2>
               <button onClick={()=>setView("home")} className="text-slate-400 text-sm font-bold bg-white px-4 py-2 rounded-xl shadow border border-slate-100">Cancel</button>
             </div>
             <CameraScanner onResult={handleResult}/>
           </motion.div>
         )}
 
-        {/* RESULTS & DEEP ANALYSIS */}
+        {/* PRODUCT RESULTS */}
+        {view === "product_results" && (
+          <motion.div key="product_results" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="px-5 space-y-5 pb-32">
+            <div className="flex items-center gap-3 pt-2">
+              <button onClick={()=>setView("home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100">
+                <ArrowLeft size={18}/>
+              </button>
+              <h2 className="text-[17px] font-black text-slate-900">Product Analysis</h2>
+            </div>
+
+            {loading ? (
+              <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-xl p-10 flex flex-col items-center text-center space-y-6">
+                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 animate-pulse">
+                  <ShoppingBag size={40} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 mb-2">Analyzing Ingredients...</h3>
+                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Checking for harmful chemicals</p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-6 space-y-4">
+                <div className="flex items-center gap-3 text-green-500 font-black text-sm uppercase">
+                  <CheckCircle2 size={20} /> Analysis Complete
+                </div>
+                <div className="text-[13px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
+                  {ai}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* RESULTS & DEEP ANALYSIS (FACE) */}
         {view === "results" && data && (
           <motion.div key="results" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} className="px-5 space-y-4">
 
