@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Crown } from "lucide-react";
+import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Crown, AlertCircle } from "lucide-react";
 import Link from "next/link";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
@@ -17,6 +17,7 @@ export default function Home() {
   const [userName, setUserName] = useState("Glow");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
+  const [scanLimitReached, setScanLimitReached] = useState(false);
 
   useEffect(() => {
     const h = localStorage.getItem("glowai_history");
@@ -32,15 +33,46 @@ export default function Home() {
   const [skinTips, setSkinTips] = useState("");
   const [loadingTips, setLoadingTips] = useState(false);
 
+  const checkScanLimit = () => {
+    if (isPremium) return true;
+
+    const today = new Date().toDateString();
+    const lastScanDate = localStorage.getItem("glowai_last_scan_date");
+    const scanCount = parseInt(localStorage.getItem("glowai_scan_count") || "0");
+
+    if (lastScanDate === today) {
+      if (scanCount >= 2) {
+        setScanLimitReached(true);
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const incrementScanCount = () => {
+    if (isPremium) return;
+    const today = new Date().toDateString();
+    const lastScanDate = localStorage.getItem("glowai_last_scan_date");
+    let count = parseInt(localStorage.getItem("glowai_scan_count") || "0");
+
+    if (lastScanDate === today) {
+      count += 1;
+    } else {
+      count = 1;
+    }
+    localStorage.setItem("glowai_last_scan_date", today);
+    localStorage.setItem("glowai_scan_count", count.toString());
+  };
+
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     
+    incrementScanCount();
     setView("results");
     setData(res);
     setLoading(true);
     setDeepScanStep(1);
 
-    // If Premium, simulate a much deeper scan
     const delay = isPremium ? 1500 : 1000;
     
     await new Promise(r => setTimeout(r, delay));
@@ -164,13 +196,31 @@ export default function Home() {
             <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
               <p className="text-[15px] font-black text-slate-900 text-center mb-1">Scan Your Skin</p>
               <p className="text-[12px] text-slate-600 font-medium text-center mb-5">Get AI-powered skin analysis in seconds</p>
-              <button
-                onClick={()=>setView("scanner")}
-                className="w-full h-16 bg-primary-gradient rounded-2xl text-white font-black text-[17px] shadow-lg shadow-purple-500/25 flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all"
-              >
-                <ScanFace size={26} strokeWidth={2.2}/>
-                Analyze My Skin
-              </button>
+              
+              {scanLimitReached && !isPremium ? (
+                <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex flex-col items-center gap-3">
+                  <div className="flex items-center gap-2 text-red-600">
+                    <AlertCircle size={20} />
+                    <p className="text-sm font-black uppercase tracking-tight">Daily Limit Reached!</p>
+                  </div>
+                  <p className="text-[11px] text-slate-500 text-center font-medium">Free users can scan 2 times per day. Upgrade for unlimited scans.</p>
+                  <Link href="/premium" className="w-full h-12 bg-primary-gradient rounded-xl text-white font-black text-sm flex items-center justify-center shadow-lg shadow-purple-500/20">
+                    Unlock Unlimited Scans 🔓
+                  </Link>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (checkScanLimit()) {
+                      setView("scanner");
+                    }
+                  }}
+                  className="w-full h-16 bg-primary-gradient rounded-2xl text-white font-black text-[17px] shadow-lg shadow-purple-500/25 flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all"
+                >
+                  <ScanFace size={26} strokeWidth={2.2}/>
+                  Analyze My Skin
+                </button>
+              )}
             </div>
 
             {/* Know Your Skin Banner */}
