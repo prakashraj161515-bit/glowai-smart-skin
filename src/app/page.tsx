@@ -140,7 +140,7 @@ export default function Home() {
       {/* Header */}
       <header className="px-5 pt-10 pb-4 flex items-center justify-between">
         <div>
-          <h1 className="text-[24px] font-black">Glow<span className="text-purple-600">AI</span></h1>
+          <h1 className="text-[24px] font-black">Velm<span className="text-purple-600">ora</span></h1>
           <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
         </div>
         {!isPremium ? (
