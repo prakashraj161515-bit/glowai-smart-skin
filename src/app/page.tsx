@@ -16,6 +16,7 @@ export default function Home() {
   const [gender, setGender] = useState<"male"|"female">("male");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [userName, setUserName] = useState("Glow");
+  const [userPic, setUserPic] = useState("");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
   const [scanLimitReached, setScanLimitReached] = useState(false);
@@ -26,6 +27,8 @@ export default function Home() {
     if (h) setHistory(JSON.parse(h));
     const savedName = localStorage.getItem("glowai_user_name");
     if (savedName) setUserName(savedName);
+    const savedPic = localStorage.getItem("glowai_user_pic");
+    if (savedPic) setUserPic(savedPic);
     const premium = localStorage.getItem("glowai_is_premium") === "true";
     setIsPremium(premium);
     const count = parseInt(localStorage.getItem("glowai_scan_count") || "0");
@@ -171,9 +174,9 @@ export default function Home() {
               </div>
               <div className="w-24 h-24 rounded-[32px] border-4 border-white shadow-xl overflow-hidden ml-3 flex-shrink-0 rotate-2">
                 <img
-                  src={gender==="male"
+                  src={userPic || (gender==="male"
                     ? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-                    : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face"}
+                    : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face")}
                   alt="person" className="w-full h-full object-cover -rotate-2"
                 />
               </div>
