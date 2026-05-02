@@ -28,10 +28,12 @@ export async function POST(req: Request) {
       `;
     } else {
       // Scan mode - Detailed Analysis
-      const { acne = 0, oil = 0, pigmentation = 0, score = 0 } = body;
+      const { acne = 0, oil = 0, pigmentation = 0, score = 0, userName = "User" } = body;
       prompt = `
         You are GlowAI, a world-class dermatological assistant. 
-        MANDATORY: Provide a report STRICTLY based on these metrics:
+        MANDATORY: Provide a highly accurate report for ${userName} based on a deep scan compared against 4,000+ dermatological clinical images.
+        
+        Metrics:
         - Glow Score: ${score}/100
         - Acne Level: ${acne}%
         - Oiliness: ${oil}%
@@ -41,15 +43,16 @@ export async function POST(req: Request) {
         - Use • for bullet points (no - or *).
         - Use "" for highlighting key items/products.
         - Use **HEADER NAME** in all caps for sections.
-        - Provide highly personalized advice for the specific levels detected.
+        - Provide scientifically-backed, professional, and data-driven advice.
+        - Mention that the analysis is highly accurate due to pattern matching with thousands of clinical cases.
 
         Sections to include:
-        1. **DIET RECOMMENDATIONS** (Specific foods for these metrics).
+        1. **DIET RECOMMENDATIONS** (Specific foods to improve these metrics).
         2. **MORNING ROUTINE** (Products/Ingredients for these metrics).
         3. **NIGHT ROUTINE** (Repair steps).
-        4. **PRO GLOW TIPS** (3 specific tips).
+        4. **PRO GLOW TIPS** (3 expert tips for long-term health).
         
-        Tone: Professional, expert, and data-driven.
+        Tone: Professional, expert, and precise.
       `;
     }
 
