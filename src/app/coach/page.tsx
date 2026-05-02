@@ -19,11 +19,11 @@ export default function CoachPage() {
 
   // Load status and messages
   useEffect(() => {
-    const premium = localStorage.getItem("glowai_is_premium") === "true";
+    const premium = localStorage.getItem("velmora_is_premium") === "true";
     setIsPremium(premium);
 
-    const saved = localStorage.getItem("glowai_chat_history");
-    const initialMsg = { id: '1', role: "assistant", content: "Hi! I'm your GlowAI Coach. How can I help you today? ✨", timestamp: Date.now() };
+    const saved = localStorage.getItem("velmora_chat_history");
+    const initialMsg = { id: '1', role: "assistant", content: "Hi! I'm your Velmora Coach. How can I help you today? ✨", timestamp: Date.now() };
     
     if (saved) {
       try {
@@ -48,8 +48,8 @@ export default function CoachPage() {
     }
 
     const today = new Date().toDateString();
-    const lastChatDate = localStorage.getItem("glowai_last_chat_date");
-    const chatCount = parseInt(localStorage.getItem("glowai_chat_count") || "0");
+    const lastChatDate = localStorage.getItem("velmora_last_chat_date");
+    const chatCount = parseInt(localStorage.getItem("velmora_chat_count") || "0");
 
     if (lastChatDate === today) {
       setMessagesLeft(Math.max(0, 5 - chatCount));
@@ -67,16 +67,16 @@ export default function CoachPage() {
   const incrementChatCount = () => {
     if (isPremium) return;
     const today = new Date().toDateString();
-    const lastChatDate = localStorage.getItem("glowai_last_chat_date");
-    let count = parseInt(localStorage.getItem("glowai_chat_count") || "0");
+    const lastChatDate = localStorage.getItem("velmora_last_chat_date");
+    let count = parseInt(localStorage.getItem("velmora_chat_count") || "0");
 
     if (lastChatDate === today) {
       count += 1;
     } else {
       count = 1;
     }
-    localStorage.setItem("glowai_last_chat_date", today);
-    localStorage.setItem("glowai_chat_count", count.toString());
+    localStorage.setItem("velmora_last_chat_date", today);
+    localStorage.setItem("velmora_chat_count", count.toString());
     setMessagesLeft(Math.max(0, 5 - count));
     if (count >= 5) setMessageLimitReached(true);
   };
@@ -84,7 +84,7 @@ export default function CoachPage() {
   // Save messages
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem("glowai_chat_history", JSON.stringify(messages));
+      localStorage.setItem("velmora_chat_history", JSON.stringify(messages));
     }
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -126,7 +126,7 @@ export default function CoachPage() {
 
       let scanContext = "";
       try {
-        const scanData = localStorage.getItem("glowai_analysis");
+        const scanData = localStorage.getItem("velmora_analysis");
         if (scanData) {
           const parsed = JSON.parse(scanData);
           scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%.`;
@@ -225,8 +225,8 @@ export default function CoachPage() {
         </div>
         <button onClick={() => {
           if (confirm("Clear all messages?")) {
-            setMessages([{ id: '1', role: "assistant", content: "Hi! I'm your GlowAI Coach. How can I help you today? ✨", timestamp: Date.now() }]);
-            localStorage.removeItem("glowai_chat_history");
+            setMessages([{ id: '1', role: "assistant", content: "Hi! I'm your Velmora Coach. How can I help you today? ✨", timestamp: Date.now() }]);
+            localStorage.removeItem("velmora_chat_history");
           }
         }} className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-400 border border-slate-100">
           <Trash2 size={18} />

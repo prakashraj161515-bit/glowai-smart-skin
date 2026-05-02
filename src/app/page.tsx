@@ -23,18 +23,18 @@ export default function Home() {
   const [scanCount, setScanCount] = useState(0);
 
   useEffect(() => {
-    const h = localStorage.getItem("glowai_history");
+    const h = localStorage.getItem("velmora_history");
     if (h) setHistory(JSON.parse(h));
-    const savedName = localStorage.getItem("glowai_user_name");
+    const savedName = localStorage.getItem("velmora_user_name");
     if (savedName) setUserName(savedName);
-    const savedPic = localStorage.getItem("glowai_user_pic");
+    const savedPic = localStorage.getItem("velmora_user_pic");
     if (savedPic) setUserPic(savedPic);
-    const premium = localStorage.getItem("glowai_is_premium") === "true";
+    const premium = localStorage.getItem("velmora_is_premium") === "true";
     setIsPremium(premium);
-    const count = parseInt(localStorage.getItem("glowai_scan_count") || "0");
+    const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
     setScanCount(count);
     const today = new Date().toDateString();
-    const lastScanDate = localStorage.getItem("glowai_last_scan_date");
+    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
     if (lastScanDate === today && count >= 2 && !premium) setScanLimitReached(true);
   }, []);
 
@@ -44,7 +44,7 @@ export default function Home() {
   const checkScanLimit = () => {
     if (isPremium) return true;
     const today = new Date().toDateString();
-    const lastScanDate = localStorage.getItem("glowai_last_scan_date");
+    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
     if (lastScanDate === today && scanCount >= 2) {
       setScanLimitReached(true);
       return false;
@@ -55,12 +55,12 @@ export default function Home() {
   const incrementScanCount = () => {
     if (isPremium) return;
     const today = new Date().toDateString();
-    const lastScanDate = localStorage.getItem("glowai_last_scan_date");
-    let count = parseInt(localStorage.getItem("glowai_scan_count") || "0");
+    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
+    let count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
     if (lastScanDate === today) count += 1;
     else count = 1;
-    localStorage.setItem("glowai_last_scan_date", today);
-    localStorage.setItem("glowai_scan_count", count.toString());
+    localStorage.setItem("velmora_last_scan_date", today);
+    localStorage.setItem("velmora_scan_count", count.toString());
     setScanCount(count);
   };
 
@@ -85,7 +85,7 @@ export default function Home() {
     };
     const updated = [entry, ...history].slice(0, 10);
     setHistory(updated);
-    localStorage.setItem("glowai_history", JSON.stringify(updated));
+    localStorage.setItem("velmora_history", JSON.stringify(updated));
     try {
       const r = await fetch("/api/generate", {
         method: "POST",
@@ -221,9 +221,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Why GlowAI */}
+            {/* Why Velmora */}
             <div>
-              <p className="text-[14px] font-black text-slate-900 mb-3 px-1">Why GlowAI?</p>
+              <p className="text-[14px] font-black text-slate-900 mb-3 px-1">Why Velmora?</p>
               <div className="grid grid-cols-4 gap-2.5">
                 {[
                   {label:"AI Powered",sub:"Smart Logic",icon:BrainCircuit,bg:"bg-blue-50",color:"text-blue-500"},

@@ -24,10 +24,10 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("glowai_is_logged_in");
-    const savedName = localStorage.getItem("glowai_user_name");
-    const savedPic = localStorage.getItem("glowai_user_pic");
-    const premium = localStorage.getItem("glowai_is_premium") === "true";
+    const saved = localStorage.getItem("velmora_is_logged_in");
+    const savedName = localStorage.getItem("velmora_user_name");
+    const savedPic = localStorage.getItem("velmora_user_pic");
+    const premium = localStorage.getItem("velmora_is_premium") === "true";
     
     if (saved === "true") setIsLoggedIn(true);
     if (savedName) setUserName(savedName);
@@ -39,9 +39,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("glowai_is_logged_in", isLoggedIn ? "true" : "false");
-      localStorage.setItem("glowai_user_name", userName);
-      localStorage.setItem("glowai_user_pic", profilePic);
+      localStorage.setItem("velmora_is_logged_in", isLoggedIn ? "true" : "false");
+      localStorage.setItem("velmora_user_name", userName);
+      localStorage.setItem("velmora_user_pic", profilePic);
     }
   }, [isLoggedIn, isLoaded, userName, profilePic]);
 
@@ -233,10 +233,10 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem("glowai_is_logged_in"); localStorage.removeItem("glowai_is_premium"); }} className="w-full h-16 premium-card flex items-center justify-center gap-3 text-red-500 font-black text-sm hover:bg-red-50 border-red-100 transition-colors mt-8 shadow-lg shadow-red-500/5">
+        <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem("velmora_is_logged_in"); localStorage.removeItem("velmora_is_premium"); }} className="w-full h-16 premium-card flex items-center justify-center gap-3 text-red-500 font-black text-sm hover:bg-red-50 border-red-100 transition-colors mt-8 shadow-lg shadow-red-500/5">
           <LogOut size={20} /> Log Out Account
         </button>
-        <p className="text-center text-[10px] text-slate-400 font-black uppercase tracking-widest pb-10">GlowAI Premium • Build v1.3.0</p>
+        <p className="text-center text-[10px] text-slate-400 font-black uppercase tracking-widest pb-10">Velmora Premium • Build v1.3.0</p>
       </div>
     </div>
   );

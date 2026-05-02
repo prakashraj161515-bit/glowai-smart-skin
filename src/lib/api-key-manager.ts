@@ -1,5 +1,5 @@
 /**
- * GlowAI API Key Manager
+ * Velmora API Key Manager
  */
 
 export function getSecureKey(): string {

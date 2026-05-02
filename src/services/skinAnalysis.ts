@@ -1,5 +1,5 @@
 /**
- * GlowAI Skin Analysis Service
+ * Velmora Skin Analysis Service
  * Uses MediaPipe for face landmarks and custom pixel analysis for skin metrics.
  */
 

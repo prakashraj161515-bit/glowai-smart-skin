@@ -12,7 +12,7 @@ export function BottomNav() {
   const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
-    const premium = localStorage.getItem("glowai_is_premium") === "true";
+    const premium = localStorage.getItem("velmora_is_premium") === "true";
     setIsPremium(premium);
   }, [pathname]);
 

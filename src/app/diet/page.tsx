@@ -14,7 +14,7 @@ export default function DietPage() {
   const [showSaved, setShowSaved] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("glowai_saved_diets");
+    const saved = localStorage.getItem("velmora_saved_diets");
     if (saved) setSavedPlans(JSON.parse(saved));
   }, []);
 
@@ -24,7 +24,7 @@ export default function DietPage() {
     
     let scanContext = "";
     try {
-      const scanData = localStorage.getItem("glowai_analysis");
+      const scanData = localStorage.getItem("velmora_analysis");
       if (scanData) {
         const parsed = JSON.parse(scanData);
         scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%.`;
@@ -62,14 +62,14 @@ export default function DietPage() {
     };
     const updated = [newPlan, ...savedPlans];
     setSavedPlans(updated);
-    localStorage.setItem("glowai_saved_diets", JSON.stringify(updated));
+    localStorage.setItem("velmora_saved_diets", JSON.stringify(updated));
     alert("Diet Plan Saved! 💾");
   };
 
   const deletePlan = (id: string) => {
     const updated = savedPlans.filter(p => p.id !== id);
     setSavedPlans(updated);
-    localStorage.setItem("glowai_saved_diets", JSON.stringify(updated));
+    localStorage.setItem("velmora_saved_diets", JSON.stringify(updated));
   };
 
   const formatText = (content: string) => {

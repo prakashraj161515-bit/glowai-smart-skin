@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
-  title: "GlowAI – Smart Skin Analysis",
+  title: "Velmora – Smart Skin Analysis",
   description: "AI-powered personalized skin analysis and coaching app.",
 };
 

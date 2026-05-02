@@ -50,7 +50,7 @@ export default function PremiumPage() {
 
   const handleSubscribe = () => {
     alert("This is a demo. Integrating payment gateway...");
-    localStorage.setItem("glowai_is_premium", "true");
+    localStorage.setItem("velmora_is_premium", "true");
     router.push("/profile");
   };
 
@@ -70,7 +70,7 @@ export default function PremiumPage() {
           <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md border border-white/30 shadow-2xl">
             <Gem size={28} className="text-purple-300 fill-purple-300" />
           </div>
-          <h1 className="text-2xl font-black mb-1">GlowAI Premium</h1>
+          <h1 className="text-2xl font-black mb-1">Velmora Premium</h1>
           <p className="text-white/80 font-bold text-[10px] uppercase tracking-[0.2em]">Upgrade for clinical results</p>
         </motion.div>
       </div>

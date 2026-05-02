@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
     const prompt = `
-You are the GlowAI Smart Skin Coach. Analyze these metrics and provide a comprehensive skin report:
+You are the Velmora Smart Skin Coach. Analyze these metrics and provide a comprehensive skin report:
 - Overall Score: ${metrics?.score ?? 70}/100
 - Redness (Acne): ${metrics?.redness ?? 0}%
 - Oiliness: ${metrics?.oiliness ?? 0}%

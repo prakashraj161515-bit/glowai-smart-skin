@@ -51,7 +51,7 @@ export default function ScanPage() {
     setProgress(40);
     
     await new Promise(r => setTimeout(r, 1500));
-    setAnalysisStatus("Consulting GlowAI Experts...");
+    setAnalysisStatus("Consulting Velmora Experts...");
     setProgress(75);
 
     // Generate Dynamic Metrics
@@ -70,7 +70,7 @@ export default function ScanPage() {
       });
       const aiAdvice = await res.json();
       localStorage.setItem('latestScan', JSON.stringify({ metrics: dynamicMetrics, advice: aiAdvice }));
-      localStorage.setItem('glowai_analysis', JSON.stringify(dynamicMetrics));
+      localStorage.setItem('velmora_analysis', JSON.stringify(dynamicMetrics));
     } catch (e) {
       console.error("Analysis failed", e);
     }

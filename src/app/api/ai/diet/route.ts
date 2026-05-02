@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     });
 
     const prompt = `
-You are the GlowAI Dietitian. Generate a personalized 7-day skincare-focused diet plan for a user.
+You are the Velmora Dietitian. Generate a personalized 7-day skincare-focused diet plan for a user.
 User's Skin Context: ${context || "Healthy skin, no specific issues mentioned."}
 
 CRITICAL RULES:
