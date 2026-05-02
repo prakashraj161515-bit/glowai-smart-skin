@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { Bell, Upload, Camera, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lightbulb, Lock } from "lucide-react";
+import { Bell, Upload, Camera, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock } from "lucide-react";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
 
@@ -13,7 +13,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState<"male"|"female">("male");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [activeNav, setActiveNav] = useState<"home"|"history"|"tips"|"profile">("home");
 
   useEffect(() => {
     const h = localStorage.getItem("glowai_history");
@@ -41,10 +40,10 @@ export default function Home() {
   }
 
   const skinLabel = (v: number) => v > 65 ? "High" : v > 40 ? "Moderate" : "Normal";
-  const scoreColor = (v: number) => v > 65 ? "#F87171" : v > 40 ? "#FB923C" : "#34D399";
 
   return (
-    <div className="min-h-screen bg-[#F4F6FF] font-outfit">
+    <div className="min-h-screen bg-[#F4F6FF] font-outfit pb-28">
+
       {/* Header */}
       <header className="px-5 pt-10 pb-4 flex justify-between items-center">
         <div>
@@ -61,12 +60,13 @@ export default function Home() {
 
         {/* HOME */}
         {view === "home" && (
-          <motion.div key="home" initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-16}} className="px-5 pb-28 space-y-5">
+          <motion.div key="home" initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-16}} className="px-5 space-y-5">
+
             {/* Hero */}
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <h2 className="text-[26px] font-black text-slate-900 leading-tight">Hello, Glow! 👋</h2>
-                <p className="text-sm text-slate-400 mt-1">Let's check your skin health today 🤍</p>
+                <p className="text-sm text-slate-400 mt-1">Let&apos;s check your skin health today 🤍</p>
                 <div className="flex gap-2 mt-4">
                   <button onClick={()=>setGender("male")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1 border transition-all ${gender==="male"?"bg-white text-slate-800 border-slate-200 shadow":"bg-transparent text-slate-400 border-transparent"}`}>
                     <span className="text-blue-500">♂</span> Male
@@ -77,7 +77,10 @@ export default function Home() {
                 </div>
               </div>
               <div className="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden ml-3 flex-shrink-0">
-                <img src={gender==="male" ? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop&face" : "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&face"} alt="person" className="w-full h-full object-cover"/>
+                <img
+                  src={gender==="male" ? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" : "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop"}
+                  alt="person" className="w-full h-full object-cover"
+                />
               </div>
             </div>
 
@@ -85,11 +88,11 @@ export default function Home() {
             <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
               <p className="text-[14px] font-black text-slate-900 text-center">Upload Your Photo</p>
               <p className="text-[11px] text-slate-400 text-center mb-4">Get AI-powered skin analysis in seconds</p>
-              <div className="upload-area p-8 flex flex-col items-center gap-3 cursor-pointer" onClick={()=>setView("scanner")}>
+              <div className="border-2 border-dashed border-purple-200 rounded-[18px] bg-gradient-to-br from-[#FAF7FF] to-[#FFF0F9] p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-purple-400 transition-all" onClick={()=>setView("scanner")}>
                 <div className="w-16 h-16 rounded-[18px] bg-purple-100 flex items-center justify-center animate-float">
                   <Upload size={28} className="text-purple-600"/>
                 </div>
-                <p className="text-xs text-slate-400">Drag & drop your image here</p>
+                <p className="text-xs text-slate-400">Drag &amp; drop your image here</p>
                 <p className="text-xs text-slate-300">or</p>
                 <button className="flex items-center gap-2 text-purple-600 font-bold text-sm border border-purple-200 bg-white px-4 py-2 rounded-xl shadow-sm">
                   <Camera size={16}/> Choose Image
@@ -134,7 +137,11 @@ export default function Home() {
             <div className="pb-4">
               <p className="text-[15px] font-black text-slate-900 mb-3">How It Works?</p>
               <div className="flex items-start justify-between">
-                {[{n:"1",label:"Upload Photo",sub:"Take clear face photo",icon:"📷"},{n:"2",label:"AI Analyzes",sub:"Our AI analyzes deeply",icon:"🤖"},{n:"3",label:"Get Results",sub:"See scores & tips",icon:"📊"}].map((s,i)=>(
+                {[
+                  {n:"1",label:"Upload Photo",sub:"Take clear face photo",icon:"📷"},
+                  {n:"2",label:"AI Analyzes",sub:"Our AI analyzes deeply",icon:"🤖"},
+                  {n:"3",label:"Get Results",sub:"See scores & tips",icon:"📊"}
+                ].map((s,i)=>(
                   <div key={i} className="flex-1 flex flex-col items-center text-center px-1 relative">
                     {i<2 && <div className="absolute top-7 right-0 text-slate-200 font-bold text-lg">→</div>}
                     <div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl mb-2 relative">
@@ -163,7 +170,8 @@ export default function Home() {
 
         {/* RESULTS */}
         {view === "results" && data && (
-          <motion.div key="results" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} className="px-5 pb-32 space-y-4">
+          <motion.div key="results" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} className="px-5 space-y-4">
+
             {/* Top Bar */}
             <div className="flex justify-between items-center pt-2">
               <button onClick={()=>setView("home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100">
@@ -178,7 +186,6 @@ export default function Home() {
             {/* Score Card */}
             <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
               <div className="flex items-center gap-5">
-                {/* Ring */}
                 <div className="relative w-28 h-28 flex-shrink-0">
                   <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
                     <defs>
@@ -200,7 +207,6 @@ export default function Home() {
                     <p className="text-[11px] text-green-500 font-bold">Good 😊</p>
                   </div>
                 </div>
-                {/* Message */}
                 <div className="flex-1">
                   <p className="text-[15px] font-black text-purple-600 mb-1">Great job!</p>
                   <p className="text-[12px] text-slate-500 leading-relaxed">Your skin is in good condition. Keep following a good skincare routine.</p>
@@ -246,7 +252,7 @@ export default function Home() {
                 <button className="text-[11px] font-bold text-purple-600">View All</button>
               </div>
               <div className="grid grid-cols-4 gap-2">
-                {[{icon:"💧",label:"Stay Hydrated"},{icon:"🧴",label:"Use Mild Cleanser"},{icon:"☀️",label:"Wear Sunscreen"},{icon:"🌙",label:"Get Enough Sleep"}].map((r,i)=>(
+                {[{icon:"💧",label:"Stay Hydrated"},{icon:"🧴",label:"Mild Cleanser"},{icon:"☀️",label:"Wear Sunscreen"},{icon:"🌙",label:"Enough Sleep"}].map((r,i)=>(
                   <div key={i} className="bg-[#F8F6FF] rounded-2xl flex flex-col items-center justify-center p-3 gap-1 text-center">
                     <span className="text-xl">{r.icon}</span>
                     <p className="text-[9px] font-bold text-slate-700 leading-tight">{r.label}</p>
@@ -256,14 +262,11 @@ export default function Home() {
             </div>
 
             {/* Skin Type */}
-            <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5 flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl bg-purple-50 flex items-center justify-center text-3xl flex-shrink-0">👤</div>
+            <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-4 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center text-3xl flex-shrink-0">👤</div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-base">🔬</span>
-                  <p className="text-[13px] font-black text-slate-900">Combination Skin</p>
-                </div>
-                <p className="text-[11px] text-slate-500 leading-relaxed">Your skin is slightly oily in T-zone and normal in cheeks.</p>
+                <p className="text-[13px] font-black text-slate-900">🔬 Combination Skin</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">Your skin is slightly oily in T-zone and normal in cheeks.</p>
                 <button className="text-[11px] font-bold text-purple-600 mt-1">Learn More</button>
               </div>
             </div>
@@ -289,7 +292,7 @@ export default function Home() {
             <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
               <div className="flex justify-between items-center mb-3">
                 <p className="text-[15px] font-black text-slate-900">🕐 History</p>
-                <button onClick={()=>{setActiveNav("history");setView("history");}} className="text-[11px] font-bold text-purple-600">View All</button>
+                <button onClick={()=>setView("history")} className="text-[11px] font-bold text-purple-600">View All</button>
               </div>
               {history.length === 0 ? (
                 <p className="text-[12px] text-slate-400 text-center py-3">No history yet</p>
@@ -315,7 +318,7 @@ export default function Home() {
             </div>
 
             {/* Upgrade Banner */}
-            <div className="bg-primary-gradient rounded-[24px] p-5 flex items-center justify-between relative overflow-hidden">
+            <div className="bg-primary-gradient rounded-[24px] p-5 flex items-center justify-between relative overflow-hidden mb-4">
               <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"/>
               <div className="z-10 flex-1">
                 <p className="text-white font-black text-[15px]">Unlock Advanced Insights</p>
@@ -331,9 +334,9 @@ export default function Home() {
 
         {/* HISTORY PAGE */}
         {view === "history" && (
-          <motion.div key="history" initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0}} className="px-5 pb-28">
+          <motion.div key="history" initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0}} className="px-5">
             <div className="flex items-center gap-3 mb-5 pt-2">
-              <button onClick={()=>{setView("home");setActiveNav("home");}} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100">
+              <button onClick={()=>setView(data ? "results" : "home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100">
                 <ArrowLeft size={18}/>
               </button>
               <h2 className="text-[18px] font-black text-slate-900">Scan History</h2>
@@ -342,7 +345,7 @@ export default function Home() {
               <div className="flex flex-col items-center justify-center py-20 gap-4">
                 <div className="text-6xl">📭</div>
                 <p className="text-[15px] font-bold text-slate-400">No scans yet</p>
-                <button onClick={()=>{setView("scanner");setActiveNav("home");}} className="bg-primary-gradient text-white font-black px-6 py-3 rounded-2xl text-sm">
+                <button onClick={()=>setView("scanner")} className="bg-primary-gradient text-white font-black px-6 py-3 rounded-2xl text-sm">
                   Start Your First Scan ✨
                 </button>
               </div>
@@ -370,24 +373,6 @@ export default function Home() {
         )}
 
       </AnimatePresence>
-
-      {/* Bottom Nav */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-5 pb-6 pt-3 bg-gradient-to-t from-white via-white/90 to-transparent z-50">
-        <nav className="bg-white border border-[#EEF0FF] rounded-[22px] shadow-lg shadow-purple-500/10 h-16 px-6 flex items-center justify-around">
-          {[
-            {id:"home" as const,label:"Home",icon:"🏠"},
-            {id:"history" as const,label:"History",icon:"🕐"},
-            {id:"tips" as const,label:"Tips",icon:"💡"},
-            {id:"profile" as const,label:"Profile",icon:"👤"},
-          ].map(n=>(
-            <button key={n.id} onClick={()=>{setActiveNav(n.id);if(n.id==="history")setView("history");else if(n.id==="home")setView("home");}} className="flex flex-col items-center gap-0.5 relative">
-              <span className={`text-xl transition-transform ${activeNav===n.id?"scale-110":""}`}>{n.icon}</span>
-              <span className={`text-[9px] font-black tracking-wider uppercase ${activeNav===n.id?"text-purple-600":"text-slate-300"}`}>{n.label}</span>
-              {activeNav===n.id && <motion.div layoutId="nav-active" className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-1 bg-purple-600 rounded-full"/>}
-            </button>
-          ))}
-        </nav>
-      </div>
     </div>
   );
 }
