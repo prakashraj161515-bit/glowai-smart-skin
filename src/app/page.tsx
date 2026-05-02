@@ -119,6 +119,12 @@ export default function Home() {
           <h1 className="text-[24px] font-black">Glow<span className="text-purple-600">AI</span></h1>
           <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
         </div>
+        {!isPremium && (
+          <Link href="/premium" className="bg-purple-50 border border-purple-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
+            <Gem size={12} className="text-purple-600" />
+            <span className="text-[10px] font-black text-purple-600 uppercase tracking-tight">Upgrade</span>
+          </Link>
+        )}
         {isPremium && (
           <div className="flex items-center gap-1.5 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-[1.5px] rounded-full shadow-lg shadow-purple-500/30">
             <div className="bg-white rounded-full px-3 py-1 flex items-center gap-1.5">
