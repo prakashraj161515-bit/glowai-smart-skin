@@ -19,14 +19,27 @@ export default function Home() {
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
   const [scanLimitReached, setScanLimitReached] = useState(false);
+  const [scanCount, setScanCount] = useState(0);
 
   useEffect(() => {
+    // Only run on client
     const h = localStorage.getItem("glowai_history");
     if (h) setHistory(JSON.parse(h));
+    
     const savedName = localStorage.getItem("glowai_user_name");
     if (savedName) setUserName(savedName);
+    
     const premium = localStorage.getItem("glowai_is_premium") === "true";
     setIsPremium(premium);
+
+    const count = parseInt(localStorage.getItem("glowai_scan_count") || "0");
+    setScanCount(count);
+
+    const today = new Date().toDateString();
+    const lastScanDate = localStorage.getItem("glowai_last_scan_date");
+    if (lastScanDate === today && count >= 2 && !premium) {
+      setScanLimitReached(true);
+    }
   }, []);
 
   const [skinTips, setSkinTips] = useState("");
@@ -36,7 +49,6 @@ export default function Home() {
     if (isPremium) return true;
     const today = new Date().toDateString();
     const lastScanDate = localStorage.getItem("glowai_last_scan_date");
-    const scanCount = parseInt(localStorage.getItem("glowai_scan_count") || "0");
     if (lastScanDate === today && scanCount >= 2) {
       setScanLimitReached(true);
       return false;
@@ -53,6 +65,7 @@ export default function Home() {
     else count = 1;
     localStorage.setItem("glowai_last_scan_date", today);
     localStorage.setItem("glowai_scan_count", count.toString());
+    setScanCount(count);
   };
 
   async function handleResult(res: any) {
@@ -215,7 +228,7 @@ export default function Home() {
                     <ScanFace size={24} />
                   </div>
                   <p className="text-[11px] font-black text-slate-800 uppercase tracking-tighter">Face Scan</p>
-                  <p className="text-[8px] text-slate-400 font-bold uppercase">{isPremium ? 'Unlimited' : `${2 - parseInt(localStorage.getItem("glowai_scan_count") || "0")} left`}</p>
+                  <p className="text-[8px] text-slate-400 font-bold uppercase">{isPremium ? 'Unlimited' : `${Math.max(0, 2 - scanCount)} left`}</p>
                 </button>
 
                 {/* Product Scan */}
@@ -269,7 +282,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Know Your Skin Banner */}
+            {/* Know Your Skin Better */}
             <div className="bg-primary-gradient rounded-[28px] p-5 overflow-hidden relative border border-white/10">
               <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-2xl" />
               <div className="flex items-center justify-between mb-3">
