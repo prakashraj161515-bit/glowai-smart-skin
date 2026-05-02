@@ -134,15 +134,15 @@ export default function PremiumPage() {
         </div>
       </div>
 
-      {/* Footer Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#F4F6FF] via-[#F4F6FF] to-transparent">
+      {/* Footer Button - Lifted to avoid BottomNav overlap */}
+      <div className="fixed bottom-[85px] left-0 right-0 p-6 bg-gradient-to-t from-[#F4F6FF] via-[#F4F6FF] to-transparent z-40">
         <button 
           onClick={handleSubscribe}
-          className="w-full h-15 bg-primary-gradient rounded-[20px] text-white font-black text-md shadow-2xl shadow-purple-500/30 active:scale-95 transition-transform flex items-center justify-center gap-2"
+          className="w-full h-16 bg-primary-gradient rounded-[24px] text-white font-black text-lg shadow-2xl shadow-purple-500/30 active:scale-95 transition-transform flex items-center justify-center gap-3"
         >
-          Subscribe Now <ChevronRight size={18} />
+          Subscribe Now <ChevronRight size={20} />
         </button>
-        <p className="text-center text-[9px] text-slate-400 font-bold mt-3">Cancel anytime • Secure Payment</p>
+        <p className="text-center text-[10px] text-slate-400 font-bold mt-4">Cancel anytime • Secure Payment</p>
       </div>
     </div>
   );
