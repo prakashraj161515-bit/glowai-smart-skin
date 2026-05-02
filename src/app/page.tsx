@@ -136,8 +136,11 @@ export default function Home() {
           <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
         </div>
         {isPremium && (
-          <div className="bg-yellow-400 p-2 rounded-xl shadow-lg shadow-yellow-500/20">
-            <Crown size={18} className="text-white fill-white" />
+          <div className="flex items-center gap-1.5 bg-gradient-to-br from-yellow-400 via-orange-400 to-yellow-600 p-[1.5px] rounded-full shadow-lg shadow-yellow-500/30">
+            <div className="bg-white rounded-full px-3 py-1 flex items-center gap-1.5">
+              <Crown size={12} className="text-yellow-600 fill-yellow-500" />
+              <span className="text-[9px] font-black text-yellow-700 uppercase tracking-tighter">Pro</span>
+            </div>
           </div>
         )}
       </header>

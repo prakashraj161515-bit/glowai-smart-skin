@@ -261,9 +261,11 @@ export default function ProfilePage() {
             </div>
           )}
           {isPremium ? (
-            <div className="flex items-center gap-1.5 mt-1 bg-yellow-400/10 border border-yellow-400/20 px-4 py-1.5 rounded-full shadow-sm">
-              <Crown size={12} className="text-yellow-600 fill-yellow-600" />
-              <p className="text-[10px] text-yellow-700 font-black uppercase tracking-widest">Premium Member</p>
+            <div className="flex items-center gap-1.5 mt-1 bg-gradient-to-br from-yellow-400 via-orange-400 to-yellow-600 p-[1px] rounded-full shadow-lg shadow-yellow-500/20">
+              <div className="bg-white rounded-full px-4 py-1 flex items-center gap-1.5">
+                <Crown size={12} className="text-yellow-600 fill-yellow-500" />
+                <p className="text-[10px] text-yellow-700 font-black uppercase tracking-widest">Premium Member</p>
+              </div>
             </div>
           ) : (
             <Link href="/premium" className="flex items-center gap-1.5 mt-1 bg-purple-50 border border-purple-100 px-4 py-1.5 rounded-full shadow-sm animate-pulse">
