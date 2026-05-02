@@ -11,8 +11,8 @@ export function BottomNav() {
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
-    { name: "History", href: "/diet", icon: History },
-    { name: "Tips", href: "/coach", icon: Lightbulb },
+    { name: "Diet", href: "/diet", icon: History },
+    { name: "Chat", href: "/coach", icon: Lightbulb },
     { name: "Profile", href: "/profile", icon: User },
   ];
 

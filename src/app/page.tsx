@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { Bell, Upload, Camera, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock } from "lucide-react";
+import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock } from "lucide-react";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
 
@@ -19,6 +19,9 @@ export default function Home() {
     if (h) setHistory(JSON.parse(h));
   }, []);
 
+  const [skinTips, setSkinTips] = useState("");
+  const [loadingTips, setLoadingTips] = useState(false);
+
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     setData(res);
@@ -32,11 +35,34 @@ export default function Home() {
     setHistory(updated);
     localStorage.setItem("glowai_history", JSON.stringify(updated));
     try {
-      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(res) });
+      const r = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...res, gender })
+      });
       const j = await r.json();
       setAi(j.text);
     } catch { setAi("⚠️ Could not generate AI report."); }
     finally { setLoading(false); }
+  }
+
+  async function handleLearnMore() {
+    setLoadingTips(true);
+    setSkinTips("");
+    try {
+      const r = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: `Give me 5 personalized skin improvement tips for a ${gender} person in simple bullet points. Focus on daily routine, diet and skincare habits.`,
+          history: [],
+          context: ""
+        })
+      });
+      const j = await r.json();
+      setSkinTips(j.text || "⚠️ Could not fetch tips.");
+    } catch { setSkinTips("⚠️ Server busy. Try again."); }
+    finally { setLoadingTips(false); }
   }
 
   const skinLabel = (v: number) => v > 65 ? "High" : v > 40 ? "Moderate" : "Normal";
@@ -44,16 +70,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#F4F6FF] font-outfit pb-28">
 
-      {/* Header */}
-      <header className="px-5 pt-10 pb-4 flex justify-between items-center">
-        <div>
-          <h1 className="text-[22px] font-black">Glow<span className="text-purple-600">AI</span></h1>
-          <p className="text-[10px] text-slate-400 font-semibold">Smart Skin, Better You</p>
-        </div>
-        <button className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 relative border border-slate-100">
-          <Bell size={18}/>
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"/>
-        </button>
+      {/* Header - no bell icon */}
+      <header className="px-5 pt-10 pb-4">
+        <h1 className="text-[24px] font-black">Glow<span className="text-purple-600">AI</span></h1>
+        <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
       </header>
 
       <AnimatePresence mode="wait">
@@ -66,40 +86,36 @@ export default function Home() {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <h2 className="text-[26px] font-black text-slate-900 leading-tight">Hello, Glow! 👋</h2>
-                <p className="text-sm text-slate-400 mt-1">Let&apos;s check your skin health today 🤍</p>
+                <p className="text-[13px] text-slate-600 font-medium mt-1">Let&apos;s check your skin health today 🤍</p>
                 <div className="flex gap-2 mt-4">
-                  <button onClick={()=>setGender("male")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1 border transition-all ${gender==="male"?"bg-white text-slate-800 border-slate-200 shadow":"bg-transparent text-slate-400 border-transparent"}`}>
+                  <button onClick={()=>setGender("male")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 border transition-all ${gender==="male"?"bg-white text-slate-900 border-slate-200 shadow":"bg-slate-100 text-slate-500 border-transparent"}`}>
                     <span className="text-blue-500">♂</span> Male
                   </button>
-                  <button onClick={()=>setGender("female")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1 border transition-all ${gender==="female"?"bg-white text-slate-800 border-slate-200 shadow":"bg-transparent text-slate-400 border-transparent"}`}>
+                  <button onClick={()=>setGender("female")} className={`px-4 py-2 rounded-full text-sm font-bold flex items-center gap-1.5 border transition-all ${gender==="female"?"bg-white text-slate-900 border-slate-200 shadow":"bg-slate-100 text-slate-500 border-transparent"}`}>
                     <span className="text-pink-500">♀</span> Female
                   </button>
                 </div>
               </div>
               <div className="w-28 h-28 rounded-full border-4 border-white shadow-lg overflow-hidden ml-3 flex-shrink-0">
                 <img
-                  src={gender==="male" ? "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" : "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop"}
+                  src={gender==="male"
+                    ? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
+                    : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face"}
                   alt="person" className="w-full h-full object-cover"
                 />
               </div>
             </div>
 
-            {/* Upload Box */}
+            {/* Analyze Box - clean, single button */}
             <div className="bg-white rounded-[24px] border border-[#EEF0FF] shadow-sm p-5">
-              <p className="text-[14px] font-black text-slate-900 text-center">Upload Your Photo</p>
-              <p className="text-[11px] text-slate-400 text-center mb-4">Get AI-powered skin analysis in seconds</p>
-              <div className="border-2 border-dashed border-purple-200 rounded-[18px] bg-gradient-to-br from-[#FAF7FF] to-[#FFF0F9] p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-purple-400 transition-all" onClick={()=>setView("scanner")}>
-                <div className="w-16 h-16 rounded-[18px] bg-purple-100 flex items-center justify-center animate-float">
-                  <Upload size={28} className="text-purple-600"/>
-                </div>
-                <p className="text-xs text-slate-400">Drag &amp; drop your image here</p>
-                <p className="text-xs text-slate-300">or</p>
-                <button className="flex items-center gap-2 text-purple-600 font-bold text-sm border border-purple-200 bg-white px-4 py-2 rounded-xl shadow-sm">
-                  <Camera size={16}/> Choose Image
-                </button>
-              </div>
-              <button onClick={()=>setView("scanner")} className="mt-4 w-full h-14 bg-primary-gradient rounded-2xl text-white font-black text-[16px] shadow-lg shadow-purple-500/20 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
-                Analyze My Skin ✨
+              <p className="text-[15px] font-black text-slate-900 text-center mb-1">Scan Your Skin</p>
+              <p className="text-[12px] text-slate-600 font-medium text-center mb-5">Get AI-powered skin analysis in seconds</p>
+              <button
+                onClick={()=>setView("scanner")}
+                className="w-full h-16 bg-primary-gradient rounded-2xl text-white font-black text-[17px] shadow-lg shadow-purple-500/25 flex items-center justify-center gap-3 hover:opacity-90 active:scale-95 transition-all"
+              >
+                <ScanFace size={26} strokeWidth={2.2}/>
+                Analyze My Skin
               </button>
             </div>
 
@@ -115,22 +131,31 @@ export default function Home() {
                 ].map((f,i)=>(
                   <div key={i} className="bg-white rounded-2xl border border-[#EEF0FF] p-2.5 flex flex-col items-center text-center shadow-sm">
                     <div className={`w-9 h-9 rounded-xl ${f.bg} flex items-center justify-center text-lg mb-1.5`}>{f.icon}</div>
-                    <p className="text-[9px] font-black leading-tight">{f.label}</p>
-                    <p className="text-[7px] text-slate-400 font-semibold mt-0.5">{f.sub}</p>
+                    <p className="text-[9px] font-black text-slate-800 leading-tight">{f.label}</p>
+                    <p className="text-[7px] text-slate-500 font-semibold mt-0.5">{f.sub}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Know Your Skin Banner */}
-            <div className="bg-primary-gradient rounded-[24px] p-5 flex items-center justify-between overflow-hidden relative">
+            <div className="bg-primary-gradient rounded-[24px] p-5 overflow-hidden relative">
               <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-2xl"/>
-              <div className="z-10">
-                <p className="text-white font-black text-[16px] leading-snug">Know Your<br/>Skin Better</p>
-                <p className="text-white/70 text-[10px] mt-1 mb-3 max-w-[150px]">Understand your unique skin and get personalized recommendations.</p>
-                <button className="bg-white text-purple-600 font-black text-[10px] px-4 py-2 rounded-xl shadow">Learn More</button>
+              <div className="flex items-center justify-between mb-3">
+                <div className="z-10">
+                  <p className="text-white font-black text-[16px] leading-snug">Know Your<br/>Skin Better</p>
+                  <p className="text-white/80 text-[11px] mt-1 mb-3 max-w-[160px]">Understand your unique skin and get personalized tips.</p>
+                  <button onClick={handleLearnMore} className="bg-white text-purple-700 font-black text-[11px] px-4 py-2 rounded-xl shadow flex items-center gap-1.5">
+                    {loadingTips ? <><RefreshCcw size={12} className="animate-spin"/> Loading...</> : "Learn More"}
+                  </button>
+                </div>
+                <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-4xl z-10">🔬</div>
               </div>
-              <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-4xl z-10">🔬</div>
+              {skinTips && (
+                <div className="bg-white/15 rounded-2xl p-4 mt-2 z-10 relative">
+                  <p className="text-white text-[12px] leading-relaxed whitespace-pre-wrap font-medium">{skinTips}</p>
+                </div>
+              )}
             </div>
 
             {/* How It Works */}
@@ -138,18 +163,18 @@ export default function Home() {
               <p className="text-[15px] font-black text-slate-900 mb-3">How It Works?</p>
               <div className="flex items-start justify-between">
                 {[
-                  {n:"1",label:"Upload Photo",sub:"Take clear face photo",icon:"📷"},
-                  {n:"2",label:"AI Analyzes",sub:"Our AI analyzes deeply",icon:"🤖"},
-                  {n:"3",label:"Get Results",sub:"See scores & tips",icon:"📊"}
+                  {n:"1",label:"Scan Face",sub:"Use camera or photo",icon:"📷"},
+                  {n:"2",label:"AI Analyzes",sub:"Deep skin analysis",icon:"🤖"},
+                  {n:"3",label:"Get Results",sub:"Scores & expert tips",icon:"📊"}
                 ].map((s,i)=>(
                   <div key={i} className="flex-1 flex flex-col items-center text-center px-1 relative">
-                    {i<2 && <div className="absolute top-7 right-0 text-slate-200 font-bold text-lg">→</div>}
+                    {i<2 && <div className="absolute top-7 right-0 text-slate-300 font-bold text-lg">→</div>}
                     <div className="w-14 h-14 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl mb-2 relative">
                       {s.icon}
                       <div className="absolute -top-1 -left-1 w-5 h-5 bg-purple-600 rounded-full text-white text-[9px] font-black flex items-center justify-center">{s.n}</div>
                     </div>
                     <p className="text-[10px] font-black text-slate-800">{s.label}</p>
-                    <p className="text-[8px] text-slate-400 mt-0.5">{s.sub}</p>
+                    <p className="text-[9px] text-slate-500 font-medium mt-0.5">{s.sub}</p>
                   </div>
                 ))}
               </div>
