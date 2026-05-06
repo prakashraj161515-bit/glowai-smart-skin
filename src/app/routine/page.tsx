@@ -162,15 +162,15 @@ export default function RoutinePage() {
     const today = new Date().getDay(); // 0-6
     
     const getTargetedDiet = () => {
-      // Base diets for 7 days
+      // Base diets for 7 days (Strictly Salads, Vegetables, Fruits)
       const diets = [
-        { b: "Spinach Smoothie", l: "Lauki (Bottle Gourd) Sabzi", s: "Carrots", d: "Vegetable Soup" },
-        { b: "Oats with Veggies", l: "Cabbage & Peas", s: "Cucumber", d: "Pumpkin Mash" },
-        { b: "Sprouts Salad", l: "Turai (Ridge Gourd) & Dal", s: "Beetroot", d: "Stir-fry Greens" },
-        { b: "Vegetable Poha", l: "Cauliflower & Matar", s: "Bell Peppers", d: "Spinach Salad" },
-        { b: "Besan Chilla", l: "Kundru (Ivy Gourd) Sabzi", s: "Radish", d: "Lentil Stew" },
-        { b: "Green Juice", l: "Karela (Bitter Gourd) Sabzi", s: "Roasted Makhana", d: "Zucchini Salad" },
-        { b: "Vegetable Upma", l: "Moringa (Drumstick) Dal", s: "Asparagus", d: "Kale Salad" }
+        { b: "Fresh Papaya & Pomegranate", l: "Boiled Bottle Gourd (Lauki) with Lemon", s: "Crunchy Carrot & Cucumber Salad", d: "Steamed Spinach & Broccoli Soup" },
+        { b: "Apple & Banana Fruit Bowl", l: "Sautéed Cabbage & Green Peas", s: "Raw Beetroot Slices", d: "Mixed Vegetable Clear Soup" },
+        { b: "Watermelon & Muskmelon", l: "Boiled Turai (Ridge Gourd) with Black Pepper", s: "Boiled Sprouts & Tomato Salad", d: "Stir-fry Green Beans & Carrots" },
+        { b: "Mixed Fruit Salad (Citrus)", l: "Steamed Cauliflower & Green Peas", s: "Fresh Guava Slices", d: "Warm Spinach & Tomato Salad" },
+        { b: "Pineapple & Kiwi Cubes", l: "Sautéed Ivy Gourd (Kundru) with Herbs", s: "Radish & Carrot Sticks", d: "Bottle Gourd & Dal Stew" },
+        { b: "Green Apple & Grapes", l: "Boiled Bitter Gourd (Karela) with Lemon", s: "Steamed Asparagus", d: "Zucchini & Bell Pepper Salad" },
+        { b: "Pear & Orange Segments", l: "Boiled Moringa (Drumstick) Soup", s: "Sliced Cucumber & Mint", d: "Mushroom & Kale Steamed Salad" }
       ];
       
       const dayDiet = diets[today];
