@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, Calendar as CalendarIcon, Zap, TrendingUp, AlertCircle, Utensils, Droplets, Sparkles, CheckCircle2, MessageSquare, BrainCircuit, X, RefreshCcw } from "lucide-react";
+import { ChevronLeft, Calendar as CalendarIcon, Zap, TrendingUp, AlertCircle, Utensils, Droplets, Sparkles, CheckCircle2, MessageSquare, BrainCircuit, X, RefreshCcw, Bell, BellOff } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,7 @@ export default function RoutinePage() {
   const [aiFeedback, setAiFeedback] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [reminders, setReminders] = useState<string[]>([]);
 
   useEffect(() => {
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
@@ -45,6 +46,9 @@ export default function RoutinePage() {
       localStorage.setItem("velmora_water_intake", "0");
       localStorage.setItem("velmora_completed_routine", "[]");
     }
+    
+    const savedReminders = localStorage.getItem("velmora_reminders");
+    if (savedReminders) setReminders(JSON.parse(savedReminders));
 
     // Set active day to current day
     setActiveDay(new Date().getDay());
@@ -57,6 +61,21 @@ export default function RoutinePage() {
     
     setCompletedItems(updated);
     localStorage.setItem("velmora_completed_routine", JSON.stringify(updated));
+  };
+
+  const toggleReminder = (name: string) => {
+    const updated = reminders.includes(name)
+      ? reminders.filter(i => i !== name)
+      : [...reminders, name];
+    setReminders(updated);
+    localStorage.setItem("velmora_reminders", JSON.stringify(updated));
+    
+    if (!reminders.includes(name)) {
+      // Simulate enabling alarm
+      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+      audio.volume = 0.2;
+      audio.play().catch(() => {});
+    }
   };
 
   const formatMarkdown = (text: string) => {
@@ -281,9 +300,20 @@ export default function RoutinePage() {
                   <img src={item.image} alt={item.name} className={cn("w-full h-full object-cover transition-opacity", completedItems.includes(item.name) ? "opacity-40 grayscale" : "opacity-100")} />
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    {item.type === "skin" ? <Sparkles size={10} className="text-[#F88E7D]" /> : <Utensils size={10} className="text-emerald-500" />}
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      {item.type === "skin" ? <Sparkles size={10} className="text-[#F88E7D]" /> : <Utensils size={10} className="text-emerald-500" />}
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
+                    </div>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleReminder(item.name); }}
+                      className={cn(
+                        "p-1.5 rounded-full transition-colors",
+                        reminders.includes(item.name) ? "bg-orange-50 text-[#F88E7D]" : "text-slate-200 hover:text-[#F88E7D]"
+                      )}
+                    >
+                      {reminders.includes(item.name) ? <Bell size={12} className="animate-bounce" /> : <BellOff size={12} />}
+                    </button>
                   </div>
                   <p className={cn("text-[14px] font-bold text-slate-800 leading-snug", completedItems.includes(item.name) && "line-through opacity-50")}>{item.name}</p>
                 </div>
