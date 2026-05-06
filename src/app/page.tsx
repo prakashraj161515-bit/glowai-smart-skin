@@ -63,7 +63,15 @@ export default function Home() {
       const r = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...res, gender, userName, mode: "accurate_scan", isPremium, image: res.image })
+        body: JSON.stringify({ 
+          ...res, 
+          gender, 
+          userName, 
+          mode: "accurate_scan", 
+          isPremium, 
+          image: res.image,
+          customPrompt: `Analyze the skin for ${gender}. Provide: 1. Possible CAUSES for the current metrics (Acne: ${res.acne}%, Oil: ${res.oil}%, Pigment: ${res.pigmentation}%). 2. WHAT TO DRINK & EAT (with exact quantities like 3L water, 5 walnuts). 3. WHAT CREAM/FACEWASH to use and EXACT TIMING (e.g. 8:30 PM). Format as clear sections.`
+        })
       });
       const j = await r.json();
       setAi(j.text);
@@ -313,16 +321,42 @@ export default function Home() {
                 </div>
 
                 {/* AI Text Analysis */}
-                <div className="bg-white rounded-[32px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden">
+                <div className="space-y-4">
                   {loading ? (
-                    <div className="py-12 flex flex-col items-center gap-4">
+                    <div className="py-12 bg-white rounded-[32px] border border-[#EEF0FF] flex flex-col items-center gap-4">
                       <div className="w-10 h-10 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin" />
-                      <p className="text-[11px] text-slate-400 font-bold uppercase animate-pulse">Generating Expert Report...</p>
+                      <p className="text-[11px] text-slate-400 font-bold uppercase animate-pulse">Generating Deep Report...</p>
                     </div>
                   ) : (
-                    <div className="text-[13px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
-                      {ai || "Scanning complete. Your personalized report is ready."}
-                    </div>
+                    <>
+                      {/* Formatted Sections if available, else fallback */}
+                      <div className="bg-white rounded-[32px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden">
+                        <div className="flex items-center gap-2 mb-4 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
+                          <BrainCircuit size={14} /> Expert Analysis & Solutions
+                        </div>
+                        <div className="text-[13px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
+                          {ai || "Scanning complete. Your personalized report is ready."}
+                        </div>
+                      </div>
+
+                      {/* Quick Summary Cards */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-blue-50 p-5 rounded-[28px] border border-blue-100/50">
+                          <Droplets className="text-blue-500 mb-2" size={20} />
+                          <p className="text-[10px] text-blue-400 font-black uppercase tracking-tight">Drink Goal</p>
+                          <p className="text-[14px] font-bold text-slate-800">{gender === "male" ? "3.5L Daily" : "2.8L Daily"}</p>
+                        </div>
+                        <div className="bg-emerald-50 p-5 rounded-[28px] border border-emerald-100/50">
+                          <Utensils className="text-emerald-500 mb-2" size={20} />
+                          <p className="text-[10px] text-emerald-400 font-black uppercase tracking-tight">Focus Food</p>
+                          <p className="text-[14px] font-bold text-slate-800">{latestScan?.acne > 30 ? "Leafy Greens" : "Omega-3"}</p>
+                        </div>
+                      </div>
+
+                      <Link href="/routine" className="w-full h-16 bg-[#FDF5F2] border border-[#F3EAE8] rounded-2xl flex items-center justify-center gap-2 text-[#F88E7D] font-bold text-sm active:scale-95 transition-transform">
+                        View Full Timeline Schedule <ChevronRight size={18} />
+                      </Link>
+                    </>
                   )}
                 </div>
               </div>
