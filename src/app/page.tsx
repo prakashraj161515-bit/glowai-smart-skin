@@ -103,16 +103,41 @@ export default function Home() {
             {/* AI Scan Button */}
             <button 
               onClick={() => (setScanMode("face"), setView("scanner"))}
-              className="w-full bg-white border border-[#F3EAE8] rounded-[24px] p-4 flex items-center justify-between group active:scale-95 transition-transform"
+              className="w-full bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#FDF5F2] flex items-center justify-center text-[#F88E7D]">
-                  <ScanFace size={24} />
+                <div className="w-14 h-14 rounded-2xl bg-[#FDF5F2] flex items-center justify-center text-[#F88E7D]">
+                  <ScanFace size={28} />
                 </div>
-                <span className="text-[15px] font-bold text-slate-800">Scan your face with AI</span>
+                <div className="text-left">
+                  <span className="block text-[16px] font-bold text-slate-800">Scan your face</span>
+                  <span className="block text-[11px] text-slate-400 font-medium italic">Instant AI Analysis</span>
+                </div>
               </div>
               <ChevronRight size={20} className="text-slate-300 group-hover:text-[#F88E7D] transition-colors" />
             </button>
+
+            {/* Main Features Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <Link href="/diet" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+                  <Info size={24} />
+                </div>
+                <div>
+                  <p className="text-[14px] font-bold text-slate-800">Diet Plan</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Nutrition for skin</p>
+                </div>
+              </Link>
+              <Link href="/coach" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
+                  <Sparkles size={24} />
+                </div>
+                <div>
+                  <p className="text-[14px] font-bold text-slate-800">AI Coach</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Expert advice</p>
+                </div>
+              </Link>
+            </div>
 
             {/* Categories */}
             <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
