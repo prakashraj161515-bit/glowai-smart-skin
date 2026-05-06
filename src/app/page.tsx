@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
 import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Gem, AlertCircle, BrainCircuit, Target, Zap, ShieldCheck, ShoppingBag, Info } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
 
