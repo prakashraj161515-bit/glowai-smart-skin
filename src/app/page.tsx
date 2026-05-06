@@ -19,6 +19,7 @@ export default function Home() {
   const [gender, setGender] = useState<"male"|"female">("female");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [country, setCountry] = useState("India");
+  const [waterIntake, setWaterIntake] = useState(0);
   const [userName, setUserName] = useState("Erica");
   const [userPic, setUserPic] = useState("");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
@@ -42,6 +43,18 @@ export default function Home() {
     if (savedGender) setGender(savedGender);
     const savedCountry = localStorage.getItem("velmora_user_country");
     if (savedCountry) setCountry(savedCountry);
+
+    // Water Intake Persistence/Reset
+    const today = new Date().toLocaleDateString();
+    const savedWater = localStorage.getItem("velmora_water_intake");
+    const savedWaterDate = localStorage.getItem("velmora_water_date");
+    if (savedWaterDate === today) {
+      if (savedWater) setWaterIntake(parseInt(savedWater));
+    } else {
+      setWaterIntake(0);
+      localStorage.setItem("velmora_water_date", today);
+      localStorage.setItem("velmora_water_intake", "0");
+    }
   }, [view]);
 
   // Dummy products
@@ -167,6 +180,48 @@ export default function Home() {
                 </div>
               </div>
             )}
+
+            {/* Water Tracker Card */}
+            <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center">
+                    <Droplets size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-[14px] font-bold text-slate-800">Water Tracker</h3>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Goal: 8 Glasses</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[18px] font-black text-blue-500">{waterIntake}</span>
+                  <span className="text-[12px] font-bold text-slate-300">/8</span>
+                </div>
+              </div>
+              
+              <div className="flex gap-2">
+                {[1,2,3,4,5,6,7,8].map((i) => (
+                  <div 
+                    key={i} 
+                    className={cn(
+                      "flex-1 h-1.5 rounded-full transition-all",
+                      i <= waterIntake ? "bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "bg-slate-100"
+                    )} 
+                  />
+                ))}
+              </div>
+              
+              <button 
+                onClick={() => {
+                  const newIntake = waterIntake + 1;
+                  setWaterIntake(newIntake);
+                  localStorage.setItem("velmora_water_intake", newIntake.toString());
+                }}
+                className="w-full mt-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-2xl text-[12px] font-bold transition-colors active:scale-95"
+              >
+                + Add a Glass (250ml)
+              </button>
+            </div>
 
             {/* Main Features Grid */}
             <div className="grid grid-cols-2 gap-4">
