@@ -25,7 +25,6 @@ export default function Home() {
   const [scanLimitReached, setScanLimitReached] = useState(false);
   const [scanCount, setScanCount] = useState(0);
   const [activeTab, setActiveTab] = useState("All");
-  const [gender, setGender] = useState<"male" | "female">("female");
 
   useEffect(() => {
     const h = localStorage.getItem("velmora_history");
