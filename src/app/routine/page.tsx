@@ -83,13 +83,15 @@ export default function RoutinePage() {
     setAiFeedback("");
     setShowFeedback(true);
     
-    const totalItems = fullSchedule.length;
-    const completedCount = completedItems.length;
-    const context = `User is in ${country} and has completed ${completedCount} out of ${totalItems} steps in their daily routine. 
-    Completed steps: ${completedItems.join(", ")}. 
-    Water intake: ${waterIntake} glasses. 
-    Scan metrics: Score ${latestScan?.score || 0}%. 
-    Provide a short, encouraging feedback (2-3 lines) in a coach-like tone about their consistency. If they missed something, suggest a local replacement or tip relevant to ${country}.`;
+    const dietItems = fullSchedule.filter(i => i.type === "diet").map(i => i.name);
+    const completedDiet = completedItems.filter(name => dietItems.includes(name));
+    
+    const context = `User is in ${country} and is following a skin-focused diet. 
+    Total Diet Goals: ${dietItems.join(", ")}. 
+    Completed Diet Today: ${completedDiet.length > 0 ? completedDiet.join(", ") : "None yet"}.
+    Water intake: ${waterIntake} glasses.
+    Total steps completed (Skin+Diet): ${completedCount}/${totalItems}.
+    Analyze how their diet was today for their skin health in ${country}. Provide a short, encouraging feedback (2-3 lines) about their diet performance and what to adjust tomorrow.`;
 
     try {
       const res = await fetch("/api/generate", {
