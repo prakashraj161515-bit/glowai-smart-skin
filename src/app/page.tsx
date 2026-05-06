@@ -245,12 +245,13 @@ export default function Home() {
           >
             <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full space-y-12">
               <div className="space-y-2">
-                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step {onboardingStep} of 4</p>
+                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step {onboardingStep} of 5</p>
                 <h2 className="text-3xl font-black text-slate-900">
                   {onboardingStep === 1 && "What's your name?"}
                   {onboardingStep === 2 && "Your gender?"}
                   {onboardingStep === 3 && "Where are you from?"}
-                  {onboardingStep === 4 && "Your skin type?"}
+                  {onboardingStep === 4 && "Quick Face Scan"}
+                  {onboardingStep === 5 && "Your skin type?"}
                 </h2>
               </div>
 
@@ -298,6 +299,18 @@ export default function Home() {
                 )}
 
                 {onboardingStep === 4 && (
+                  <div className="space-y-4">
+                    <p className="text-xs text-slate-400 font-medium">This helps us personalize your diet and routine instantly.</p>
+                    <div className="rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-black aspect-[3/4]">
+                      <CameraScanner onResult={(res) => {
+                        handleResult(res);
+                        setOnboardingStep(5);
+                      }} mode="face" />
+                    </div>
+                  </div>
+                )}
+
+                {onboardingStep === 5 && (
                   <div className="grid grid-cols-2 gap-4">
                     {["Oily", "Dry", "Combination", "Sensitive"].map((s) => (
                       <button 
@@ -316,16 +329,19 @@ export default function Home() {
               </div>
 
               <div className="pt-8">
-                <button 
-                  onClick={() => {
-                    if (onboardingStep < 4) setOnboardingStep(onboardingStep + 1);
-                    else completeOnboarding();
-                  }}
-                  className="w-full bg-[#F88E7D] text-white h-16 rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
-                >
-                  {onboardingStep === 4 ? "Complete Setup ✨" : "Continue"}
-                </button>
-                {onboardingStep > 1 && (
+                {onboardingStep !== 4 && (
+                  <button 
+                    onClick={() => {
+                      if (onboardingStep < 5) setOnboardingStep(onboardingStep + 1);
+                      else completeOnboarding();
+                    }}
+                    className="w-full bg-[#F88E7D] text-white h-16 rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
+                  >
+                    {onboardingStep === 5 ? "Complete Setup ✨" : "Continue"}
+                  </button>
+                )}
+                
+                {onboardingStep > 1 && onboardingStep !== 4 && (
                   <button 
                     onClick={() => setOnboardingStep(onboardingStep - 1)}
                     className="w-full mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest"
