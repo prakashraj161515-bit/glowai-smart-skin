@@ -612,12 +612,12 @@ export default function Home() {
                           <div className="flex items-center justify-between">
                             <div className="space-y-1">
                               <p className="text-[13px] font-bold text-slate-800">
-                                {data.score > history[1].score ? "Skin is showing improvement! ✨" : "Keep following the routine."}
+                                {data?.score > history[1]?.score ? "Skin is showing improvement! ✨" : "Keep following the routine."}
                               </p>
-                              <p className="text-[11px] text-slate-500">Compared to your last scan on {history[1].date}</p>
+                              <p className="text-[11px] text-slate-500">Compared to your last scan on {history[1]?.date || "N/A"}</p>
                             </div>
-                            <div className={cn("text-lg font-black px-3 py-1 rounded-full", data.score > history[1].score ? "text-emerald-500 bg-emerald-100" : "text-slate-400 bg-slate-100")}>
-                              {data.score > history[1].score ? `+${data.score - history[1].score}%` : `${data.score - history[1].score}%`}
+                            <div className={cn("text-lg font-black px-3 py-1 rounded-full", (data?.score && history[1]?.score && data.score > history[1].score) ? "text-emerald-500 bg-emerald-100" : "text-slate-400 bg-slate-100")}>
+                              {data?.score && history[1]?.score ? (data.score > history[1].score ? `+${data.score - history[1].score}%` : `${data.score - history[1].score}%`) : "0%"}
                             </div>
                           </div>
                         </div>
