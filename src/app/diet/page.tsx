@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Apple, Utensils, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, ChevronDown, ChevronUp, AlertCircle, ChevronLeft } from "lucide-react";
+import { Apple, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, AlertCircle, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -27,7 +27,7 @@ export default function DietPage() {
       const scanData = localStorage.getItem("velmora_analysis");
       if (scanData) {
         const parsed = JSON.parse(scanData);
-        scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%.`;
+        scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%, Gender: ${parsed.gender}.`;
       }
     } catch (e) {}
 
@@ -264,7 +264,6 @@ export default function DietPage() {
                 ))}
               </ul>
             </div>
-          </motion.div>
           </motion.div>
         )}
       </div>
