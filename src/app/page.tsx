@@ -126,6 +126,7 @@ export default function Home() {
   };
 
   async function handleResult(res: any) {
+    if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
     
     // Auto-detect Skin Type from metrics
