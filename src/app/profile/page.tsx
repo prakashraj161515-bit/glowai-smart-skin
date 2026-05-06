@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   User, Shield, Bell, LogOut, ChevronRight, Settings, 
   Smartphone, Mail, Clock, Camera, Sparkles,
-  Edit2, Gem, BellRing
+  Edit2, Gem, BellRing, Target
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
