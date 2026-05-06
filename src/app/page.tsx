@@ -137,31 +137,22 @@ export default function Home() {
                   <p className="text-[10px] text-slate-400 font-medium">Expert advice</p>
                 </div>
               </Link>
+              <button 
+                onClick={() => (setScanMode("product"), setView("scanner"))}
+                className="col-span-2 bg-white border border-[#F3EAE8] rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
+                    <ShoppingBag size={24} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[15px] font-bold text-slate-800">Product Scanner</p>
+                    <p className="text-[10px] text-slate-400 font-medium">Analyze product ingredients</p>
+                  </div>
+                </div>
+                <ChevronRight size={20} className="text-slate-300 group-hover:text-orange-500 transition-colors" />
+              </button>
             </div>
-
-            {/* Categories */}
-            <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
-              {["All", "Skincare", "Makeup"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={cn(
-                    "px-8 py-4 rounded-full text-[13px] font-bold transition-all whitespace-nowrap",
-                    activeTab === tab ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]"
-                  )}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-
-            {/* Product Grid */}
-            <div className="grid grid-cols-2 gap-6">
-              {products.map((p, i) => (
-                <ProductCard key={i} {...p} />
-              ))}
-            </div>
-
           </motion.div>
         )}
 
