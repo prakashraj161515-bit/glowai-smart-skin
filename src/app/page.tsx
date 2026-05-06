@@ -90,7 +90,6 @@ export default function Home() {
     localStorage.setItem("velmora_user_name", userName);
     localStorage.setItem("velmora_user_gender", gender);
     localStorage.setItem("velmora_user_country", country);
-    localStorage.setItem("velmora_user_skin_type", skinType);
     
     // If we have scan data from onboarding, show results
     if (data) setView("results");
@@ -127,9 +126,16 @@ export default function Home() {
   };
 
   async function handleResult(res: any) {
-    if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
     
+    // Auto-detect Skin Type from metrics
+    let detectedType = "Combination";
+    if (res.oil > 60) detectedType = "Oily";
+    else if (res.oil < 25) detectedType = "Dry";
+    else if (res.acne > 40) detectedType = "Acne-Prone";
+    setSkinType(detectedType);
+    localStorage.setItem("velmora_user_skin_type", detectedType);
+
     // Save analysis metrics immediately for Diet/Routine
     const analysisData = {
       ...res,
@@ -166,7 +172,7 @@ export default function Home() {
           mode: "accurate_scan", 
           isPremium, 
           image: res.image,
-          customPrompt: `Analyze the skin for ${gender} in ${country}. Provide: 1. Possible CAUSES. 2. WHAT TO DRINK & EAT (must be local food available in ${country}, with exact quantities). 3. WHAT CREAM/FACEWASH and EXACT TIMING. Format as clear sections.`
+          customPrompt: `Analyze the skin for ${gender} in ${country}. Provide: 1. Possible CAUSES. 2. WHAT TO DRINK & EAT (focus ONLY on simple healthy food, vegetables, and fruits available in ${country}, with exact quantities). 3. WHAT CREAM/FACEWASH and EXACT TIMING. Format as clear sections.`
         })
       });
       const j = await r.json();
@@ -255,13 +261,12 @@ export default function Home() {
           >
             <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full space-y-12">
               <div className="space-y-2">
-                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step {onboardingStep} of 5</p>
+                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step {onboardingStep} of 4</p>
                 <h2 className="text-3xl font-black text-slate-900">
                   {onboardingStep === 1 && "What's your name?"}
                   {onboardingStep === 2 && "Your gender?"}
                   {onboardingStep === 3 && "Where are you from?"}
-                  {onboardingStep === 4 && "Quick Face Scan"}
-                  {onboardingStep === 5 && "Your skin type?"}
+                  {onboardingStep === 4 && "Face Scan for Skin Type"}
                 </h2>
               </div>
 
@@ -310,48 +315,32 @@ export default function Home() {
 
                 {onboardingStep === 4 && (
                   <div className="space-y-4">
-                    <p className="text-xs text-slate-400 font-medium">This helps us personalize your diet and routine instantly.</p>
+                    <p className="text-xs text-slate-400 font-medium">We&apos;ll automatically detect your skin type from this scan.</p>
                     <div className="rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-black aspect-[3/4]">
                       <CameraScanner onResult={(res) => {
                         handleResult(res);
-                        setOnboardingStep(5);
+                        // handleResult now calls completeOnboarding internally via setView logic if needed
+                        // but here we just wait for the scan and then we're done
+                        setTimeout(() => completeOnboarding(), 2000);
                       }} mode="face" />
                     </div>
-                  </div>
-                )}
-
-                {onboardingStep === 5 && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {["Oily", "Dry", "Combination", "Sensitive"].map((s) => (
-                      <button 
-                        key={s}
-                        onClick={() => setSkinType(s)}
-                        className={cn(
-                          "h-24 rounded-[28px] border-2 flex flex-col items-center justify-center transition-all",
-                          skinType === s ? "bg-white border-[#F88E7D] shadow-lg" : "bg-white/50 border-white"
-                        )}
-                      >
-                        <span className={cn("font-bold text-[13px]", skinType === s ? "text-[#F88E7D]" : "text-slate-500")}>{s}</span>
-                      </button>
-                    ))}
                   </div>
                 )}
               </div>
 
               <div className="pt-8">
-                {onboardingStep !== 4 && (
+                {onboardingStep < 4 && (
                   <button 
                     onClick={() => {
-                      if (onboardingStep < 5) setOnboardingStep(onboardingStep + 1);
-                      else completeOnboarding();
+                      setOnboardingStep(onboardingStep + 1);
                     }}
                     className="w-full bg-[#F88E7D] text-white h-16 rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
                   >
-                    {onboardingStep === 5 ? "Complete Setup ✨" : "Continue"}
+                    Continue
                   </button>
                 )}
                 
-                {onboardingStep > 1 && onboardingStep !== 4 && (
+                {onboardingStep > 1 && onboardingStep < 4 && (
                   <button 
                     onClick={() => setOnboardingStep(onboardingStep - 1)}
                     className="w-full mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest"
