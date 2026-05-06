@@ -6,7 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function RoutinePage() {
-  const [activeDay, setActiveDay] = useState(3);
+  const [activeDay, setActiveDay] = useState(new Date().getDay());
   const [gender, setGender] = useState<"male" | "female">("female");
   const [country, setCountry] = useState("India");
   const [latestScan, setLatestScan] = useState<any>(null);
@@ -45,6 +45,9 @@ export default function RoutinePage() {
       localStorage.setItem("velmora_water_intake", "0");
       localStorage.setItem("velmora_completed_routine", "[]");
     }
+
+    // Set active day to current day
+    setActiveDay(new Date().getDay());
   }, []);
 
   const toggleItem = (name: string) => {
@@ -200,17 +203,17 @@ export default function RoutinePage() {
 
       {/* Calendar Bar */}
       <div className="px-6 flex justify-between gap-2 mb-8">
-        {days.map((day) => (
+        {days.map((day, idx) => (
           <button 
-            key={day.num}
-            onClick={() => setActiveDay(day.num)}
+            key={idx}
+            onClick={() => setActiveDay(idx)}
             className={cn(
-              "flex-1 py-4 rounded-[24px] flex flex-col items-center gap-1 transition-all",
-              activeDay === day.num ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]"
+              "flex-1 py-4 rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all",
+              activeDay === idx ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]"
             )}
           >
-            <span className="text-[18px] font-bold">{day.num}</span>
-            <span className="text-[10px] font-black tracking-widest">{day.label}</span>
+            <span className="text-[11px] font-black tracking-widest">{day.label}</span>
+            {activeDay === idx && <div className="w-1.5 h-1.5 rounded-full bg-white mt-1" />}
           </button>
         ))}
       </div>
