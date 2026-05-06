@@ -86,6 +86,9 @@ export default function RoutinePage() {
     const dietItems = fullSchedule.filter(i => i.type === "diet").map(i => i.name);
     const completedDiet = completedItems.filter(name => dietItems.includes(name));
     
+    const totalItems = fullSchedule.length;
+    const completedCount = completedItems.length;
+    
     const context = `User is in ${country} and is following a skin-focused diet. 
     Total Diet Goals: ${dietItems.join(", ")}. 
     Completed Diet Today: ${completedDiet.length > 0 ? completedDiet.join(", ") : "None yet"}.
