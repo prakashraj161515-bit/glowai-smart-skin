@@ -20,6 +20,8 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [country, setCountry] = useState("India");
   const [waterIntake, setWaterIntake] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
   const [userName, setUserName] = useState("Erica");
   const [userPic, setUserPic] = useState("");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
@@ -55,7 +57,19 @@ export default function Home() {
       localStorage.setItem("velmora_water_date", today);
       localStorage.setItem("velmora_water_intake", "0");
     }
+
+    const savedAuth = localStorage.getItem("velmora_auth_status");
+    if (savedAuth === "true") {
+      setIsLoggedIn(true);
+      setShowLanding(false);
+    }
   }, [view]);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setShowLanding(false);
+    localStorage.setItem("velmora_auth_status", "true");
+  };
 
   // Dummy products
   const products = [
@@ -137,6 +151,66 @@ export default function Home() {
     <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
 
       <AnimatePresence mode="wait">
+        
+        {/* LANDING / LOGIN PAGE */}
+        {showLanding && (
+          <motion.div 
+            key="landing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, y: -50 }}
+            className="fixed inset-0 z-[100] bg-white flex flex-col"
+          >
+            <div className="h-[55%] relative overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&q=80" 
+                alt="Velmora Skincare" 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
+              <div className="absolute top-12 left-0 right-0 flex justify-center">
+                <div className="bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border border-white/50">
+                  <h1 className="text-2xl font-black text-[#F88E7D] tracking-tighter italic">Velmora AI</h1>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 px-8 pt-8 pb-12 flex flex-col justify-between">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-black text-slate-900 leading-tight">Your Personal <span className="text-[#F88E7D]">Skin Coach</span> in your pocket.</h2>
+                  <p className="text-slate-400 text-sm mt-3 font-medium">Analyze your skin with AI, get personalized diets, and track your daily routine for a natural glow.</p>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0"><ScanFace size={20} /></div>
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Instant AI Skin Analysis</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center flex-shrink-0"><Utensils size={20} /></div>
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Personalized Diet & Nutrition</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#F88E7D] flex items-center justify-center flex-shrink-0"><Zap size={20} /></div>
+                    <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Daily Growth Tracking</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <button 
+                  onClick={handleLogin}
+                  className="w-full bg-slate-900 text-white h-16 rounded-[24px] flex items-center justify-center gap-4 font-bold active:scale-95 transition-transform shadow-xl shadow-slate-200"
+                >
+                  <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+                  Continue with Google
+                </button>
+                <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Secure Login powered by Velmora</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* HOME */}
         {view === "home" && (
