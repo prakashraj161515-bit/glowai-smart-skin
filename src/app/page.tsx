@@ -388,7 +388,7 @@ export default function Home() {
                         <div className="bg-emerald-50 p-5 rounded-[28px] border border-emerald-100/50">
                           <Utensils className="text-emerald-500 mb-2" size={20} />
                           <p className="text-[10px] text-emerald-400 font-black uppercase tracking-tight">Focus Food</p>
-                          <p className="text-[14px] font-bold text-slate-800">{latestScan?.acne > 30 ? "Leafy Greens" : "Omega-3"}</p>
+                          <p className="text-[14px] font-bold text-slate-800">{data?.acne > 30 ? "Leafy Greens" : "Omega-3"}</p>
                         </div>
                       </div>
 
