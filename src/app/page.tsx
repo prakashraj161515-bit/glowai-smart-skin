@@ -126,7 +126,26 @@ export default function Home() {
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
-    setView("results");
+    
+    // Save analysis metrics immediately for Diet/Routine
+    const analysisData = {
+      ...res,
+      score: res.score,
+      acne: res.acne,
+      oil: res.oil,
+      pigmentation: res.pigmentation,
+      gender: gender,
+      date: new Date().toLocaleDateString()
+    };
+    localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
+    
+    // Update history
+    const newHistory = [analysisData, ...history].slice(0, 30);
+    setHistory(newHistory);
+    localStorage.setItem("velmora_history", JSON.stringify(newHistory));
+
+    if (!showOnboarding) setView("results");
+    
     setData(res);
     setLoading(true);
     setDeepScanStep(1);
@@ -149,24 +168,12 @@ export default function Home() {
       });
       const j = await r.json();
       setAi(j.text);
-      // Save analysis for Diet/Coach
-      const analysisData = {
-        ...res,
-        score: res.score,
-        acne: res.acne,
-        oil: res.oil,
-        pigmentation: res.pigmentation,
-        gender: gender,
-        date: new Date().toLocaleDateString()
-      };
-      localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
-
-      // Save to history
-      const newHistory = [analysisData, ...history].slice(0, 30);
-      setHistory(newHistory);
-      localStorage.setItem("velmora_history", JSON.stringify(newHistory));
-    } catch { setAi("⚠️ Could not generate AI report."); }
-    finally { setLoading(false); setDeepScanStep(0); }
+    } catch {
+      setAi("⚠️ Could not generate AI report."); 
+    } finally { 
+      setLoading(false); 
+      setDeepScanStep(0); 
+    }
   }
 
   return (
