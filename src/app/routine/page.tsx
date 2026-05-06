@@ -18,6 +18,9 @@ export default function RoutinePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [reminders, setReminders] = useState<string[]>([]);
+  const [dietSeed, setDietSeed] = useState(0);
+  const [activeAlarm, setActiveAlarm] = useState<string | null>(null);
+  const [alarmAudio, setAlarmAudio] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
@@ -71,11 +74,35 @@ export default function RoutinePage() {
     localStorage.setItem("velmora_reminders", JSON.stringify(updated));
     
     if (!reminders.includes(name)) {
-      // Simulate enabling alarm
-      const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
-      audio.volume = 0.2;
-      audio.play().catch(() => {});
+      // Simulate enabling alarm - small chime
+      const chime = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+      chime.volume = 0.2;
+      chime.play().catch(() => {});
+      
+      // Simulate a real alarm triggering (for demo)
+      setTimeout(() => {
+        triggerAlarm(name);
+      }, 5000); // Trigger after 5s for demo
     }
+  };
+
+  const triggerAlarm = (name: string) => {
+    setActiveAlarm(name);
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/135/135-preview.mp3");
+    audio.loop = true;
+    audio.play().catch(() => {});
+    setAlarmAudio(audio);
+    
+    // Auto stop after 1 min
+    setTimeout(() => stopAlarm(), 60000);
+  };
+
+  const stopAlarm = () => {
+    if (alarmAudio) {
+      alarmAudio.pause();
+      setAlarmAudio(null);
+    }
+    setActiveAlarm(null);
   };
 
   const formatMarkdown = (text: string) => {
@@ -173,7 +200,9 @@ export default function RoutinePage() {
         { b: "Pear & Orange Segments", l: "Boiled Moringa (Drumstick) Soup", s: "Sliced Cucumber & Mint", d: "Mushroom & Kale Steamed Salad" }
       ];
       
-      const dayDiet = diets[today];
+      // Shuffle logic using dietSeed
+      const dayIdx = (today + dietSeed) % 7;
+      const dayDiet = {...diets[dayIdx]};
       
       // Personalize names based on skin problem
       if (isAcneProne) {
@@ -215,8 +244,8 @@ export default function RoutinePage() {
           <h1 className="text-[17px] font-bold text-slate-800">Daily Schedule</h1>
           <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">{gender} &bull; {country}</p>
         </div>
-        <button onClick={getDailyFeedback} className="w-12 h-12 rounded-full bg-[#F88E7D] flex items-center justify-center text-white shadow-lg shadow-orange-500/20 active:scale-90 transition-transform">
-          <BrainCircuit size={20} />
+        <button onClick={() => setDietSeed(s => s + 1)} className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#F88E7D] shadow-sm border border-[#F3EAE8] active:scale-90 transition-transform">
+          <RefreshCcw size={20} />
         </button>
       </header>
 
@@ -325,6 +354,68 @@ export default function RoutinePage() {
           ))}
         </div>
       </div>
+
+      {/* Active Alarm Overlay */}
+      <AnimatePresence>
+        {activeAlarm && (
+          <motion.div initial={{scale:0.8, opacity:0}} animate={{scale:1, opacity:1}} className="fixed inset-0 z-[200] bg-[#F88E7D]/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-[#F88E7D] mb-8 animate-bounce shadow-2xl">
+              <Bell size={48} />
+            </div>
+            <h2 className="text-4xl font-black mb-2 uppercase tracking-tighter">Diet Time!</h2>
+            <p className="text-xl font-bold mb-12 opacity-90">{activeAlarm}</p>
+            <button 
+              onClick={stopAlarm}
+              className="w-full h-20 bg-white text-[#F88E7D] rounded-[32px] text-2xl font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-transform"
+            >
+              Stop Alarm
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* AI Coach Overlay */}
+      <AnimatePresence>
+        {showFeedback && (
+          <motion.div initial={{opacity:0, y: 100}} animate={{opacity:1, y: 0}} exit={{opacity:0, y: 100}} className="fixed inset-0 z-[150] bg-white flex flex-col">
+            <div className="px-6 pt-16 pb-6 flex items-center justify-between border-b border-slate-50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#FFEDE8] rounded-2xl flex items-center justify-center text-[#F88E7D]"><BrainCircuit size={28} /></div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 tracking-tight">AI Skin Coach</h3>
+                  <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest italic">Personalized Report</p>
+                </div>
+              </div>
+              <button onClick={()=>setShowFeedback(false)} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400"><X size={20} /></button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-8 py-8 no-scrollbar">
+              <div className="text-[15px] text-slate-600 leading-relaxed font-medium">
+                {aiFeedback ? formatMarkdown(aiFeedback) : (
+                  <div className="py-20 flex flex-col items-center gap-4">
+                    <div className="w-10 h-10 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin" />
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Generating Strategy...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="p-8 border-t border-slate-50">
+              <button onClick={()=>setShowFeedback(false)} className="w-full h-16 bg-[#F88E7D] text-white rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform">
+                Got it, Thanks! ✨
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* AI Coach Trigger Button (Bottom Right) */}
+      {!showFeedback && !activeAlarm && (
+        <button 
+          onClick={getDailyFeedback}
+          className="fixed bottom-32 right-6 w-16 h-16 bg-[#F88E7D] rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-500/40 z-50 active:scale-90 transition-transform"
+        >
+          <BrainCircuit size={28} />
+        </button>
+      )}
     </div>
   );
 }

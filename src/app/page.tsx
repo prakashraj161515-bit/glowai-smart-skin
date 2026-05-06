@@ -25,8 +25,9 @@ export default function Home() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [userName, setUserName] = useState("Erica");
+  const [isEditingName, setIsEditingName] = useState(false);
   const [skinType, setSkinType] = useState("Oily");
-  const [userPic, setUserPic] = useState("");
+  const [userPic, setUserPic] = useState<string | null>(null);
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
   const [scanLimitReached, setScanLimitReached] = useState(false);
@@ -368,15 +369,69 @@ export default function Home() {
         {view === "home" && (
           <motion.div key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-6 pt-12 space-y-8">
             
-            {/* Header */}
             <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-[28px] font-bold text-slate-800 leading-tight">Hi {userName},</h1>
-                <p className="text-[13px] text-slate-400 font-medium mt-0.5">Transform Your Skin&apos;s Health</p>
+              <div className="flex items-center gap-3">
+                <div className="relative group">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center">
+                    {userPic ? (
+                      <img src={userPic} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={24} className="text-slate-300" />
+                    )}
+                  </div>
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          const base64 = reader.result as string;
+                          setUserPic(base64);
+                          localStorage.setItem("velmora_user_pic", base64);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    {isEditingName ? (
+                      <input 
+                        autoFocus
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        onBlur={() => {
+                          setIsEditingName(false);
+                          localStorage.setItem("velmora_user_name", userName);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            setIsEditingName(false);
+                            localStorage.setItem("velmora_user_name", userName);
+                          }
+                        }}
+                        className="text-[28px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-32"
+                      />
+                    ) : (
+                      <h1 onClick={() => setIsEditingName(true)} className="text-[28px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors">Hi {userName},</h1>
+                    )}
+                  </div>
+                  <p className="text-[13px] text-slate-400 font-medium mt-0.5">Transform Your Skin&apos;s Health</p>
+                </div>
               </div>
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
-                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" alt="Profile" className="w-full h-full object-cover" />
-              </div>
+              <Link href="/routine">
+                <motion.div 
+                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="w-14 h-14 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8]"
+                >
+                  <BrainCircuit size={28} className="text-[#F88E7D]" />
+                </motion.div>
+              </Link>
             </div>
 
             {/* Promo Banner */}
@@ -429,6 +484,52 @@ export default function Home() {
               </div>
             )}
 
+
+            {/* Water Tracker */}
+            <div className="bg-[#FFEDE8] rounded-[40px] p-8 relative overflow-hidden group">
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#F88E7D] shadow-sm">
+                      <Droplets size={24} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-widest">Daily Water Tracker</p>
+                      <p className="text-xl font-black text-slate-900">{waterIntake}/8 <span className="text-[13px] font-bold text-slate-400">Glasses</span></p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => {
+                        if (waterIntake > 0) {
+                          const n = waterIntake - 1;
+                          setWaterIntake(n);
+                          localStorage.setItem("velmora_water_intake", n.toString());
+                        }
+                      }}
+                      className="w-10 h-10 bg-white/50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all font-bold"
+                    >
+                      -
+                    </button>
+                    <button 
+                      onClick={() => {
+                        const n = waterIntake + 1;
+                        setWaterIntake(n);
+                        localStorage.setItem("velmora_water_intake", n.toString());
+                      }}
+                      className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#F88E7D] shadow-sm active:scale-95 transition-transform font-bold"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <div className="flex gap-2 h-2">
+                  {[1,2,3,4,5,6,7,8].map((i) => (
+                    <div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-[#F88E7D]" : "bg-white/40")} />
+                  ))}
+                </div>
+              </div>
+            </div>
 
             {/* Main Features Grid */}
             <div className="grid grid-cols-2 gap-4">
