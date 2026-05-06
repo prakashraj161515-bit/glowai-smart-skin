@@ -65,6 +65,28 @@ export default function Home() {
     { name: "Night Repair", price: "$45.00", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80" },
   ];
 
+  const formatMarkdown = (text: string) => {
+    return text.split("\n").map((line, i) => {
+      // Bold
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      
+      if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
+        return (
+          <div key={i} className="flex gap-2 mb-1.5 ml-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F88E7D] mt-2 flex-shrink-0" />
+            <span dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
+          </div>
+        );
+      }
+      
+      if (line.trim() === "") return <div key={i} className="h-2" />;
+      
+      return (
+        <p key={i} className="mb-2" dangerouslySetInnerHTML={{ __html: formattedLine }} />
+      );
+    });
+  };
+
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
@@ -351,8 +373,8 @@ export default function Home() {
                         <div className="flex items-center gap-2 mb-4 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
                           <BrainCircuit size={14} /> Expert Analysis & Solutions
                         </div>
-                        <div className="text-[13px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
-                          {ai || "Scanning complete. Your personalized report is ready."}
+                        <div className="text-[13px] text-slate-600 leading-relaxed font-medium">
+                          {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
                         </div>
                       </div>
 

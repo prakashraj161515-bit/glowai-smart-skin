@@ -56,6 +56,28 @@ export default function RoutinePage() {
     localStorage.setItem("velmora_completed_routine", JSON.stringify(updated));
   };
 
+  const formatMarkdown = (text: string) => {
+    return text.split("\n").map((line, i) => {
+      // Bold
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      
+      if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
+        return (
+          <div key={i} className="flex gap-2 mb-1.5 ml-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F88E7D] mt-2 flex-shrink-0" />
+            <span dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
+          </div>
+        );
+      }
+      
+      if (line.trim() === "") return <div key={i} className="h-2" />;
+      
+      return (
+        <p key={i} className="mb-2" dangerouslySetInnerHTML={{ __html: formattedLine }} />
+      );
+    });
+  };
+
   const getDailyFeedback = async () => {
     setIsAnalyzing(true);
     setAiFeedback("");
@@ -169,7 +191,9 @@ export default function RoutinePage() {
                   <RefreshCcw size={14} className="animate-spin" /> Analyzing your consistency...
                 </div>
               ) : (
-                <p className="text-[13px] text-slate-600 leading-relaxed italic font-medium">&quot;{aiFeedback}&quot;</p>
+                <div className="text-[13px] text-slate-600 leading-relaxed italic font-medium">
+                  {aiFeedback ? formatMarkdown(aiFeedback) : "Analysis complete."}
+                </div>
               )}
             </motion.div>
           )}
