@@ -9,17 +9,23 @@ export default function RoutinePage() {
   const [activeDay, setActiveDay] = useState(3);
 
   const days = [
-    { num: 2, label: "SUN" },
-    { num: 3, label: "MON" },
-    { num: 4, label: "TUE" },
-    { num: 5, label: "WED" },
+    { num: 1, label: "SUN" },
+    { num: 2, label: "MON" },
+    { num: 3, label: "TUE" },
+    { num: 4, label: "WED" },
+    { num: 5, label: "THU" },
+    { num: 6, label: "FRI" },
+    { num: 7, label: "SAT" },
   ];
 
   const routine = [
-    { time: "8:00 AM", name: "Tatcha The Water Cream", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-cyan-50" },
-    { time: "9:30 AM", name: "Embryolisse Lait-Crème Concentré", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
-    { time: "1:00 PM", name: "Lala Retro Whipped Moisturizer", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-purple-50" },
-    { time: "4:30 PM", name: "Soft Creme/Mask Moisturizer", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-pink-50" },
+    { time: "08:00 AM", name: "Gentle Cleanser", label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" },
+    { time: "08:15 AM", name: "Vitamin C Serum", label: "Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
+    { time: "08:30 AM", name: "SPF 50+ Sunscreen", label: "Essential Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
+    { time: "01:00 PM", name: "Sunscreen Re-apply", label: "Maintenance", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
+    { time: "08:00 PM", name: "Double Cleanse", label: "Night Prep", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" },
+    { time: "08:30 PM", name: "Retinol/Targeted Serum", label: "Treatment", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" },
+    { time: "09:00 PM", name: "Hydrating Night Cream", label: "Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-pink-50" },
   ];
 
   return (
@@ -76,7 +82,10 @@ export default function RoutinePage() {
                 <div className="w-16 h-16 rounded-2xl bg-white overflow-hidden flex-shrink-0 shadow-inner">
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
-                <p className="text-[14px] font-bold text-slate-800 leading-snug">{item.name}</p>
+                <div>
+                  <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-widest mb-0.5">{item.label}</p>
+                  <p className="text-[14px] font-bold text-slate-800 leading-snug">{item.name}</p>
+                </div>
               </div>
             </motion.div>
           ))}
