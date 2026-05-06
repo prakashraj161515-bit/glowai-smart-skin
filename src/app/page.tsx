@@ -25,6 +25,7 @@ export default function Home() {
   const [scanLimitReached, setScanLimitReached] = useState(false);
   const [scanCount, setScanCount] = useState(0);
   const [activeTab, setActiveTab] = useState("All");
+  const [gender, setGender] = useState<"male" | "female">("female");
 
   useEffect(() => {
     const h = localStorage.getItem("velmora_history");
@@ -37,6 +38,8 @@ export default function Home() {
     setIsPremium(premium);
     const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
     setScanCount(count);
+    const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
+    if (savedGender) setGender(savedGender);
   }, [view]);
 
   // Dummy products
@@ -65,6 +68,15 @@ export default function Home() {
       });
       const j = await r.json();
       setAi(j.text);
+      // Save analysis for Diet/Coach
+      localStorage.setItem("velmora_analysis", JSON.stringify({
+        ...res,
+        score: res.score,
+        acne: res.acne,
+        oil: res.oil,
+        pigmentation: res.pigmentation,
+        gender: gender
+      }));
     } catch { setAi("⚠️ Could not generate AI report."); }
     finally { setLoading(false); setDeepScanStep(0); }
   }

@@ -77,31 +77,31 @@ export default function DietPage() {
     return lines.map((line, i) => {
       if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
         return (
-          <div key={i} className="text-[14px] font-black text-purple-600 mt-6 mb-2 tracking-tight uppercase border-b border-purple-100 pb-1">
+          <div key={i} className="text-[14px] font-bold text-[#F88E7D] mt-6 mb-2 tracking-tight uppercase border-b border-[#FDF5F2] pb-1">
             {line.replace(/\*\*/g, '')}
           </div>
         );
       }
-      return <div key={i} className="mb-1 text-slate-600 text-[12px] leading-relaxed">{line}</div>;
+      return <div key={i} className="mb-1 text-slate-600 text-[13px] leading-relaxed font-medium">{line}</div>;
     });
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFF] pb-32">
+    <div className="min-h-screen bg-[#FDF5F2] pb-32 font-outfit">
       {/* Header */}
-      <header className="px-6 pt-8 flex justify-between items-center mb-8">
+      <header className="px-6 pt-12 flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-400 border border-slate-100">
-            <ChevronLeft size={20} />
+          <Link href="/" className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-[#F3EAE8]">
+            <ChevronLeft size={24} />
           </Link>
           <div>
-            <h1 className="text-xl font-black text-slate-900">Diet Planner</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Smart Meal Plans</p>
+            <h1 className="text-[20px] font-bold text-slate-800">Diet Planner</h1>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Smart Meal Plans</p>
           </div>
         </div>
         <button 
           onClick={() => setShowSaved(!showSaved)}
-          className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${showSaved ? 'bg-primary-gradient text-white' : 'bg-white shadow-md text-slate-400 border border-slate-100'}`}
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${showSaved ? 'bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20' : 'bg-white shadow-sm text-slate-400 border border-[#F3EAE8]'}`}
         >
           <Bookmark size={20} />
         </button>
@@ -114,33 +114,33 @@ export default function DietPage() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="mb-6 space-y-3"
+              className="mb-8 space-y-4"
             >
-              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-widest flex items-center gap-2">
-                <Bookmark size={12} /> My Saved Plans
+              <h3 className="text-[11px] font-bold text-[#F88E7D] uppercase tracking-widest flex items-center gap-2">
+                <Bookmark size={14} /> My Saved Plans
               </h3>
               {savedPlans.length === 0 ? (
-                <div className="premium-card p-6 text-center text-[10px] text-slate-400 font-bold uppercase">No saved plans yet</div>
+                <div className="card p-6 text-center text-[11px] text-slate-300 font-bold uppercase tracking-widest">No saved plans yet</div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {savedPlans.map(plan => (
-                    <div key={plan.id} className="premium-card p-4 flex justify-between items-center group">
+                    <div key={plan.id} className="card p-5 flex justify-between items-center group bg-white/50">
                       <div>
-                        <p className="text-xs font-black text-slate-800 mb-0.5">{plan.concern}</p>
-                        <p className="text-[9px] text-slate-400 font-bold">{plan.date}</p>
+                        <p className="text-[14px] font-bold text-slate-800 mb-0.5">{plan.concern}</p>
+                        <p className="text-[10px] text-slate-400 font-bold">{plan.date}</p>
                       </div>
                       <div className="flex gap-2">
                         <button 
                           onClick={() => { setDietPlan(plan.text); setShowSaved(false); }} 
-                          className="bg-purple-50 text-purple-600 px-3 py-1.5 rounded-xl text-[10px] font-black border border-purple-100"
+                          className="bg-[#FFEDE8] text-[#F88E7D] px-4 py-2 rounded-2xl text-[11px] font-bold border border-[#F3EAE8]"
                         >
                           View
                         </button>
                         <button 
                           onClick={() => deletePlan(plan.id)} 
-                          className="w-8 h-8 flex items-center justify-center text-red-400 hover:bg-red-50 rounded-full transition-colors"
+                          className="w-10 h-10 flex items-center justify-center text-red-300 hover:bg-red-50 rounded-full transition-colors"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={18} />
                         </button>
                       </div>
                     </div>
@@ -155,30 +155,30 @@ export default function DietPage() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="premium-card p-8 text-center"
+            className="card p-8 text-center bg-white/80 backdrop-blur-sm"
           >
-            <div className="w-20 h-20 bg-purple-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-purple-600 shadow-inner shadow-purple-100 animate-float">
+            <div className="w-20 h-20 bg-[#FFEDE8] rounded-[32px] flex items-center justify-center mx-auto mb-6 text-[#F88E7D] shadow-inner animate-float">
               <Apple size={40} />
             </div>
-            <h2 className="text-2xl font-black text-slate-900 mb-2">Ready to Glow?</h2>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-tight mb-8">
-              Personalized meal plans for your skin type
+            <h2 className="text-[22px] font-bold text-slate-800 mb-2">Ready to Glow?</h2>
+            <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mb-8 italic">
+              Personalized for your skin type
             </p>
             
             <div className="mb-6">
               <textarea 
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Describe your skin issues (e.g. acne, dry skin, eczema)..."
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 text-[13px] font-medium text-slate-700 focus:outline-none focus:border-purple-200 transition-all h-32 resize-none placeholder:text-slate-300"
+                placeholder="Describe your skin issues (e.g. acne, oily, dry skin)..."
+                className="w-full bg-[#FDF5F2] border-2 border-transparent rounded-[32px] p-6 text-[14px] font-medium text-slate-700 focus:outline-none focus:border-[#FFB5A7] transition-all h-40 resize-none placeholder:text-slate-300"
               />
             </div>
 
             <button 
               onClick={generateDietPlan}
-              className="w-full h-14 bg-primary-gradient text-white font-black rounded-2xl transition-all flex items-center justify-center gap-2 shadow-xl shadow-purple-500/20 active:scale-95"
+              className="w-full h-16 bg-primary-gradient text-white font-bold rounded-[24px] transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-500/20 active:scale-95"
             >
-              <Sparkles size={20} />
+              <Sparkles size={22} />
               Generate Diet Plan
             </button>
           </motion.div>
@@ -190,27 +190,27 @@ export default function DietPage() {
               <motion.div 
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-[6px] border-purple-100 border-t-purple-600 rounded-full"
+                className="absolute inset-0 border-[6px] border-[#FFEDE8] border-t-[#F88E7D] rounded-full"
               />
-              <div className="absolute inset-0 flex items-center justify-center text-purple-600">
+              <div className="absolute inset-0 flex items-center justify-center text-[#F88E7D]">
                 <Apple size={40} className="animate-pulse" />
               </div>
             </div>
-            <p className="mt-6 text-slate-400 text-xs font-black uppercase tracking-widest animate-pulse">Crafting your meal plan...</p>
+            <p className="mt-8 text-slate-400 text-[11px] font-black uppercase tracking-[0.2em] animate-pulse">Crafting your meal plan...</p>
           </div>
         )}
 
         {error && (
-          <div className="premium-card p-8 text-center space-y-6">
-            <div className="flex flex-col items-center gap-3 text-red-500">
-              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center">
-                <AlertCircle size={32} />
+          <div className="card p-8 text-center space-y-6">
+            <div className="flex flex-col items-center gap-3 text-red-400">
+              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center">
+                <AlertCircle size={40} />
               </div>
-              <p className="text-sm font-black uppercase tracking-tight">Server is busy Please try again</p>
+              <p className="text-[14px] font-bold uppercase tracking-tight">Server is busy. Try again.</p>
             </div>
             <button 
               onClick={generateDietPlan} 
-              className="w-full h-14 bg-purple-600 text-white font-black rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-purple-500/20 active:scale-95"
+              className="w-full h-16 bg-[#F88E7D] text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95"
             >
               <RefreshCcw size={20} /> Retry Now
             </button>
@@ -219,51 +219,52 @@ export default function DietPage() {
 
         {dietPlan && !isLoading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-            <div className="flex justify-between items-center bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center">
-                  <Calendar size={18} />
+            <div className="flex justify-between items-center bg-white p-5 rounded-[32px] shadow-sm border border-[#F3EAE8]">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-[#FFEDE8] text-[#F88E7D] rounded-2xl flex items-center justify-center">
+                  <Calendar size={22} />
                 </div>
                 <div>
-                  <p className="text-[11px] font-black text-slate-800">7-Day Plan</p>
-                  <p className="text-[8px] font-bold text-slate-400 uppercase">Expert Nutrition</p>
+                  <p className="text-[15px] font-bold text-slate-800">7-Day Plan</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nutrition Expert</p>
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={saveCurrentPlan} className="bg-primary-gradient p-2.5 rounded-xl text-white shadow-lg shadow-purple-500/20"><Bookmark size={18} /></button>
-                <button onClick={generateDietPlan} className="bg-slate-50 p-2.5 rounded-xl text-slate-400 border border-slate-100"><RefreshCcw size={18} /></button>
+                <button onClick={saveCurrentPlan} className="bg-primary-gradient w-12 h-12 rounded-2xl text-white shadow-lg shadow-orange-500/20 flex items-center justify-center"><Bookmark size={20} /></button>
+                <button onClick={generateDietPlan} className="bg-[#FDF5F2] w-12 h-12 rounded-2xl text-slate-300 border border-[#F3EAE8] flex items-center justify-center"><RefreshCcw size={20} /></button>
               </div>
             </div>
 
-            <div className="premium-card p-8 whitespace-pre-wrap relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5">
-                <Sparkles size={48} className="text-purple-600" />
+            <div className="card p-8 whitespace-pre-wrap relative overflow-hidden bg-white/80 backdrop-blur-sm">
+              <div className="absolute top-0 right-0 p-6 opacity-10">
+                <Sparkles size={64} className="text-[#F88E7D]" />
               </div>
               <div className="relative z-10">
                 {formatText(dietPlan)}
               </div>
             </div>
 
-            <div className="bg-primary-gradient p-6 rounded-[32px] text-white shadow-xl shadow-purple-500/10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-md">
-                  <Droplets size={20} />
+            <div className="bg-primary-gradient p-8 rounded-[40px] text-white shadow-xl shadow-orange-500/10">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                  <Droplets size={24} />
                 </div>
-                <h3 className="text-sm font-black uppercase tracking-tight">Daily Glow Routine</h3>
+                <h3 className="text-[16px] font-bold uppercase tracking-tight">Daily Glow Habits</h3>
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {[
-                  "Drink 2.5 - 3L water daily",
-                  "Get at least 7-8 hours of sleep",
-                  "Limit processed sugars and caffeine"
+                  "Drink 3L water daily (with lemon)",
+                  "Sleep 8 hours for cell repair",
+                  "Avoid sugar for 7 days straight"
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-[11px] font-medium text-white/90">
-                    <div className="w-1 h-1 bg-white rounded-full" />
+                  <li key={i} className="flex items-center gap-4 text-[13px] font-medium text-white/90">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
+          </motion.div>
           </motion.div>
         )}
       </div>
