@@ -91,6 +91,9 @@ export default function Home() {
     localStorage.setItem("velmora_user_gender", gender);
     localStorage.setItem("velmora_user_country", country);
     localStorage.setItem("velmora_user_skin_type", skinType);
+    
+    // If we have scan data from onboarding, show results
+    if (data) setView("results");
   };
 
   // Dummy products
