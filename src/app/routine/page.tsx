@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, Calendar as CalendarIcon, Zap, TrendingUp, AlertCircle } from "lucide-react";
+import { ChevronLeft, Calendar as CalendarIcon, Zap, TrendingUp, AlertCircle, Utensils, Droplets, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -28,45 +28,104 @@ export default function RoutinePage() {
     { num: 7, label: "SAT" },
   ];
 
-  // Dynamic Routine Logic based on Scan + Gender
-  const getRoutine = () => {
+  // Integrated Schedule Logic (Skin + Diet)
+  const getSchedule = () => {
     const isOily = latestScan?.oil > 50;
     const isAcneProne = latestScan?.acne > 30;
-    
-    if (gender === "male") {
-      return [
-        { 
-          time: "08:00 AM", 
-          name: isAcneProne ? "Salicylic Face Wash" : "Charcoal Face Wash", 
-          label: isAcneProne ? "Acne Control" : "Deep Pore Cleanse", 
-          image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", 
-          color: "bg-blue-50" 
-        },
-        { time: "08:15 AM", name: "Soothing Shave Balm", label: "Anti-Irritation", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
-        { time: "08:30 AM", name: isOily ? "Oil-Free Moisturizer" : "Hydrating Cream", label: "Moisture", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
-        { time: "08:00 PM", name: "Mild Face Cleanser", label: "Evening Reset", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" },
-        { time: "08:30 PM", name: "Night Repair Gel", label: "Recovery", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" },
-      ];
-    } else {
-      return [
-        { 
-          time: "08:00 AM", 
-          name: isAcneProne ? "BHA Gentle Cleanser" : "Hydrating Foaming Wash", 
-          label: "Morning Glow", 
-          image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", 
-          color: "bg-pink-50" 
-        },
-        { time: "08:15 AM", name: "Vitamin C Serum", label: "Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
-        { time: "08:30 AM", name: "Lightweight Lotion", label: "Barrier Support", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
-        { time: "08:45 AM", name: "SPF 50+ Sunscreen", label: "UV Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-blue-50" },
-        { time: "08:00 PM", name: "Micellar Water + Cleanser", label: "Double Cleanse", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" },
-        { time: "08:30 PM", name: isAcneProne ? "Spot Treatment" : "Niacinamide Serum", label: "Targeted Care", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" },
-        { time: "09:00 PM", name: "Intense Night Repair", label: "Overnight Reset", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-pink-50" },
-      ];
-    }
+    const isPigmented = latestScan?.pigmentation > 40;
+
+    const schedule = [];
+
+    // --- MORNING ---
+    schedule.push({
+      time: "08:00 AM",
+      type: "skin",
+      name: gender === "male" ? (isAcneProne ? "Salicylic Face Wash" : "Charcoal Face Wash") : (isAcneProne ? "BHA Gentle Cleanser" : "Hydrating Foaming Wash"),
+      label: "Morning Cleanse",
+      image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80",
+      color: "bg-blue-50"
+    });
+
+    schedule.push({
+      time: "08:15 AM",
+      type: "skin",
+      name: isPigmented ? "Vitamin C + Niacinamide" : "Hydrating Serum",
+      label: "Skin Protection",
+      image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80",
+      color: "bg-orange-50"
+    });
+
+    schedule.push({
+      time: "08:30 AM",
+      type: "skin",
+      name: isOily ? "Matte Moisturizer + SPF" : "Rich Ceramide Cream + SPF",
+      label: "Barrier & UV Shield",
+      image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80",
+      color: "bg-cyan-50"
+    });
+
+    // --- BREAKFAST ---
+    schedule.push({
+      time: "09:00 AM",
+      type: "diet",
+      name: isAcneProne ? "Oats with Berries & Seeds" : "Avocado Toast & Green Tea",
+      label: gender === "male" ? "High Protein Breakfast" : "Healthy Glow Breakfast",
+      image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=100&q=80",
+      color: "bg-emerald-50"
+    });
+
+    // --- LUNCH ---
+    schedule.push({
+      time: "01:30 PM",
+      type: "diet",
+      name: isOily ? "Grilled Chicken/Paneer Salad" : "Salmon/Lentil soup with Veggies",
+      label: "Balanced Lunch",
+      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80",
+      color: "bg-emerald-50"
+    });
+
+    // --- EVENING ---
+    schedule.push({
+      time: "05:00 PM",
+      type: "diet",
+      name: "Walnuts & Pumpkin Seeds",
+      label: "Skin Superfood Snack",
+      image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=100&q=80",
+      color: "bg-orange-50"
+    });
+
+    // --- NIGHT ---
+    schedule.push({
+      time: "08:00 PM",
+      type: "skin",
+      name: "Double Cleanse (Oil + Water)",
+      label: "Deep Detox",
+      image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80",
+      color: "bg-indigo-50"
+    });
+
+    schedule.push({
+      time: "08:30 PM",
+      type: "diet",
+      name: isAcneProne ? "Quinoa & Steamed Veggies" : "Light Vegetable Stir-fry",
+      label: "Light Dinner",
+      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80",
+      color: "bg-emerald-50"
+    });
+
+    schedule.push({
+      time: "09:00 PM",
+      type: "skin",
+      name: isAcneProne ? "Retinol + Spot Treatment" : "Peptide Night Cream",
+      label: "Overnight Repair",
+      image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80",
+      color: "bg-purple-50"
+    });
+
+    return schedule;
   };
 
-  const activeRoutine = getRoutine();
+  const fullSchedule = getSchedule();
 
   return (
     <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
@@ -75,35 +134,13 @@ export default function RoutinePage() {
           <ChevronLeft size={24} />
         </Link>
         <div className="text-center">
-          <h1 className="text-[17px] font-bold text-slate-800">Daily Routine</h1>
-          <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">{gender} &bull; {latestScan ? "Custom" : "Standard"}</p>
+          <h1 className="text-[17px] font-bold text-slate-800">Daily Schedule</h1>
+          <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">{gender} &bull; AI Powered</p>
         </div>
         <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-800 shadow-sm border border-[#F3EAE8]">
           <CalendarIcon size={20} />
         </div>
       </header>
-
-      {/* Growth Insight Card */}
-      {latestScan && (
-        <div className="px-6 mb-8">
-          <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm flex items-center justify-between overflow-hidden relative group">
-            <div className="absolute -right-4 -top-4 w-20 h-20 bg-[#FDF5F2] rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500" />
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-                <TrendingUp size={24} />
-              </div>
-              <div>
-                <p className="text-[14px] font-bold text-slate-800">Growth Track</p>
-                <p className="text-[11px] text-slate-400 font-medium">Score: <span className="text-[#F88E7D] font-black">{latestScan.score}%</span> &bull; {latestScan.date}</p>
-              </div>
-            </div>
-            <div className="text-emerald-500 font-black text-xs relative z-10 flex flex-col items-end">
-              <span>ACTIVE</span>
-              <span className="text-[9px] text-slate-300">Tracking daily</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Calendar Bar */}
       <div className="px-6 flex justify-between gap-2 mb-8">
@@ -122,42 +159,61 @@ export default function RoutinePage() {
         ))}
       </div>
 
-      {/* Timeline */}
+      {/* Timeline Schedule */}
       <div className="px-6 space-y-4">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-[20px] font-bold text-slate-800">Today&apos;s Steps</h2>
-          {latestScan && latestScan.acne > 30 && (
-            <div className="bg-orange-50 text-orange-500 px-3 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-1">
-              <AlertCircle size={10} /> Acne Target Mode
+          <h2 className="text-[20px] font-bold text-slate-800">Today&apos;s Journey</h2>
+          {latestScan && (
+            <div className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-1">
+              <Sparkles size={10} /> Based on {latestScan.score}% Glow Score
             </div>
           )}
         </div>
         
-        <div className="space-y-6">
-          {activeRoutine.map((item, idx) => (
+        <div className="space-y-8 relative">
+          {/* Vertical Line */}
+          <div className="absolute left-[31px] top-4 bottom-4 w-0.5 bg-slate-100" />
+
+          {fullSchedule.map((item, idx) => (
             <motion.div 
               key={idx}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.1 }}
-              className="flex items-center gap-6"
+              transition={{ delay: idx * 0.05 }}
+              className="flex items-center gap-6 relative"
             >
-              <div className="w-16 flex-shrink-0">
-                <p className="text-[14px] font-bold text-slate-800">{item.time.split(' ')[0]}</p>
-                <p className="text-[10px] font-black text-slate-400 tracking-tighter uppercase">{item.time.split(' ')[1]}</p>
+              {/* Time Column */}
+              <div className="w-16 flex-shrink-0 text-right">
+                <p className="text-[13px] font-bold text-slate-800">{item.time.split(' ')[0]}</p>
+                <p className="text-[9px] font-black text-slate-400 tracking-tight uppercase">{item.time.split(' ')[1]}</p>
               </div>
-              
+
+              {/* Dot on Line */}
               <div className={cn(
-                "flex-1 p-4 rounded-[32px] flex items-center gap-4 border border-white/50 shadow-sm",
+                "absolute left-[28px] w-2 h-2 rounded-full border-2 border-white z-10",
+                item.type === "skin" ? "bg-[#F88E7D]" : "bg-emerald-500"
+              )} />
+              
+              {/* Content Card */}
+              <div className={cn(
+                "flex-1 p-5 rounded-[32px] flex items-center gap-4 border border-white/50 shadow-sm relative group active:scale-95 transition-transform",
                 item.color
               )}>
                 <div className="w-16 h-16 rounded-2xl bg-white overflow-hidden flex-shrink-0 shadow-inner">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                 </div>
-                <div>
-                  <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-widest mb-0.5">{item.label}</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-0.5">
+                    {item.type === "skin" ? <Sparkles size={10} className="text-[#F88E7D]" /> : <Utensils size={10} className="text-emerald-500" />}
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
+                  </div>
                   <p className="text-[14px] font-bold text-slate-800 leading-snug">{item.name}</p>
                 </div>
+                {item.type === "diet" && (
+                  <div className="absolute top-4 right-4">
+                    <Droplets size={14} className="text-blue-200" title="Drink Water!" />
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
