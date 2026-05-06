@@ -68,14 +68,21 @@ export default function Home() {
       const j = await r.json();
       setAi(j.text);
       // Save analysis for Diet/Coach
-      localStorage.setItem("velmora_analysis", JSON.stringify({
+      const analysisData = {
         ...res,
         score: res.score,
         acne: res.acne,
         oil: res.oil,
         pigmentation: res.pigmentation,
-        gender: gender
-      }));
+        gender: gender,
+        date: new Date().toLocaleDateString()
+      };
+      localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
+
+      // Save to history
+      const newHistory = [analysisData, ...history].slice(0, 30);
+      setHistory(newHistory);
+      localStorage.setItem("velmora_history", JSON.stringify(newHistory));
     } catch { setAi("⚠️ Could not generate AI report."); }
     finally { setLoading(false); setDeepScanStep(0); }
   }
@@ -114,19 +121,41 @@ export default function Home() {
             {/* AI Scan Button */}
             <button 
               onClick={() => (setScanMode("face"), setView("scanner"))}
-              className="w-full bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
+              className="w-full bg-[#F88E7D] border-2 border-[#F88E7D]/20 rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-xl shadow-orange-500/20 text-white"
             >
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#FDF5F2] flex items-center justify-center text-[#F88E7D]">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
                   <ScanFace size={28} />
                 </div>
                 <div className="text-left">
-                  <span className="block text-[16px] font-bold text-slate-800">Scan your face</span>
-                  <span className="block text-[11px] text-slate-400 font-medium italic">Instant AI Analysis</span>
+                  <span className="block text-[16px] font-bold">Scan your face</span>
+                  <span className="block text-[11px] text-white/70 font-medium italic">Instant AI Analysis</span>
                 </div>
               </div>
-              <ChevronRight size={20} className="text-slate-300 group-hover:text-[#F88E7D] transition-colors" />
+              <ChevronRight size={20} className="text-white/50 group-hover:text-white transition-colors" />
             </button>
+
+            {/* Growth Insight Card */}
+            {history.length >= 2 && (
+              <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
+                    <Zap size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-bold text-slate-800">
+                      {history[0].score > history[1].score ? "Skin improving!" : "Skin needs care"}
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-medium">
+                      Glow score {history[0].score > history[1].score ? "up" : "down"} by {Math.abs(history[0].score - history[1].score)}%
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-emerald-500 font-black text-xs">
+                  {history[0].score > history[1].score ? "+" : "-"}{Math.abs(history[0].score - history[1].score)}%
+                </div>
+              </div>
+            )}
 
             {/* Main Features Grid */}
             <div className="grid grid-cols-2 gap-4">
