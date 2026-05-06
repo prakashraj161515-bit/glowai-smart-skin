@@ -249,37 +249,53 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Bottom Sheet - Best Solutions */}
+            {/* Bottom Sheet - Analysis Result */}
             <motion.div 
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               transition={{ type: "spring", damping: 20, stiffness: 100 }}
-              className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl rounded-t-[40px] p-8 pb-12 shadow-2xl border-t border-white/40"
+              className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl rounded-t-[40px] p-8 pb-12 shadow-2xl border-t border-white/40 max-h-[70vh] overflow-y-auto no-scrollbar"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-[18px] font-bold text-slate-800">Best Solutions</h3>
-                <button className="text-[#F88E7D] text-[13px] font-bold">View All</button>
+                <div>
+                  <h3 className="text-[18px] font-bold text-slate-800 tracking-tight">Skin Analysis Result</h3>
+                  <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest mt-0.5">AI Report Complete</p>
+                </div>
+                <div className="w-14 h-14 rounded-2xl bg-[#FFEDE8] flex items-center justify-center text-[#F88E7D] shadow-inner font-black text-lg">
+                  {data.score}%
+                </div>
               </div>
               
-              <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-2 px-2 pb-2">
-                {[
-                  { image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=200&q=80", active: false },
-                  { image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80", active: true },
-                  { image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80", active: false },
-                  { image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200&q=80", active: false },
-                ].map((item, idx) => (
-                  <div key={idx} className={cn(
-                    "relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all flex-shrink-0",
-                    item.active ? "border-[#F88E7D] scale-110 shadow-lg" : "border-transparent opacity-60"
-                  )}>
-                    <img src={item.image} alt="Solution" className="w-full h-full object-cover" />
-                    {item.active && (
-                      <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#F88E7D] rounded-full flex items-center justify-center text-white">
-                        <CheckCircle2 size={12} strokeWidth={3} />
-                      </div>
-                    )}
+              <div className="space-y-6">
+                {/* Score Pills */}
+                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                  <div className="bg-[#FDF5F2] px-4 py-2 rounded-2xl border border-[#F3EAE8] flex-shrink-0">
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Acne</p>
+                    <p className="text-[14px] font-bold text-slate-800">{data.acne}%</p>
                   </div>
-                ))}
+                  <div className="bg-[#FDF5F2] px-4 py-2 rounded-2xl border border-[#F3EAE8] flex-shrink-0">
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Oil</p>
+                    <p className="text-[14px] font-bold text-slate-800">{data.oil}%</p>
+                  </div>
+                  <div className="bg-[#FDF5F2] px-4 py-2 rounded-2xl border border-[#F3EAE8] flex-shrink-0">
+                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">Pigment</p>
+                    <p className="text-[14px] font-bold text-slate-800">{data.pigmentation}%</p>
+                  </div>
+                </div>
+
+                {/* AI Text Analysis */}
+                <div className="bg-white rounded-[32px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden">
+                  {loading ? (
+                    <div className="py-12 flex flex-col items-center gap-4">
+                      <div className="w-10 h-10 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin" />
+                      <p className="text-[11px] text-slate-400 font-bold uppercase animate-pulse">Generating Expert Report...</p>
+                    </div>
+                  ) : (
+                    <div className="text-[13px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">
+                      {ai || "Scanning complete. Your personalized report is ready."}
+                    </div>
+                  )}
+                </div>
               </div>
             </motion.div>
           </motion.div>
