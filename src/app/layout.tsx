@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${outfit.variable} font-sans bg-[#F4F6FF] min-h-screen`}>
+      <body className={`${inter.variable} ${outfit.variable} font-outfit bg-[#FDF5F2] min-h-screen`}>
         <main>{children}</main>
         <BottomNav />
       </body>

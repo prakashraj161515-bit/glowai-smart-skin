@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Utensils, MessageCircle, User, Gem } from "lucide-react";
+import { Home, Calendar, ShoppingBag, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -18,61 +18,39 @@ export function BottomNav() {
 
   const navItems = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Diet", href: "/diet", icon: Utensils },
-    { name: "Premium", href: "/premium", icon: Gem, special: true },
-    { name: "Chat", href: "/coach", icon: MessageCircle },
+    { name: "Routine", href: "/routine", icon: Calendar },
+    { name: "Cart", href: "/cart", icon: ShoppingBag },
     { name: "Profile", href: "/profile", icon: User },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 px-4 pb-6 pt-3 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none z-50 max-w-[430px] mx-auto">
-      <nav className="h-16 bg-white border border-[#EEF0FF] rounded-[24px] shadow-2xl shadow-purple-500/15 px-2 flex items-center justify-around pointer-events-auto overflow-hidden">
+    <div className="fixed bottom-0 left-0 right-0 px-8 pb-8 pt-3 bg-gradient-to-t from-[#FDF5F2] via-[#FDF5F2]/90 to-transparent pointer-events-none z-50 max-w-[430px] mx-auto">
+      <nav className="h-20 bg-white border border-[#F3EAE8] rounded-[32px] shadow-2xl shadow-orange-500/10 px-4 flex items-center justify-around pointer-events-auto overflow-hidden">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link key={item.name} href={item.href} className="relative group flex flex-col items-center justify-center flex-1">
               <div className={cn(
-                "flex flex-col items-center justify-center gap-0.5 transition-all duration-300",
-                isActive ? "text-purple-600 scale-105" : "text-slate-300 hover:text-slate-400",
-                item.special && !isPremium && "animate-bounce-subtle"
+                "flex flex-col items-center justify-center gap-1 transition-all duration-300",
+                isActive ? "text-[#F88E7D] scale-110" : "text-slate-300 hover:text-slate-400"
               )}>
                 <item.icon 
-                  size={item.special ? 24 : 20} 
+                  size={24} 
                   className={cn(
-                    isActive ? "stroke-[2.5px]" : "stroke-[2px]",
-                    item.special && !isActive && "text-purple-500 opacity-60",
-                    item.special && isActive && "text-purple-600"
+                    isActive ? "stroke-[2.5px] fill-[#F88E7D]/10" : "stroke-[2px]"
                   )} 
                 />
-                <span className={cn(
-                  "text-[8px] font-black uppercase tracking-tighter transition-all",
-                  isActive ? "opacity-100 text-purple-600" : "opacity-0"
-                )}>
-                  {item.name}
-                </span>
               </div>
               {isActive && (
                 <motion.div
                   layoutId="nav-dot"
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-1 bg-purple-600 rounded-full"
+                  className="absolute -bottom-2 w-1.5 h-1.5 bg-[#F88E7D] rounded-full"
                 />
-              )}
-              {item.special && !isPremium && (
-                <div className="absolute -top-1 -right-0 w-2 h-2 bg-pink-500 rounded-full border border-white animate-pulse" />
               )}
             </Link>
           );
         })}
       </nav>
-      <style jsx global>{`
-        @keyframes bounce-subtle {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-2px); }
-        }
-        .animate-bounce-subtle {
-          animation: bounce-subtle 2s infinite ease-in-out;
-        }
-      `}</style>
     </div>
   );
 }

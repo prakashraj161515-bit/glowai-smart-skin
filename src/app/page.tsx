@@ -7,20 +7,23 @@ import Link from "next/link";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; };
 
+import ProductCard from "@/components/ProductCard";
+
 export default function Home() {
   const [view, setView] = useState<"home"|"scanner"|"results"|"history"|"product_results">("home");
   const [scanMode, setScanMode] = useState<"face"|"product">("face");
   const [data, setData] = useState<any>(null);
   const [ai, setAi] = useState("");
   const [loading, setLoading] = useState(false);
-  const [gender, setGender] = useState<"male"|"female">("male");
+  const [gender, setGender] = useState<"male"|"female">("female");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [userName, setUserName] = useState("Glow");
+  const [userName, setUserName] = useState("Erica");
   const [userPic, setUserPic] = useState("");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
   const [scanLimitReached, setScanLimitReached] = useState(false);
   const [scanCount, setScanCount] = useState(0);
+  const [activeTab, setActiveTab] = useState("All");
 
   useEffect(() => {
     const h = localStorage.getItem("velmora_history");
@@ -33,59 +36,26 @@ export default function Home() {
     setIsPremium(premium);
     const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
     setScanCount(count);
-    const today = new Date().toDateString();
-    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
-    if (lastScanDate === today && count >= 2 && !premium) setScanLimitReached(true);
   }, [view]);
 
-  const [skinTips, setSkinTips] = useState("");
-  const [loadingTips, setLoadingTips] = useState(false);
-
-  const checkScanLimit = () => {
-    if (isPremium) return true;
-    const today = new Date().toDateString();
-    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
-    if (lastScanDate === today && scanCount >= 2) {
-      setScanLimitReached(true);
-      return false;
-    }
-    return true;
-  };
-
-  const incrementScanCount = () => {
-    if (isPremium) return;
-    const today = new Date().toDateString();
-    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
-    let count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
-    if (lastScanDate === today) count += 1;
-    else count = 1;
-    localStorage.setItem("velmora_last_scan_date", today);
-    localStorage.setItem("velmora_scan_count", count.toString());
-    setScanCount(count);
-  };
+  // Dummy products
+  const products = [
+    { name: "Brightening Cream", price: "$24.00", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=400&q=80" },
+    { name: "Hydrating Serum", price: "$32.00", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&q=80" },
+    { name: "Cleansing Oil", price: "$18.00", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=400&q=80" },
+    { name: "Night Repair", price: "$45.00", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80" },
+  ];
 
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
-    incrementScanCount();
     setView("results");
     setData(res);
     setLoading(true);
     setDeepScanStep(1);
-    const delay = isPremium ? 1500 : 1000;
-    await new Promise(r => setTimeout(r, delay));
-    setDeepScanStep(2); 
-    await new Promise(r => setTimeout(r, delay + 500));
-    setDeepScanStep(3); 
-    await new Promise(r => setTimeout(r, delay));
+    await new Promise(r => setTimeout(r, 1000));
     setDeepScanStep(4); 
-    const entry: HistoryEntry = {
-      date: new Date().toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }),
-      score: res.score, acne: res.acne, oil: res.oil, pigmentation: res.pigmentation
-    };
-    const updated = [entry, ...history].slice(0, 10);
-    setHistory(updated);
-    localStorage.setItem("velmora_history", JSON.stringify(updated));
+    await new Promise(r => setTimeout(r, 500));
     try {
       const r = await fetch("/api/generate", {
         method: "POST",
@@ -98,199 +68,74 @@ export default function Home() {
     finally { setLoading(false); setDeepScanStep(0); }
   }
 
-  async function handleProductResult(res: any) {
-    setView("product_results");
-    setLoading(true);
-    try {
-      const r = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "product_scan", isPremium, userName, gender, image: res.image })
-      });
-      const j = await r.json();
-      setAi(j.text);
-    } catch { setAi("⚠️ Could not analyze product."); }
-    finally { setLoading(false); }
-  }
-
-  async function handleLearnMore() {
-    setLoadingTips(true);
-    setSkinTips("");
-    try {
-      const r = await fetch("/api/ai/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: `Give me 5 personalized skin improvement tips for a ${gender} person in simple bullet points. Focus on daily routine, diet and skincare habits.`,
-          history: [],
-          context: ""
-        })
-      });
-      const j = await r.json();
-      setSkinTips(j.text || "⚠️ Could not fetch tips.");
-    } catch { setSkinTips("⚠️ Server busy. Try again."); }
-    finally { setLoadingTips(false); }
-  }
-
   return (
-    <div className="min-h-screen bg-[#F4F6FF] font-outfit pb-28">
-
-      {/* Header */}
-      <header className="px-5 pt-10 pb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-[24px] font-black">Velm<span className="text-purple-600">ora</span></h1>
-          <p className="text-[11px] text-slate-500 font-semibold">Smart Skin, Better You</p>
-        </div>
-        {!isPremium ? (
-          <Link href="/premium" className="bg-purple-50 border border-purple-100 px-3 py-1.5 rounded-xl flex items-center gap-1.5 active:scale-95 transition-transform">
-            <Gem size={12} strokeWidth={1.2} className="text-purple-600" />
-            <span className="text-[10px] font-black text-purple-600 uppercase tracking-tight">Upgrade</span>
-          </Link>
-        ) : (
-          <div className="flex items-center gap-1.5 bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-[1.5px] rounded-full shadow-lg shadow-purple-500/30">
-            <div className="bg-white rounded-full px-3 py-1 flex items-center gap-1.5">
-              <Gem size={10} strokeWidth={1.2} className="text-purple-600 fill-purple-500" />
-              <span className="text-[8px] font-black text-purple-700 uppercase tracking-tighter">Pro</span>
-            </div>
-          </div>
-        )}
-      </header>
+    <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
 
       <AnimatePresence mode="wait">
 
         {/* HOME */}
         {view === "home" && (
-          <motion.div key="home" initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-16}} className="px-5 space-y-5">
-
-            {/* Hero */}
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <h2 className="text-[26px] font-black text-slate-900 leading-tight flex items-center gap-2">
-                  Hello, {userName}! {isPremium && <Gem size={16} strokeWidth={1.2} className="text-purple-500 fill-purple-500" />}
-                </h2>
-                <p className="text-[13px] text-slate-600 font-medium mt-1">Let&apos;s check your skin health today 🤍</p>
+          <motion.div key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-6 pt-12 space-y-8">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-[28px] font-bold text-slate-800 leading-tight">Hi {userName},</h1>
+                <p className="text-[13px] text-slate-400 font-medium mt-0.5">Transform Your Skin&apos;s Health</p>
               </div>
-              <div className="w-24 h-24 rounded-[32px] border-4 border-white shadow-xl overflow-hidden ml-3 flex-shrink-0 rotate-2">
-                <img
-                  src={userPic || (gender==="male"
-                    ? "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
-                    : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=face")}
-                  alt="person" className="w-full h-full object-cover -rotate-2"
-                />
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face" alt="Profile" className="w-full h-full object-cover" />
               </div>
             </div>
 
-            {/* Premium Upgrade Banner */}
-            {!isPremium && (
-              <Link href="/premium">
-                <div className="bg-primary-gradient rounded-[24px] p-3.5 flex items-center justify-between shadow-xl shadow-purple-500/10 border border-white/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-white backdrop-blur-sm">
-                      <Gem size={16} strokeWidth={1.2} />
-                    </div>
-                    <div>
-                      <p className="text-white font-black text-[13px]">Upgrade to Premium</p>
-                      <p className="text-white/70 text-[9px] font-bold">Unlock clinical vision metrics ✨</p>
-                    </div>
-                  </div>
-                  <ChevronRight size={16} strokeWidth={1.2} className="text-white/50" />
+            {/* Promo Banner */}
+            <div className="relative bg-[#FFEDE8] rounded-[32px] p-8 overflow-hidden flex items-center justify-between group">
+              <div className="z-10 max-w-[140px]">
+                <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-widest mb-1.5">Find the right</p>
+                <h2 className="text-[22px] font-bold text-slate-800 leading-tight italic">Cream for your Skin</h2>
+              </div>
+              <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center p-4">
+                <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?w=300&q=80" alt="Product" className="w-full h-full object-contain rotate-12 transition-transform group-hover:scale-110" />
+              </div>
+            </div>
+
+            {/* AI Scan Button */}
+            <button 
+              onClick={() => (setScanMode("face"), setView("scanner"))}
+              className="w-full bg-white border border-[#F3EAE8] rounded-[24px] p-4 flex items-center justify-between group active:scale-95 transition-transform"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#FDF5F2] flex items-center justify-center text-[#F88E7D]">
+                  <ScanFace size={24} />
                 </div>
-              </Link>
-            )}
+                <span className="text-[15px] font-bold text-slate-800">Scan your face with AI</span>
+              </div>
+              <ChevronRight size={20} className="text-slate-300 group-hover:text-[#F88E7D] transition-colors" />
+            </button>
 
-            {/* Gender Selection */}
-            <div className="bg-white rounded-[22px] p-1.5 flex gap-1.5 border border-[#EEF0FF] shadow-sm">
-              <button 
-                onClick={() => setGender("male")}
-                className={`flex-1 py-3 rounded-[18px] text-[12px] font-black uppercase tracking-wider transition-all ${gender === "male" ? "bg-primary-gradient text-white shadow-lg shadow-purple-500/20" : "text-slate-400"}`}
-              >
-                Male
-              </button>
-              <button 
-                onClick={() => setGender("female")}
-                className={`flex-1 py-3 rounded-[18px] text-[12px] font-black uppercase tracking-wider transition-all ${gender === "female" ? "bg-primary-gradient text-white shadow-lg shadow-purple-500/20" : "text-slate-400"}`}
-              >
-                Female
-              </button>
-            </div>
-
-            {/* Dual Analyze Box */}
-            <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5 space-y-3">
-              <p className="text-[14px] font-black text-slate-900 px-1">AI Analysis Tools</p>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <button onClick={() => checkScanLimit() && (setScanMode("face"), setView("scanner"))}
-                  className={`p-4 rounded-[22px] flex flex-col items-center gap-2 transition-all ${scanLimitReached && !isPremium ? 'bg-slate-50 opacity-60' : 'bg-purple-50/50 hover:bg-purple-50'}`}>
-                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-purple-600"><ScanFace size={24} strokeWidth={1.2} /></div>
-                  <p className="text-[11px] font-black text-slate-800 uppercase tracking-tighter">Face Scan</p>
-                  <p className="text-[8px] text-slate-400 font-bold uppercase">{isPremium ? 'Unlimited' : `${Math.max(0, 2 - scanCount)} left`}</p>
+            {/* Categories */}
+            <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 no-scrollbar">
+              {["All", "Skincare", "Makeup"].map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={cn(
+                    "px-8 py-4 rounded-full text-[13px] font-bold transition-all whitespace-nowrap",
+                    activeTab === tab ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]"
+                  )}
+                >
+                  {tab}
                 </button>
-                <button onClick={() => isPremium ? (setScanMode("product"), setView("scanner")) : (alert("Premium feature!"), window.location.href="/premium")}
-                  className={`p-4 rounded-[22px] flex flex-col items-center gap-2 transition-all bg-blue-50/50 hover:bg-blue-50 relative overflow-hidden`}>
-                  {!isPremium && <Lock size={10} strokeWidth={1.2} className="absolute top-2 right-2 text-slate-400" />}
-                  <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-500"><ShoppingBag size={22} strokeWidth={1.2} /></div>
-                  <p className="text-[11px] font-black text-slate-800 uppercase tracking-tighter">Scan Product</p>
-                  <p className="text-[8px] text-blue-400 font-bold uppercase">{isPremium ? 'Unlimited' : 'Premium'}</p>
-                </button>
-              </div>
+              ))}
             </div>
 
-            {/* Why Velmora */}
-            <div>
-              <p className="text-[14px] font-black text-slate-900 mb-3 px-1">Why Velmora?</p>
-              <div className="grid grid-cols-4 gap-2.5">
-                {[
-                  {label:"AI Powered",sub:"Smart Logic",icon:BrainCircuit,bg:"bg-blue-50",color:"text-blue-500"},
-                  {label:"Accurate",sub:"Precise",icon:Target,bg:"bg-cyan-50",color:"text-cyan-500"},
-                  {label:"Fast",sub:"Instant",icon:Zap,bg:"bg-orange-50",color:"text-orange-500"},
-                  {label:"Secure",sub:"Private",icon:ShieldCheck,bg:"bg-purple-50",color:"text-purple-500"},
-                ].map((f,i)=>(
-                  <div key={i} className="bg-white rounded-2xl border border-[#EEF0FF] p-2 flex flex-col items-center text-center shadow-sm">
-                    <div className={`w-8 h-8 rounded-xl ${f.bg} ${f.color} flex items-center justify-center mb-1.5`}><f.icon size={16} strokeWidth={1.2} /></div>
-                    <p className="text-[9px] font-black text-slate-800 leading-tight">{f.label}</p>
-                    <p className="text-[7px] text-slate-500 font-bold mt-0.5">{f.sub}</p>
-                  </div>
-                ))}
-              </div>
+            {/* Product Grid */}
+            <div className="grid grid-cols-2 gap-6">
+              {products.map((p, i) => (
+                <ProductCard key={i} {...p} />
+              ))}
             </div>
 
-            {/* Know Your Skin Better */}
-            <div className="bg-primary-gradient rounded-[28px] p-5 overflow-hidden relative border border-white/10">
-              <div className="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-2xl" />
-              <div className="flex items-center justify-between mb-3">
-                <div className="z-10">
-                  <p className="text-white font-black text-[16px] leading-snug">Know Your<br/>Skin Better</p>
-                  <p className="text-white/80 text-[11px] mt-1 mb-3 max-w-[160px]">Understand your unique skin and get personalized tips.</p>
-                  <button onClick={handleLearnMore} className="bg-white text-purple-700 font-black text-[11px] px-4 py-2 rounded-xl shadow flex items-center gap-1.5">
-                    {loadingTips ? <><RefreshCcw size={12} strokeWidth={1.2} className="animate-spin"/> Loading...</> : "Learn More"}
-                  </button>
-                </div>
-                <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl z-10 backdrop-blur-md">🔬</div>
-              </div>
-              {skinTips && <div className="bg-white/15 rounded-2xl p-4 mt-2 z-10 relative backdrop-blur-sm border border-white/10"><p className="text-white text-[12px] leading-relaxed whitespace-pre-wrap font-medium">{skinTips}</p></div>}
-            </div>
-
-            {/* How It Works */}
-            <div className="pb-4">
-              <p className="text-[14px] font-black text-slate-900 mb-3 px-1">How It Works?</p>
-              <div className="flex items-start justify-between">
-                {[
-                  {n:"1",label:"Scan Face",sub:"Camera/Photo",icon:"📷"},
-                  {n:"2",label:"AI Analysis",sub:"Deep Logic",icon:"🤖"},
-                  {n:"3",label:"Results",sub:"Expert Tips",icon:"📊"}
-                ].map((s,i)=>(
-                  <div key={i} className="flex-1 flex flex-col items-center text-center px-1 relative">
-                    {i<2 && <div className="absolute top-6 right-0 text-slate-300 font-bold text-lg">→</div>}
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-xl mb-2 relative">
-                      <span className="text-[20px]">{s.icon}</span>
-                      <div className="absolute -top-1 -left-1 w-4 h-4 bg-purple-600 rounded-full text-white text-[8px] font-black flex items-center justify-center shadow-md">{s.n}</div>
-                    </div>
-                    <p className="text-[10px] font-black text-slate-800">{s.label}</p>
-                    <p className="text-[8px] text-slate-500 font-bold mt-0.5">{s.sub}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </motion.div>
         )}
 
@@ -347,67 +192,68 @@ export default function Home() {
 
         {/* RESULTS & DEEP ANALYSIS (FACE) */}
         {view === "results" && data && (
-          <motion.div key="results" initial={{opacity:0,x:20}} animate={{opacity:1,x:0}} className="px-5 space-y-4">
-            <div className="flex justify-between items-center pt-2">
-              <button onClick={()=>setView("home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100"><ArrowLeft size={18} strokeWidth={1.2} /></button>
-              <h2 className="text-[17px] font-black text-slate-900">Skin Report</h2>
-              {isPremium ? <button onClick={() => alert("Downloading PDF...")} className="w-10 h-10 rounded-full bg-primary-gradient shadow flex items-center justify-center text-white"><Download size={18} strokeWidth={1.2} /></button> : <Link href="/premium" className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-300 border border-slate-100 relative"><Download size={18} strokeWidth={1.2} /><Lock size={10} strokeWidth={1.2} className="absolute top-1 right-1 text-purple-600" /></Link>}
-            </div>
-            {loading && deepScanStep > 0 && (
-              <div className="bg-white rounded-[28px] border-2 border-purple-100 shadow-xl p-8 flex flex-col items-center text-center space-y-6">
-                <div className="relative w-20 h-20">
-                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity, ease: "linear" }} className="absolute inset-0 rounded-full border-4 border-dashed border-purple-400 opacity-20" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    {deepScanStep === 1 && <Database size={32} strokeWidth={1.2} className="text-purple-600 animate-pulse" />}
-                    {deepScanStep === 2 && <Search size={32} strokeWidth={1.2} className="text-purple-600 animate-bounce" />}
-                    {deepScanStep === 3 && <Sparkles size={32} strokeWidth={1.2} className="text-purple-600 animate-spin" />}
-                    {deepScanStep === 4 && <CheckCircle2 size={32} strokeWidth={1.2} className="text-green-500" />}
-                  </div>
-                </div>
-                <div><h3 className="text-[16px] font-black text-slate-900 mb-2">{deepScanStep === 1 && "Connecting Database..."}{deepScanStep === 2 && `Scanning 4,000+ Profiles...`}{deepScanStep === 3 && "Matching Patterns..."}{deepScanStep === 4 && "Finalizing Report..."}</h3><div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden"><motion.div initial={{ width: "0%" }} animate={{ width: `${deepScanStep * 25}%` }} className="h-full bg-primary-gradient" /></div></div>
+          <motion.div key="results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen">
+            {/* Background Image (The scanned face) */}
+            <div className="absolute inset-0 bg-slate-200">
+              <img src={data.image || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80"} alt="Scan" className="w-full h-full object-cover" />
+              
+              {/* Scan Dots */}
+              <div className="absolute inset-0">
+                <motion.div initial={{scale:0}} animate={{scale:1}} transition={{delay:0.5}} className="absolute top-[30%] left-[40%] w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                <motion.div initial={{scale:0}} animate={{scale:1}} transition={{delay:0.7}} className="absolute top-[45%] left-[60%] w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                <motion.div initial={{scale:0}} animate={{scale:1}} transition={{delay:0.9}} className="absolute top-[60%] left-[35%] w-3 h-3 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.8)]" />
+                
+                {/* Highlight Circle (Under Eye example) */}
+                <motion.div 
+                  initial={{opacity:0}} animate={{opacity:1}} transition={{delay:1.2}}
+                  className="absolute top-[40%] left-[45%] w-24 h-12 border-2 border-dashed border-white/50 rounded-[50%] rotate-[-15deg]" 
+                />
               </div>
-            )}
-            {!loading && (
-              <>
-                <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5">
-                  <div className="flex items-center gap-5">
-                    <div className="relative w-24 h-24 flex-shrink-0">
-                      <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
-                        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#7C3AED"/><stop offset="100%" stopColor="#EC4899"/></linearGradient></defs>
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="#EEF0FF" strokeWidth="8"/>
-                        <motion.circle cx="50" cy="50" r="40" fill="none" stroke="url(#rg)" strokeWidth="8" strokeLinecap="round" initial={{strokeDasharray:"0 251"}} animate={{strokeDasharray:`${(data.score/100)*251} 251`}} transition={{duration:1.5}} />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center"><p className="text-[20px] font-black text-slate-900 leading-none">{data.score}%</p><p className="text-[10px] text-green-500 font-bold mt-0.5">Good 😊</p></div>
-                    </div>
-                    <div className="flex-1"><p className="text-[14px] font-black text-purple-600 mb-1">{isPremium ? "Clinical Analysis" : "Expert Analysis"}</p><p className="text-[11px] text-slate-600 leading-relaxed font-medium">Patterns matched against {isPremium ? 'clinical' : 'standard'} database.</p><div className="mt-2 flex items-center gap-1.5 bg-purple-50 w-fit px-3 py-1 rounded-full border border-purple-100">{isPremium && <Gem size={10} strokeWidth={1.2} className="text-purple-600" />}<span className="text-[9px] font-black text-purple-700 uppercase">{isPremium ? "Pro Accuracy" : "Accurate"}</span></div></div>
-                  </div>
-                </div>
-                <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5">
-                  <p className="text-[14px] font-black text-slate-900 mb-3 px-1">Skin Scores</p>
-                  <div className="space-y-2.5">
-                    {[
-                      {label:"Acne",val:data.acne,icon:"😫",color:"#F87171"},
-                      {label:"Oiliness",val:data.oil,icon:"💧",color:"#60A5FA"},
-                      {label:"Pigmentation",val:data.pigmentation,icon:"☀️",color:"#FB923C"},
-                      {label:"Glow",val:80,icon:"✨",color:"#A78BFA"},
-                      {label:"Texture",val:65,icon:"🌿",color:"#34D399"},
-                    ].map((m,i)=>(
-                      <div key={m.label} className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-slate-50 flex items-center justify-center text-sm flex-shrink-0">{m.icon}</div>
-                        <div className="flex-1">
-                          <div className="flex justify-between mb-0.5">
-                            <p className="text-[11px] font-bold text-slate-800">{m.label}</p>
-                            <p className="text-[11px] font-black" style={{color:m.color}}>{m.val}%</p>
-                          </div>
-                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden"><motion.div initial={{width:0}} animate={{width:`${m.val}%`}} transition={{duration:1,delay:i*0.1}} className="h-full rounded-full" style={{background:m.color}}/></div>
-                        </div>
+            </div>
+
+            {/* Top Controls */}
+            <div className="absolute top-12 left-6 right-6 flex justify-between items-center z-10">
+              <button onClick={()=>setView("home")} className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform">
+                <ArrowLeft size={20} />
+              </button>
+              <button onClick={()=>setView("scanner")} className="px-6 py-3 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-sm border border-white/20 active:scale-90 transition-transform">
+                Rescan
+              </button>
+            </div>
+
+            {/* Bottom Sheet - Best Solutions */}
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              transition={{ type: "spring", damping: 20, stiffness: 100 }}
+              className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl rounded-t-[40px] p-8 pb-12 shadow-2xl border-t border-white/40"
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-[18px] font-bold text-slate-800">Best Solutions</h3>
+                <button className="text-[#F88E7D] text-[13px] font-bold">View All</button>
+              </div>
+              
+              <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-2 px-2 pb-2">
+                {[
+                  { image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=200&q=80", active: false },
+                  { image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80", active: true },
+                  { image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80", active: false },
+                  { image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200&q=80", active: false },
+                ].map((item, idx) => (
+                  <div key={idx} className={cn(
+                    "relative w-20 h-20 rounded-2xl overflow-hidden border-2 transition-all flex-shrink-0",
+                    item.active ? "border-[#F88E7D] scale-110 shadow-lg" : "border-transparent opacity-60"
+                  )}>
+                    <img src={item.image} alt="Solution" className="w-full h-full object-cover" />
+                    {item.active && (
+                      <div className="absolute bottom-1 right-1 w-5 h-5 bg-[#F88E7D] rounded-full flex items-center justify-center text-white">
+                        <CheckCircle2 size={12} strokeWidth={3} />
                       </div>
-                    ))}
+                    )}
                   </div>
-                </div>
-                {ai && <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5"><p className="text-[14px] font-black text-slate-900 mb-3 flex items-center gap-2"><Sparkles size={14} strokeWidth={1.2} className="text-purple-600"/> AI Recommendations</p><div className="text-[11px] text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">{ai}</div></div>}
-              </>
-            )}
+                ))}
+              </div>
+            </motion.div>
           </motion.div>
         )}
 
