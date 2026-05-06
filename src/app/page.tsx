@@ -18,6 +18,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState<"male"|"female">("female");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [country, setCountry] = useState("India");
   const [userName, setUserName] = useState("Erica");
   const [userPic, setUserPic] = useState("");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
@@ -39,6 +40,8 @@ export default function Home() {
     setScanCount(count);
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
     if (savedGender) setGender(savedGender);
+    const savedCountry = localStorage.getItem("velmora_user_country");
+    if (savedCountry) setCountry(savedCountry);
   }, [view]);
 
   // Dummy products
@@ -70,7 +73,7 @@ export default function Home() {
           mode: "accurate_scan", 
           isPremium, 
           image: res.image,
-          customPrompt: `Analyze the skin for ${gender}. Provide: 1. Possible CAUSES for the current metrics (Acne: ${res.acne}%, Oil: ${res.oil}%, Pigment: ${res.pigmentation}%). 2. WHAT TO DRINK & EAT (with exact quantities like 3L water, 5 walnuts). 3. WHAT CREAM/FACEWASH to use and EXACT TIMING (e.g. 8:30 PM). Format as clear sections.`
+          customPrompt: `Analyze the skin for ${gender} in ${country}. Provide: 1. Possible CAUSES. 2. WHAT TO DRINK & EAT (must be local food available in ${country}, with exact quantities). 3. WHAT CREAM/FACEWASH and EXACT TIMING. Format as clear sections.`
         })
       });
       const j = await r.json();

@@ -8,12 +8,16 @@ import { cn } from "@/lib/utils";
 export default function RoutinePage() {
   const [activeDay, setActiveDay] = useState(3);
   const [gender, setGender] = useState<"male" | "female">("female");
+  const [country, setCountry] = useState("India");
   const [latestScan, setLatestScan] = useState<any>(null);
 
   useEffect(() => {
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
     if (savedGender) setGender(savedGender);
     
+    const savedCountry = localStorage.getItem("velmora_user_country");
+    if (savedCountry) setCountry(savedCountry);
+
     const scanData = localStorage.getItem("velmora_analysis");
     if (scanData) setLatestScan(JSON.parse(scanData));
   }, []);
@@ -28,11 +32,12 @@ export default function RoutinePage() {
     { num: 7, label: "SAT" },
   ];
 
-  // Integrated Schedule Logic (Skin + Diet)
+  // Integrated Schedule Logic (Skin + Diet + Localized Food)
   const getSchedule = () => {
     const isOily = latestScan?.oil > 50;
     const isAcneProne = latestScan?.acne > 30;
     const isPigmented = latestScan?.pigmentation > 40;
+    const isIndia = country === "India" || country === "Pakistan" || country === "Bangladesh";
 
     const schedule = [];
 
@@ -65,20 +70,30 @@ export default function RoutinePage() {
     });
 
     // --- BREAKFAST ---
+    let breakfastName = isAcneProne ? "Oats with Berries" : "Avocado Toast";
+    if (isIndia) {
+      breakfastName = isAcneProne ? "Moong Dal Chilla / Poha" : "Dalia with Nuts";
+    }
+
     schedule.push({
       time: "09:00 AM",
       type: "diet",
-      name: isAcneProne ? "Oats with Berries & Seeds" : "Avocado Toast & Green Tea",
+      name: breakfastName,
       label: gender === "male" ? "High Protein Breakfast" : "Healthy Glow Breakfast",
       image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=100&q=80",
       color: "bg-emerald-50"
     });
 
     // --- LUNCH ---
+    let lunchName = isOily ? "Grilled Chicken Salad" : "Salmon with Veggies";
+    if (isIndia) {
+      lunchName = isOily ? "Roasted Paneer / Chicken with Salad" : "Dal, Brown Rice & Curd";
+    }
+
     schedule.push({
       time: "01:30 PM",
       type: "diet",
-      name: isOily ? "Grilled Chicken/Paneer Salad" : "Salmon/Lentil soup with Veggies",
+      name: lunchName,
       label: "Balanced Lunch",
       image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80",
       color: "bg-emerald-50"
@@ -88,7 +103,7 @@ export default function RoutinePage() {
     schedule.push({
       time: "05:00 PM",
       type: "diet",
-      name: "Walnuts & Pumpkin Seeds",
+      name: isIndia ? "Makhana (Fox Nuts) & Green Tea" : "Walnuts & Pumpkin Seeds",
       label: "Skin Superfood Snack",
       image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=100&q=80",
       color: "bg-orange-50"
@@ -104,10 +119,16 @@ export default function RoutinePage() {
       color: "bg-indigo-50"
     });
 
+    // --- DINNER ---
+    let dinnerName = isAcneProne ? "Quinoa & Steamed Veggies" : "Light Vegetable Stir-fry";
+    if (isIndia) {
+      dinnerName = isAcneProne ? "Oatmeal Khichdi / Vegetable Soup" : "2 Jowar Roti & Boiled Veggies";
+    }
+
     schedule.push({
       time: "08:30 PM",
       type: "diet",
-      name: isAcneProne ? "Quinoa & Steamed Veggies" : "Light Vegetable Stir-fry",
+      name: dinnerName,
       label: "Light Dinner",
       image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80",
       color: "bg-emerald-50"
@@ -135,7 +156,7 @@ export default function RoutinePage() {
         </Link>
         <div className="text-center">
           <h1 className="text-[17px] font-bold text-slate-800">Daily Schedule</h1>
-          <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">{gender} &bull; AI Powered</p>
+          <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">{gender} &bull; {country}</p>
         </div>
         <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-800 shadow-sm border border-[#F3EAE8]">
           <CalendarIcon size={20} />
@@ -165,13 +186,12 @@ export default function RoutinePage() {
           <h2 className="text-[20px] font-bold text-slate-800">Today&apos;s Journey</h2>
           {latestScan && (
             <div className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[9px] font-black uppercase flex items-center gap-1">
-              <Sparkles size={10} /> Based on {latestScan.score}% Glow Score
+              <Sparkles size={10} /> Localized for {country}
             </div>
           )}
         </div>
         
         <div className="space-y-8 relative">
-          {/* Vertical Line */}
           <div className="absolute left-[31px] top-4 bottom-4 w-0.5 bg-slate-100" />
 
           {fullSchedule.map((item, idx) => (
@@ -182,19 +202,16 @@ export default function RoutinePage() {
               transition={{ delay: idx * 0.05 }}
               className="flex items-center gap-6 relative"
             >
-              {/* Time Column */}
               <div className="w-16 flex-shrink-0 text-right">
                 <p className="text-[13px] font-bold text-slate-800">{item.time.split(' ')[0]}</p>
                 <p className="text-[9px] font-black text-slate-400 tracking-tight uppercase">{item.time.split(' ')[1]}</p>
               </div>
 
-              {/* Dot on Line */}
               <div className={cn(
                 "absolute left-[28px] w-2 h-2 rounded-full border-2 border-white z-10",
                 item.type === "skin" ? "bg-[#F88E7D]" : "bg-emerald-500"
               )} />
               
-              {/* Content Card */}
               <div className={cn(
                 "flex-1 p-5 rounded-[32px] flex items-center gap-4 border border-white/50 shadow-sm relative group active:scale-95 transition-transform",
                 item.color
@@ -209,11 +226,6 @@ export default function RoutinePage() {
                   </div>
                   <p className="text-[14px] font-bold text-slate-800 leading-snug">{item.name}</p>
                 </div>
-                {item.type === "diet" && (
-                  <div className="absolute top-4 right-4">
-                    <Droplets size={14} className="text-blue-200" title="Drink Water!" />
-                  </div>
-                )}
               </div>
             </motion.div>
           ))}

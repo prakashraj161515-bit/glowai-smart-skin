@@ -17,6 +17,7 @@ export default function ProfilePage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
   const [gender, setGender] = useState<"male" | "female">("female");
+  const [country, setCountry] = useState("India");
   const [authMode, setAuthMode] = useState<"login" | "signup" | "otp">("login");
   
   const [userName, setUserName] = useState("Anrudh Kumar");
@@ -31,11 +32,13 @@ export default function ProfilePage() {
     const savedPic = localStorage.getItem("velmora_user_pic");
     const premium = localStorage.getItem("velmora_is_premium") === "true";
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
+    const savedCountry = localStorage.getItem("velmora_user_country");
     
     if (saved === "true") setIsLoggedIn(true);
     if (savedName) setUserName(savedName);
     if (savedPic) setProfilePic(savedPic);
     if (savedGender) setGender(savedGender);
+    if (savedCountry) setCountry(savedCountry);
     setIsPremium(premium);
     
     setIsLoaded(true);
@@ -47,8 +50,9 @@ export default function ProfilePage() {
       localStorage.setItem("velmora_user_name", userName);
       localStorage.setItem("velmora_user_pic", profilePic);
       localStorage.setItem("velmora_user_gender", gender);
+      localStorage.setItem("velmora_user_country", country);
     }
-  }, [isLoggedIn, isLoaded, userName, profilePic, gender]);
+  }, [isLoggedIn, isLoaded, userName, profilePic, gender, country]);
 
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -227,6 +231,25 @@ export default function ProfilePage() {
                     <button onClick={() => setGender("male")} className={cn("text-[14px] font-bold", gender === "male" ? "text-[#F88E7D]" : "text-slate-300")}>Male</button>
                     <button onClick={() => setGender("female")} className={cn("text-[14px] font-bold", gender === "female" ? "text-[#F88E7D]" : "text-slate-300")}>Female</button>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center"><Target size={24} /></div>
+                <div>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Location / Country</p>
+                  <select value={country} onChange={(e) => setCountry(e.target.value)} className="bg-transparent text-[15px] font-bold text-slate-800 outline-none cursor-pointer">
+                    <option value="India">India</option>
+                    <option value="USA">USA</option>
+                    <option value="UK">UK</option>
+                    <option value="UAE">UAE</option>
+                    <option value="Pakistan">Pakistan</option>
+                    <option value="Bangladesh">Bangladesh</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                  </select>
                 </div>
               </div>
             </div>
