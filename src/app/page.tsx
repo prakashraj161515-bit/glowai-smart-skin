@@ -161,6 +161,9 @@ export default function Home() {
     await new Promise(r => setTimeout(r, 1000));
     setDeepScanStep(4); 
     await new Promise(r => setTimeout(r, 500));
+    const prevScan = history[0];
+    const comparisonContext = prevScan ? `Previous scan on ${prevScan.date}: Score ${prevScan.score}%, Acne ${prevScan.acne}%, Oil ${prevScan.oil}%, Pigmentation ${prevScan.pigmentation}%.` : "No previous scan available.";
+
     try {
       const r = await fetch("/api/generate", {
         method: "POST",
@@ -172,7 +175,14 @@ export default function Home() {
           mode: "accurate_scan", 
           isPremium, 
           image: res.image,
-          customPrompt: `Analyze the skin for ${gender} in ${country}. Provide: 1. Possible CAUSES. 2. WHAT TO DRINK & EAT (focus ONLY on simple healthy food, vegetables, and fruits available in ${country}, with exact quantities). 3. WHAT CREAM/FACEWASH and EXACT TIMING. Format as clear sections.`
+          customPrompt: `Analyze the skin for ${gender} in ${country}. 
+          ${comparisonContext} 
+          Provide: 
+          1. SKIN IMPROVEMENT ANALYSIS: Compare today's metrics with the previous scan and tell if skin is improving and why.
+          2. Possible CAUSES for current issues. 
+          3. WHAT TO DRINK & EAT (focus ONLY on simple healthy vegetable and fruit diets available in ${country}). 
+          4. WHAT CREAM/FACEWASH and EXACT TIMING based on the specific problems detected (Acne, Oil, or Pigmentation).
+          Format as clear sections with bold headings.`
         })
       });
       const j = await r.json();
@@ -592,6 +602,26 @@ export default function Home() {
                           {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
                         </div>
                       </div>
+
+                      {/* Skin Improving History Mini Graph/Stat */}
+                      {history.length > 1 && (
+                        <div className="bg-emerald-50 rounded-[32px] p-6 border border-emerald-100 shadow-sm">
+                          <div className="flex items-center gap-2 mb-3 text-emerald-600 font-black text-[11px] uppercase tracking-widest">
+                            <TrendingUp size={14} /> Skin Improving History
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                              <p className="text-[13px] font-bold text-slate-800">
+                                {data.score > history[1].score ? "Skin is showing improvement! ✨" : "Keep following the routine."}
+                              </p>
+                              <p className="text-[11px] text-slate-500">Compared to your last scan on {history[1].date}</p>
+                            </div>
+                            <div className={cn("text-lg font-black px-3 py-1 rounded-full", data.score > history[1].score ? "text-emerald-500 bg-emerald-100" : "text-slate-400 bg-slate-100")}>
+                              {data.score > history[1].score ? `+${data.score - history[1].score}%` : `${data.score - history[1].score}%`}
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Quick Summary Cards */}
                       <div className="grid grid-cols-2 gap-4">

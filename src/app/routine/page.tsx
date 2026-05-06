@@ -112,9 +112,9 @@ export default function RoutinePage() {
   };
 
   const days = [
-    { num: 1, label: "SUN" }, { num: 2, label: "MON" }, { num: 3, label: "TUE" },
-    { num: 4, label: "WED" }, { num: 5, label: "THU" }, { num: 6, label: "FRI" },
-    { num: 7, label: "SAT" },
+    { label: "SUN" }, { label: "MON" }, { label: "TUE" },
+    { label: "WED" }, { label: "THU" }, { label: "FRI" },
+    { label: "SAT" },
   ];
 
   const getSchedule = () => {
@@ -124,25 +124,38 @@ export default function RoutinePage() {
     const isIndia = country === "India" || country === "Pakistan" || country === "Bangladesh";
 
     const schedule = [];
-    schedule.push({ time: "08:00 AM", type: "skin", name: gender === "male" ? (isAcneProne ? "Salicylic Face Wash" : "Charcoal Face Wash") : (isAcneProne ? "BHA Gentle Cleanser" : "Hydrating Foaming Wash"), label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "08:15 AM", type: "skin", name: isPigmented ? "Vitamin C + Niacinamide" : "Hydrating Serum", label: "Skin Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" });
-    schedule.push({ time: "08:30 AM", type: "skin", name: isOily ? "Matte Moisturizer + SPF" : "Rich Ceramide Cream + SPF", label: "Barrier & UV Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" });
     
-    let breakfastName = isAcneProne ? "Oats with Berries" : "Avocado Toast";
-    if (isIndia) breakfastName = isAcneProne ? "Moong Dal Chilla" : "Dalia with Nuts";
-    schedule.push({ time: "09:00 AM", type: "diet", name: breakfastName, label: "Breakfast", image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=100&q=80", color: "bg-emerald-50" });
+    // Targeted Skincare names
+    let fwName = "Hydrating Wash";
+    let crName = "Barrier Cream";
+    if (isAcneProne) { fwName = "Salicylic Acid Cleanser"; crName = "Benzoyl Peroxide Spot Treatment"; }
+    else if (isOily) { fwName = "Oil-Control Foam"; crName = "Matte Gel Moisturizer"; }
+    else if (isPigmented) { fwName = "Brightening Vitamin C Wash"; crName = "Kojic Acid Night Serum"; }
 
-    let lunchName = isOily ? "Grilled Chicken Salad" : "Salmon with Veggies";
-    if (isIndia) lunchName = isOily ? "Paneer with Salad" : "Dal, Rice & Curd";
-    schedule.push({ time: "01:30 PM", type: "diet", name: lunchName, label: "Balanced Lunch", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "08:00 AM", type: "skin", name: fwName, label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" });
+    schedule.push({ time: "08:15 AM", type: "skin", name: isPigmented ? "Niacinamide Serum" : "Hyaluronic Acid", label: "Skin Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" });
+    schedule.push({ time: "08:30 AM", type: "skin", name: crName + " + SPF", label: "Barrier & UV Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" });
+    
+    // 7 Days Different Healthy Vegetable Diets
+    const today = new Date().getDay(); // 0-6
+    const vegDiets = [
+      { b: "Spinach & Moong Dal Chilla", l: "Bottle Gourd (Lauki) Curry & Brown Rice", s: "Carrot Sticks", d: "Mixed Vegetable Soup" },
+      { b: "Oats with Steamed Broccoli", l: "Cabbage & Green Peas Sabzi with Roti", s: "Cucumber Slices", d: "Pumpkin Curry" },
+      { b: "Sweet Potato Mash", l: "Ridge Gourd (Turai) Sabzi & Quinoa", s: "Bell Pepper Strips", d: "Green Bean Stir-fry" },
+      { b: "Vegetable Poha", l: "Cauliflower (Gobi) Matar & Dal", s: "Boiled Beetroot", d: "Spinach & Corn Salad" },
+      { b: "Besan Chilla with Tomatoes", l: "Ivy Gourd (Kundru) Fry & Brown Rice", s: "Radish Slices", d: "Lentil & Vegetable Stew" },
+      { b: "Green Smoothie & Sprouts", l: "Bitter Gourd (Karela) & Whole Wheat Roti", s: "Roasted Makhana", d: "Zucchini Noodles with Pesto" },
+      { b: "Vegetable Upma", l: "Drumstick (Moringa) Dal & Salad", s: "Steamed Asparagus", d: "Mushroom & Kale Salad" }
+    ];
+    const diet = vegDiets[today];
 
-    schedule.push({ time: "05:00 PM", type: "diet", name: isIndia ? "Makhana & Green Tea" : "Walnuts & Seeds", label: "Evening Snack", image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=100&q=80", color: "bg-orange-50" });
+    schedule.push({ time: "09:00 AM", type: "diet", name: diet.b, label: "Breakfast", image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "01:30 PM", type: "diet", name: diet.l, label: "Balanced Lunch", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "05:00 PM", type: "diet", name: diet.s, label: "Evening Snack", image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=100&q=80", color: "bg-orange-50" });
+    
     schedule.push({ time: "08:00 PM", type: "skin", name: "Double Cleanse", label: "Deep Detox", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" });
-    
-    let dinnerName = isAcneProne ? "Quinoa & Veggies" : "Vegetable Stir-fry";
-    if (isIndia) dinnerName = isAcneProne ? "Oatmeal Khichdi" : "2 Roti & Veggies";
-    schedule.push({ time: "08:30 PM", type: "diet", name: dinnerName, label: "Light Dinner", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80", color: "bg-emerald-50" });
-    schedule.push({ time: "09:00 PM", type: "skin", name: isAcneProne ? "Retinol + Spot Treatment" : "Peptide Night Cream", label: "Overnight Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" });
+    schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "09:00 PM", type: "skin", name: crName, label: "Overnight Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" });
 
     return schedule;
   };
