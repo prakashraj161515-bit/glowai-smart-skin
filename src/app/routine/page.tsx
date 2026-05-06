@@ -137,15 +137,13 @@ export default function RoutinePage() {
     
     const totalItems = fullSchedule.length;
     const completedCount = completedItems.length;
-    const missed = fullSchedule.filter(item => !completedItems.includes(item.name)).map(item => item.name);
     
     const context = `User is in ${country} and is following a skin-focused diet. 
-    Total Goals: ${fullSchedule.map(i => i.name).join(", ")}. 
-    Completed Today: ${completedItems.length > 0 ? completedItems.join(", ") : "None yet"}.
-    Missed Today: ${missed.length > 0 ? missed.join(", ") : "None"}.
+    Total Diet Goals: ${dietItems.join(", ")}. 
+    Completed Diet Today: ${completedDiet.length > 0 ? completedDiet.join(", ") : "None yet"}.
     Water intake: ${waterIntake} glasses.
-    Total steps completed: ${completedCount}/${totalItems}.
-    If the user missed some items (especially diet), mention them by name and explain why they are important for ${gender}'s skin health in ${country}. Provide a short, encouraging feedback (2-3 lines).`;
+    Total steps completed (Skin+Diet): ${completedCount}/${totalItems}.
+    Analyze how their diet was today for their skin health in ${country}. Provide a short, encouraging feedback (2-3 lines) about their diet performance and what to adjust tomorrow.`;
 
     try {
       const res = await fetch("/api/generate", {
