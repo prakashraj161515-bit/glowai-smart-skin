@@ -85,11 +85,11 @@ export default function RoutinePage() {
     
     const totalItems = fullSchedule.length;
     const completedCount = completedItems.length;
-    const context = `User has completed ${completedCount} out of ${totalItems} steps in their daily routine. 
+    const context = `User is in ${country} and has completed ${completedCount} out of ${totalItems} steps in their daily routine. 
     Completed steps: ${completedItems.join(", ")}. 
     Water intake: ${waterIntake} glasses. 
     Scan metrics: Score ${latestScan?.score || 0}%. 
-    Provide a short, encouraging feedback (2-3 lines) in a coach-like tone about their consistency and what to improve.`;
+    Provide a short, encouraging feedback (2-3 lines) in a coach-like tone about their consistency. If they missed something, suggest a local replacement or tip relevant to ${country}.`;
 
     try {
       const res = await fetch("/api/generate", {
