@@ -542,7 +542,7 @@ export default function Home() {
                   <p className="text-[10px] text-slate-400 font-medium">Nutrition for skin</p>
                 </div>
               </Link>
-              <Link href="/routine" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
+              <Link href="/coach" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
                 <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
                   <Sparkles size={24} />
                 </div>
