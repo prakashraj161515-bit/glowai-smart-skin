@@ -137,13 +137,15 @@ export default function RoutinePage() {
     
     const totalItems = fullSchedule.length;
     const completedCount = completedItems.length;
+    const missed = fullSchedule.filter(item => !completedItems.includes(item.name)).map(item => item.name);
     
     const context = `User is in ${country} and is following a skin-focused diet. 
-    Total Diet Goals: ${dietItems.join(", ")}. 
-    Completed Diet Today: ${completedDiet.length > 0 ? completedDiet.join(", ") : "None yet"}.
+    Total Goals: ${fullSchedule.map(i => i.name).join(", ")}. 
+    Completed Today: ${completedItems.length > 0 ? completedItems.join(", ") : "None yet"}.
+    Missed Today: ${missed.length > 0 ? missed.join(", ") : "None"}.
     Water intake: ${waterIntake} glasses.
-    Total steps completed (Skin+Diet): ${completedCount}/${totalItems}.
-    Analyze how their diet was today for their skin health in ${country}. Provide a short, encouraging feedback (2-3 lines) about their diet performance and what to adjust tomorrow.`;
+    Total steps completed: ${completedCount}/${totalItems}.
+    If the user missed some items (especially diet), mention them by name and explain why they are important for ${gender}'s skin health in ${country}. Provide a short, encouraging feedback (2-3 lines).`;
 
     try {
       const res = await fetch("/api/generate", {
@@ -174,12 +176,12 @@ export default function RoutinePage() {
 
     const schedule = [];
     
-    // Targeted Skincare names
-    let fwName = "Hydrating Wash";
-    let crName = "Barrier Cream";
-    if (isAcneProne) { fwName = "Salicylic Acid Cleanser"; crName = "Benzoyl Peroxide Spot Treatment"; }
-    else if (isOily) { fwName = "Oil-Control Foam"; crName = "Matte Gel Moisturizer"; }
-    else if (isPigmented) { fwName = "Brightening Vitamin C Wash"; crName = "Kojic Acid Night Serum"; }
+    // Targeted Skincare names (Simple Indian Names)
+    let fwName = "Mild Facewash";
+    let crName = "Soft Cream";
+    if (isAcneProne) { fwName = "Neem Facewash"; crName = "Turmeric Anti-Acne Cream"; }
+    else if (isOily) { fwName = "Lemon Oil-Control Wash"; crName = "Aloe Vera Light Gel"; }
+    else if (isPigmented) { fwName = "Saffron Brightening Wash"; crName = "Kesar-Chandan Night Cream"; }
 
     schedule.push({ time: "08:00 AM", type: "skin", name: fwName, label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" });
     schedule.push({ time: "08:15 AM", type: "skin", name: isPigmented ? "Niacinamide Serum" : "Hyaluronic Acid", label: "Skin Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" });

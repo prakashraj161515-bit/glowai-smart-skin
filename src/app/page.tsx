@@ -542,13 +542,14 @@ export default function Home() {
                   <p className="text-[10px] text-slate-400 font-medium">Nutrition for skin</p>
                 </div>
               </Link>
-              <Link href="/coach" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
+              <Link href="/routine" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm relative overflow-hidden">
+                <div className="absolute -right-2 -top-2 w-12 h-12 bg-blue-50/50 rounded-full blur-xl" />
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500 shadow-inner">
                   <Sparkles size={24} />
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-slate-800">AI Coach</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Expert advice</p>
+                  <p className="text-[14px] font-bold text-slate-800">Expert Coach</p>
+                  <p className="text-[10px] text-slate-400 font-medium">Daily Strategy</p>
                 </div>
               </Link>
               <button 
