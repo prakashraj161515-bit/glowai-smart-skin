@@ -136,18 +136,39 @@ export default function RoutinePage() {
     schedule.push({ time: "08:15 AM", type: "skin", name: isPigmented ? "Niacinamide Serum" : "Hyaluronic Acid", label: "Skin Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" });
     schedule.push({ time: "08:30 AM", type: "skin", name: crName + " + SPF", label: "Barrier & UV Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" });
     
-    // 7 Days Different Healthy Vegetable Diets
+    // 7 Days Different Healthy Vegetable Diets (Targeted by Skin Problem)
     const today = new Date().getDay(); // 0-6
-    const vegDiets = [
-      { b: "Spinach & Moong Dal Chilla", l: "Bottle Gourd (Lauki) Curry & Brown Rice", s: "Carrot Sticks", d: "Mixed Vegetable Soup" },
-      { b: "Oats with Steamed Broccoli", l: "Cabbage & Green Peas Sabzi with Roti", s: "Cucumber Slices", d: "Pumpkin Curry" },
-      { b: "Sweet Potato Mash", l: "Ridge Gourd (Turai) Sabzi & Quinoa", s: "Bell Pepper Strips", d: "Green Bean Stir-fry" },
-      { b: "Vegetable Poha", l: "Cauliflower (Gobi) Matar & Dal", s: "Boiled Beetroot", d: "Spinach & Corn Salad" },
-      { b: "Besan Chilla with Tomatoes", l: "Ivy Gourd (Kundru) Fry & Brown Rice", s: "Radish Slices", d: "Lentil & Vegetable Stew" },
-      { b: "Green Smoothie & Sprouts", l: "Bitter Gourd (Karela) & Whole Wheat Roti", s: "Roasted Makhana", d: "Zucchini Noodles with Pesto" },
-      { b: "Vegetable Upma", l: "Drumstick (Moringa) Dal & Salad", s: "Steamed Asparagus", d: "Mushroom & Kale Salad" }
-    ];
-    const diet = vegDiets[today];
+    
+    const getTargetedDiet = () => {
+      // Base diets for 7 days
+      const diets = [
+        { b: "Spinach Smoothie", l: "Lauki (Bottle Gourd) Sabzi", s: "Carrots", d: "Vegetable Soup" },
+        { b: "Oats with Veggies", l: "Cabbage & Peas", s: "Cucumber", d: "Pumpkin Mash" },
+        { b: "Sprouts Salad", l: "Turai (Ridge Gourd) & Dal", s: "Beetroot", d: "Stir-fry Greens" },
+        { b: "Vegetable Poha", l: "Cauliflower & Matar", s: "Bell Peppers", d: "Spinach Salad" },
+        { b: "Besan Chilla", l: "Kundru (Ivy Gourd) Sabzi", s: "Radish", d: "Lentil Stew" },
+        { b: "Green Juice", l: "Karela (Bitter Gourd) Sabzi", s: "Roasted Makhana", d: "Zucchini Salad" },
+        { b: "Vegetable Upma", l: "Moringa (Drumstick) Dal", s: "Asparagus", d: "Kale Salad" }
+      ];
+      
+      const dayDiet = diets[today];
+      
+      // Personalize names based on skin problem
+      if (isAcneProne) {
+        dayDiet.l += " (Zinc Rich)";
+        dayDiet.d += " (Anti-Inflammatory)";
+      } else if (isOily) {
+        dayDiet.l += " (Oil-Control)";
+        dayDiet.s += " (Hydrating)";
+      } else if (isPigmented) {
+        dayDiet.b += " (Vit-C Boost)";
+        dayDiet.l += " (Skin Brightening)";
+      }
+      
+      return dayDiet;
+    };
+
+    const diet = getTargetedDiet();
 
     schedule.push({ time: "09:00 AM", type: "diet", name: diet.b, label: "Breakfast", image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=100&q=80", color: "bg-emerald-50" });
     schedule.push({ time: "01:30 PM", type: "diet", name: diet.l, label: "Balanced Lunch", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80", color: "bg-emerald-50" });
