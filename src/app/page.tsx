@@ -22,7 +22,10 @@ export default function Home() {
   const [waterIntake, setWaterIntake] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(1);
   const [userName, setUserName] = useState("Erica");
+  const [skinType, setSkinType] = useState("Oily");
   const [userPic, setUserPic] = useState("");
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
@@ -62,6 +65,11 @@ export default function Home() {
     if (savedAuth === "true") {
       setIsLoggedIn(true);
       setShowLanding(false);
+      
+      const savedOnboarding = localStorage.getItem("velmora_onboarding_complete");
+      if (savedOnboarding !== "true") {
+        setShowOnboarding(true);
+      }
     }
   }, [view]);
 
@@ -69,6 +77,20 @@ export default function Home() {
     setIsLoggedIn(true);
     setShowLanding(false);
     localStorage.setItem("velmora_auth_status", "true");
+    
+    const savedOnboarding = localStorage.getItem("velmora_onboarding_complete");
+    if (savedOnboarding !== "true") {
+      setShowOnboarding(true);
+    }
+  };
+
+  const completeOnboarding = () => {
+    setShowOnboarding(false);
+    localStorage.setItem("velmora_onboarding_complete", "true");
+    localStorage.setItem("velmora_user_name", userName);
+    localStorage.setItem("velmora_user_gender", gender);
+    localStorage.setItem("velmora_user_country", country);
+    localStorage.setItem("velmora_user_skin_type", skinType);
   };
 
   // Dummy products
@@ -207,6 +229,110 @@ export default function Home() {
                   Continue with Google
                 </button>
                 <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Secure Login powered by Velmora</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ONBOARDING FLOW */}
+        {showOnboarding && (
+          <motion.div 
+            key="onboarding"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            className="fixed inset-0 z-[110] bg-[#FDF5F2] flex flex-col p-8"
+          >
+            <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full space-y-12">
+              <div className="space-y-2">
+                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step {onboardingStep} of 4</p>
+                <h2 className="text-3xl font-black text-slate-900">
+                  {onboardingStep === 1 && "What's your name?"}
+                  {onboardingStep === 2 && "Your gender?"}
+                  {onboardingStep === 3 && "Where are you from?"}
+                  {onboardingStep === 4 && "Your skin type?"}
+                </h2>
+              </div>
+
+              <div className="space-y-6">
+                {onboardingStep === 1 && (
+                  <input 
+                    type="text" 
+                    value={userName} 
+                    onChange={(e)=>setUserName(e.target.value)}
+                    placeholder="Enter your name"
+                    className="w-full bg-white h-16 px-6 rounded-[24px] border border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
+                  />
+                )}
+
+                {onboardingStep === 2 && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {["male", "female"].map((g) => (
+                      <button 
+                        key={g}
+                        onClick={() => setGender(g as "male" | "female")}
+                        className={cn(
+                          "h-32 rounded-[32px] border-2 flex flex-col items-center justify-center gap-3 transition-all",
+                          gender === g ? "bg-white border-[#F88E7D] shadow-xl shadow-orange-500/10" : "bg-white/50 border-white"
+                        )}
+                      >
+                        <div className={cn("w-12 h-12 rounded-full flex items-center justify-center", gender === g ? "bg-[#F88E7D] text-white" : "bg-slate-100 text-slate-400")}>
+                          <User size={24} />
+                        </div>
+                        <span className={cn("font-black text-xs uppercase tracking-widest", gender === g ? "text-[#F88E7D]" : "text-slate-400")}>{g}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {onboardingStep === 3 && (
+                  <select 
+                    value={country} 
+                    onChange={(e)=>setCountry(e.target.value)}
+                    className="w-full bg-white h-16 px-6 rounded-[24px] border border-[#F3EAE8] font-bold text-lg outline-none appearance-none"
+                  >
+                    {["India", "USA", "UK", "UAE", "Pakistan", "Bangladesh", "Canada", "Australia"].map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                )}
+
+                {onboardingStep === 4 && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {["Oily", "Dry", "Combination", "Sensitive"].map((s) => (
+                      <button 
+                        key={s}
+                        onClick={() => setSkinType(s)}
+                        className={cn(
+                          "h-24 rounded-[28px] border-2 flex flex-col items-center justify-center transition-all",
+                          skinType === s ? "bg-white border-[#F88E7D] shadow-lg" : "bg-white/50 border-white"
+                        )}
+                      >
+                        <span className={cn("font-bold text-[13px]", skinType === s ? "text-[#F88E7D]" : "text-slate-500")}>{s}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-8">
+                <button 
+                  onClick={() => {
+                    if (onboardingStep < 4) setOnboardingStep(onboardingStep + 1);
+                    else completeOnboarding();
+                  }}
+                  className="w-full bg-[#F88E7D] text-white h-16 rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
+                >
+                  {onboardingStep === 4 ? "Complete Setup ✨" : "Continue"}
+                </button>
+                {onboardingStep > 1 && (
+                  <button 
+                    onClick={() => setOnboardingStep(onboardingStep - 1)}
+                    className="w-full mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest"
+                  >
+                    Go Back
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
