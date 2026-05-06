@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, Calendar as CalendarIcon } from "lucide-react";
 import Link from "next/link";
@@ -7,6 +7,12 @@ import { cn } from "@/lib/utils";
 
 export default function RoutinePage() {
   const [activeDay, setActiveDay] = useState(3);
+  const [gender, setGender] = useState<"male" | "female">("female");
+
+  useEffect(() => {
+    const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
+    if (savedGender) setGender(savedGender);
+  }, []);
 
   const days = [
     { num: 1, label: "SUN" },
@@ -18,15 +24,25 @@ export default function RoutinePage() {
     { num: 7, label: "SAT" },
   ];
 
-  const routine = [
-    { time: "08:00 AM", name: "Gentle Cleanser", label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" },
-    { time: "08:15 AM", name: "Vitamin C Serum", label: "Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
-    { time: "08:30 AM", name: "SPF 50+ Sunscreen", label: "Essential Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
-    { time: "01:00 PM", name: "Sunscreen Re-apply", label: "Maintenance", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
-    { time: "08:00 PM", name: "Double Cleanse", label: "Night Prep", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" },
-    { time: "08:30 PM", name: "Retinol/Targeted Serum", label: "Treatment", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" },
-    { time: "09:00 PM", name: "Hydrating Night Cream", label: "Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-pink-50" },
+  const maleRoutine = [
+    { time: "08:00 AM", name: "Foaming Face Wash", label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" },
+    { time: "08:15 AM", name: "Post-Shave Balm", label: "Soothing", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
+    { time: "08:30 AM", name: "Matte Moisturizer + SPF", label: "Oil Control", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
+    { time: "08:00 PM", name: "Deep Pore Cleanser", label: "Evening Clean", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" },
+    { time: "08:30 PM", name: "Night Repair Gel", label: "Recovery", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" },
   ];
+
+  const femaleRoutine = [
+    { time: "08:00 AM", name: "Gentle Cream Cleanser", label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" },
+    { time: "08:15 AM", name: "Vitamin C Serum", label: "Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" },
+    { time: "08:30 AM", name: "Hydrating Moisturizer", label: "Barrier Support", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" },
+    { time: "08:45 AM", name: "SPF 50+ Sunscreen", label: "Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-blue-50" },
+    { time: "08:00 PM", name: "Double Cleanse (Oil + Water)", label: "Deep Cleanse", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" },
+    { time: "08:30 PM", name: "Retinol / Serum", label: "Treatment", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" },
+    { time: "09:00 PM", name: "Intense Night Cream", label: "Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-pink-50" },
+  ];
+
+  const activeRoutine = gender === "male" ? maleRoutine : femaleRoutine;
 
   return (
     <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
@@ -34,7 +50,10 @@ export default function RoutinePage() {
         <Link href="/" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-[#F3EAE8]">
           <ChevronLeft size={24} />
         </Link>
-        <h1 className="text-[17px] font-bold text-slate-800">Daily Routine</h1>
+        <div>
+          <h1 className="text-[17px] font-bold text-slate-800">Daily Routine</h1>
+          <p className="text-[10px] text-[#F88E7D] font-black uppercase text-center tracking-widest">{gender} Plan</p>
+        </div>
         <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-800 shadow-sm border border-[#F3EAE8]">
           <CalendarIcon size={20} />
         </div>
@@ -59,10 +78,10 @@ export default function RoutinePage() {
 
       {/* Timeline */}
       <div className="px-6 space-y-4">
-        <h2 className="text-[20px] font-bold text-slate-800 mb-6">Monday 03</h2>
+        <h2 className="text-[20px] font-bold text-slate-800 mb-6">Today&apos;s Steps</h2>
         
         <div className="space-y-6">
-          {routine.map((item, idx) => (
+          {activeRoutine.map((item, idx) => (
             <motion.div 
               key={idx}
               initial={{ opacity: 0, x: -20 }}
