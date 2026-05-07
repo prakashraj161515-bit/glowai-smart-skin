@@ -170,6 +170,7 @@ export default function RoutinePage() {
 
   const getSchedule = () => {
     const isOily = latestScan?.oil > 50;
+    const isDry = latestScan?.oil < 30;
     const isAcneProne = latestScan?.acne > 30;
     const isPigmented = latestScan?.pigmentation > 40;
     const isIndia = country === "India" || country === "Pakistan" || country === "Bangladesh";
