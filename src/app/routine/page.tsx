@@ -177,29 +177,37 @@ export default function RoutinePage() {
 
     const schedule = [];
     
-    // Targeted Skincare names (Simple Indian Names)
-    let fwName = "Charcoal Detox Wash";
+    // Targeted Skincare names (Doctor Approved)
+    let fwName = "Deep Pore Charcoal Wash";
     let fwImage = "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=200&q=80";
-    let crName = "Oil-Free Moisturizer";
+    let crName = "Hydrating Gel Moisturizer";
+    let crImage = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80";
 
     if (isDry) { 
-      fwName = "Hydrating Oat Wash"; 
+      fwName = "Creamy Oat Cleanser"; 
       fwImage = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80";
-      crName = "Shea Butter Rich Cream"; 
+      crName = "Ceramide Rich Barrier Cream"; 
+      crImage = "https://images.unsplash.com/photo-1612817288484-6f916006741a?w=200&q=80";
     }
     else if (isOily) { 
-      fwName = "Lemon Oil-Control Wash"; 
+      fwName = "Salicylic Acid Purifying Wash"; 
       fwImage = "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80";
-      crName = "Aloe Vera Light Gel"; 
+      crName = "Oil-Free Niacinamide Gel"; 
+      crImage = "https://images.unsplash.com/photo-1556228578-567ba127e37f?w=200&q=80";
     }
     else if (isPigmented) { 
-      fwName = "Saffron Brightening Wash"; 
+      fwName = "Vitamin C Brightening Wash"; 
       fwImage = "https://images.unsplash.com/photo-1611080626919-7cf5a969fc8f?w=200&q=80";
-      crName = "Kesar-Chandan Night Cream"; 
+      crName = "Kojic Acid Night Repair"; 
+      crImage = "https://images.unsplash.com/photo-1594125356715-c0852e690082?w=200&q=80";
     }
 
-    schedule.push({ time: "08:00 AM", type: "skincare", name: fwName, label: "Morning Facewash", image: fwImage, color: "bg-blue-50" });
-    schedule.push({ time: "01:00 PM", type: "skincare", name: "Mid-Day Refresh Wash", label: "Oil Control Wash", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80", color: "bg-cyan-50" });
+    // Skincare Steps
+    schedule.push({ time: "08:00 AM", type: "skincare", name: fwName, label: "Morning Cleansing", image: fwImage, color: "bg-blue-50" });
+    schedule.push({ time: "08:15 AM", type: "skincare", name: crName, label: "Day Protection Cream", image: crImage, color: "bg-blue-50" });
+    
+    schedule.push({ time: "01:00 PM", type: "skincare", name: "Aqua Fresh Face Wash", label: "Mid-Day Oil Control", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80", color: "bg-cyan-50" });
+    schedule.push({ time: "01:15 PM", type: "skincare", name: "Lightweight Hydrator", label: "Post-Wash Care", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200&q=80", color: "bg-cyan-50" });
     
     // 7 Days Different Healthy Vegetable Diets (Targeted by Skin Problem)
     const today = new Date().getDay(); // 0-6
@@ -262,10 +270,11 @@ export default function RoutinePage() {
     schedule.push({ time: "05:00 PM", type: "diet", name: diet.s, label: "Evening Snack", image: getDietImage(diet.s), color: "bg-orange-50" });
     schedule.push({ time: "06:00 PM", type: "diet", name: "Glass 6: Evening", label: "Cravings Control", image: waterImg, color: "bg-blue-50" });
     schedule.push({ time: "08:00 PM", type: "diet", name: "Glass 7: Pre-Dinner", label: "Weight Management", image: waterImg, color: "bg-blue-50" });
-    
-    schedule.push({ time: "08:00 PM", type: "skincare", name: "Double Cleanse", label: "Night Facewash", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=200&q=80", color: "bg-indigo-50" });
     schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: getDietImage(diet.d), color: "bg-emerald-50" });
-    schedule.push({ time: "10:00 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: waterImg, color: "bg-blue-50" });
+    
+    schedule.push({ time: "09:30 PM", type: "skincare", name: "Derm-Grade Gentle Cleanser", label: "Night Deep Cleanse", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=200&q=80", color: "bg-indigo-50" });
+    schedule.push({ time: "10:00 PM", type: "skincare", name: crName.includes("Night") ? crName : "Hyaluronic Night Repair", label: "Night Recovery Cream", image: crImage, color: "bg-indigo-50" });
+    schedule.push({ time: "10:30 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: waterImg, color: "bg-blue-50" });
 
     return schedule;
   };
