@@ -22,6 +22,8 @@ export default function RoutinePage() {
   const [activeAlarm, setActiveAlarm] = useState<string | null>(null);
   const [alarmAudio, setAlarmAudio] = useState<HTMLAudioElement | null>(null);
 
+  const [activeTab, setActiveTab] = useState<"skincare" | "diet">("skincare");
+
   useEffect(() => {
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
     if (savedGender) setGender(savedGender);
@@ -332,9 +334,37 @@ export default function RoutinePage() {
           </div>
         </div>
         
+        {/* Tab Switcher */}
+        <div className="flex bg-slate-100/50 p-1.5 rounded-[24px] mb-8 border border-slate-200/50">
+          <button 
+            onClick={() => setActiveTab("skincare")}
+            className={cn(
+              "flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex flex-col items-center gap-1",
+              activeTab === "skincare" ? "bg-white text-[#F88E7D] shadow-sm" : "text-slate-400"
+            )}
+          >
+            <span>Skincare</span>
+            <span className="text-[8px] opacity-60 font-bold -mt-1">(Facewash etc)</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab("diet")}
+            className={cn(
+              "flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 flex flex-col items-center gap-1",
+              activeTab === "diet" ? "bg-white text-emerald-500 shadow-sm" : "text-slate-400"
+            )}
+          >
+            <span>Diet Plan</span>
+            <span className="text-[8px] opacity-60 font-bold -mt-1">(Khane Ka Plan)</span>
+          </button>
+        </div>
+
+        <h2 className="text-[20px] font-bold text-slate-800 mb-4">
+          {activeTab === "skincare" ? "Facewash & More" : "Dietary Routine"}
+        </h2>
+        
         <div className="space-y-6 relative">
           <div className="absolute left-[31px] top-4 bottom-4 w-0.5 bg-slate-100" />
-          {fullSchedule.map((item, idx) => (
+          {fullSchedule.filter(item => item.type === activeTab).map((item, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }} className="flex items-center gap-6 relative">
               <div className="w-16 flex-shrink-0 text-right">
                 <p className="text-[13px] font-bold text-slate-800">{item.time.split(' ')[0]}</p>
