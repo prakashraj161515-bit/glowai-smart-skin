@@ -223,11 +223,15 @@ export default function RoutinePage() {
     const diet = getTargetedDiet();
 
     schedule.push({ time: "09:00 AM", type: "diet", name: diet.b, label: "Breakfast", image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "10:30 AM", type: "diet", name: "250ml Pure Water", label: "Hydration Boost", image: "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=100&q=80", color: "bg-blue-50" });
     schedule.push({ time: "01:30 PM", type: "diet", name: diet.l, label: "Balanced Lunch", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "03:00 PM", type: "diet", name: "250ml Pure Water", label: "Skin Hydration", image: "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=100&q=80", color: "bg-blue-50" });
     schedule.push({ time: "05:00 PM", type: "diet", name: diet.s, label: "Evening Snack", image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=100&q=80", color: "bg-orange-50" });
+    schedule.push({ time: "07:00 PM", type: "diet", name: "250ml Pure Water", label: "Pre-Dinner Hydration", image: "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=100&q=80", color: "bg-blue-50" });
     
     schedule.push({ time: "08:00 PM", type: "skincare", name: "Double Cleanse", label: "Night Facewash", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" });
     schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80", color: "bg-emerald-50" });
+    schedule.push({ time: "10:00 PM", type: "diet", name: "250ml Pure Water", label: "Night Hydration", image: "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=100&q=80", color: "bg-blue-50" });
 
     return schedule;
   };
