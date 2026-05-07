@@ -272,7 +272,7 @@ export default function RoutinePage() {
     schedule.push({ time: "08:00 PM", type: "diet", name: "Glass 7: Pre-Dinner", label: "Weight Management", image: waterImg, color: "bg-blue-50" });
     schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: getDietImage(diet.d), color: "bg-emerald-50" });
     
-    schedule.push({ time: "09:30 PM", type: "skincare", name: "Derm-Grade Gentle Cleanser", label: "Night Deep Cleanse", image: "https://images.unsplash.com/photo-1556227475-9961569d30a5?w=200&q=80", color: "bg-indigo-50" });
+    schedule.push({ time: "09:30 PM", type: "skincare", name: "Derm-Grade Gentle Cleanser", label: "Doctor's Night Wash", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80", color: "bg-indigo-50" });
     schedule.push({ time: "10:00 PM", type: "skincare", name: crName.includes("Night") ? crName : "Hyaluronic Night Repair", label: "Night Recovery Cream", image: crImage, color: "bg-indigo-50" });
     schedule.push({ time: "10:30 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: waterImg, color: "bg-blue-50" });
 
