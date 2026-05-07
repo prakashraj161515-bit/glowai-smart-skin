@@ -92,14 +92,33 @@ export default function ScanPage() {
         <h1 className="text-xl font-bold font-outfit">Skin Analysis</h1>
       </header>
 
-      <div className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card flex flex-col items-center justify-center bg-purple-500/5 border border-purple-500/20">
-        <div className="w-24 h-24 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400 mb-4">
-          <Camera size={48} />
+      <div className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card flex flex-col items-center justify-center bg-black border border-purple-500/20 shadow-2xl shadow-purple-500/10">
+        {/* Camera Feed */}
+        {!error ? (
+          <video 
+            ref={videoRef} 
+            autoPlay 
+            playsInline 
+            muted 
+            className="absolute inset-0 w-full h-full object-cover opacity-80"
+          />
+        ) : (
+          <div className="flex flex-col items-center gap-4 text-center px-8">
+            <AlertCircle size={48} className="text-red-400" />
+            <p className="text-sm text-red-400">{error}</p>
+          </div>
+        )}
+
+        {/* Scan Frame Overlay */}
+        <div className="absolute inset-0 border-[40px] border-black/40 pointer-events-none">
+          <div className="w-full h-full border-2 border-purple-500/30 rounded-[40px] relative">
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-purple-400 rounded-tl-xl" />
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-purple-400 rounded-tr-xl" />
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-purple-400 rounded-bl-xl" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-purple-400 rounded-br-xl" />
+          </div>
         </div>
-        <p className="text-sm text-slate-400 px-8 text-center">
-          Tap the button below to start your AI-powered skin analysis.
-        </p>
-        
+
         {/* Scanning line */}
         <AnimatePresence>
           {scanning && (
@@ -115,14 +134,14 @@ export default function ScanPage() {
         {/* Progress Overlay */}
         {scanning && (
           <div className="absolute inset-x-0 bottom-12 px-8 z-30">
-            <div className="glass-card p-4 bg-background/80">
+            <div className="glass-card p-4 bg-background/80 backdrop-blur-xl border border-white/10">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold text-purple-400">{analysisStatus}</span>
                 <span className="text-xs font-bold">{progress}%</span>
               </div>
               <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
                 <motion.div 
-                  className="h-full bg-purple-500"
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                 />
@@ -130,7 +149,7 @@ export default function ScanPage() {
             </div>
           </div>
         )}
-      </div>)}
+      </div>
 
       {!scanning && !error && (
         <button 
