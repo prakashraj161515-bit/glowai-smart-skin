@@ -226,17 +226,16 @@ export default function RoutinePage() {
     const getDietImage = (name) => {
       const n = name.toLowerCase();
       if (n.includes("papaya")) return "https://images.unsplash.com/photo-1517282004455-f8238689bb4e?w=200&q=80";
-      if (n.includes("apple") || n.includes("fruit")) return "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=200&q=80";
+      if (n.includes("apple") || n.includes("fruit") || n.includes("pineapple")) return "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=200&q=80";
       if (n.includes("watermelon")) return "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=200&q=80";
-      if (n.includes("pineapple")) return "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=200&q=80";
       if (n.includes("bottle gourd") || n.includes("lauki") || n.includes("soup")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=200&q=80";
       if (n.includes("spinach") || n.includes("broccoli")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80";
       if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80";
       if (n.includes("sprouts") || n.includes("moringa")) return "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=200&q=80";
-      return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80";
+      return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80";
     };
 
-    const waterImg = "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=200&q=80";
+    const waterImg = "https://images.unsplash.com/photo-1516715668338-752c8863adad?w=200&q=80";
 
     // 8 Glasses of Water (Doctor Approved Timing)
     schedule.push({ time: "07:00 AM", type: "diet", name: "Glass 1: Wake Up Water", label: "Metabolism Boost", image: waterImg, color: "bg-blue-50" });
