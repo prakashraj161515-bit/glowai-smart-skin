@@ -291,21 +291,45 @@ export default function RoutinePage() {
 
         <h2 className="text-[20px] font-bold text-slate-800 mb-4">Today&apos;s Progress</h2>
 
-        {/* Water Tracker Card */}
-        <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center"><Droplets size={20} /></div>
-              <div><h3 className="text-[14px] font-bold text-slate-800">Water Tracker</h3><p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Goal: 8 Glasses</p></div>
+        {/* Water Tracker - Premium UI */}
+        <div className="bg-white rounded-[40px] p-8 border border-[#F3EAE8] shadow-sm relative overflow-hidden group mb-8">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/30 rounded-full blur-3xl -mr-16 -mt-16" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 shadow-inner">
+                  <Droplets size={28} />
+                </div>
+                <div>
+                  <h3 className="text-[17px] font-black text-slate-900">Hydration</h3>
+                  <p className="text-[10px] text-blue-400 font-black uppercase tracking-widest">Goal: 8 Glasses</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => { if(waterIntake > 0) { const n = waterIntake - 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); } }}
+                  className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 active:scale-90 transition-all font-bold border border-slate-100"
+                >
+                  -
+                </button>
+                <div className="flex flex-col items-center min-w-[40px]">
+                  <span className="text-[20px] font-black text-blue-500">{waterIntake}</span>
+                  <span className="text-[10px] font-bold text-slate-300 -mt-1">/8</span>
+                </div>
+                <button 
+                  onClick={() => { const n = waterIntake + 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); }}
+                  className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm active:scale-95 transition-all font-bold"
+                >
+                  +
+                </button>
+              </div>
             </div>
-            <div className="text-right"><span className="text-[18px] font-black text-blue-500">{waterIntake}</span><span className="text-[12px] font-bold text-slate-300">/8</span></div>
+            <div className="flex gap-2.5 h-2">
+              {[1,2,3,4,5,6,7,8].map((i) => (
+                <div key={i} className={cn("flex-1 rounded-full transition-all duration-700 ease-out", i <= waterIntake ? "bg-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.4)]" : "bg-slate-100")} />
+              ))}
+            </div>
           </div>
-          <div className="flex gap-2 mb-6">
-            {[1,2,3,4,5,6,7,8].map((i) => (
-              <div key={i} className={cn("flex-1 h-1.5 rounded-full transition-all", i <= waterIntake ? "bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.5)]" : "bg-slate-100")} />
-            ))}
-          </div>
-          <button onClick={() => { const n = waterIntake + 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); }} className="w-full py-3 bg-blue-50 text-blue-600 rounded-2xl text-[12px] font-bold active:scale-95 transition-transform">+ Add a Glass</button>
         </div>
         
         <div className="space-y-6 relative">

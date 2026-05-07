@@ -331,8 +331,6 @@ export default function Home() {
                     <div className="rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-black aspect-[3/4]">
                       <CameraScanner onResult={(res) => {
                         handleResult(res);
-                        // handleResult now calls completeOnboarding internally via setView logic if needed
-                        // but here we just wait for the scan and then we're done
                         setTimeout(() => completeOnboarding(), 2000);
                       }} mode="face" />
                     </div>
@@ -484,52 +482,6 @@ export default function Home() {
               </div>
             )}
 
-
-            {/* Water Tracker */}
-            <div className="bg-[#FFEDE8] rounded-[40px] p-8 relative overflow-hidden group">
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#F88E7D] shadow-sm">
-                      <Droplets size={24} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-widest">Daily Water Tracker</p>
-                      <p className="text-xl font-black text-slate-900">{waterIntake}/8 <span className="text-[13px] font-bold text-slate-400">Glasses</span></p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => {
-                        if (waterIntake > 0) {
-                          const n = waterIntake - 1;
-                          setWaterIntake(n);
-                          localStorage.setItem("velmora_water_intake", n.toString());
-                        }
-                      }}
-                      className="w-10 h-10 bg-white/50 rounded-xl flex items-center justify-center text-slate-400 active:scale-90 transition-all font-bold"
-                    >
-                      -
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const n = waterIntake + 1;
-                        setWaterIntake(n);
-                        localStorage.setItem("velmora_water_intake", n.toString());
-                      }}
-                      className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#F88E7D] shadow-sm active:scale-95 transition-transform font-bold"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-                <div className="flex gap-2 h-2">
-                  {[1,2,3,4,5,6,7,8].map((i) => (
-                    <div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-[#F88E7D]" : "bg-white/40")} />
-                  ))}
-                </div>
-              </div>
-            </div>
 
             {/* Main Features Grid */}
             <div className="grid grid-cols-2 gap-4">
@@ -726,16 +678,18 @@ export default function Home() {
                       )}
 
                       {/* Quick Summary Cards */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-blue-50 p-5 rounded-[28px] border border-blue-100/50">
-                          <Droplets className="text-blue-500 mb-2" size={20} />
-                          <p className="text-[10px] text-blue-400 font-black uppercase tracking-tight">Drink Goal</p>
-                          <p className="text-[14px] font-bold text-slate-800">{gender === "male" ? "3.5L Daily" : "2.8L Daily"}</p>
-                        </div>
-                        <div className="bg-emerald-50 p-5 rounded-[28px] border border-emerald-100/50">
-                          <Utensils className="text-emerald-500 mb-2" size={20} />
-                          <p className="text-[10px] text-emerald-400 font-black uppercase tracking-tight">Focus Food</p>
-                          <p className="text-[14px] font-bold text-slate-800">{data?.acne > 30 ? "Leafy Greens" : "Omega-3"}</p>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div className="bg-emerald-50 p-6 rounded-[32px] border border-emerald-100/50 flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm">
+                              <Utensils size={24} />
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-emerald-400 font-black uppercase tracking-tight">Focus Food</p>
+                              <p className="text-[15px] font-bold text-slate-800">{data?.acne > 30 ? "Leafy Greens" : "Omega-3 rich seeds"}</p>
+                            </div>
+                          </div>
+                          <ChevronRight size={18} className="text-emerald-300" />
                         </div>
                       </div>
 
