@@ -207,51 +207,52 @@ export default function RoutinePage() {
     const getTargetedDiet = () => {
       // Base diets for 7 days (Strictly Salads, Vegetables, Fruits)
       const diets = [
-        { b: "Fresh Papaya & Pomegranate", l: "Boiled Bottle Gourd (Lauki) with Lemon", s: "Crunchy Carrot & Cucumber Salad", d: "Steamed Spinach & Broccoli Soup" },
-        { b: "Apple & Banana Fruit Bowl", l: "Sautéed Cabbage & Green Peas", s: "Raw Beetroot Slices", d: "Mixed Vegetable Clear Soup" },
-        { b: "Watermelon & Muskmelon", l: "Boiled Turai (Ridge Gourd) with Black Pepper", s: "Boiled Sprouts & Tomato Salad", d: "Stir-fry Green Beans & Carrots" },
-        { b: "Mixed Fruit Salad (Citrus)", l: "Steamed Cauliflower & Green Peas", s: "Fresh Guava Slices", d: "Warm Spinach & Tomato Salad" },
-        { b: "Pineapple & Kiwi Cubes", l: "Sautéed Ivy Gourd (Kundru) with Herbs", s: "Radish & Carrot Sticks", d: "Bottle Gourd & Dal Stew" },
-        { b: "Green Apple & Grapes", l: "Boiled Bitter Gourd (Karela) with Lemon", s: "Steamed Asparagus", d: "Zucchini & Bell Pepper Salad" },
-        { b: "Pear & Orange Segments", l: "Boiled Moringa (Drumstick) Soup", s: "Sliced Cucumber & Mint", d: "Mushroom & Kale Steamed Salad" }
+        { b: "Fresh Papaya & Pomegranate", l: "Boiled Bottle Gourd (Lauki)", s: "Crunchy Carrot Salad", d: "Steamed Spinach Soup" },
+        { b: "Apple & Banana Fruit Bowl", l: "Sautéed Cabbage & Peas", s: "Raw Beetroot Slices", d: "Mixed Vegetable Soup" },
+        { b: "Watermelon & Muskmelon", l: "Boiled Ridge Gourd (Turai)", s: "Boiled Sprouts Salad", d: "Stir-fry Green Beans" },
+        { b: "Mixed Fruit Salad (Citrus)", l: "Steamed Cauliflower", s: "Fresh Guava Slices", d: "Warm Spinach Salad" },
+        { b: "Pineapple & Kiwi Cubes", l: "Sautéed Ivy Gourd (Kundru)", s: "Radish & Carrot Sticks", d: "Bottle Gourd Stew" },
+        { b: "Green Apple & Grapes", l: "Boiled Bitter Gourd (Karela)", s: "Steamed Asparagus", d: "Zucchini & Bell Pepper" },
+        { b: "Pear & Orange Segments", l: "Boiled Moringa Soup", s: "Sliced Cucumber & Mint", d: "Mushroom & Kale Salad" }
       ];
       
-      // Shuffle logic using dietSeed
-      const dayIdx = (today + dietSeed) % 7;
+      const dayIdx = (today + (typeof dietSeed !== 'undefined' ? dietSeed : 0)) % 7;
       const dayDiet = {...diets[dayIdx]};
-      
-      // Personalize names based on skin problem
-      if (isAcneProne) {
-        dayDiet.l += " (Zinc Rich)";
-        dayDiet.d += " (Anti-Inflammatory)";
-      } else if (isOily) {
-        dayDiet.l += " (Oil-Control)";
-        dayDiet.s += " (Hydrating)";
-      } else if (isPigmented) {
-        dayDiet.b += " (Vit-C Boost)";
-        dayDiet.l += " (Skin Brightening)";
-      }
-      
       return dayDiet;
     };
 
     const diet = getTargetedDiet();
 
+    const getDietImage = (name) => {
+      const n = name.toLowerCase();
+      if (n.includes("papaya")) return "https://images.unsplash.com/photo-1517282004455-f8238689bb4e?w=200&q=80";
+      if (n.includes("apple") || n.includes("fruit")) return "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=200&q=80";
+      if (n.includes("watermelon")) return "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=200&q=80";
+      if (n.includes("pineapple")) return "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=200&q=80";
+      if (n.includes("bottle gourd") || n.includes("lauki") || n.includes("soup")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=200&q=80";
+      if (n.includes("spinach") || n.includes("broccoli")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80";
+      if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80";
+      if (n.includes("sprouts") || n.includes("moringa")) return "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=200&q=80";
+      return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80";
+    };
+
+    const waterImg = "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=200&q=80";
+
     // 8 Glasses of Water (Doctor Approved Timing)
-    schedule.push({ time: "07:00 AM", type: "diet", name: "Glass 1: Wake Up Water", label: "Metabolism Boost", image: "https://images.unsplash.com/photo-1523362628242-f933bb843b1e?w=200&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "08:30 AM", type: "diet", name: "Glass 2: Post-Breakfast", label: "Morning Hydration", image: "https://images.unsplash.com/photo-1516715668338-752c8863adad?w=200&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "09:00 AM", type: "diet", name: diet.b, label: "Breakfast", image: "https://images.unsplash.com/photo-1494390248081-4e521a5940db?w=200&q=80", color: "bg-emerald-50" });
-    schedule.push({ time: "11:00 AM", type: "diet", name: "Glass 3: Mid-Morning", label: "Brain Power", image: "https://images.unsplash.com/photo-1559839914-17aae19cea9e?w=200&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "01:00 PM", type: "diet", name: "Glass 4: Pre-Lunch", label: "Digestion Support", image: "https://images.unsplash.com/photo-1548964856-ac521a5940db?w=200&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "01:30 PM", type: "diet", name: diet.l, label: "Balanced Lunch", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&q=80", color: "bg-emerald-50" });
-    schedule.push({ time: "04:00 PM", type: "diet", name: "Glass 5: Afternoon", label: "Energy Lift", image: "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=200&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "05:00 PM", type: "diet", name: diet.s, label: "Evening Snack", image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=200&q=80", color: "bg-orange-50" });
-    schedule.push({ time: "06:00 PM", type: "diet", name: "Glass 6: Evening", label: "Cravings Control", image: "https://images.unsplash.com/photo-1523362628242-f933bb843b1e?w=200&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "08:00 PM", type: "diet", name: "Glass 7: Pre-Dinner", label: "Weight Management", image: "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=200&q=80", color: "bg-blue-50" });
+    schedule.push({ time: "07:00 AM", type: "diet", name: "Glass 1: Wake Up Water", label: "Metabolism Boost", image: waterImg, color: "bg-blue-50" });
+    schedule.push({ time: "08:30 AM", type: "diet", name: "Glass 2: Post-Breakfast", label: "Morning Hydration", image: waterImg, color: "bg-blue-50" });
+    schedule.push({ time: "09:00 AM", type: "diet", name: diet.b, label: "Breakfast", image: getDietImage(diet.b), color: "bg-emerald-50" });
+    schedule.push({ time: "11:00 AM", type: "diet", name: "Glass 3: Mid-Morning", label: "Brain Power", image: waterImg, color: "bg-blue-50" });
+    schedule.push({ time: "01:00 PM", type: "diet", name: "Glass 4: Pre-Lunch", label: "Digestion Support", image: waterImg, color: "bg-blue-50" });
+    schedule.push({ time: "01:30 PM", type: "diet", name: diet.l, label: "Balanced Lunch", image: getDietImage(diet.l), color: "bg-emerald-50" });
+    schedule.push({ time: "04:00 PM", type: "diet", name: "Glass 5: Afternoon", label: "Energy Lift", image: waterImg, color: "bg-blue-50" });
+    schedule.push({ time: "05:00 PM", type: "diet", name: diet.s, label: "Evening Snack", image: getDietImage(diet.s), color: "bg-orange-50" });
+    schedule.push({ time: "06:00 PM", type: "diet", name: "Glass 6: Evening", label: "Cravings Control", image: waterImg, color: "bg-blue-50" });
+    schedule.push({ time: "08:00 PM", type: "diet", name: "Glass 7: Pre-Dinner", label: "Weight Management", image: waterImg, color: "bg-blue-50" });
     
     schedule.push({ time: "08:00 PM", type: "skincare", name: "Double Cleanse", label: "Night Facewash", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=200&q=80", color: "bg-indigo-50" });
-    schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80", color: "bg-emerald-50" });
-    schedule.push({ time: "10:00 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: "https://images.unsplash.com/photo-1495333031258-f3e17818968d?w=200&q=80", color: "bg-blue-50" });
+    schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: getDietImage(diet.d), color: "bg-emerald-50" });
+    schedule.push({ time: "10:00 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: waterImg, color: "bg-blue-50" });
 
     return schedule;
   };
