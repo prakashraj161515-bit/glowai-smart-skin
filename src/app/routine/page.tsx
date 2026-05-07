@@ -341,8 +341,8 @@ export default function RoutinePage() {
               activeTab === "skincare" ? "bg-white text-[#F88E7D] shadow-sm" : "text-slate-400"
             )}
           >
-            <span>Skincare</span>
-            <span className="text-[8px] opacity-60 font-bold -mt-1">(Facewash etc)</span>
+            <span>Facewash</span>
+            <span className="text-[8px] opacity-60 font-bold -mt-1">(Skin Routine)</span>
           </button>
           <button 
             onClick={() => setActiveTab("diet")}
@@ -357,7 +357,7 @@ export default function RoutinePage() {
         </div>
 
         <h2 className="text-[20px] font-bold text-slate-800 mb-4">
-          {activeTab === "skincare" ? "Facewash & More" : "Dietary Routine"}
+          {activeTab === "skincare" ? "Daily Facewash Routine" : "Full Day Diet Plan"}
         </h2>
         
         <div className="space-y-6 relative">
