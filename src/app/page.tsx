@@ -129,6 +129,32 @@ export default function Home() {
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
+
+  async function handleProductResult(res: any) {
+    setView("product_results");
+    setLoading(true);
+    setAi("");
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          image: res.image, 
+          mode: "product_scan", 
+          gender,
+          userName 
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setAi(data.text);
+    } catch (err) {
+      setAi("⚠️ Could not analyze product. Please ensure the label is clear.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
     
     // Auto-detect Skin Type from metrics
     let detectedType = "Combination";
@@ -567,7 +593,10 @@ export default function Home() {
             ) : (
               <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-6 space-y-4">
                 <div className="flex items-center gap-3 text-green-500 font-black text-sm uppercase"><CheckCircle2 size={20} strokeWidth={1.2} /> Analysis Complete</div>
-                <div className="text-[13px] text-slate-600 leading-relaxed font-medium whitespace-pre-wrap">{ai}</div>
+                <div className="text-[13px] text-slate-600 leading-relaxed font-medium">
+                  {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
+                </div>
+
               </div>
             )}
           </motion.div>
