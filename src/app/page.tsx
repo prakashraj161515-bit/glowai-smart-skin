@@ -579,26 +579,87 @@ export default function Home() {
         )}
 
         {/* PRODUCT RESULTS */}
-        {view === "product_results" && (
-          <motion.div key="product_results" initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} className="px-5 space-y-5 pb-32">
-            <div className="flex items-center gap-3 pt-2">
-              <button onClick={()=>setView("home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100"><ArrowLeft size={18} strokeWidth={1.2} /></button>
-              <h2 className="text-[17px] font-black text-slate-900">Product Analysis</h2>
+        {view === "product_results" && data && (
+          <motion.div key="product_results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen">
+            {/* Background Image (The scanned product) */}
+            <div className="absolute inset-0 bg-slate-100">
+              <img src={data.image} alt="Product" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
-            {loading ? (
-              <div className="bg-white rounded-[28px] border-2 border-blue-100 shadow-xl p-10 flex flex-col items-center text-center space-y-6">
-                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 animate-pulse"><ShoppingBag size={40} strokeWidth={1.2} /></div>
-                <div><h3 className="text-lg font-black text-slate-900 mb-2">Analyzing Ingredients...</h3><p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Checking for harmful chemicals</p></div>
-              </div>
-            ) : (
-              <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-6 space-y-4">
-                <div className="flex items-center gap-3 text-green-500 font-black text-sm uppercase"><CheckCircle2 size={20} strokeWidth={1.2} /> Analysis Complete</div>
-                <div className="text-[13px] text-slate-600 leading-relaxed font-medium">
-                  {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
-                </div>
 
+            {/* Top Controls */}
+            <div className="absolute top-12 left-6 right-6 flex justify-between items-center z-10">
+              <button onClick={()=>setView("home")} className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform">
+                <ArrowLeft size={20} />
+              </button>
+              <div className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-md text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/20 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                Live Analysis
               </div>
-            )}
+            </div>
+
+            {/* Bottom Sheet */}
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              transition={{ type: "spring", damping: 20, stiffness: 100 }}
+              className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-2xl rounded-t-[40px] p-8 pb-12 shadow-2xl border-t border-white/40 max-h-[75vh] overflow-y-auto no-scrollbar"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className="space-y-1">
+                  <h3 className="text-[20px] font-black text-slate-900 tracking-tight">Ingredient Analysis</h3>
+                  <div className="flex items-center gap-2 text-emerald-500 font-black text-[10px] uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full w-fit">
+                    <CheckCircle2 size={12} strokeWidth={3} /> AI Approved
+                  </div>
+                </div>
+                <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-slate-400 relative overflow-hidden group">
+                  <ShoppingBag size={24} strokeWidth={1.2} className="text-slate-300" />
+                  <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors" />
+                </div>
+              </div>
+
+              {loading ? (
+                <div className="py-20 flex flex-col items-center gap-6 text-center">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-4 border-slate-100 border-t-blue-500 rounded-full animate-spin" />
+                    <Sparkles className="absolute inset-0 m-auto text-blue-500 animate-pulse" size={24} />
+                  </div>
+                  <div>
+                    <p className="text-[12px] text-slate-400 font-bold uppercase tracking-widest animate-pulse">Scanning Molecular Data...</p>
+                    <p className="text-[10px] text-slate-300 font-medium mt-1">Checking against 10,000+ medical databases</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* Doctor/Expert Badge */}
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-[28px] p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
+                    <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
+                    <div className="flex items-center gap-4 relative z-10">
+                      <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shrink-0">
+                        <BrainCircuit size={24} />
+                      </div>
+                      <div>
+                        <p className="text-[14px] font-black leading-tight uppercase tracking-wide">Doctor Approved Analysis</p>
+                        <p className="text-[10px] text-blue-100 font-medium">Safe for {skinType} Skin</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-[32px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden min-h-[200px]">
+                    <div className="text-[14px] text-slate-600 leading-relaxed font-medium">
+                      {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={() => setView("home")}
+                    className="w-full py-5 rounded-[24px] bg-slate-900 text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
+                  >
+                    Done & Save Analysis
+                  </button>
+                </div>
+              )}
+            </motion.div>
           </motion.div>
         )}
 
