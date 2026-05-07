@@ -301,8 +301,8 @@ export default function RoutinePage() {
                   <Droplets size={28} />
                 </div>
                 <div>
-                  <h3 className="text-[17px] font-black text-slate-900">Hydration</h3>
-                  <p className="text-[10px] text-blue-400 font-black uppercase tracking-widest">Goal: 8 Glasses</p>
+                  <h3 className="text-[17px] font-black text-slate-900">Water Routine</h3>
+                  <p className="text-[10px] text-blue-400 font-black uppercase tracking-widest">Goal: 8 Glasses (250ml each)</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
