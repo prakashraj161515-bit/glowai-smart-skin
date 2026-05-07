@@ -249,7 +249,7 @@ export default function RoutinePage() {
       return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
     };
 
-    const waterImg = "https://images.unsplash.com/photo-1523362628242-f933bb843b1e?w=400&q=80";
+    const waterImg = "/water-glass.png";
 
     // 8 Glasses of Water (Doctor Approved Timing)
     schedule.push({ time: "07:00 AM", type: "diet", name: "Glass 1: Wake Up Water", label: "Metabolism Boost", image: waterImg, color: "bg-blue-50" });
