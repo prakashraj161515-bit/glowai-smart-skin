@@ -226,30 +226,30 @@ export default function RoutinePage() {
     const getDietImage = (name) => {
       const n = name.toLowerCase();
       // Fruits
-      if (n.includes("papaya")) return "https://images.unsplash.com/photo-1517282004455-f8238689bb4e?w=300&q=80";
-      if (n.includes("apple")) return "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=300&q=80";
-      if (n.includes("banana")) return "https://images.unsplash.com/photo-1571771894821-ad99024177c6?w=300&q=80";
-      if (n.includes("watermelon") || n.includes("melon")) return "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=300&q=80";
-      if (n.includes("pineapple")) return "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=300&q=80";
-      if (n.includes("pomegranate")) return "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=300&q=80";
-      if (n.includes("citrus") || n.includes("orange") || n.includes("lemon")) return "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=300&q=80";
-      if (n.includes("kiwi")) return "https://images.unsplash.com/photo-1585052245554-bc5a0c226e90?w=300&q=80";
-      if (n.includes("guava")) return "https://images.unsplash.com/photo-1536511132770-e5066929976b?w=300&q=80";
+      if (n.includes("papaya")) return "https://images.unsplash.com/photo-1517282004455-f8238689bb4e?w=400&q=80";
+      if (n.includes("apple")) return "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&q=80";
+      if (n.includes("banana")) return "https://images.unsplash.com/photo-1571771894821-ad99024177c6?w=400&q=80";
+      if (n.includes("watermelon") || n.includes("melon")) return "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=400&q=80";
+      if (n.includes("pineapple")) return "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&q=80";
+      if (n.includes("pomegranate")) return "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&q=80";
+      if (n.includes("citrus") || n.includes("orange") || n.includes("lemon")) return "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=400&q=80";
+      if (n.includes("kiwi")) return "https://images.unsplash.com/photo-1585052245554-bc5a0c226e90?w=400&q=80";
+      if (n.includes("guava")) return "https://images.unsplash.com/photo-1536511132770-e5066929976b?w=400&q=80";
       
       // Vegetables / Cooked Meals
-      if (n.includes("soup") || n.includes("stew") || n.includes("moringa")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=300&q=80";
-      if (n.includes("gourd") || n.includes("lauki") || n.includes("turai")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=300&q=80";
-      if (n.includes("spinach") || n.includes("kale") || n.includes("green")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300&q=80";
-      if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber") || n.includes("beetroot")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=300&q=80";
-      if (n.includes("sprouts")) return "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=300&q=80";
-      if (n.includes("broccoli") || n.includes("cauliflower")) return "https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=300&q=80";
+      if (n.includes("soup") || n.includes("stew") || n.includes("moringa")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80";
+      if (n.includes("gourd") || n.includes("lauki") || n.includes("turai")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80";
+      if (n.includes("spinach") || n.includes("kale") || n.includes("green")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80";
+      if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber") || n.includes("beetroot")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
+      if (n.includes("sprouts")) return "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=400&q=80";
+      if (n.includes("broccoli") || n.includes("cauliflower")) return "https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=400&q=80";
       
       // Default / Mixed Fruit
-      if (n.includes("fruit")) return "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=300&q=80";
-      return "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&q=80";
+      if (n.includes("fruit")) return "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&q=80";
+      return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
     };
 
-    const waterImg = "https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=300&q=80";
+    const waterImg = "https://images.unsplash.com/photo-1523362628242-f933bb843b1e?w=400&q=80";
 
     // 8 Glasses of Water (Doctor Approved Timing)
     schedule.push({ time: "07:00 AM", type: "diet", name: "Glass 1: Wake Up Water", label: "Metabolism Boost", image: waterImg, color: "bg-blue-50" });
