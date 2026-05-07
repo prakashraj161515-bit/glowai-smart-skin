@@ -183,7 +183,13 @@ export default function RoutinePage() {
     let crName = "Hydrating Gel Moisturizer";
     let crImage = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80";
 
-    if (isDry) { 
+    if (isAcneProne) {
+      fwName = "Salicylic Acid Purifying Wash";
+      fwImage = "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=200&q=80";
+      crName = "Zinc & Niacinamide Healing Gel";
+      crImage = "https://images.unsplash.com/photo-1556228578-567ba127e37f?w=200&q=80";
+    }
+    else if (isDry) { 
       fwName = "Creamy Oat Cleanser"; 
       fwImage = "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80";
       crName = "Ceramide Rich Barrier Cream"; 
