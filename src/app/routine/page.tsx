@@ -183,7 +183,7 @@ export default function RoutinePage() {
     else if (isOily) { fwName = "Lemon Oil-Control Wash"; crName = "Aloe Vera Light Gel"; }
     else if (isPigmented) { fwName = "Saffron Brightening Wash"; crName = "Kesar-Chandan Night Cream"; }
 
-    schedule.push({ time: "08:00 AM", type: "skin", name: fwName, label: "Morning Cleanse", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" });
+    schedule.push({ time: "08:00 AM", type: "skin", name: fwName, label: "Morning Facewash", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" });
     schedule.push({ time: "08:15 AM", type: "skin", name: isPigmented ? "Niacinamide Serum" : "Hyaluronic Acid", label: "Skin Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" });
     schedule.push({ time: "08:30 AM", type: "skin", name: crName + " + SPF", label: "Barrier & UV Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" });
     
@@ -227,7 +227,7 @@ export default function RoutinePage() {
     schedule.push({ time: "01:30 PM", type: "diet", name: diet.l, label: "Balanced Lunch", image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100&q=80", color: "bg-emerald-50" });
     schedule.push({ time: "05:00 PM", type: "diet", name: diet.s, label: "Evening Snack", image: "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=100&q=80", color: "bg-orange-50" });
     
-    schedule.push({ time: "08:00 PM", type: "skin", name: "Double Cleanse", label: "Deep Detox", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" });
+    schedule.push({ time: "08:00 PM", type: "skin", name: "Double Cleanse", label: "Night Facewash", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" });
     schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80", color: "bg-emerald-50" });
     schedule.push({ time: "09:00 PM", type: "skin", name: crName, label: "Overnight Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" });
 
