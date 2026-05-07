@@ -213,15 +213,15 @@ export default function RoutinePage() {
     const today = new Date().getDay(); // 0-6
     
     const getTargetedDiet = () => {
-      // Base diets for 7 days (Strictly Salads, Vegetables, Fruits)
+      // Base diets for 7 days (Easy to find Indian Fruits & Veggies)
       const diets = [
-        { b: "Fresh Papaya & Pomegranate", l: "Boiled Bottle Gourd (Lauki)", s: "Crunchy Carrot Salad", d: "Steamed Spinach Soup" },
-        { b: "Apple & Banana Fruit Bowl", l: "Sautéed Cabbage & Peas", s: "Raw Beetroot Slices", d: "Mixed Vegetable Soup" },
-        { b: "Watermelon & Muskmelon", l: "Boiled Ridge Gourd (Turai)", s: "Boiled Sprouts Salad", d: "Stir-fry Green Beans" },
-        { b: "Mixed Fruit Salad (Citrus)", l: "Steamed Cauliflower", s: "Fresh Guava Slices", d: "Warm Spinach Salad" },
-        { b: "Pineapple & Kiwi Cubes", l: "Sautéed Ivy Gourd (Kundru)", s: "Radish & Carrot Sticks", d: "Bottle Gourd Stew" },
-        { b: "Green Apple & Grapes", l: "Boiled Bitter Gourd (Karela)", s: "Steamed Asparagus", d: "Zucchini & Bell Pepper" },
-        { b: "Pear & Orange Segments", l: "Boiled Moringa Soup", s: "Sliced Cucumber & Mint", d: "Mushroom & Kale Salad" }
+        { b: "Fresh Papaya & Pomegranate", l: "Boiled Lauki (Bottle Gourd)", s: "Crunchy Gajar & Cucumber", d: "Steamed Palak Soup" },
+        { b: "Seb (Apple) & Banana", l: "Sautéed Gobi & Matar", s: "Beetroot & Kheera Salad", d: "Mixed Veg Soup (Gajar-Tamatar)" },
+        { b: "Watermelon (Tarbooj)", l: "Boiled Turai (Ridge Gourd)", s: "Ankurit Moong (Sprouts)", d: "Stir-fry Beans & Carrot" },
+        { b: "Fresh Amrud (Guava) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" },
+        { b: "Orange & Pomegranate", l: "Sautéed Kundru (Ivy Gourd)", s: "Radish (Mooli) Sticks", d: "Lauki Ka Soup" },
+        { b: "Green Seb & Grapes", l: "Boiled Karela (Bitter Gourd)", s: "Steamed Moong Dal", d: "Pumpkin (Kaddu) Stew" },
+        { b: "Fresh Papaya Bowl", l: "Moringa (Sahjan) Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal & Veggie Bowl" }
       ];
       
       const dayIdx = (today + (typeof dietSeed !== 'undefined' ? dietSeed : 0)) % 7;
@@ -245,12 +245,17 @@ export default function RoutinePage() {
       if (n.includes("guava")) return "https://images.unsplash.com/photo-1536511132770-e5066929976b?w=400&q=80";
       
       // Vegetables / Cooked Meals
-      if (n.includes("soup") || n.includes("stew") || n.includes("moringa")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80";
-      if (n.includes("gourd") || n.includes("lauki") || n.includes("turai")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80";
-      if (n.includes("spinach") || n.includes("kale") || n.includes("green")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80";
-      if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber") || n.includes("beetroot")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
-      if (n.includes("sprouts")) return "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=400&q=80";
-      if (n.includes("broccoli") || n.includes("cauliflower")) return "https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=400&q=80";
+      if (n.includes("soup") || n.includes("stew") || n.includes("moringa") || n.includes("dal")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80";
+      if (n.includes("gourd") || n.includes("lauki") || n.includes("turai") || n.includes("kaddu") || n.includes("pumpkin")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80";
+      if (n.includes("spinach") || n.includes("kale") || n.includes("green") || n.includes("palak") || n.includes("methi")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80";
+      if (n.includes("salad") || n.includes("carrot") || n.includes("gajar") || n.includes("cucumber") || n.includes("kheera") || n.includes("beetroot") || n.includes("mooli")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
+      if (n.includes("sprouts") || n.includes("moong") || n.includes("makhana")) return "https://images.unsplash.com/photo-1590779033100-9f60702a0559?w=400&q=80";
+      if (n.includes("broccoli") || n.includes("cauliflower") || n.includes("gobi") || n.includes("matar")) return "https://images.unsplash.com/photo-1584270354949-c26b0d5b4a0c?w=400&q=80";
+      
+      // Hindi Keywords
+      if (n.includes("amrud")) return "https://images.unsplash.com/photo-1536511132770-e5066929976b?w=400&q=80";
+      if (n.includes("seb")) return "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&q=80";
+      if (n.includes("tarbooj")) return "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=400&q=80";
       
       // Default / Mixed Fruit
       if (n.includes("fruit")) return "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&q=80";
