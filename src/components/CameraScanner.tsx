@@ -140,9 +140,13 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
           <div className="w-12 h-12" /> {/* Spacer */}
         </div>
         
-        <p className="text-[10px] text-white font-black uppercase tracking-[0.2em] bg-black/20 backdrop-blur-md px-6 py-2 rounded-full border border-white/20">
+        <button 
+          onClick={scan}
+          disabled={!isReady || isAnalyzing}
+          className="text-[10px] text-white font-black uppercase tracking-[0.2em] bg-black/40 backdrop-blur-md px-10 py-3 rounded-full border border-white/20 active:scale-95 transition-all hover:bg-black/60 disabled:opacity-50"
+        >
           {isAnalyzing ? "AI Analyzing..." : mode === 'face' ? "Scan My Face" : "Scan Ingredients"}
-        </p>
+        </button>
       </div>
     </div>
   );
