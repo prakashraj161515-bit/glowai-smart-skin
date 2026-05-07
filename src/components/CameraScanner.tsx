@@ -37,9 +37,18 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     };
   }, [mode]);
 
+  const [showFlash, setShowFlash] = useState(false);
+
   async function scan() {
     if (!videoRef.current || isAnalyzing) return;
     
+    // Feedback: Flash & Vibrate
+    setShowFlash(true);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+    setTimeout(() => setShowFlash(false), 150);
+
     setIsAnalyzing(true);
     const video = videoRef.current;
     const canvas = document.createElement("canvas");
@@ -82,6 +91,11 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
         muted 
         className="w-full h-full object-cover" 
       />
+
+      {/* Flash Effect Overlay */}
+      {showFlash && (
+        <div className="absolute inset-0 bg-white z-50 animate-flash" />
+      )}
       
       {/* Face Guide Overlay */}
       {mode === "face" && (
