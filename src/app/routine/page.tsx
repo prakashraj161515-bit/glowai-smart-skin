@@ -184,8 +184,7 @@ export default function RoutinePage() {
     else if (isPigmented) { fwName = "Saffron Brightening Wash"; crName = "Kesar-Chandan Night Cream"; }
 
     schedule.push({ time: "08:00 AM", type: "skin", name: fwName, label: "Morning Facewash", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-blue-50" });
-    schedule.push({ time: "08:15 AM", type: "skin", name: isPigmented ? "Niacinamide Serum" : "Hyaluronic Acid", label: "Skin Protection", image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=100&q=80", color: "bg-orange-50" });
-    schedule.push({ time: "08:30 AM", type: "skin", name: crName + " + SPF", label: "Barrier & UV Shield", image: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=100&q=80", color: "bg-cyan-50" });
+    schedule.push({ time: "01:00 PM", type: "skin", name: "Mid-Day Refresh Wash", label: "Oil Control Wash", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&q=80", color: "bg-cyan-50" });
     
     // 7 Days Different Healthy Vegetable Diets (Targeted by Skin Problem)
     const today = new Date().getDay(); // 0-6
@@ -229,7 +228,6 @@ export default function RoutinePage() {
     
     schedule.push({ time: "08:00 PM", type: "skin", name: "Double Cleanse", label: "Night Facewash", image: "https://images.unsplash.com/photo-1556229167-279262113337?w=100&q=80", color: "bg-indigo-50" });
     schedule.push({ time: "08:30 PM", type: "diet", name: diet.d, label: "Light Dinner", image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=100&q=80", color: "bg-emerald-50" });
-    schedule.push({ time: "09:00 PM", type: "skin", name: crName, label: "Overnight Repair", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=100&q=80", color: "bg-purple-50" });
 
     return schedule;
   };
