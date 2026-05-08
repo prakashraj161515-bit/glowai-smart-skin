@@ -144,9 +144,10 @@ export default function Home() {
       });
       const data = await response.json();
       if (data.error) throw new Error(data.error);
+      if (!data.text) throw new Error("AI returned an empty response.");
       setAi(data.text);
-    } catch (err) {
-      setAi("⚠️ Could not analyze product. Please ensure the label is clear.");
+    } catch (err: any) {
+      setAi(`⚠️ Analysis failed: ${err.message || "Please ensure the label is clear."}`);
     } finally {
       setLoading(false);
     }
