@@ -127,6 +127,7 @@ export default function Home() {
   };
 
   async function handleProductResult(res: any) {
+    setData(res);
     setView("product_results");
     setLoading(true);
     setAi("");
