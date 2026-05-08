@@ -10,18 +10,7 @@ export async function POST(req: Request) {
     if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Using gemini-1.5-flash for better stability and performance
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-pro-vision",
-      generationConfig: { maxOutputTokens: 1000, temperature: 0.4 },
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      ]
-    });
-
+    
     let prompt = "";
     let imagePart: any = null;
 
@@ -94,10 +83,42 @@ export async function POST(req: Request) {
     }
 
     const content = imagePart ? [prompt, imagePart] : [prompt];
-    const result = await model.generateContent(content);
-    const text = result.response.text();
 
-    return NextResponse.json({ text });
+    const modelsToTry = [
+      "gemini-1.5-flash",
+      "gemini-1.5-flash-latest",
+      "gemini-1.5-pro",
+      "gemini-1.0-pro-vision-latest"
+    ];
+
+    let lastError: any;
+    
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          generationConfig: { maxOutputTokens: 1000, temperature: 0.4 },
+          safetySettings: [
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+          ]
+        });
+
+        const result = await model.generateContent(content);
+        const text = result.response.text();
+        return NextResponse.json({ text });
+      } catch (e: any) {
+        console.warn(`Model ${modelName} failed:`, e.message);
+        lastError = e;
+        // Continue to next model
+      }
+    }
+
+    // If all models failed
+    throw lastError;
+
   } catch (err: any) {
     console.error("🔥 Next.js AI Error:", err);
     return NextResponse.json({ error: "Failed to connect to AI: " + err.message }, { status: 500 });
