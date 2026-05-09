@@ -252,55 +252,101 @@ export default function Home() {
             key="landing"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -50 }}
-            className="fixed inset-0 z-[100] bg-white flex flex-col"
+            exit={{ opacity: 0, scale: 0.97 }}
+            className="fixed inset-0 z-[100] bg-white flex flex-col overflow-y-auto"
           >
-            <div className="h-[55%] relative overflow-hidden">
+            {/* Hero Section */}
+            <div className="relative h-[60vh] overflow-hidden flex-shrink-0">
               <img 
-                src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=800&q=80" 
+                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80" 
                 alt="Velmora Skincare" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
-              <div className="absolute top-12 left-0 right-0 flex justify-center">
-                <div className="bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border border-white/50">
-                  <h1 className="text-2xl font-black text-[#F88E7D] tracking-tighter italic">Velmora AI</h1>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              {/* Logo */}
+              <div className="absolute top-14 left-0 right-0 flex justify-center">
+                <div className="bg-white/15 backdrop-blur-xl px-8 py-3 rounded-full border border-white/30">
+                  <h1 className="text-3xl font-black text-white tracking-tighter italic">✨ Velmora AI</h1>
                 </div>
+              </div>
+              {/* Hero Text */}
+              <div className="absolute bottom-8 left-6 right-6">
+                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em] mb-2">AI-Powered Skincare</p>
+                <h2 className="text-4xl font-black text-white leading-tight">Your Personal <br/><span className="text-[#F88E7D]">Skin Coach</span></h2>
+                <p className="text-white/70 text-sm mt-3 font-medium">Real AI analysis. Real results. Real glow.</p>
               </div>
             </div>
 
-            <div className="flex-1 px-8 pt-8 pb-12 flex flex-col justify-between">
-              <div className="space-y-6">
-                <div>
-                  <h2 className="text-3xl font-black text-slate-900 leading-tight">Your Personal <span className="text-[#F88E7D]">Skin Coach</span> in your pocket.</h2>
-                  <p className="text-slate-400 text-sm mt-3 font-medium">Analyze your skin with AI, get personalized diets, and track your daily routine for a natural glow.</p>
+            {/* Feature Cards */}
+            <div className="px-5 py-8 space-y-4 flex-1">
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] mb-5">What Velmora can do</p>
+              
+              {/* Feature 1 - AI Skin Scan */}
+              <div className="flex gap-4 bg-gradient-to-r from-blue-50 to-white rounded-[28px] p-4 border border-blue-100 shadow-sm items-center">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
+                  <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80" alt="Skin Scan" className="w-full h-full object-cover" />
                 </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center flex-shrink-0"><ScanFace size={20} /></div>
-                    <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Instant AI Skin Analysis</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center"><ScanFace size={14} className="text-white" /></div>
+                    <p className="font-black text-slate-800 text-[13px]">AI Skin Analysis</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center flex-shrink-0"><Utensils size={20} /></div>
-                    <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Personalized Diet & Nutrition</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#F88E7D] flex items-center justify-center flex-shrink-0"><Zap size={20} /></div>
-                    <p className="text-xs font-bold text-slate-700 uppercase tracking-tight">Daily Growth Tracking</p>
-                  </div>
+                  <p className="text-[11px] text-slate-500 font-medium leading-snug">Real-time Glow Score, Acne, Oil & Pigmentation detection using Gemini AI Vision.</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              {/* Feature 2 - Diet Plan */}
+              <div className="flex gap-4 bg-gradient-to-r from-emerald-50 to-white rounded-[28px] p-4 border border-emerald-100 shadow-sm items-center">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
+                  <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80" alt="Diet Plan" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center"><Utensils size={14} className="text-white" /></div>
+                    <p className="font-black text-slate-800 text-[13px]">Personalized Diet Plan</p>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-medium leading-snug">AI-curated food & nutrition plans based on your skin type and country.</p>
+                </div>
+              </div>
+
+              {/* Feature 3 - Product Scanner */}
+              <div className="flex gap-4 bg-gradient-to-r from-orange-50 to-white rounded-[28px] p-4 border border-orange-100 shadow-sm items-center">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
+                  <img src="https://images.unsplash.com/photo-1556229167-279262113337?w=200&q=80" alt="Product Scanner" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg bg-orange-400 flex items-center justify-center"><ShoppingBag size={14} className="text-white" /></div>
+                    <p className="font-black text-slate-800 text-[13px]">Product Scanner</p>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-medium leading-snug">Scan any skincare product to get an AI verdict on ingredients & safety.</p>
+                </div>
+              </div>
+
+              {/* Feature 4 - AI Coach */}
+              <div className="flex gap-4 bg-gradient-to-r from-purple-50 to-white rounded-[28px] p-4 border border-purple-100 shadow-sm items-center">
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
+                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80" alt="AI Coach" className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-7 h-7 rounded-lg bg-purple-500 flex items-center justify-center"><Sparkles size={14} className="text-white" /></div>
+                    <p className="font-black text-slate-800 text-[13px]">AI Skin Coach</p>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-medium leading-snug">Chat with your personal AI dermatologist anytime for expert skincare advice.</p>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <div className="pt-4 pb-8 space-y-3">
                 <button 
                   onClick={handleLogin}
-                  className="w-full bg-slate-900 text-white h-16 rounded-[24px] flex items-center justify-center gap-4 font-bold active:scale-95 transition-transform shadow-xl shadow-slate-200"
+                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] flex items-center justify-center gap-3 font-black text-[15px] active:scale-95 transition-transform shadow-xl shadow-orange-500/30"
                 >
                   <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
                   Continue with Google
                 </button>
-                <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Secure Login powered by Velmora</p>
+                <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Free • No credit card required</p>
               </div>
             </div>
           </motion.div>
@@ -308,101 +354,172 @@ export default function Home() {
 
         {/* ONBOARDING FLOW */}
         {showOnboarding && (
-          <motion.div 
+          <motion.div
             key="onboarding"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            className="fixed inset-0 z-[110] bg-[#FDF5F2] flex flex-col p-8"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-white flex flex-col overflow-y-auto"
           >
-            <div className="flex-1 flex flex-col justify-center max-w-md mx-auto w-full space-y-12">
-              <div className="space-y-2">
-                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step {onboardingStep} of 4</p>
-                <h2 className="text-3xl font-black text-slate-900">
-                  {onboardingStep === 1 && "What's your name?"}
-                  {onboardingStep === 2 && "Your gender?"}
-                  {onboardingStep === 3 && "Where are you from?"}
-                  {onboardingStep === 4 && "Face Scan for Skin Type"}
-                </h2>
-              </div>
+            {/* Progress Bar */}
+            <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
+              {[1,2,3,4].map(s => (
+                <div key={s} className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", onboardingStep >= s ? "bg-[#F88E7D]" : "bg-slate-100")} />
+              ))}
+            </div>
 
-              <div className="space-y-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={onboardingStep}
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -40 }}
+                transition={{ duration: 0.25 }}
+                className="flex-1 flex flex-col"
+              >
+                {/* Step 1 – Name */}
                 {onboardingStep === 1 && (
-                  <input 
-                    type="text" 
-                    value={userName} 
-                    onChange={(e)=>setUserName(e.target.value)}
-                    placeholder="Enter your name"
-                    className="w-full bg-white h-16 px-6 rounded-[24px] border border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
-                  />
-                )}
-
-                {onboardingStep === 2 && (
-                  <div className="grid grid-cols-2 gap-4">
-                    {["male", "female"].map((g) => (
-                      <button 
-                        key={g}
-                        onClick={() => setGender(g as "male" | "female")}
-                        className={cn(
-                          "h-32 rounded-[32px] border-2 flex flex-col items-center justify-center gap-3 transition-all",
-                          gender === g ? "bg-white border-[#F88E7D] shadow-xl shadow-orange-500/10" : "bg-white/50 border-white"
-                        )}
-                      >
-                        <div className={cn("w-12 h-12 rounded-full flex items-center justify-center", gender === g ? "bg-[#F88E7D] text-white" : "bg-slate-100 text-slate-400")}>
-                          <User size={24} />
-                        </div>
-                        <span className={cn("font-black text-xs uppercase tracking-widest", gender === g ? "text-[#F88E7D]" : "text-slate-400")}>{g}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {onboardingStep === 3 && (
-                  <select 
-                    value={country} 
-                    onChange={(e)=>setCountry(e.target.value)}
-                    className="w-full bg-white h-16 px-6 rounded-[24px] border border-[#F3EAE8] font-bold text-lg outline-none appearance-none"
-                  >
-                    {["India", "USA", "UK", "UAE", "Pakistan", "Bangladesh", "Canada", "Australia"].map(c => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                )}
-
-                {onboardingStep === 4 && (
-                  <div className="space-y-4">
-                    <p className="text-xs text-slate-400 font-medium">We&apos;ll automatically detect your skin type from this scan.</p>
-                    <div className="rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-black aspect-[3/4]">
-                      <CameraScanner onResult={(res) => {
-                        handleResult(res);
-                        setTimeout(() => completeOnboarding(), 2000);
-                      }} mode="face" />
+                  <div className="flex flex-col flex-1">
+                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80" alt="Welcome" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                    </div>
+                    <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
+                      <div>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 1 of 4</p>
+                        <h2 className="text-3xl font-black text-slate-900 mt-1">Hi! What&apos;s your name? 👋</h2>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">We&apos;ll personalize your entire skincare experience just for you.</p>
+                      </div>
+                      <input
+                        type="text"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        placeholder="Enter your name"
+                        className="w-full bg-[#FDF5F2] h-16 px-6 rounded-[24px] border-2 border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
+                      />
+                      <div className="space-y-3 mt-2">
+                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">What you&apos;ll get</p>
+                        {[
+                          { icon: "🔬", text: "Real AI skin analysis with Glow Score" },
+                          { icon: "🥗", text: "Personalized diet plan for your skin" },
+                          { icon: "🛍️", text: "Instant product ingredient scanner" },
+                          { icon: "🤖", text: "24/7 AI skin coach & advice" },
+                        ].map((f, i) => (
+                          <div key={i} className="flex items-center gap-3 bg-[#FDF5F2] rounded-2xl px-4 py-3">
+                            <span className="text-lg">{f.icon}</span>
+                            <p className="text-[12px] font-bold text-slate-700">{f.text}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
-              </div>
 
-              <div className="pt-8">
-                {onboardingStep < 4 && (
-                  <button 
-                    onClick={() => {
-                      setOnboardingStep(onboardingStep + 1);
-                    }}
-                    className="w-full bg-[#F88E7D] text-white h-16 rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
-                  >
-                    Continue
-                  </button>
+                {/* Step 2 – Gender */}
+                {onboardingStep === 2 && (
+                  <div className="flex flex-col flex-1">
+                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" alt="Gender" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                    </div>
+                    <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
+                      <div>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 4</p>
+                        <h2 className="text-3xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">Male and female skin have different needs. This helps Velmora tailor your analysis.</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { g: "male", emoji: "👨", img: "https://images.unsplash.com/photo-1500048993953-d23a436266cf?w=200&q=80" },
+                          { g: "female", emoji: "👩", img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&q=80" },
+                        ].map(({ g, emoji, img }) => (
+                          <button
+                            key={g}
+                            onClick={() => setGender(g as "male" | "female")}
+                            className={cn(
+                              "rounded-[28px] border-2 overflow-hidden transition-all flex flex-col",
+                              gender === g ? "border-[#F88E7D] shadow-xl shadow-orange-500/20" : "border-slate-100"
+                            )}
+                          >
+                            <div className="h-32 overflow-hidden">
+                              <img src={img} alt={g} className="w-full h-full object-cover" />
+                            </div>
+                            <div className={cn("py-3 flex items-center justify-center gap-2 font-black text-sm uppercase tracking-wider", gender === g ? "bg-[#F88E7D] text-white" : "bg-white text-slate-500")}>
+                              <span>{emoji}</span> {g}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
-                
-                {onboardingStep > 1 && onboardingStep < 4 && (
-                  <button 
-                    onClick={() => setOnboardingStep(onboardingStep - 1)}
-                    className="w-full mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest"
-                  >
-                    Go Back
-                  </button>
+
+                {/* Step 3 – Country */}
+                {onboardingStep === 3 && (
+                  <div className="flex flex-col flex-1">
+                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                      <img src="https://images.unsplash.com/photo-1604881988758-f76ad2f7aac1?w=600&q=80" alt="Location" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                    </div>
+                    <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
+                      <div>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 4</p>
+                        <h2 className="text-3xl font-black text-slate-900 mt-1">Where are you from? 🌍</h2>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">Your location helps us recommend locally available foods & products that work for your climate.</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {["India","USA","UK","UAE","Pakistan","Bangladesh","Canada","Australia"].map(c => (
+                          <button
+                            key={c}
+                            onClick={() => setCountry(c)}
+                            className={cn(
+                              "h-14 rounded-[20px] border-2 font-black text-sm transition-all",
+                              country === c ? "bg-[#F88E7D] border-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-[#FDF5F2] border-transparent text-slate-600"
+                            )}
+                          >
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
-              </div>
+
+                {/* Step 4 – Face Scan */}
+                {onboardingStep === 4 && (
+                  <div className="flex flex-col flex-1 px-6 pt-4 pb-8 gap-4">
+                    <div>
+                      <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 4 of 4</p>
+                      <h2 className="text-3xl font-black text-slate-900 mt-1">Your First Skin Scan 📸</h2>
+                      <p className="text-slate-400 text-sm mt-2 font-medium">Our Gemini AI will analyze your face and generate a real Glow Score instantly.</p>
+                    </div>
+                    <div className="rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-black flex-1 min-h-[300px]">
+                      <CameraScanner onResult={handleResult} mode="face" />
+                    </div>
+                    <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Position face clearly in good lighting</p>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Bottom Buttons */}
+            <div className="px-6 pb-10 pt-4 flex-shrink-0 space-y-3">
+              {onboardingStep < 4 && (
+                <button
+                  onClick={() => setOnboardingStep(onboardingStep + 1)}
+                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
+                >
+                  Continue →
+                </button>
+              )}
+              {onboardingStep > 1 && onboardingStep < 4 && (
+                <button
+                  onClick={() => setOnboardingStep(onboardingStep - 1)}
+                  className="w-full text-slate-400 font-bold text-xs uppercase tracking-widest py-2"
+                >
+                  ← Go Back
+                </button>
+              )}
             </div>
           </motion.div>
         )}
