@@ -550,18 +550,14 @@ export default function Home() {
                         className="w-full bg-[#FDF5F2] h-16 px-6 rounded-[24px] border-2 border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
                       />
                       <div className="space-y-3 mt-2">
-                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">What you&apos;ll get</p>
-                        {[
-                          { icon: "🔬", text: "Real AI skin analysis with Glow Score" },
-                          { icon: "🥗", text: "Personalized diet plan for your skin" },
-                          { icon: "🛍️", text: "Instant product ingredient scanner" },
-                          { icon: "🤖", text: "24/7 AI skin coach & advice" },
-                        ].map((f, i) => (
-                          <div key={i} className="flex items-center gap-3 bg-[#FDF5F2] rounded-2xl px-4 py-3">
-                            <span className="text-lg">{f.icon}</span>
-                            <p className="text-[12px] font-bold text-slate-700">{f.text}</p>
-                          </div>
-                        ))}
+                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Premium Features Included</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {["🔬 AI Scan", "🥗 Diet Plan", "🛍️ Scanner", "🤖 AI Coach"].map((f, i) => (
+                            <div key={i} className="flex items-center gap-2 bg-[#FDF5F2] rounded-xl px-3 py-2 border border-[#F3EAE8]">
+                              <p className="text-[10px] font-black text-slate-700 uppercase tracking-tight">{f}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -578,7 +574,7 @@ export default function Home() {
                       <div>
                         <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 4</p>
                         <h2 className="text-3xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
-                        <p className="text-slate-400 text-sm mt-2 font-medium">Male and female skin have different needs. This helps Velmora tailor your analysis.</p>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">This helps Velmora understand your hormone balance and skin needs.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         {[
@@ -606,8 +602,39 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Step 3 – Country */}
+                {/* Step 3 – Skin Type */}
                 {onboardingStep === 3 && (
+                  <div className="flex flex-col flex-1">
+                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                      <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80" alt="Skin Type" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                    </div>
+                    <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
+                      <div>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 4</p>
+                        <h2 className="text-3xl font-black text-slate-900 mt-1">Skin type? ✨</h2>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">Select your primary concern or type. You can change this later with a scan.</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        {["Oily", "Dry", "Combination", "Normal", "Sensitive", "Acne-Prone"].map(t => (
+                          <button
+                            key={t}
+                            onClick={() => setSkinType(t)}
+                            className={cn(
+                              "h-14 rounded-[20px] border-2 font-black text-sm transition-all",
+                              skinType === t ? "bg-[#F88E7D] border-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-[#FDF5F2] border-transparent text-slate-600"
+                            )}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 4 – Country */}
+                {onboardingStep === 4 && (
                   <div className="flex flex-col flex-1">
                     <div className="relative h-56 flex-shrink-0 overflow-hidden">
                       <img src="https://images.unsplash.com/photo-1604881988758-f76ad2f7aac1?w=600&q=80" alt="Location" className="w-full h-full object-cover" />
@@ -615,12 +642,12 @@ export default function Home() {
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 4</p>
-                        <h2 className="text-3xl font-black text-slate-900 mt-1">Where are you from? 🌍</h2>
-                        <p className="text-slate-400 text-sm mt-2 font-medium">Your location helps us recommend locally available foods & products that work for your climate.</p>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 4 of 4</p>
+                        <h2 className="text-3xl font-black text-slate-900 mt-1">Where are you? 🌍</h2>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">We customize diet and product availability based on your region.</p>
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {["India","USA","UK","UAE","Pakistan","Bangladesh","Canada","Australia"].map(c => (
+                      <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[300px] pr-1">
+                        {["India","USA","UK","UAE","Pakistan","Bangladesh","Canada","Australia","Singapore","Germany"].map(c => (
                           <button
                             key={c}
                             onClick={() => setCountry(c)}
@@ -636,35 +663,24 @@ export default function Home() {
                     </div>
                   </div>
                 )}
-
-                {/* Step 4 – Face Scan */}
-                {onboardingStep === 4 && (
-                  <div className="flex flex-col flex-1 px-6 pt-4 pb-8 gap-4">
-                    <div>
-                      <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 4 of 4</p>
-                      <h2 className="text-3xl font-black text-slate-900 mt-1">Your First Skin Scan 📸</h2>
-                      <p className="text-slate-400 text-sm mt-2 font-medium">Our Gemini AI will analyze your face and generate a real Glow Score instantly.</p>
-                    </div>
-                    <div className="rounded-[32px] overflow-hidden border-4 border-white shadow-2xl bg-black flex-1 min-h-[300px]">
-                      <CameraScanner onResult={handleResult} mode="face" />
-                    </div>
-                    <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Position face clearly in good lighting</p>
-                  </div>
-                )}
               </motion.div>
             </AnimatePresence>
 
             {/* Bottom Buttons */}
             <div className="px-6 pb-10 pt-4 flex-shrink-0 space-y-3">
-              {onboardingStep < 4 && (
-                <button
-                  onClick={() => setOnboardingStep(onboardingStep + 1)}
-                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform"
-                >
-                  Continue →
-                </button>
-              )}
-              {onboardingStep > 1 && onboardingStep < 4 && (
+              <button
+                onClick={() => {
+                  if (onboardingStep < 4) {
+                    setOnboardingStep(onboardingStep + 1);
+                  } else {
+                    completeOnboarding();
+                  }
+                }}
+                className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
+              >
+                {onboardingStep === 4 ? "Finish & Start Glow ✨" : "Continue →"}
+              </button>
+              {onboardingStep > 1 && (
                 <button
                   onClick={() => setOnboardingStep(onboardingStep - 1)}
                   className="w-full text-slate-400 font-bold text-xs uppercase tracking-widest py-2"
@@ -675,6 +691,7 @@ export default function Home() {
             </div>
           </motion.div>
         )}
+
 
         {/* HOME */}
         {view === "home" && (
