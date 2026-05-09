@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Home, Calendar, ShoppingBag, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {
+  const { status } = useSession();
   const pathname = usePathname();
   const [isPremium, setIsPremium] = useState(false);
 
@@ -16,14 +18,15 @@ export function BottomNav() {
     setIsPremium(premium);
   }, [pathname]);
 
+  if (status !== "authenticated") return null;
+  if (pathname === "/coach") return null;
+
   const navItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Routine", href: "/routine", icon: Calendar },
     { name: "Cart", href: "/cart", icon: ShoppingBag },
     { name: "Profile", href: "/profile", icon: User },
   ];
-
-  if (pathname === "/coach") return null;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 px-8 pb-8 pt-3 bg-gradient-to-t from-[#FDF5F2] via-[#FDF5F2]/90 to-transparent pointer-events-none z-50 max-w-[430px] mx-auto">

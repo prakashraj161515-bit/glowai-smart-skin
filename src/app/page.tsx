@@ -104,6 +104,38 @@ export default function Home() {
     }
   }, [status, session]);
 
+  // ─── LOADING SPLASH SCREEN ──────────────────────────────────────────────────
+  if (status === "loading") {
+    return (
+      <div className="fixed inset-0 bg-[#FDF5F2] flex flex-col items-center justify-center z-[200]">
+        <motion.div 
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="flex flex-col items-center gap-6"
+        >
+          <div className="w-20 h-20 bg-gradient-to-tr from-[#F88E7D] to-[#f97316] rounded-[24px] flex items-center justify-center shadow-2xl shadow-orange-500/20">
+            <Sparkles size={40} className="text-white" />
+          </div>
+          <div className="text-center">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">VELMORA</h1>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] mt-1">Smart Skin AI</p>
+          </div>
+          <div className="mt-8 flex gap-1">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
+                className="w-1.5 h-1.5 bg-[#F88E7D] rounded-full"
+              />
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+
   const handleLogin = () => {
     // If Google credentials configured → real Google login
     // Otherwise → show demo name modal
