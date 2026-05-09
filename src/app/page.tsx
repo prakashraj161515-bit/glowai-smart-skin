@@ -77,27 +77,22 @@ export default function Home() {
             if (data.onboardingComplete) {
               localStorage.setItem("velmora_onboarding_complete", "true");
               setShowOnboarding(false);
-              setShowLanding(false); // Only hide landing if onboarding is done
+              // Removed auto-hide landing
             } else {
               setShowOnboarding(true);
-              setShowLanding(false);
+              // Removed auto-hide landing
             }
           } else {
-            // No cloud data - check local onboarding
             const done = localStorage.getItem("velmora_onboarding_complete") === "true";
-            setShowLanding(false);
             setShowOnboarding(!done);
           }
         })
         .catch(() => {
-          // Fallback
           const done = localStorage.getItem("velmora_onboarding_complete") === "true";
-          setShowLanding(false);
           setShowOnboarding(!done);
         });
 
     } else if (status === "unauthenticated") {
-      // Force landing if not logged in
       setShowLanding(true);
       setShowOnboarding(false);
       setView("home");
@@ -137,6 +132,12 @@ export default function Home() {
 
 
   const handleLogin = () => {
+    // If already authenticated, just enter the app
+    if (status === "authenticated") {
+      setShowLanding(false);
+      return;
+    }
+
     // If Google credentials configured → real Google login
     // Otherwise → show demo name modal
     const hasGoogle = process.env.NEXT_PUBLIC_HAS_GOOGLE === "true";
@@ -495,7 +496,7 @@ export default function Home() {
                   className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] flex items-center justify-center gap-3 font-black text-[15px] active:scale-95 transition-transform shadow-xl shadow-orange-500/30"
                 >
                   <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
-                  Continue with Google
+                  {status === "authenticated" ? "Enter Velmora" : "Continue with Google"}
                 </button>
                 <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Free • No credit card required</p>
               </div>
