@@ -382,15 +382,14 @@ export default function Home() {
 
               {/* Feature 4 - AI Coach */}
               <div className="flex gap-4 bg-gradient-to-r from-purple-50 to-white rounded-[28px] p-4 border border-purple-100 shadow-sm items-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-purple-100 flex items-center justify-center text-3xl">
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-purple-100 flex items-center justify-center text-3xl">
                   <img 
                     src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&q=80"
                     alt="AI Coach" 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover absolute inset-0"
                     onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }}
                   />
-                  <span className="absolute">🤖</span>
-                </div>
+                  <span>🤖</span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
