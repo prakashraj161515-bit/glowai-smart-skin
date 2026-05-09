@@ -131,7 +131,18 @@ export default function Home() {
 
   const handleDemoLogin = async () => {
     if (!demoName.trim()) return;
-    await signIn("Demo", { redirect: false, name: demoName.trim() });
+    const result = await signIn("credentials", { 
+      redirect: false, 
+      name: demoName.trim() 
+    });
+    if (result?.ok || result === undefined) {
+      // Login successful - close modal, show onboarding
+      setShowDemoModal(false);
+      setShowLanding(false);
+      setUserName(demoName.trim());
+      const onboardingDone = localStorage.getItem("velmora_onboarding_complete") === "true";
+      setShowOnboarding(!onboardingDone);
+    }
   };
 
   const handleLogout = () => {
