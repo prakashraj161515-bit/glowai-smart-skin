@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSession, signOut as nextSignOut } from "next-auth/react";
 import { 
   User, Shield, Bell, LogOut, ChevronRight, Settings, 
   Smartphone, Mail, Clock, Camera, Sparkles,
@@ -12,51 +13,49 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isPremium, setIsPremium] = useState(false);
   const [gender, setGender] = useState<"male" | "female">("female");
   const [country, setCountry] = useState("India");
-  const [authMode, setAuthMode] = useState<"login" | "signup" | "otp">("login");
   
-  const [userName, setUserName] = useState("Anrudh Kumar");
-  const [profilePic, setProfilePic] = useState("https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&h=400&fit=crop");
+  const [userName, setUserName] = useState("User");
+  const [profilePic, setProfilePic] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("velmora_is_logged_in");
-    const savedName = localStorage.getItem("velmora_user_name");
-    const savedPic = localStorage.getItem("velmora_user_pic");
     const premium = localStorage.getItem("velmora_is_premium") === "true";
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
     const savedCountry = localStorage.getItem("velmora_user_country");
     
-    if (saved === "true") setIsLoggedIn(true);
-    if (savedName) setUserName(savedName);
-    if (savedPic) setProfilePic(savedPic);
     if (savedGender) setGender(savedGender);
     if (savedCountry) setCountry(savedCountry);
     setIsPremium(premium);
+
+    if (status === "authenticated" && session?.user) {
+      setUserName(session.user.name || "User");
+      setProfilePic(session.user.image || "");
+    }
     
     setIsLoaded(true);
-  }, []);
+  }, [status, session]);
 
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("velmora_is_logged_in", isLoggedIn ? "true" : "false");
       localStorage.setItem("velmora_user_name", userName);
       localStorage.setItem("velmora_user_pic", profilePic);
       localStorage.setItem("velmora_user_gender", gender);
       localStorage.setItem("velmora_user_country", country);
     }
-  }, [isLoggedIn, isLoaded, userName, profilePic, gender, country]);
+  }, [isLoaded, userName, profilePic, gender, country]);
 
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(session?.user?.email || "");
   const [skinType, setSkinType] = useState("Combination");
+
   const [reminders, setReminders] = useState([
     { id: '1', title: "Morning Skincare", time: "08:00", active: true },
     { id: '2', title: "Healthy Breakfast", time: "09:00", active: true },
@@ -113,40 +112,11 @@ export default function ProfilePage() {
     reader.readAsDataURL(file);
   };
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-[#FDF5F2] flex flex-col items-center justify-center px-6">
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-sm card p-8 space-y-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-[#FFEDE8] rounded-[32px] flex items-center justify-center mx-auto mb-6 text-[#F88E7D] shadow-inner animate-float"><User size={40} /></div>
-            <h2 className="text-2xl font-bold text-slate-800">{authMode === "login" ? "Welcome Back" : authMode === "signup" ? "Create Account" : "Verify OTP"}</h2>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-2">{authMode === "otp" ? "Enter the code sent to your phone" : "Access your personalized skin journey"}</p>
-          </div>
-          <form onSubmit={handleLogin} className="space-y-4">
-            {authMode !== "otp" ? (
-              <>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <input type="email" placeholder="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full bg-[#FDF5F2] border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-sm font-medium outline-none focus:border-[#FFB5A7] transition-all text-slate-700" />
-                </div>
-                <div className="relative">
-                  <Smartphone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                  <input type="tel" placeholder="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full bg-[#FDF5F2] border-2 border-transparent rounded-2xl py-4 pl-12 pr-4 text-sm font-medium outline-none focus:border-[#FFB5A7] transition-all text-slate-700" />
-                </div>
-              </>
-            ) : (
-              <div className="flex justify-between gap-2">
-                {[1, 2, 3, 4].map(i => <input key={i} type="text" maxLength={1} className="w-14 h-14 bg-[#FDF5F2] border-2 border-transparent rounded-2xl text-center text-xl font-black outline-none focus:border-[#FFB5A7] transition-all text-slate-800" />)}
-              </div>
-            )}
-            <button type="submit" className="w-full bg-primary-gradient h-14 rounded-2xl font-bold text-white shadow-xl shadow-orange-500/20 transition-all active:scale-95 mt-4">{authMode === "otp" ? "Verify & Login" : "Continue"}</button>
-          </form>
-          <div className="text-center pt-2">
-            <button onClick={() => setAuthMode(authMode === "login" ? "signup" : "login")} className="text-[10px] text-[#F88E7D] font-bold uppercase tracking-widest hover:underline">{authMode === "login" ? "Don't have an account? Sign Up" : "Already have an account? Login"}</button>
-          </div>
-        </motion.div>
-      </div>
-    );
+  if (status === "loading") return <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div></div>;
+
+  if (status === "unauthenticated") {
+    router.push("/");
+    return null;
   }
 
   return (
@@ -166,7 +136,11 @@ export default function ProfilePage() {
         <div className="relative">
           <div className={`w-32 h-32 rounded-[48px] p-1.5 rotate-3 group ${isPremium ? 'bg-orange-400' : 'bg-primary-gradient'}`}>
             <div className="w-full h-full rounded-[42px] bg-white flex items-center justify-center overflow-hidden border-4 border-white -rotate-3 transition-transform group-hover:rotate-0">
-              <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+              {profilePic ? (
+                <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300"><User size={48} /></div>
+              )}
             </div>
           </div>
           <button onClick={() => fileInputRef.current?.click()} className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-white border-4 border-[#FDF5F2] flex items-center justify-center text-[#F88E7D] shadow-xl active:scale-90 transition-transform">
@@ -183,12 +157,13 @@ export default function ProfilePage() {
               <Edit2 size={18} className="text-slate-300 group-hover:text-[#F88E7D] transition-colors" />
             </div>
           )}
+          <p className="text-[12px] text-slate-400 font-medium mt-1">{session?.user?.email}</p>
           {isPremium ? (
-            <div className="flex items-center gap-1.5 mt-1 bg-gradient-to-br from-[#F88E7D] to-[#FFB5A7] p-[1px] rounded-full shadow-lg shadow-orange-500/20">
+            <div className="flex items-center gap-1.5 mt-2 bg-gradient-to-br from-[#F88E7D] to-[#FFB5A7] p-[1px] rounded-full shadow-lg shadow-orange-500/20">
               <div className="bg-white rounded-full px-4 py-1 flex items-center gap-1.5"><Gem size={12} className="text-[#F88E7D] fill-[#F88E7D]" /><p className="text-[10px] text-[#F88E7D] font-bold uppercase tracking-widest">Premium Member</p></div>
             </div>
           ) : (
-            <Link href="/premium" className="flex items-center gap-1.5 mt-1 bg-[#FFEDE8] border border-[#F3EAE8] px-4 py-1.5 rounded-full shadow-sm">
+            <Link href="/premium" className="flex items-center gap-1.5 mt-2 bg-[#FFEDE8] border border-[#F3EAE8] px-4 py-1.5 rounded-full shadow-sm">
               <Sparkles size={12} className="text-[#F88E7D]" /><p className="text-[10px] text-[#F88E7D] font-bold uppercase tracking-widest">Free Plan • Upgrade</p>
             </Link>
           )}
@@ -276,9 +251,10 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <button onClick={() => { setIsLoggedIn(false); localStorage.removeItem("velmora_is_logged_in"); localStorage.removeItem("velmora_is_premium"); }} className="w-full h-16 card flex items-center justify-center gap-3 text-red-400 font-bold text-[15px] hover:bg-red-50 border-red-50 transition-colors mt-8">
+        <button onClick={() => { nextSignOut(); localStorage.clear(); }} className="w-full h-16 card flex items-center justify-center gap-3 text-red-400 font-bold text-[15px] hover:bg-red-50 border-red-50 transition-colors mt-8">
           <LogOut size={20} /> Log Out Account
         </button>
+
         <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest pb-10">Velmora Premium • Build v1.4.0</p>
       </div>
     </div>
