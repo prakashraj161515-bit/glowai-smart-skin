@@ -34,6 +34,8 @@ export default function Home() {
   const [scanLimitReached, setScanLimitReached] = useState(false);
   const [scanCount, setScanCount] = useState(0);
   const [activeTab, setActiveTab] = useState("All");
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [demoName, setDemoName] = useState("");
 
   // ─── SAVE TO CLOUD ───────────────────────────────────────────────────────────
   const saveToCloud = async (payload: object) => {
@@ -117,7 +119,19 @@ export default function Home() {
   }, [status, session]);
 
   const handleLogin = () => {
-    signIn("google");
+    // If Google credentials configured → real Google login
+    // Otherwise → show demo name modal
+    const hasGoogle = process.env.NEXT_PUBLIC_HAS_GOOGLE === "true";
+    if (hasGoogle) {
+      signIn("google");
+    } else {
+      setShowDemoModal(true);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    if (!demoName.trim()) return;
+    await signIn("Demo", { redirect: false, name: demoName.trim() });
   };
 
   const handleLogout = () => {
@@ -295,6 +309,51 @@ export default function Home() {
 
       <AnimatePresence mode="wait">
         
+        {/* DEMO LOGIN MODAL - shown when Google OAuth not configured */}
+        {showDemoModal && (
+          <motion.div
+            key="demo-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            onClick={() => setShowDemoModal(false)}
+          >
+            <motion.div
+              initial={{ y: 60, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="text-center mb-6">
+                <div className="text-5xl mb-3">✨</div>
+                <h2 className="text-2xl font-black text-slate-900">Welcome to Velmora</h2>
+                <p className="text-slate-400 text-sm mt-2 font-medium">Enter your name to get started</p>
+              </div>
+              <input
+                type="text"
+                value={demoName}
+                onChange={e => setDemoName(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleDemoLogin()}
+                placeholder="Your name"
+                autoFocus
+                className="w-full bg-[#FDF5F2] h-14 px-5 rounded-[20px] border-2 border-[#F3EAE8] font-bold text-base outline-none focus:border-[#F88E7D] transition-colors mb-4"
+              />
+              <button
+                onClick={handleDemoLogin}
+                disabled={!demoName.trim()}
+                className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-14 rounded-[20px] font-black text-[15px] active:scale-95 transition-transform shadow-lg shadow-orange-500/25 disabled:opacity-40"
+              >
+                Continue →
+              </button>
+              <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-4">
+                Add Google credentials in Vercel for full login
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+
         {/* LANDING / LOGIN PAGE */}
         {showLanding && (
           <motion.div 
