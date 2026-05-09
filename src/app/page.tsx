@@ -192,6 +192,16 @@ export default function Home() {
     localStorage.setItem("velmora_user_name", userName);
     localStorage.setItem("velmora_user_gender", gender);
     localStorage.setItem("velmora_user_country", country);
+    
+    // Save to cloud so it persists across devices
+    saveToCloud({
+      onboardingComplete: true,
+      userName,
+      gender,
+      country,
+      skinType
+    });
+
     if (data) setView("results");
   };
 
