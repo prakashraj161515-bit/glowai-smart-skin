@@ -163,71 +163,81 @@ export default function Home() {
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
-    
-    // Auto-detect Skin Type from metrics
-    let detectedType = "Combination";
-    if (res.oil > 60) detectedType = "Oily";
-    else if (res.oil < 25) detectedType = "Dry";
-    else if (res.acne > 40) detectedType = "Acne-Prone";
-    setSkinType(detectedType);
-    localStorage.setItem("velmora_user_skin_type", detectedType);
 
-    // Save analysis metrics immediately for Diet/Routine
-    const analysisData = {
-      ...res,
-      score: res.score,
-      acne: res.acne,
-      oil: res.oil,
-      pigmentation: res.pigmentation,
-      gender: gender,
-      date: new Date().toLocaleDateString()
-    };
-    localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
-    
-    // Update history
-    const newHistory = [analysisData, ...history].slice(0, 30);
-    setHistory(newHistory);
-    localStorage.setItem("velmora_history", JSON.stringify(newHistory));
-
-    if (!showOnboarding) setView("results");
-    
-    setData(res);
+    // Show loading screen immediately with placeholder data
+    setView("results");
     setLoading(true);
     setDeepScanStep(1);
-    await new Promise(r => setTimeout(r, 1000));
-    setDeepScanStep(4); 
-    await new Promise(r => setTimeout(r, 500));
-    const prevScan = history[0];
-    const comparisonContext = prevScan ? `Previous scan on ${prevScan.date}: Score ${prevScan.score}%, Acne ${prevScan.acne}%, Oil ${prevScan.oil}%, Pigmentation ${prevScan.pigmentation}%.` : "No previous scan available.";
+    setData({ image: res.image, score: 0, acne: 0, oil: 0, pigmentation: 0 });
+    setAi("");
 
     try {
+      const prevScan = history[0];
       const r = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          ...res, 
-          gender, 
-          userName, 
-          mode: "accurate_scan", 
-          isPremium, 
+        body: JSON.stringify({
+          mode: "face_scan",
           image: res.image,
-          customPrompt: `Analyze the skin for ${gender} in ${country}. 
-          ${comparisonContext} 
-          Provide: 
-          1. SKIN IMPROVEMENT ANALYSIS: Compare today's metrics with the previous scan and tell if skin is improving and why.
-          2. Possible CAUSES for current issues. 
-          3. WHAT TO DRINK & EAT (focus ONLY on simple healthy vegetable and fruit diets available in ${country}). 
-          4. WHAT CREAM/FACEWASH and EXACT TIMING based on the specific problems detected (Acne, Oil, or Pigmentation).
-          Format as clear sections with bold headings.`
+          gender,
+          userName,
+          country,
+          prevScan: prevScan ? {
+            date: prevScan.date,
+            score: prevScan.score,
+            acne: prevScan.acne,
+            oil: prevScan.oil,
+            pigmentation: prevScan.pigmentation
+          } : null
         })
       });
-      const j = await r.json();
-      setAi(j.text);
-    } catch {
-      setAi("⚠️ Could not generate AI report."); 
-    } finally { 
-      setLoading(false); 
-      setDeepScanStep(0); 
+
+      const aiData = await r.json();
+      if (aiData.error) throw new Error(aiData.error);
+
+      // Use 100% real AI-generated metrics
+      const realScore = typeof aiData.score === "number" ? aiData.score : 0;
+      const realAcne = typeof aiData.acne === "number" ? aiData.acne : 0;
+      const realOil = typeof aiData.oil === "number" ? aiData.oil : 0;
+      const realPigmentation = typeof aiData.pigmentation === "number" ? aiData.pigmentation : 0;
+      const realReport = aiData.report || aiData.text || "Analysis complete.";
+
+      // Auto-detect Skin Type from real AI metrics
+      let detectedType = "Combination";
+      if (realOil > 60) detectedType = "Oily";
+      else if (realOil < 25) detectedType = "Dry";
+      else if (realAcne > 40) detectedType = "Acne-Prone";
+      setSkinType(detectedType);
+      localStorage.setItem("velmora_user_skin_type", detectedType);
+
+      // Build final analysis object from REAL AI data
+      const analysisData = {
+        image: res.image,
+        score: realScore,
+        acne: realAcne,
+        oil: realOil,
+        pigmentation: realPigmentation,
+        gender,
+        date: new Date().toLocaleDateString()
+      };
+
+      // Update all state with real values
+      setData(analysisData);
+      setAi(realReport);
+
+      // Save real data to history & LocalStorage
+      const newHistory = [analysisData, ...history].slice(0, 30);
+      setHistory(newHistory);
+      localStorage.setItem("velmora_history", JSON.stringify(newHistory));
+      localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
+
+      if (showOnboarding) setTimeout(() => completeOnboarding(), 500);
+
+    } catch (err: any) {
+      setAi(`⚠️ Could not generate AI report: ${err.message}`);
+    } finally {
+      setLoading(false);
+      setDeepScanStep(0);
     }
   }
 

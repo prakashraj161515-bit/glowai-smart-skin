@@ -31,7 +31,8 @@ export async function POST(req: Request) {
 
     const gender = body.gender || "user";
 
-    // Prioritize customPrompt if provided by the client
+    // Face Scan: AI returns real JSON metrics
+    let isFaceScan = false;
     if (body.customPrompt) {
       prompt = body.customPrompt;
     } else if (body.mode === "product_scan") {
@@ -65,38 +66,68 @@ export async function POST(req: Request) {
         User (${gender}) Question: "${body.message}"
         Provide professional, gender-specific skincare advice.
       `;
-    } else {
-      const { acne = 0, oil = 0, pigmentation = 0, score = 0, userName = "User" } = body;
-      prompt = `
-        Analyze this skin scan for ${userName} (${gender}).
-        MANDATORY: Provide a personalized report specifically tailored for a ${gender}.
-        
-        Metrics:
-        - Glow Score: ${score}/100
-        - Acne Level: ${acne}%
-        - Oiliness: ${oil}%
-        - Pigmentation: ${pigmentation}%
+    } else if (body.mode === "face_scan" || body.image) {
+      // REAL AI FACE SCAN — returns structured JSON
+      isFaceScan = true;
+      const { userName = "User", country = "India" } = body;
+      prompt = `You are Velmora, a world-class AI dermatologist. Analyze the facial skin in the image carefully and provide REAL scores based on actual visual analysis.
 
-        Sections: DIET, MORNING ROUTINE, NIGHT ROUTINE, PRO GLOW TIPS.
-        Tailor the advice for ${gender} skin physiology.
-      `;
+Carefully examine:
+- Acne, pimples, blemishes, redness (for acne score)
+- Shine, oiliness, sebum on skin surface (for oil score)
+- Dark spots, uneven tone, hyperpigmentation (for pigmentation score)
+- Overall healthy glow based on all factors (for glow score)
+
+Return ONLY a valid JSON object, no extra text, in this exact format:
+{
+  "score": <integer 0-100, overall glow/health score>,
+  "acne": <integer 0-100, acne severity>,
+  "oil": <integer 0-100, oiliness level>,
+  "pigmentation": <integer 0-100, dark spots level>,
+  "report": "<a detailed multiline markdown report for ${userName} (${gender}) with sections: **SKIN IMPROVEMENT ANALYSIS**, **CAUSES**, **WHAT TO EAT & DRINK** (foods available in ${country}), **RECOMMENDED PRODUCTS & TIMING**. Use bullet points. Tailor specifically for ${gender} skin physiology.>"
+}`;
+    } else {
+      prompt = `You are Velmora, a world-class dermatological assistant. Provide professional skincare advice.`;
     }
 
     const content = imagePart ? [prompt, imagePart] : [prompt];
 
+    const safetySettings = [
+      { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+      { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+    ];
+
     const model = genAI.getGenerativeModel({ 
       model: "gemini-3.1-flash-lite-preview",
-      generationConfig: { maxOutputTokens: 1000, temperature: 0.4 },
-      safetySettings: [
-        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-      ]
+      generationConfig: { 
+        maxOutputTokens: 2000, 
+        temperature: 0.4,
+        ...(isFaceScan ? { responseMimeType: "application/json" } : {})
+      },
+      safetySettings,
     });
 
     const result = await model.generateContent(content);
     const text = result.response.text();
+
+    if (isFaceScan) {
+      try {
+        const parsed = JSON.parse(text);
+        return NextResponse.json({ 
+          score: parsed.score,
+          acne: parsed.acne,
+          oil: parsed.oil,
+          pigmentation: parsed.pigmentation,
+          report: parsed.report,
+          text: parsed.report
+        });
+      } catch {
+        // If JSON parse fails, try to extract from text
+        return NextResponse.json({ text });
+      }
+    }
 
     return NextResponse.json({ text });
   } catch (err: any) {
