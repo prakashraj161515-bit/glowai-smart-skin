@@ -35,38 +35,70 @@ export default function Home() {
   const [scanCount, setScanCount] = useState(0);
   const [activeTab, setActiveTab] = useState("All");
 
+  // ─── SAVE TO CLOUD ───────────────────────────────────────────────────────────
+  const saveToCloud = async (payload: object) => {
+    try {
+      await fetch("/api/user/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      console.warn("Cloud save failed (non-critical):", e);
+    }
+  };
+
   // ─── CORE AUTH FLOW ─────────────────────────────────────────────────────────
   // SOURCE OF TRUTH: NextAuth session status ONLY.
   // localStorage is used ONLY for user preferences (history, gender, etc.)
   // When user reinstalls / clears data → session gone → login + onboarding shown.
   useEffect(() => {
-    if (status === "loading") return; // wait for session to resolve
+    if (status === "loading") return;
 
     if (status === "authenticated" && session?.user) {
-      // ✅ User is logged in via Google
       const googleName = session.user.name || "User";
       const googlePic = session.user.image || null;
       setUserName(googleName);
       setUserPic(googlePic);
-      localStorage.setItem("velmora_user_name", googleName);
-      if (googlePic) localStorage.setItem("velmora_user_pic", googlePic);
       setShowLanding(false);
 
-      // Show onboarding only if not completed yet (flag in localStorage)
-      const onboardingDone = localStorage.getItem("velmora_onboarding_complete") === "true";
-      setShowOnboarding(!onboardingDone);
+      // 🌐 Load from cloud — restores ALL history after reinstall
+      fetch("/api/user/load")
+        .then(r => r.json())
+        .then(({ data }) => {
+          if (data) {
+            if (data.history?.length) {
+              setHistory(data.history);
+              localStorage.setItem("velmora_history", JSON.stringify(data.history));
+            }
+            if (data.gender) { setGender(data.gender); localStorage.setItem("velmora_user_gender", data.gender); }
+            if (data.country) { setCountry(data.country); localStorage.setItem("velmora_user_country", data.country); }
+            if (data.skinType) setSkinType(data.skinType);
+            if (data.onboardingComplete) {
+              localStorage.setItem("velmora_onboarding_complete", "true");
+              setShowOnboarding(false);
+            } else {
+              setShowOnboarding(true);
+            }
+          } else {
+            // New user
+            const done = localStorage.getItem("velmora_onboarding_complete") === "true";
+            setShowOnboarding(!done);
+          }
+        })
+        .catch(() => {
+          // Fallback to localStorage if cloud unavailable
+          const done = localStorage.getItem("velmora_onboarding_complete") === "true";
+          setShowOnboarding(!done);
+          const h = localStorage.getItem("velmora_history");
+          if (h) setHistory(JSON.parse(h));
+          const g = localStorage.getItem("velmora_user_gender") as "male" | "female";
+          if (g) setGender(g);
+          const c = localStorage.getItem("velmora_user_country");
+          if (c) setCountry(c);
+        });
 
-      // Load saved preferences
-      const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
-      if (savedGender) setGender(savedGender);
-      const savedCountry = localStorage.getItem("velmora_user_country");
-      if (savedCountry) setCountry(savedCountry);
-      const h = localStorage.getItem("velmora_history");
-      if (h) setHistory(JSON.parse(h));
-      const premium = localStorage.getItem("velmora_is_premium") === "true";
-      setIsPremium(premium);
-
-      // Water intake
+      // Water intake (local only, resets daily)
       const today = new Date().toLocaleDateString();
       const savedWaterDate = localStorage.getItem("velmora_water_date");
       const savedWater = localStorage.getItem("velmora_water_intake");
@@ -79,7 +111,6 @@ export default function Home() {
       }
 
     } else if (status === "unauthenticated") {
-      // ❌ Not logged in → show landing always (fresh install or logout)
       setShowLanding(true);
       setShowOnboarding(false);
     }
@@ -240,6 +271,15 @@ export default function Home() {
       localStorage.setItem("velmora_history", JSON.stringify(newHistory));
       localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
 
+      // ☁️ Save to cloud so history persists across reinstalls
+      saveToCloud({
+        history: newHistory,
+        gender,
+        country,
+        skinType: detectedType,
+        onboardingComplete: true,
+      });
+
       if (showOnboarding) setTimeout(() => completeOnboarding(), 500);
 
     } catch (err: any) {
@@ -292,8 +332,9 @@ export default function Home() {
               
               {/* Feature 1 - AI Skin Scan */}
               <div className="flex gap-4 bg-gradient-to-r from-blue-50 to-white rounded-[28px] p-4 border border-blue-100 shadow-sm items-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
-                  <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80" alt="Skin Scan" className="w-full h-full object-cover" />
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-blue-100 flex items-center justify-center text-3xl">
+                  <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80" alt="Skin Scan" className="w-full h-full object-cover absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }} />
+                  <span>🔬</span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -306,8 +347,9 @@ export default function Home() {
 
               {/* Feature 2 - Diet Plan */}
               <div className="flex gap-4 bg-gradient-to-r from-emerald-50 to-white rounded-[28px] p-4 border border-emerald-100 shadow-sm items-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
-                  <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80" alt="Diet Plan" className="w-full h-full object-cover" />
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-emerald-100 flex items-center justify-center text-3xl">
+                  <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80" alt="Diet Plan" className="w-full h-full object-cover absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }} />
+                  <span>🥗</span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -320,8 +362,14 @@ export default function Home() {
 
               {/* Feature 3 - Product Scanner */}
               <div className="flex gap-4 bg-gradient-to-r from-orange-50 to-white rounded-[28px] p-4 border border-orange-100 shadow-sm items-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
-                  <img src="https://images.unsplash.com/photo-1556229167-279262113337?w=200&q=80" alt="Product Scanner" className="w-full h-full object-cover" />
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-orange-100 flex items-center justify-center text-3xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=200&q=80" 
+                    alt="Product Scanner" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }}
+                  />
+                  <span className="absolute">🛍️</span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
@@ -334,8 +382,15 @@ export default function Home() {
 
               {/* Feature 4 - AI Coach */}
               <div className="flex gap-4 bg-gradient-to-r from-purple-50 to-white rounded-[28px] p-4 border border-purple-100 shadow-sm items-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md">
-                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80" alt="AI Coach" className="w-full h-full object-cover" />
+                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-purple-100 flex items-center justify-center text-3xl">
+                  <img 
+                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&q=80"
+                    alt="AI Coach" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }}
+                  />
+                  <span className="absolute">🤖</span>
+                </div>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
