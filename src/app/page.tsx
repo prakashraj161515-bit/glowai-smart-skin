@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import CameraScanner from "@/components/CameraScanner";
-import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Gem, AlertCircle, BrainCircuit, Target, Zap, ShieldCheck, ShoppingBag, Info, Droplets, Utensils, User, TrendingUp } from "lucide-react";
+import { ScanFace, Sparkles, ChevronRight, RefreshCcw, Download, ArrowLeft, Lock, Database, Search, CheckCircle2, Gem, AlertCircle, BrainCircuit, Target, Zap, ShieldCheck, ShoppingBag, Info, Droplets, Utensils, User, TrendingUp, LogOut } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,7 @@ type HistoryEntry = { date: string; score: number; acne: number; oil: number; pi
 import ProductCard from "@/components/ProductCard";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const [view, setView] = useState<"home"|"scanner"|"results"|"history"|"product_results">("home");
   const [scanMode, setScanMode] = useState<"face"|"product">("face");
   const [data, setData] = useState<any>(null);
@@ -20,11 +22,10 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [country, setCountry] = useState("India");
   const [waterIntake, setWaterIntake] = useState(0);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
-  const [userName, setUserName] = useState("Erica");
+  const [userName, setUserName] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
   const [skinType, setSkinType] = useState("Oily");
   const [userPic, setUserPic] = useState<string | null>(null);
@@ -34,55 +35,65 @@ export default function Home() {
   const [scanCount, setScanCount] = useState(0);
   const [activeTab, setActiveTab] = useState("All");
 
+  // ─── CORE AUTH FLOW ─────────────────────────────────────────────────────────
+  // SOURCE OF TRUTH: NextAuth session status ONLY.
+  // localStorage is used ONLY for user preferences (history, gender, etc.)
+  // When user reinstalls / clears data → session gone → login + onboarding shown.
   useEffect(() => {
-    const h = localStorage.getItem("velmora_history");
-    if (h) setHistory(JSON.parse(h));
-    const savedName = localStorage.getItem("velmora_user_name");
-    if (savedName) setUserName(savedName);
-    const savedPic = localStorage.getItem("velmora_user_pic");
-    if (savedPic) setUserPic(savedPic);
-    const premium = localStorage.getItem("velmora_is_premium") === "true";
-    setIsPremium(premium);
-    const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
-    setScanCount(count);
-    const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
-    if (savedGender) setGender(savedGender);
-    const savedCountry = localStorage.getItem("velmora_user_country");
-    if (savedCountry) setCountry(savedCountry);
+    if (status === "loading") return; // wait for session to resolve
 
-    // Water Intake Persistence/Reset
-    const today = new Date().toLocaleDateString();
-    const savedWater = localStorage.getItem("velmora_water_intake");
-    const savedWaterDate = localStorage.getItem("velmora_water_date");
-    if (savedWaterDate === today) {
-      if (savedWater) setWaterIntake(parseInt(savedWater));
-    } else {
-      setWaterIntake(0);
-      localStorage.setItem("velmora_water_date", today);
-      localStorage.setItem("velmora_water_intake", "0");
-    }
-
-    const savedAuth = localStorage.getItem("velmora_auth_status");
-    if (savedAuth === "true") {
-      setIsLoggedIn(true);
+    if (status === "authenticated" && session?.user) {
+      // ✅ User is logged in via Google
+      const googleName = session.user.name || "User";
+      const googlePic = session.user.image || null;
+      setUserName(googleName);
+      setUserPic(googlePic);
+      localStorage.setItem("velmora_user_name", googleName);
+      if (googlePic) localStorage.setItem("velmora_user_pic", googlePic);
       setShowLanding(false);
-      
-      const savedOnboarding = localStorage.getItem("velmora_onboarding_complete");
-      if (savedOnboarding !== "true") {
-        setShowOnboarding(true);
+
+      // Show onboarding only if not completed yet (flag in localStorage)
+      const onboardingDone = localStorage.getItem("velmora_onboarding_complete") === "true";
+      setShowOnboarding(!onboardingDone);
+
+      // Load saved preferences
+      const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
+      if (savedGender) setGender(savedGender);
+      const savedCountry = localStorage.getItem("velmora_user_country");
+      if (savedCountry) setCountry(savedCountry);
+      const h = localStorage.getItem("velmora_history");
+      if (h) setHistory(JSON.parse(h));
+      const premium = localStorage.getItem("velmora_is_premium") === "true";
+      setIsPremium(premium);
+
+      // Water intake
+      const today = new Date().toLocaleDateString();
+      const savedWaterDate = localStorage.getItem("velmora_water_date");
+      const savedWater = localStorage.getItem("velmora_water_intake");
+      if (savedWaterDate === today && savedWater) {
+        setWaterIntake(parseInt(savedWater));
+      } else {
+        setWaterIntake(0);
+        localStorage.setItem("velmora_water_date", today);
+        localStorage.setItem("velmora_water_intake", "0");
       }
+
+    } else if (status === "unauthenticated") {
+      // ❌ Not logged in → show landing always (fresh install or logout)
+      setShowLanding(true);
+      setShowOnboarding(false);
     }
-  }, [view]);
+  }, [status, session]);
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
-    setShowLanding(false);
-    localStorage.setItem("velmora_auth_status", "true");
-    
-    const savedOnboarding = localStorage.getItem("velmora_onboarding_complete");
-    if (savedOnboarding !== "true") {
-      setShowOnboarding(true);
-    }
+    signIn("google");
+  };
+
+  const handleLogout = () => {
+    signOut();
+    localStorage.removeItem("velmora_auth_status");
+    localStorage.removeItem("velmora_onboarding_complete");
+    setShowLanding(true);
   };
 
   const completeOnboarding = () => {
@@ -91,8 +102,6 @@ export default function Home() {
     localStorage.setItem("velmora_user_name", userName);
     localStorage.setItem("velmora_user_gender", gender);
     localStorage.setItem("velmora_user_country", country);
-    
-    // If we have scan data from onboarding, show results
     if (data) setView("results");
   };
 
