@@ -85,7 +85,7 @@ export async function POST(req: Request) {
     const content = imagePart ? [prompt, imagePart] : [prompt];
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-3.1-flash-lite-preview",
       generationConfig: { maxOutputTokens: 1000, temperature: 0.4 },
       safetySettings: [
         { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
