@@ -51,20 +51,17 @@ export default function Home() {
   };
 
   // ─── CORE AUTH FLOW ─────────────────────────────────────────────────────────
-  // SOURCE OF TRUTH: NextAuth session status ONLY.
-  // localStorage is used ONLY for user preferences (history, gender, etc.)
-  // When user reinstalls / clears data → session gone → login + onboarding shown.
   useEffect(() => {
     if (status === "loading") return;
 
     if (status === "authenticated" && session?.user) {
+      // User is logged in
       const googleName = session.user.name || "User";
       const googlePic = session.user.image || null;
       setUserName(googleName);
       setUserPic(googlePic);
-      setShowLanding(false);
-
-      // 🌐 Load from cloud — restores ALL history after reinstall
+      
+      // Load cloud data
       fetch("/api/user/load")
         .then(r => r.json())
         .then(({ data }) => {
@@ -76,45 +73,34 @@ export default function Home() {
             if (data.gender) { setGender(data.gender); localStorage.setItem("velmora_user_gender", data.gender); }
             if (data.country) { setCountry(data.country); localStorage.setItem("velmora_user_country", data.country); }
             if (data.skinType) setSkinType(data.skinType);
+            
             if (data.onboardingComplete) {
               localStorage.setItem("velmora_onboarding_complete", "true");
               setShowOnboarding(false);
+              setShowLanding(false); // Only hide landing if onboarding is done
             } else {
               setShowOnboarding(true);
+              setShowLanding(false);
             }
           } else {
-            // New user
+            // No cloud data - check local onboarding
             const done = localStorage.getItem("velmora_onboarding_complete") === "true";
+            setShowLanding(false);
             setShowOnboarding(!done);
           }
         })
         .catch(() => {
-          // Fallback to localStorage if cloud unavailable
+          // Fallback
           const done = localStorage.getItem("velmora_onboarding_complete") === "true";
+          setShowLanding(false);
           setShowOnboarding(!done);
-          const h = localStorage.getItem("velmora_history");
-          if (h) setHistory(JSON.parse(h));
-          const g = localStorage.getItem("velmora_user_gender") as "male" | "female";
-          if (g) setGender(g);
-          const c = localStorage.getItem("velmora_user_country");
-          if (c) setCountry(c);
         });
 
-      // Water intake (local only, resets daily)
-      const today = new Date().toLocaleDateString();
-      const savedWaterDate = localStorage.getItem("velmora_water_date");
-      const savedWater = localStorage.getItem("velmora_water_intake");
-      if (savedWaterDate === today && savedWater) {
-        setWaterIntake(parseInt(savedWater));
-      } else {
-        setWaterIntake(0);
-        localStorage.setItem("velmora_water_date", today);
-        localStorage.setItem("velmora_water_intake", "0");
-      }
-
     } else if (status === "unauthenticated") {
+      // Force landing if not logged in
       setShowLanding(true);
       setShowOnboarding(false);
+      setView("home");
     }
   }, [status, session]);
 
