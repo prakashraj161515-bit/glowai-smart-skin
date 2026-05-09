@@ -34,6 +34,9 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       if (streamRef) {
         streamRef.getTracks().forEach(track => track.stop());
       }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     };
   }, [mode]);
 

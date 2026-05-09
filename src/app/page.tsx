@@ -126,6 +126,13 @@ export default function Home() {
     });
   };
 
+  const resetScanner = (newMode: "face" | "product") => {
+    setAi("");
+    setData(null);
+    setScanMode(newMode);
+    setView("scanner");
+  };
+
   async function handleProductResult(res: any) {
     setData(res);
     setView("product_results");
@@ -472,7 +479,7 @@ export default function Home() {
 
             {/* AI Scan Button */}
             <button 
-              onClick={() => (setScanMode("face"), setView("scanner"))}
+              onClick={() => resetScanner("face")}
               className="w-full bg-[#F88E7D] border-2 border-[#F88E7D]/20 rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-xl shadow-orange-500/20 text-white"
             >
               <div className="flex items-center gap-4">
@@ -531,7 +538,7 @@ export default function Home() {
                 </div>
               </Link>
               <button 
-                onClick={() => (setScanMode("product"), setView("scanner"))}
+                onClick={() => resetScanner("product")}
                 className="col-span-2 bg-white border border-[#F3EAE8] rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
               >
                 <div className="flex items-center gap-4">
@@ -690,7 +697,7 @@ export default function Home() {
               <button onClick={()=>setView("home")} className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform">
                 <ArrowLeft size={20} />
               </button>
-              <button onClick={()=>setView("scanner")} className="px-6 py-3 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-sm border border-white/20 active:scale-90 transition-transform">
+              <button onClick={()=>resetScanner("face")} className="px-6 py-3 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-sm border border-white/20 active:scale-90 transition-transform">
                 Rescan
               </button>
             </div>
