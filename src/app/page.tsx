@@ -37,6 +37,22 @@ export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoName, setDemoName] = useState("");
 
+  const APP_VERSION = "2.0"; // Increment this to force restart for all users
+
+  // ─── GLOBAL RESTART LOGIC ──────────────────────────────────────────────────
+  useEffect(() => {
+    const savedVersion = localStorage.getItem("velmora_app_version");
+    if (savedVersion !== APP_VERSION) {
+      // Version mismatch! Clear everything and force logout
+      console.log("App version updated. Restarting for all users...");
+      localStorage.clear();
+      localStorage.setItem("velmora_app_version", APP_VERSION);
+      signOut({ redirect: false });
+      setShowLanding(true);
+      setShowOnboarding(false);
+    }
+  }, []);
+
   // ─── SAVE TO CLOUD ───────────────────────────────────────────────────────────
   const saveToCloud = async (payload: object) => {
     try {
