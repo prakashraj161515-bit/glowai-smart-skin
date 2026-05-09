@@ -154,9 +154,8 @@ export default function Home() {
       return;
     }
 
-    // If Google credentials configured → real Google login
-    // Otherwise → show demo name modal
-    const hasGoogle = process.env.NEXT_PUBLIC_HAS_GOOGLE === "true";
+    // Google Login is now ALWAYS the primary option
+    const hasGoogle = true; 
     if (hasGoogle) {
       signIn("google");
     } else {
