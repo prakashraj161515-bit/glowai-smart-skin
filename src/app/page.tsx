@@ -406,115 +406,77 @@ export default function Home() {
             key="landing"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, scale: 0.97 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] bg-white flex flex-col overflow-y-auto"
           >
             {/* Hero Section */}
-            <div className="relative h-[60vh] overflow-hidden flex-shrink-0">
+            <div className="relative h-[45vh] flex-shrink-0 overflow-hidden">
               <img 
-                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=80" 
+                src="https://images.unsplash.com/photo-1596462502278-27bfac4033c8?w=800&q=80" 
                 alt="Velmora Skincare" 
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              {/* Logo */}
-              <div className="absolute top-14 left-0 right-0 flex justify-center">
-                <div className="bg-white/15 backdrop-blur-xl px-8 py-3 rounded-full border border-white/30">
-                  <h1 className="text-3xl font-black text-white tracking-tighter italic">✨ Velmora AI</h1>
-                </div>
-              </div>
-              {/* Hero Text */}
-              <div className="absolute bottom-8 left-6 right-6">
-                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em] mb-2">AI-Powered Skincare</p>
-                <h2 className="text-4xl font-black text-white leading-tight">Your Personal <br/><span className="text-[#F88E7D]">Skin Coach</span></h2>
-                <p className="text-white/70 text-sm mt-3 font-medium">Real AI analysis. Real results. Real glow.</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
+              
+              {/* Floating Logo */}
+              <div className="absolute top-12 left-0 right-0 flex justify-center">
+                <motion.div 
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  className="bg-white/20 backdrop-blur-2xl px-6 py-2 rounded-full border border-white/40 shadow-2xl"
+                >
+                  <h1 className="text-2xl font-black text-white tracking-tighter italic flex items-center gap-2">
+                    <Sparkles size={20} className="text-[#F88E7D]" /> Velmora
+                  </h1>
+                </motion.div>
               </div>
             </div>
 
-            {/* Feature Cards */}
-            <div className="px-5 py-8 space-y-4 flex-1">
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em] mb-5">What Velmora can do</p>
+            {/* Login & Features Container */}
+            <div className="px-6 -mt-16 relative z-10 flex flex-col gap-8 pb-12">
               
-              {/* Feature 1 - AI Skin Scan */}
-              <div className="flex gap-4 bg-gradient-to-r from-blue-50 to-white rounded-[28px] p-4 border border-blue-100 shadow-sm items-center">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-blue-100 flex items-center justify-center text-3xl">
-                  <img src="https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=200&q=80" alt="Skin Scan" className="w-full h-full object-cover absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }} />
-                  <span>🔬</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center"><ScanFace size={14} className="text-white" /></div>
-                    <p className="font-black text-slate-800 text-[13px]">AI Skin Analysis</p>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium leading-snug">Real-time Glow Score, Acne, Oil & Pigmentation detection using Gemini AI Vision.</p>
-                </div>
-              </div>
-
-              {/* Feature 2 - Diet Plan */}
-              <div className="flex gap-4 bg-gradient-to-r from-emerald-50 to-white rounded-[28px] p-4 border border-emerald-100 shadow-sm items-center">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-emerald-100 flex items-center justify-center text-3xl">
-                  <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=200&q=80" alt="Diet Plan" className="w-full h-full object-cover absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }} />
-                  <span>🥗</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center"><Utensils size={14} className="text-white" /></div>
-                    <p className="font-black text-slate-800 text-[13px]">Personalized Diet Plan</p>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium leading-snug">AI-curated food & nutrition plans based on your skin type and country.</p>
-                </div>
-              </div>
-
-              {/* Feature 3 - Product Scanner */}
-              <div className="flex gap-4 bg-gradient-to-r from-orange-50 to-white rounded-[28px] p-4 border border-orange-100 shadow-sm items-center">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-orange-100 flex items-center justify-center text-3xl">
-                  <img 
-                    src="https://images.unsplash.com/photo-1611080626919-7cf5a9dbab12?w=200&q=80" 
-                    alt="Product Scanner" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }}
-                  />
-                  <span className="absolute">🛍️</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-lg bg-orange-400 flex items-center justify-center"><ShoppingBag size={14} className="text-white" /></div>
-                    <p className="font-black text-slate-800 text-[13px]">Product Scanner</p>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium leading-snug">Scan any skincare product to get an AI verdict on ingredients & safety.</p>
-                </div>
-              </div>
-
-              {/* Feature 4 - AI Coach */}
-              <div className="flex gap-4 bg-gradient-to-r from-purple-50 to-white rounded-[28px] p-4 border border-purple-100 shadow-sm items-center">
-                <div className="relative w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 shadow-md bg-purple-100 flex items-center justify-center text-3xl">
-                  <img 
-                    src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&q=80"
-                    alt="AI Coach" 
-                    className="w-full h-full object-cover absolute inset-0"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display="none"; }}
-                  />
-                  <span>🤖</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-7 h-7 rounded-lg bg-purple-500 flex items-center justify-center"><Sparkles size={14} className="text-white" /></div>
-                    <p className="font-black text-slate-800 text-[13px]">AI Skin Coach</p>
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium leading-snug">Chat with your personal AI dermatologist anytime for expert skincare advice.</p>
-                </div>
-              </div>
-
-              {/* CTA */}
-              <div className="pt-4 pb-8 space-y-3">
+              {/* MAIN LOGIN CARD */}
+              <div className="bg-white rounded-[40px] p-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-orange-50 text-center">
+                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.4em] mb-3">Welcome to the future</p>
+                <h2 className="text-3xl font-black text-slate-900 leading-tight mb-6">Analyze Your Skin <br/> With Real AI</h2>
+                
                 <button 
                   onClick={handleLogin}
-                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] flex items-center justify-center gap-3 font-black text-[15px] active:scale-95 transition-transform shadow-xl shadow-orange-500/30"
+                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] flex items-center justify-center gap-4 font-black text-[16px] active:scale-95 transition-transform shadow-xl shadow-orange-500/30 mb-4"
                 >
-                  <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
-                  {status === "authenticated" ? "Enter Velmora" : "Continue with Google"}
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                    <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
+                  </div>
+                  {status === "authenticated" ? "Enter Your Account" : "Login with Google"}
                 </button>
-                <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest">Free • No credit card required</p>
+                
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                  <ShieldCheck size={12} className="text-emerald-500" /> Secure Cloud Sync Enabled
+                </p>
+              </div>
+
+              {/* What we do section */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between px-2">
+                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em]">What you get</p>
+                  <div className="h-px bg-slate-100 flex-1 ml-4" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { icon: <ScanFace className="text-blue-500" />, title: "AI Scan", bg: "bg-blue-50" },
+                    { icon: <Utensils className="text-emerald-500" />, title: "Diet Plan", bg: "bg-emerald-50" },
+                    { icon: <ShoppingBag className="text-orange-500" />, title: "Scanner", bg: "bg-orange-50" },
+                    { icon: <BrainCircuit className="text-purple-500" />, title: "AI Coach", bg: "bg-purple-50" }
+                  ].map((feat, i) => (
+                    <div key={i} className={cn("p-4 rounded-[28px] border border-white shadow-sm flex flex-col gap-3", feat.bg)}>
+                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        {feat.icon}
+                      </div>
+                      <p className="font-black text-slate-800 text-[13px]">{feat.title}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </motion.div>
