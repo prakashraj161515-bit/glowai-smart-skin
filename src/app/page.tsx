@@ -253,6 +253,12 @@ export default function Home() {
   };
 
   const resetScanner = (newMode: "face" | "product") => {
+    // Product scanner is strictly premium
+    if (newMode === "product" && !isPremium) {
+      setScanLimitReached(true);
+      return;
+    }
+    
     if (!canScan) {
       setScanLimitReached(true);
       return;
