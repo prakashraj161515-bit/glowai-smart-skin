@@ -99,8 +99,8 @@ export default function RoutinePage() {
       { b: "Fresh Papaya Bowl", l: "Moringa Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal Bowl" } // SAT
     ];
     
-    // Diet now depends directly on the active day selected in the calendar
-    const diet = diets[activeDay % 7];
+    // Diet now depends on the active day AND the refresh seed for shuffling
+    const diet = diets[(activeDay + dietSeed) % 7];
 
     const getDietImage = (name: string) => {
       const n = name.toLowerCase();
