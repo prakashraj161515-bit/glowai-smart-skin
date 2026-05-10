@@ -144,12 +144,28 @@ export default function DietPage() {
       </header>
 
       <div className="px-6">
-        <div className="mb-8 bg-white/60 border border-white rounded-[32px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md">
-          <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 animate-pulse">
+        <div 
+          onClick={() => {
+            const tips = [
+              "Add Vitamin C rich foods today for natural glow.",
+              "Try green tea instead of coffee for skin hydration.",
+              "Incorporate walnuts for healthy skin barrier oils.",
+              "A cup of papaya helps in natural skin exfoliation.",
+              "Drink warm water with lemon first thing in the morning.",
+              "Avoid dairy for a week to see reduced acne flares.",
+              "Zinc-rich seeds (Pumpkin) help in skin healing.",
+              "Eat more berries for powerful anti-oxidants."
+            ];
+            const randomTip = tips[Math.floor(Math.random() * tips.length)];
+            setDailyTip(randomTip);
+          }}
+          className="mb-8 bg-white/60 border border-white rounded-[32px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md cursor-pointer active:scale-95 transition-transform group"
+        >
+          <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:rotate-180 transition-transform duration-500">
             <RefreshCcw size={22} />
           </div>
-          <div>
-            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Daily Skin Boost • Refreshing</p>
+          <div className="flex-1">
+            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Daily Skin Boost • Tap to Shuffle</p>
             <p className="text-[13px] font-bold text-slate-700 mt-0.5 italic">&quot;{dailyTip}&quot;</p>
           </div>
         </div>
