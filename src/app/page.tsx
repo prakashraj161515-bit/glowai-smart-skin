@@ -798,7 +798,6 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-            </div>
 
             {/* Promo Banner */}
             <div className="relative bg-[#FFEDE8] rounded-[32px] p-8 overflow-hidden flex items-center justify-between group">
