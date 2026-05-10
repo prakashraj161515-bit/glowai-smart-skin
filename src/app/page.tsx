@@ -718,19 +718,8 @@ export default function Home() {
         {view === "home" && (
           <motion.div key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-6 pt-12 space-y-8">
             
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="relative group">
-                  <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-white shadow-sm bg-slate-100 flex items-center justify-center">
-                    {userPic ? (
-                      <img src={userPic} alt="Profile" className="w-full h-full object-cover" />
-                    ) : (
-                      <User size={24} className="text-slate-300" />
-                    )}
-                  </div>
-                  <input 
             {/* HEADER */}
-            <div className="flex justify-between items-center mb-8 px-2">
+            <div className="flex justify-between items-center mb-8 px-2 pt-4">
               <div className="flex items-center gap-4">
                 <div className="relative w-16 h-16">
                   <div className="absolute inset-0 bg-primary-gradient rounded-[22px] rotate-6 opacity-20" />
