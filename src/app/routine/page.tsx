@@ -219,20 +219,22 @@ export default function RoutinePage() {
     const today = new Date().getDay(); // 0-6
     
     const getTargetedDiet = () => {
-      // Base diets for 7 days (Easy to find Indian Fruits & Veggies)
+      // Base diets for 7 days
       const diets = [
         { b: "Fresh Papaya & Pomegranate", l: "Boiled Lauki (Bottle Gourd)", s: "Crunchy Gajar & Cucumber", d: "Steamed Palak Soup" },
         { b: "Seb (Apple) & Banana", l: "Sautéed Gobi & Matar", s: "Beetroot & Kheera Salad", d: "Mixed Veg Soup (Gajar-Tamatar)" },
         { b: "Watermelon (Tarbooj)", l: "Boiled Turai (Ridge Gourd)", s: "Ankurit Moong (Sprouts)", d: "Stir-fry Beans & Carrot" },
-        { b: "Fresh Amrud (Guava) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" },
+        { b: "Guava (Amrud) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" },
         { b: "Orange & Pomegranate", l: "Sautéed Kundru (Ivy Gourd)", s: "Radish (Mooli) Sticks", d: "Lauki Ka Soup" },
         { b: "Green Seb & Grapes", l: "Boiled Karela (Bitter Gourd)", s: "Steamed Moong Dal", d: "Pumpkin (Kaddu) Stew" },
         { b: "Fresh Papaya Bowl", l: "Moringa (Sahjan) Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal & Veggie Bowl" }
       ];
       
-      const dayIdx = (today + (typeof dietSeed !== 'undefined' ? dietSeed : 0)) % 7;
-      const dayDiet = {...diets[dayIdx]};
-      return dayDiet;
+      // Auto-refresh seed based on date string (YYYY-MM-DD)
+      const dateStr = new Date().toISOString().split('T')[0];
+      const seed = dateStr.split('-').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const dayIdx = (seed + (typeof dietSeed !== 'undefined' ? dietSeed : 0)) % 7;
+      return diets[dayIdx];
     };
 
     const diet = getTargetedDiet();
@@ -350,43 +352,26 @@ export default function RoutinePage() {
         <h2 className="text-[20px] font-bold text-slate-800 mb-4">Today&apos;s Progress</h2>
 
         {/* Water Tracker - Premium UI */}
-        <div className="bg-white rounded-[40px] p-8 border border-[#F3EAE8] shadow-sm relative overflow-hidden group mb-8">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/30 rounded-full blur-3xl -mr-16 -mt-16" />
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-500 shadow-inner">
-                  <Droplets size={28} />
-                </div>
-                <div>
-                  <h3 className="text-[17px] font-black text-slate-900">Water Routine</h3>
-                  <p className="text-[10px] text-blue-400 font-black uppercase tracking-widest">Goal: 8 Glasses (250ml each)</p>
-                </div>
+        <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm relative overflow-hidden group mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500">
+                <Droplets size={20} />
               </div>
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => { if(waterIntake > 0) { const n = waterIntake - 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); } }}
-                  className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 active:scale-90 transition-all font-bold border border-slate-100"
-                >
-                  -
-                </button>
-                <div className="flex flex-col items-center min-w-[40px]">
-                  <span className="text-[20px] font-black text-blue-500">{waterIntake}</span>
-                  <span className="text-[10px] font-bold text-slate-300 -mt-1">/8</span>
-                </div>
-                <button 
-                  onClick={() => { const n = waterIntake + 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); }}
-                  className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm active:scale-95 transition-all font-bold"
-                >
-                  +
-                </button>
+              <div>
+                <h3 className="text-[14px] font-bold text-slate-900">Water Intake</h3>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{waterIntake} / 8 Glasses</p>
               </div>
             </div>
-            <div className="flex gap-2.5 h-2">
-              {[1,2,3,4,5,6,7,8].map((i) => (
-                <div key={i} className={cn("flex-1 rounded-full transition-all duration-700 ease-out", i <= waterIntake ? "bg-blue-400 shadow-[0_0_12px_rgba(96,165,250,0.4)]" : "bg-slate-100")} />
-              ))}
+            <div className="flex gap-1">
+              <button onClick={() => { if(waterIntake > 0) { const n = waterIntake - 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); } }} className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 font-bold">-</button>
+              <button onClick={() => { const n = waterIntake + 1; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); }} className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 font-bold">+</button>
             </div>
+          </div>
+          <div className="flex gap-1.5 h-1.5">
+            {[1,2,3,4,5,6,7,8].map((i) => (
+              <div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-blue-400" : "bg-slate-100")} />
+            ))}
           </div>
         </div>
         

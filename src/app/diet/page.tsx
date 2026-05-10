@@ -74,17 +74,59 @@ export default function DietPage() {
 
   const formatText = (content: string) => {
     const lines = content.split('\n');
+    let currentCategory = "";
+    
     return lines.map((line, i) => {
-      if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
+      const trimmed = line.trim();
+      if (!trimmed) return null;
+
+      if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+        currentCategory = trimmed.replace(/\*\*/g, '');
         return (
-          <div key={i} className="text-[14px] font-bold text-[#F88E7D] mt-6 mb-2 tracking-tight uppercase border-b border-[#FDF5F2] pb-1">
-            {line.replace(/\*\*/g, '')}
+          <div key={i} className="flex items-center gap-2 mt-8 mb-4">
+            <div className="h-px bg-slate-200 flex-1" />
+            <span className="text-[10px] font-black text-[#F88E7D] uppercase tracking-[0.3em] whitespace-nowrap">
+              {currentCategory}
+            </span>
+            <div className="h-px bg-slate-200 flex-1" />
           </div>
         );
       }
-      return <div key={i} className="mb-1 text-slate-600 text-[13px] leading-relaxed font-medium">{line}</div>;
+
+      // Render items in boxes
+      return (
+        <motion.div 
+          key={i} 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+          className="bg-white rounded-[24px] p-5 mb-3 border border-orange-50 shadow-sm flex gap-4 items-start"
+        >
+          <div className="w-10 h-10 bg-[#FFEDE8] rounded-xl flex items-center justify-center flex-shrink-0 text-[#F88E7D]">
+            <Droplets size={20} />
+          </div>
+          <div>
+            <p className="text-[13px] font-bold text-slate-800 leading-snug">{trimmed.replace(/^[-*•]\s*/, '')}</p>
+          </div>
+        </motion.div>
+      );
     });
   };
+
+  // ─── DAILY REFRESH LOGIC ────────────────────────────────────────────────────
+  const [dailyTip, setDailyTip] = useState("");
+  useEffect(() => {
+    const tips = [
+      "Add Vitamin C rich foods today for natural glow.",
+      "Try green tea instead of coffee for skin hydration.",
+      "Incorporate walnuts for healthy skin barrier oils.",
+      "A cup of papaya helps in natural skin exfoliation.",
+      "Drink warm water with lemon first thing in the morning."
+    ];
+    // Simple logic to pick a tip based on the day of the year
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    setDailyTip(tips[dayOfYear % tips.length]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FDF5F2] pb-32 font-outfit">
@@ -108,6 +150,17 @@ export default function DietPage() {
       </header>
 
       <div className="px-6">
+        {/* Daily Refresh Box */}
+        <div className="mb-8 bg-white/60 border border-white rounded-[32px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md">
+          <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 animate-pulse">
+            <RefreshCcw size={22} />
+          </div>
+          <div>
+            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Daily Skin Boost • Refreshing</p>
+            <p className="text-[13px] font-bold text-slate-700 mt-0.5 italic">&quot;{dailyTip}&quot;</p>
+          </div>
+        </div>
+
         <AnimatePresence>
           {showSaved && (
             <motion.div
@@ -218,15 +271,15 @@ export default function DietPage() {
         )}
 
         {dietPlan && !isLoading && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-20">
             <div className="flex justify-between items-center bg-white p-5 rounded-[32px] shadow-sm border border-[#F3EAE8]">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#FFEDE8] text-[#F88E7D] rounded-2xl flex items-center justify-center">
                   <Calendar size={22} />
                 </div>
                 <div>
-                  <p className="text-[15px] font-bold text-slate-800">7-Day Plan</p>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nutrition Expert</p>
+                  <p className="text-[15px] font-bold text-slate-800">Your Plan</p>
+                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Personalized AI</p>
                 </div>
               </div>
               <div className="flex gap-2">
@@ -235,13 +288,8 @@ export default function DietPage() {
               </div>
             </div>
 
-            <div className="card p-8 whitespace-pre-wrap relative overflow-hidden bg-white/80 backdrop-blur-sm">
-              <div className="absolute top-0 right-0 p-6 opacity-10">
-                <Sparkles size={64} className="text-[#F88E7D]" />
-              </div>
-              <div className="relative z-10">
-                {formatText(dietPlan)}
-              </div>
+            <div className="space-y-2">
+              {formatText(dietPlan)}
             </div>
 
             <div className="bg-primary-gradient p-8 rounded-[40px] text-white shadow-xl shadow-orange-500/10">
@@ -266,7 +314,6 @@ export default function DietPage() {
             </div>
           </motion.div>
         )}
-      </div>
     </div>
   );
 }
