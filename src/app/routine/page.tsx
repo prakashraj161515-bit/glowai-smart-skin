@@ -89,15 +89,38 @@ export default function RoutinePage() {
     schedule.push({ time: "01:00 PM", type: "skincare", name: "Aqua Fresh Face Wash", label: "Mid-Day Oil Control", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&q=80", color: "bg-cyan-50" });
     schedule.push({ time: "01:15 PM", type: "skincare", name: "Lightweight Hydrator", label: "Post-Wash Care", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200&q=80", color: "bg-cyan-50" });
     
-    const diets = [
-      { b: "Papaya & Pomegranate", l: "Boiled Lauki (Bottle Gourd)", s: "Crunchy Gajar & Cucumber", d: "Steamed Palak Soup" }, // SUN
-      { b: "Seb (Apple) & Banana", l: "Sautéed Gobi & Matar", s: "Beetroot & Kheera Salad", d: "Mixed Veg Soup" }, // MON
-      { b: "Watermelon (Tarbooj)", l: "Boiled Turai (Ridge Gourd)", s: "Ankurit Moong (Sprouts)", d: "Stir-fry Beans" }, // TUE
-      { b: "Guava (Amrud) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" }, // WED
-      { b: "Orange & Pomegranate", l: "Sautéed Kundru (Ivy Gourd)", s: "Radish (Mooli) Sticks", d: "Lauki Ka Soup" }, // THU
-      { b: "Green Seb & Grapes", l: "Boiled Karela (Bitter Gourd)", s: "Steamed Moong Dal", d: "Pumpkin Stew" }, // FRI
-      { b: "Fresh Papaya Bowl", l: "Moringa Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal Bowl" } // SAT
-    ];
+    const countryDiets: Record<string, any[]> = {
+      "India": [
+        { b: "Papaya & Pomegranate", l: "Boiled Lauki (Bottle Gourd)", s: "Crunchy Gajar & Cucumber", d: "Steamed Palak Soup" },
+        { b: "Seb (Apple) & Banana", l: "Sautéed Gobi & Matar", s: "Beetroot & Kheera Salad", d: "Mixed Veg Soup" },
+        { b: "Watermelon (Tarbooj)", l: "Boiled Turai (Ridge Gourd)", s: "Ankurit Moong (Sprouts)", d: "Stir-fry Beans" },
+        { b: "Guava (Amrud) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" },
+        { b: "Orange & Pomegranate", l: "Sautéed Kundru (Ivy Gourd)", s: "Radish (Mooli) Sticks", d: "Lauki Ka Soup" },
+        { b: "Green Seb & Grapes", l: "Boiled Karela (Bitter Gourd)", s: "Steamed Moong Dal", d: "Pumpkin Stew" },
+        { b: "Fresh Papaya Bowl", l: "Moringa Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal Bowl" }
+      ],
+      "USA": [
+        { b: "Greek Yogurt & Berries", l: "Grilled Salmon & Asparagus", s: "Handful of Almonds", d: "Quinoa Veggie Bowl" },
+        { b: "Avocado Toast", l: "Turkey Avocado Wrap", s: "Apple Slices with Peanut Butter", d: "Roasted Chicken & Broccoli" },
+        { b: "Oatmeal with Walnuts", l: "Kale & Chickpea Salad", s: "Carrot Sticks & Hummus", d: "Baked Sweet Potato & Beans" },
+        { b: "Smoothie Bowl", l: "Tuna Salad (No Mayo)", s: "Greek Yogurt", d: "Lentil Pasta & Zucchini" },
+        { b: "Eggs & Spinach", l: "Chicken Breast & Quinoa", s: "Cottage Cheese & Peaches", d: "Grilled Shrimp & Salad" },
+        { b: "Protein Pancakes", l: "Buddha Bowl with Tofu", s: "Trail Mix", d: "Mushroom & Kale Risotto" },
+        { b: "Chia Seed Pudding", l: "Beef & Vegetable Stir-fry", s: "Hard Boiled Egg", d: "Roasted Vegetable Salad" }
+      ],
+      "UK": [
+        { b: "Porridge with Honey", l: "Baked Potato with Beans", s: "Pear Slices", d: "Vegetable Shepherds Pie" },
+        { b: "Poached Eggs on Rye", l: "Roast Beef & Root Veg", s: "Oatcakes & Cheese", d: "Cod & Mushy Peas" },
+        { b: "Bran Flakes & Milk", l: "Chicken & Barley Soup", s: "Yogurt & Walnuts", d: "Grilled Sausages & Mash" },
+        { b: "Muesli with Raspberries", l: "Ploughman's Lunch", s: "Apple & Cheddar", d: "Steak & Kidney Pie" },
+        { b: "Scrambled Eggs", l: "Lamb & Vegetable Stew", s: "Scone & Jam", d: "Fish Cakes & Greens" },
+        { b: "Grilled Mushrooms & Toast", l: "Coronation Chicken Salad", s: "Tea & Digestive", d: "Cottage Pie" },
+        { b: "Kipper on Toast", l: "Lancashire Hotpot", s: "Blueberry Muffin", d: "Bangers & Mash" }
+      ]
+    };
+
+    // Fallback to India diet if country not found
+    const diets = countryDiets[country] || countryDiets["India"];
     
     // Diet now depends on the active day AND the refresh seed for shuffling
     const diet = diets[(activeDay + dietSeed) % 7];
@@ -114,6 +137,9 @@ export default function RoutinePage() {
       if (n.includes("soup") || n.includes("stew") || n.includes("dal")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80";
       if (n.includes("gourd") || n.includes("lauki") || n.includes("pumpkin")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80";
       if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
+      if (n.includes("chicken") || n.includes("beef") || n.includes("turkey") || n.includes("salmon") || n.includes("shrimp")) return "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80";
+      if (n.includes("yogurt") || n.includes("chia") || n.includes("oatmeal") || n.includes("pudding")) return "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&q=80";
+      if (n.includes("toast") || n.includes("pie") || n.includes("muffin") || n.includes("pasta")) return "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&q=80";
       return "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&q=80";
     };
 
@@ -134,7 +160,7 @@ export default function RoutinePage() {
     schedule.push({ time: "10:30 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: waterImg, color: "bg-blue-50" });
 
     return schedule;
-  }, [latestScan, dietSeed, activeDay]);
+  }, [latestScan, dietSeed, activeDay, country]);
 
   useEffect(() => {
     const checkTime = () => {
