@@ -464,25 +464,28 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* What we do section */}
+              {/* Skin Benefits section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-2">
-                  <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.25em]">What you get</p>
+                  <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.25em]">Skin Benefits</p>
                   <div className="h-px bg-slate-100 flex-1 ml-4" />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   {[
-                    { icon: <ScanFace className="text-blue-500" />, title: "AI Scan", bg: "bg-blue-50" },
-                    { icon: <Utensils className="text-emerald-500" />, title: "Diet Plan", bg: "bg-emerald-50" },
-                    { icon: <ShoppingBag className="text-orange-500" />, title: "Scanner", bg: "bg-orange-50" },
-                    { icon: <BrainCircuit className="text-purple-500" />, title: "AI Coach", bg: "bg-purple-50" }
+                    { icon: <Sparkles className="text-blue-500" />, title: "Glass Glow", sub: "Clear Texture", bg: "bg-blue-50" },
+                    { icon: <ShieldCheck className="text-emerald-500" />, title: "Zero Risks", sub: "Safe Products", bg: "bg-emerald-50" },
+                    { icon: <TrendingUp className="text-orange-500" />, title: "Healing Map", sub: "Daily Progress", bg: "bg-orange-50" },
+                    { icon: <Utensils className="text-purple-500" />, title: "Skin Fuel", sub: "Expert Diet", bg: "bg-purple-50" }
                   ].map((feat, i) => (
-                    <div key={i} className={cn("p-4 rounded-[28px] border border-white shadow-sm flex flex-col gap-3", feat.bg)}>
-                      <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                    <div key={i} className={cn("p-5 rounded-[32px] border border-white shadow-sm flex flex-col gap-3", feat.bg)}>
+                      <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm">
                         {feat.icon}
                       </div>
-                      <p className="font-black text-slate-800 text-[13px]">{feat.title}</p>
+                      <div>
+                        <p className="font-black text-slate-800 text-[14px] leading-tight">{feat.title}</p>
+                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">{feat.sub}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
