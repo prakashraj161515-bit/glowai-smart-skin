@@ -36,6 +36,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("All");
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoName, setDemoName] = useState("");
+  const [streak, setStreak] = useState(1);
 
   const APP_VERSION = "2.0"; // Increment this to force restart for all users
 
@@ -115,12 +116,32 @@ export default function Home() {
 
   // ─── SCAN LIMIT LOGIC ──────────────────────────────────────────────────────
   useEffect(() => {
-    const today = new Date().toLocaleDateString();
+    const today = new Date();
+    const todayStr = today.toLocaleDateString();
     const lastScanDate = localStorage.getItem("velmora_last_scan_date");
     const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
     
-    if (lastScanDate !== today) {
-      localStorage.setItem("velmora_last_scan_date", today);
+    // Streak logic
+    const lastLoginStr = localStorage.getItem("velmora_last_login_date");
+    let currentStreak = parseInt(localStorage.getItem("velmora_streak") || "1");
+
+    if (lastLoginStr && lastLoginStr !== todayStr) {
+      const lastLogin = new Date(lastLoginStr);
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      if (lastLogin.toLocaleDateString() === yesterday.toLocaleDateString()) {
+        currentStreak += 1;
+      } else {
+        currentStreak = 1;
+      }
+      localStorage.setItem("velmora_streak", currentStreak.toString());
+    }
+    setStreak(currentStreak);
+    localStorage.setItem("velmora_last_login_date", todayStr);
+
+    if (lastScanDate !== todayStr) {
+      localStorage.setItem("velmora_last_scan_date", todayStr);
       localStorage.setItem("velmora_scan_count", "0");
       setScanCount(0);
     } else {
@@ -773,7 +794,7 @@ export default function Home() {
                   <div className="flex items-center gap-2 mt-1">
                     <div className="flex items-center gap-1 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
                       <Zap size={10} className="text-orange-500 fill-orange-500" />
-                      <span className="text-[9px] font-black text-orange-600 uppercase tracking-tighter">Strike Rate: 98%</span>
+                      <span className="text-[9px] font-black text-orange-600 uppercase tracking-tighter">Login Streak: {streak} Days</span>
                     </div>
                     <p className="text-[11px] text-slate-400 font-medium truncate">Glow Mode On ✨</p>
                   </div>
