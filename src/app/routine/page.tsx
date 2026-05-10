@@ -236,15 +236,29 @@ export default function RoutinePage() {
     setIsAnalyzing(true);
     setAiFeedback("");
     setShowFeedback(true);
-    const dietItems = fullSchedule.filter(i => i.type === "diet").map(i => i.name);
-    const completedDiet = completedItems.filter(name => dietItems.includes(name));
-    const context = `User diet performance analysis...`;
+    
+    const dietItems = fullSchedule.filter(i => i.type === "diet" && !i.name.includes("Glass"));
+    const completedDiet = dietItems.filter(item => completedItems.includes(item.name));
+    const pendingDiet = dietItems.filter(item => !completedItems.includes(item.name));
+
+    const summary = `
+**Today's Diet Summary:**
+${completedDiet.length > 0 ? "✅ **Completed:**\n" + completedDiet.map(i => "- " + i.name).join("\n") : ""}
+${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.name).join("\n") : ""}
+
+**AI Analysis:**
+Analyzing your choices for ${country} lifestyle...
+    `;
+    setAiFeedback(summary);
+
+    const context = `User from ${country} is following a ${gender} diet plan. Today they completed ${completedDiet.length} out of ${dietItems.length} diet items. Completed: ${completedDiet.map(i=>i.name).join(", ")}. Pending: ${pendingDiet.map(i=>i.name).join(", ")}. Provide brief, encouraging feedback.`;
+    
     try {
       const res = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ customPrompt: context }) });
       const data = await res.json();
-      setAiFeedback(data.text);
+      setAiFeedback(summary.replace("Analyzing your choices for " + country + " lifestyle...", data.text));
     } catch {
-      setAiFeedback("Great effort today! ✨");
+      setAiFeedback(summary.replace("Analyzing your choices for " + country + " lifestyle...", "Great effort today! Keep sticking to the plan for better results. ✨"));
     } finally {
       setIsAnalyzing(false);
     }
@@ -349,7 +363,9 @@ export default function RoutinePage() {
       </AnimatePresence>
 
       {!showFeedback && !activeAlarm && (
-        <button onClick={getDailyFeedback} className="fixed bottom-32 right-6 w-16 h-16 bg-[#F88E7D] rounded-full flex items-center justify-center text-white shadow-2xl z-50"><BrainCircuit size={28} /></button>
+        <button onClick={getDailyFeedback} className="fixed bottom-32 right-6 w-16 h-16 bg-primary-gradient rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-500/40 z-50 animate-pulse active:scale-90 transition-transform">
+          <Sparkles size={32} className="fill-white" />
+        </button>
       )}
     </div>
   );
