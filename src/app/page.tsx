@@ -434,7 +434,7 @@ export default function Home() {
                   animate={{ y: 0, opacity: 1 }}
                   className="bg-white/20 backdrop-blur-2xl px-6 py-2 rounded-full border border-white/40 shadow-2xl"
                 >
-                  <h1 className="text-2xl font-black text-white tracking-tighter italic flex items-center gap-2">
+                  <h1 className="text-2xl font-black text-slate-900 tracking-tighter italic flex items-center gap-2">
                     <Sparkles size={20} className="text-[#F88E7D]" /> Velmora
                   </h1>
                 </motion.div>
@@ -447,7 +447,7 @@ export default function Home() {
               {/* MAIN LOGIN CARD */}
               <div className="bg-white rounded-[40px] p-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-orange-50 text-center">
                 <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.4em] mb-3">Welcome to the future</p>
-                <h2 className="text-3xl font-black text-slate-900 leading-tight mb-6">Analyze Your Skin <br/> With Real AI</h2>
+                <h2 className="text-3xl font-black text-slate-900 leading-tight mb-6">Analyze Your Skin <br/> With Ai</h2>
                 
                 <button 
                   onClick={handleLogin}
