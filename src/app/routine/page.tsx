@@ -59,6 +59,27 @@ export default function RoutinePage() {
     setActiveDay(new Date().getDay());
   }, []);
 
+  // Alarm Background Monitor
+  useEffect(() => {
+    const checkTime = () => {
+      const now = new Date();
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const hours12 = hours % 12 || 12;
+      const currentTimeStr = `${hours12.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+
+      fullSchedule.forEach(item => {
+        if (reminders.includes(item.name) && item.time === currentTimeStr && !activeAlarm) {
+          triggerAlarm(item.name);
+        }
+      });
+    };
+
+    const interval = setInterval(checkTime, 30000); // Check every 30s
+    return () => clearInterval(interval);
+  }, [reminders, activeAlarm, fullSchedule]);
+
   const toggleItem = (name: string) => {
     const updated = completedItems.includes(name) 
       ? completedItems.filter(i => i !== name)
@@ -76,33 +97,26 @@ export default function RoutinePage() {
     localStorage.setItem("velmora_reminders", JSON.stringify(updated));
     
     if (!reminders.includes(name)) {
-      // Simulate enabling alarm - small chime
+      // Small chime to confirm enabling
       const chime = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
       chime.volume = 0.2;
       chime.play().catch(() => {});
-      
-      // Simulate a real alarm triggering (for demo)
-      setTimeout(() => {
-        triggerAlarm(name);
-      }, 5000); // Trigger after 5s for demo
     }
   };
 
   const triggerAlarm = (name: string) => {
+    if (activeAlarm) return;
     setActiveAlarm(name);
-    // New premium ringtone: Soft Zen Chime
     const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
     audio.loop = true;
     audio.play().catch(() => {});
     setAlarmAudio(audio);
-    
-    // Auto stop after 1 min
-    setTimeout(() => stopAlarm(), 60000);
   };
 
   const stopAlarm = () => {
     if (alarmAudio) {
       alarmAudio.pause();
+      alarmAudio.currentTime = 0;
       setAlarmAudio(null);
     }
     setActiveAlarm(null);
