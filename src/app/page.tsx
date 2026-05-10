@@ -115,12 +115,22 @@ export default function Home() {
           setShowOnboarding(!done);
         });
 
-    } else if (status === "unauthenticated") {
-      setShowLanding(true);
-      setShowOnboarding(false);
-      setView("home");
+  // ─── SCAN LIMIT LOGIC ──────────────────────────────────────────────────────
+  useEffect(() => {
+    const today = new Date().toLocaleDateString();
+    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
+    const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
+    
+    if (lastScanDate !== today) {
+      localStorage.setItem("velmora_last_scan_date", today);
+      localStorage.setItem("velmora_scan_count", "0");
+      setScanCount(0);
+    } else {
+      setScanCount(count);
     }
-  }, [status, session]);
+  }, []);
+
+  const canScan = isPremium || scanCount < 1;
 
   // ─── LOADING SPLASH SCREEN ──────────────────────────────────────────────────
   if (status === "loading") {
@@ -245,6 +255,10 @@ export default function Home() {
   };
 
   const resetScanner = (newMode: "face" | "product") => {
+    if (!canScan) {
+      setScanLimitReached(true);
+      return;
+    }
     setAi("");
     setData(null);
     setScanMode(newMode);
@@ -284,6 +298,14 @@ export default function Home() {
 
     // Show loading screen immediately with placeholder data
     setView("results");
+    setLoading(true);
+
+    // Update scan count for free users
+    if (!isPremium) {
+      const newCount = scanCount + 1;
+      setScanCount(newCount);
+      localStorage.setItem("velmora_scan_count", newCount.toString());
+    }
     setLoading(true);
     setDeepScanStep(1);
     setData({ image: res.image, score: 0, acne: 0, oil: 0, pigmentation: 0 });
@@ -1063,8 +1085,20 @@ export default function Home() {
                         <div className="flex items-center gap-2 mb-4 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
                           <BrainCircuit size={14} /> Expert Analysis & Solutions
                         </div>
-                        <div className="text-[13px] text-slate-600 leading-relaxed font-medium">
-                          {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
+                        <div className="text-[13px] text-slate-600 leading-relaxed font-medium relative">
+                          {!isPremium && !loading && (
+                            <div className="absolute inset-0 bg-white/60 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-6">
+                              <Lock className="text-[#F88E7D] mb-3" size={24} />
+                              <p className="text-[14px] font-black text-slate-800 leading-tight mb-2">Detailed Report Locked</p>
+                              <p className="text-[10px] text-slate-500 font-bold mb-4">Upgrade to Premium to read full analysis and doctor recommendations.</p>
+                              <Link href="/premium" className="bg-primary-gradient text-white px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20">
+                                Unlock Now ✨
+                              </Link>
+                            </div>
+                          )}
+                          <div className={cn(isPremium ? "" : "blur-sm select-none")}>
+                            {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
+                          </div>
                         </div>
                       </div>
 
@@ -1130,6 +1164,38 @@ export default function Home() {
           </motion.div>
         )}
 
+      </AnimatePresence>
+
+      {/* SCAN LIMIT MODAL */}
+      <AnimatePresence>
+        {scanLimitReached && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[40px] p-8 w-full max-w-[360px] text-center shadow-2xl relative"
+            >
+              <button 
+                onClick={() => setScanLimitReached(false)}
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"
+              >
+                <X size={20} />
+              </button>
+              <div className="w-20 h-20 bg-[#FFEDE8] rounded-[32px] flex items-center justify-center mx-auto mb-6 text-[#F88E7D] shadow-inner">
+                <AlertCircle size={40} />
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 leading-tight mb-2">Scan Limit Reached!</h2>
+              <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mb-8 italic px-4">
+                Free users get 1 scan per day. Upgrade for unlimited analysis.
+              </p>
+              <Link href="/premium" onClick={() => setScanLimitReached(false)} className="w-full h-16 bg-primary-gradient text-white font-black rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-orange-500/20 active:scale-95 transition-transform mb-4">
+                Unlock Unlimited Scans 🔓
+              </Link>
+              <button onClick={() => setScanLimitReached(false)} className="text-[11px] font-black text-slate-300 uppercase tracking-widest">Maybe Later</button>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );

@@ -41,11 +41,11 @@ export default function PremiumPage() {
   ];
 
   const features = [
-    { title: "Advanced Skin Metrics", desc: "Scan wrinkles, dark circles & skin age", icon: Scan, color: "text-blue-500", bg: "bg-blue-50" },
+    { title: "Unlimited Daily Scans", desc: "No limits on AI skin analysis", icon: Scan, color: "text-blue-500", bg: "bg-blue-50" },
     { title: "Download PDF Reports", desc: "Get professional dermatological reports", icon: ShieldCheck, color: "text-green-500", bg: "bg-green-50" },
     { title: "Unlimited AI Coach", desc: "24/7 expert chat with no daily limits", icon: Zap, color: "text-orange-500", bg: "bg-orange-50" },
     { title: "Product Scanner", desc: "Check if products match your skin type", icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
-    { title: "High-Accuracy Deep Scan", desc: "Comparison with 4,000+ clinical images", icon: BrainCircuit, color: "text-pink-500", bg: "bg-pink-50" }
+    { title: "Advanced Skin Metrics", desc: "Scan wrinkles, dark circles & skin age", icon: BrainCircuit, color: "text-pink-500", bg: "bg-pink-50" }
   ];
 
   const handleSubscribe = () => {
