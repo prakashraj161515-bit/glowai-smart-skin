@@ -12,10 +12,21 @@ export default function DietPage() {
   const [error, setError] = useState("");
   const [savedPlans, setSavedPlans] = useState<{id: string, text: string, date: string, concern: string}[]>([]);
   const [showSaved, setShowSaved] = useState(false);
+  const [dailyTip, setDailyTip] = useState("");
 
   useEffect(() => {
     const saved = localStorage.getItem("velmora_saved_diets");
     if (saved) setSavedPlans(JSON.parse(saved));
+
+    const tips = [
+      "Add Vitamin C rich foods today for natural glow.",
+      "Try green tea instead of coffee for skin hydration.",
+      "Incorporate walnuts for healthy skin barrier oils.",
+      "A cup of papaya helps in natural skin exfoliation.",
+      "Drink warm water with lemon first thing in the morning."
+    ];
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    setDailyTip(tips[dayOfYear % tips.length]);
   }, []);
 
   const generateDietPlan = async () => {
@@ -93,7 +104,6 @@ export default function DietPage() {
         );
       }
 
-      // Render items in boxes
       return (
         <motion.div 
           key={i} 
@@ -105,7 +115,7 @@ export default function DietPage() {
           <div className="w-10 h-10 bg-[#FFEDE8] rounded-xl flex items-center justify-center flex-shrink-0 text-[#F88E7D]">
             <Droplets size={20} />
           </div>
-          <div>
+          <div className="flex-1 flex justify-between items-center">
             <p className="text-[13px] font-bold text-slate-800 leading-snug">{trimmed.replace(/^[-*•]\s*/, '')}</p>
           </div>
         </motion.div>
@@ -113,24 +123,8 @@ export default function DietPage() {
     });
   };
 
-  // ─── DAILY REFRESH LOGIC ────────────────────────────────────────────────────
-  const [dailyTip, setDailyTip] = useState("");
-  useEffect(() => {
-    const tips = [
-      "Add Vitamin C rich foods today for natural glow.",
-      "Try green tea instead of coffee for skin hydration.",
-      "Incorporate walnuts for healthy skin barrier oils.",
-      "A cup of papaya helps in natural skin exfoliation.",
-      "Drink warm water with lemon first thing in the morning."
-    ];
-    // Simple logic to pick a tip based on the day of the year
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    setDailyTip(tips[dayOfYear % tips.length]);
-  }, []);
-
   return (
     <div className="min-h-screen bg-[#FDF5F2] pb-32 font-outfit">
-      {/* Header */}
       <header className="px-6 pt-12 flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-[#F3EAE8]">
@@ -150,7 +144,6 @@ export default function DietPage() {
       </header>
 
       <div className="px-6">
-        {/* Daily Refresh Box */}
         <div className="mb-8 bg-white/60 border border-white rounded-[32px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md">
           <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 animate-pulse">
             <RefreshCcw size={22} />
@@ -314,6 +307,7 @@ export default function DietPage() {
             </div>
           </motion.div>
         )}
+      </div>
     </div>
   );
 }
