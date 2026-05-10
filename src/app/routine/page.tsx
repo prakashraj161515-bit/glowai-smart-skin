@@ -90,17 +90,17 @@ export default function RoutinePage() {
     schedule.push({ time: "01:15 PM", type: "skincare", name: "Lightweight Hydrator", label: "Post-Wash Care", image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=200&q=80", color: "bg-cyan-50" });
     
     const diets = [
-      { b: "Fresh Papaya & Pomegranate", l: "Boiled Lauki (Bottle Gourd)", s: "Crunchy Gajar & Cucumber", d: "Steamed Palak Soup" },
-      { b: "Seb (Apple) & Banana", l: "Sautéed Gobi & Matar", s: "Beetroot & Kheera Salad", d: "Mixed Veg Soup (Gajar-Tamatar)" },
-      { b: "Watermelon (Tarbooj)", l: "Boiled Turai (Ridge Gourd)", s: "Ankurit Moong (Sprouts)", d: "Stir-fry Beans & Carrot" },
-      { b: "Guava (Amrud) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" },
-      { b: "Orange & Pomegranate", l: "Sautéed Kundru (Ivy Gourd)", s: "Radish (Mooli) Sticks", d: "Lauki Ka Soup" },
-      { b: "Green Seb & Grapes", l: "Boiled Karela (Bitter Gourd)", s: "Steamed Moong Dal", d: "Pumpkin (Kaddu) Stew" },
-      { b: "Fresh Papaya Bowl", l: "Moringa (Sahjan) Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal & Veggie Bowl" }
+      { b: "Papaya & Pomegranate", l: "Boiled Lauki (Bottle Gourd)", s: "Crunchy Gajar & Cucumber", d: "Steamed Palak Soup" }, // SUN
+      { b: "Seb (Apple) & Banana", l: "Sautéed Gobi & Matar", s: "Beetroot & Kheera Salad", d: "Mixed Veg Soup" }, // MON
+      { b: "Watermelon (Tarbooj)", l: "Boiled Turai (Ridge Gourd)", s: "Ankurit Moong (Sprouts)", d: "Stir-fry Beans" }, // TUE
+      { b: "Guava (Amrud) Slices", l: "Steamed Patta Gobi", s: "Roasted Makhana (Fox Nuts)", d: "Gajar & Methi Sabzi" }, // WED
+      { b: "Orange & Pomegranate", l: "Sautéed Kundru (Ivy Gourd)", s: "Radish (Mooli) Sticks", d: "Lauki Ka Soup" }, // THU
+      { b: "Green Seb & Grapes", l: "Boiled Karela (Bitter Gourd)", s: "Steamed Moong Dal", d: "Pumpkin Stew" }, // FRI
+      { b: "Fresh Papaya Bowl", l: "Moringa Leaves Soup", s: "Cucumber & Mint Salad", d: "Mixed Dal Bowl" } // SAT
     ];
-    const dateStr = new Date().toISOString().split('T')[0];
-    const seed = dateStr.split('-').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const diet = diets[(seed + dietSeed) % 7];
+    
+    // Diet now depends directly on the active day selected in the calendar
+    const diet = diets[activeDay % 7];
 
     const getDietImage = (name: string) => {
       const n = name.toLowerCase();
@@ -134,7 +134,7 @@ export default function RoutinePage() {
     schedule.push({ time: "10:30 PM", type: "diet", name: "Glass 8: Night", label: "Cell Recovery", image: waterImg, color: "bg-blue-50" });
 
     return schedule;
-  }, [latestScan, dietSeed]);
+  }, [latestScan, dietSeed, activeDay]);
 
   useEffect(() => {
     const checkTime = () => {
