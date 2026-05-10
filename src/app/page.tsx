@@ -70,7 +70,14 @@ export default function Home() {
   useEffect(() => {
     if (status === "loading") return;
 
+    // Check if user already entered this session
+    const hasEntered = typeof window !== "undefined" && sessionStorage.getItem("velmora_entered") === "true";
+
     if (status === "authenticated" && session?.user) {
+      // If already entered this session, hide landing immediately
+      if (hasEntered) {
+        setShowLanding(false);
+      }
       // User is logged in
       const googleName = session.user.name || "User";
       const googlePic = session.user.image || null;
@@ -150,6 +157,8 @@ export default function Home() {
   const handleLogin = () => {
     // If already authenticated, just enter the app
     if (status === "authenticated") {
+      // Mark as entered for this session
+      sessionStorage.setItem("velmora_entered", "true");
       setShowLanding(false);
       return;
     }
