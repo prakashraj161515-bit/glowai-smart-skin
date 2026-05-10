@@ -707,8 +707,16 @@ export default function Home() {
                     )}
                   </div>
                   <input 
+            {/* HEADER */}
+            <div className="flex justify-between items-center mb-8 px-2">
+              <div className="flex items-center gap-4">
+                <div className="relative w-16 h-16">
+                  <div className="absolute inset-0 bg-primary-gradient rounded-[22px] rotate-6 opacity-20" />
+                  <div className="w-full h-full rounded-[22px] bg-white border-2 border-white shadow-md overflow-hidden relative z-10 flex items-center justify-center">
+                    {userPic ? <img src={userPic} className="w-full h-full object-cover" alt="User" /> : <User className="text-slate-200" size={32} />}
+                  </div>
+                  <input 
                     type="file" 
-                    accept="image/*"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
@@ -721,7 +729,7 @@ export default function Home() {
                         reader.readAsDataURL(file);
                       }
                     }}
-                    className="absolute inset-0 opacity-0 cursor-pointer"
+                    className="absolute inset-0 opacity-0 cursor-pointer z-20"
                   />
                 </div>
                 <div>
@@ -750,15 +758,24 @@ export default function Home() {
                   <p className="text-[13px] text-slate-400 font-medium mt-0.5">Transform Your Skin&apos;s Health</p>
                 </div>
               </div>
-              <Link href="/routine">
-                <motion.div 
-                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                  className="w-14 h-14 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8]"
-                >
-                  <BrainCircuit size={28} className="text-[#F88E7D]" />
-                </motion.div>
-              </Link>
+              <div className="flex items-center gap-2">
+                {!isPremium && (
+                  <Link href="/premium" className="flex items-center gap-2 bg-[#FFEDE8] px-4 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform">
+                    <Sparkles size={16} className="text-[#F88E7D] fill-[#F88E7D]" />
+                    <span className="text-[11px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
+                  </Link>
+                )}
+                <Link href="/routine">
+                  <motion.div 
+                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="w-12 h-12 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8]"
+                  >
+                    <BrainCircuit size={24} className="text-[#F88E7D]" />
+                  </motion.div>
+                </Link>
+              </div>
+            </div>
             </div>
 
             {/* Promo Banner */}
@@ -771,28 +788,6 @@ export default function Home() {
                 <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?w=300&q=80" alt="Product" className="w-full h-full object-contain rotate-12 transition-transform group-hover:scale-110" />
               </div>
             </div>
-
-            {/* Premium Call to Action */}
-            {!isPremium && (
-              <Link href="/premium">
-                <motion.div 
-                  whileTap={{ scale: 0.98 }}
-                  className="bg-primary-gradient rounded-[32px] p-6 flex items-center justify-between relative overflow-hidden shadow-xl shadow-orange-500/20"
-                >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
-                  <div className="flex items-center gap-4 z-10">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
-                      <Gem size={28} className="fill-white" />
-                    </div>
-                    <div>
-                      <h2 className="text-white font-bold text-[17px]">Unlock Premium ✨</h2>
-                      <p className="text-white/80 text-[11px] font-medium">Get Advanced Skin Metrics</p>
-                    </div>
-                  </div>
-                  <ChevronRight size={22} className="text-white/50" />
-                </motion.div>
-              </Link>
-            )}
 
             {/* AI Scan Button */}
             <button 
