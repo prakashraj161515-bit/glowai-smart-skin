@@ -90,7 +90,8 @@ export default function RoutinePage() {
 
   const triggerAlarm = (name: string) => {
     setActiveAlarm(name);
-    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/135/135-preview.mp3");
+    // New premium ringtone: Soft Zen Chime
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
     audio.loop = true;
     audio.play().catch(() => {});
     setAlarmAudio(audio);
@@ -433,17 +434,24 @@ export default function RoutinePage() {
                       onClick={(e) => { e.stopPropagation(); toggleReminder(item.name); }}
                       className={cn(
                         "p-1.5 rounded-full transition-colors",
-                        reminders.includes(item.name) ? "bg-orange-50 text-[#F88E7D]" : "text-slate-200 hover:text-[#F88E7D]"
+                        reminders.includes(item.name) ? "bg-slate-800 text-white" : "text-slate-300 hover:text-slate-800"
                       )}
                     >
-                      {reminders.includes(item.name) ? <Bell size={12} className="animate-bounce" /> : <BellOff size={12} />}
+                      {reminders.includes(item.name) ? <Bell size={14} className="animate-bounce fill-white" /> : <BellOff size={14} />}
                     </button>
                   </div>
-                  <p className={cn("text-[14px] font-bold text-slate-800 leading-snug", completedItems.includes(item.name) && "line-through opacity-50")}>{item.name}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className={cn("text-[14px] font-bold text-slate-800 leading-snug", completedItems.includes(item.name) && "line-through opacity-50")}>{item.name}</p>
+                    <div 
+                        className={cn(
+                          "w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all",
+                          completedItems.includes(item.name) ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-200 bg-white"
+                        )}
+                      >
+                        {completedItems.includes(item.name) && <CheckCircle2 size={16} />}
+                      </div>
+                  </div>
                 </div>
-                {completedItems.includes(item.name) && (
-                  <div className="text-emerald-500"><CheckCircle2 size={24} /></div>
-                )}
               </div>
             </motion.div>
           ))}
