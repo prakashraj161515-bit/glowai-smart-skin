@@ -820,13 +820,28 @@ export default function Home() {
                   <p className="text-[10px] text-slate-400 font-medium">Expert advice</p>
                 </div>
               </Link>
+
+              <Link href="/store" className="col-span-2 bg-primary-gradient rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-xl shadow-orange-500/10 text-white overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                <div className="flex items-center gap-4 z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
+                    <ShoppingBag size={28} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[17px] font-bold">Skincare Store</p>
+                    <p className="text-[11px] text-white/70 font-medium italic">Curated Products for You</p>
+                  </div>
+                </div>
+                <ChevronRight size={22} className="text-white/50 group-hover:text-white transition-colors z-10" />
+              </Link>
+
               <button 
                 onClick={() => resetScanner("product")}
                 className="col-span-2 bg-white border border-[#F3EAE8] rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
-                    <ShoppingBag size={24} />
+                    <Target size={24} />
                   </div>
                   <div className="text-left">
                     <p className="text-[15px] font-bold text-slate-800">Product Scanner</p>
