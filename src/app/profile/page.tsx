@@ -180,12 +180,54 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <button onClick={() => { nextSignOut(); localStorage.clear(); }} className="w-full h-16 card flex items-center justify-center gap-3 text-red-400 font-bold text-[15px] hover:bg-red-50 border-red-50 transition-colors mt-8">
+        <button 
+          onClick={() => setShowLogoutConfirm(true)} 
+          className="w-full h-16 card flex items-center justify-center gap-3 text-red-400 font-bold text-[15px] hover:bg-red-50 border-red-50 transition-colors mt-8"
+        >
           <LogOut size={20} /> Log Out Account
         </button>
 
         <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest pb-10">Velmora Premium • Build v1.4.0</p>
       </div>
+
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center px-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-[40px] p-8 w-full max-w-sm text-center shadow-2xl"
+            >
+              <div className="w-20 h-20 bg-red-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 text-red-400">
+                <LogOut size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-2">Logout?</h3>
+              <p className="text-[13px] text-slate-400 font-medium mb-8 leading-relaxed">Are you sure you want to log out? You will need to login again to access your routines.</p>
+              
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={handleLogout}
+                  className="w-full h-14 bg-red-400 text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 active:scale-95 transition-transform"
+                >
+                  Yes, Log Out
+                </button>
+                <button 
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="w-full h-14 bg-slate-50 text-slate-400 font-bold rounded-2xl active:scale-95 transition-transform"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
