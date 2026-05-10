@@ -109,7 +109,6 @@ export default function Home() {
             const done = localStorage.getItem("velmora_onboarding_complete") === "true";
             setShowOnboarding(!done);
           }
-        })
         });
     }
   }, [status, session]);
