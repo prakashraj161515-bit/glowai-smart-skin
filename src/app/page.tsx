@@ -720,8 +720,8 @@ export default function Home() {
             <div className="flex justify-between items-center mb-8 px-2 pt-4">
               <div className="flex items-center gap-4">
                 <div className="relative w-16 h-16">
-                  <div className="absolute inset-0 bg-primary-gradient rounded-[22px] rotate-6 opacity-20" />
-                  <div className="w-full h-full rounded-[22px] bg-white border-2 border-white shadow-md overflow-hidden relative z-10 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-primary-gradient rounded-full rotate-6 opacity-20" />
+                  <div className="w-full h-full rounded-full bg-white border-2 border-white shadow-md overflow-hidden relative z-10 flex items-center justify-center">
                     {userPic ? <img src={userPic} className="w-full h-full object-cover" alt="User" /> : <User className="text-slate-200" size={32} />}
                   </div>
                   <input 
@@ -741,7 +741,7 @@ export default function Home() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-20"
                   />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     {isEditingName ? (
                       <input 
@@ -758,13 +758,19 @@ export default function Home() {
                             localStorage.setItem("velmora_user_name", userName);
                           }
                         }}
-                        className="text-[28px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-32"
+                        className="text-[22px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-full whitespace-nowrap"
                       />
                     ) : (
-                      <h1 onClick={() => setIsEditingName(true)} className="text-[28px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors">Hi {userName},</h1>
+                      <h1 onClick={() => setIsEditingName(true)} className="text-[22px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors whitespace-nowrap overflow-hidden text-ellipsis">Hi {userName},</h1>
                     )}
                   </div>
-                  <p className="text-[13px] text-slate-400 font-medium mt-0.5">Transform Your Skin&apos;s Health</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-center gap-1 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
+                      <Zap size={10} className="text-orange-500 fill-orange-500" />
+                      <span className="text-[9px] font-black text-orange-600 uppercase tracking-tighter">Strike Rate: 98%</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-medium truncate">Glow Mode On ✨</p>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
