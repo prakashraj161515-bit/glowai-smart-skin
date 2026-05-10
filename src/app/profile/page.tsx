@@ -23,6 +23,8 @@ export default function ProfilePage() {
   const [userName, setUserName] = useState("User");
   const [profilePic, setProfilePic] = useState("");
   const [isEditingName, setIsEditingName] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
   const nameInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,6 +65,11 @@ export default function ProfilePage() {
       if (typeof reader.result === "string") setProfilePic(reader.result);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleLogout = () => {
+    nextSignOut();
+    localStorage.clear();
   };
 
   if (status === "loading") return <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div></div>;
