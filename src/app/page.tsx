@@ -110,10 +110,9 @@ export default function Home() {
             setShowOnboarding(!done);
           }
         })
-        .catch(() => {
-          const done = localStorage.getItem("velmora_onboarding_complete") === "true";
-          setShowOnboarding(!done);
         });
+    }
+  }, [status, session]);
 
   // ─── SCAN LIMIT LOGIC ──────────────────────────────────────────────────────
   useEffect(() => {
