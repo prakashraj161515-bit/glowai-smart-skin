@@ -772,6 +772,28 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Premium Call to Action */}
+            {!isPremium && (
+              <Link href="/premium">
+                <motion.div 
+                  whileTap={{ scale: 0.98 }}
+                  className="bg-primary-gradient rounded-[32px] p-6 flex items-center justify-between relative overflow-hidden shadow-xl shadow-orange-500/20"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-16 -mt-16" />
+                  <div className="flex items-center gap-4 z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30">
+                      <Gem size={28} className="fill-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-white font-bold text-[17px]">Unlock Premium ✨</h2>
+                      <p className="text-white/80 text-[11px] font-medium">Get Advanced Skin Metrics</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={22} className="text-white/50" />
+                </motion.div>
+              </Link>
+            )}
+
             {/* AI Scan Button */}
             <button 
               onClick={() => resetScanner("face")}
