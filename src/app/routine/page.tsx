@@ -344,7 +344,7 @@ Analyzing your choices for ${country} lifestyle...
 
       <AnimatePresence>
         {activeAlarm && (
-          <motion.div initial={{scale:0.8, opacity:0}} animate={{scale:1, opacity:1}} exit={{scale:0.8, opacity:0}} className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[200] bg-[#F88E7D]/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
+          <motion.div initial={{scale:0.8, opacity:0, x: "-50%"}} animate={{scale:1, opacity:1, x: "-50%"}} exit={{scale:0.8, opacity:0, x: "-50%"}} className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[200] bg-[#F88E7D]/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
             <Bell size={48} className="animate-bounce mb-8" />
             <h2 className="text-4xl font-black mb-2">Time for {activeAlarm}!</h2>
             <button onClick={stopAlarm} className="w-full h-20 bg-white text-[#F88E7D] rounded-[32px] text-2xl font-black uppercase shadow-2xl active:scale-95 transition-transform">Stop Alarm</button>
@@ -354,7 +354,7 @@ Analyzing your choices for ${country} lifestyle...
 
       <AnimatePresence>
         {showFeedback && (
-          <motion.div initial={{opacity:0, y: 100}} animate={{opacity:1, y: 0}} exit={{opacity:0, y: 100}} className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[100dvh] z-[200] bg-white flex flex-col p-8 pb-12 shadow-2xl">
+          <motion.div initial={{opacity:0, y: 100, x: "-50%"}} animate={{opacity:1, y: 0, x: "-50%"}} exit={{opacity:0, y: 100, x: "-50%"}} className="fixed top-0 left-1/2 w-full max-w-[430px] h-[100dvh] z-[200] bg-white flex flex-col p-8 pb-12 shadow-2xl">
             <div className="flex justify-between mb-8"><h3 className="text-lg font-black">AI Skin Coach</h3><button onClick={()=>setShowFeedback(false)}><X size={24} /></button></div>
             <div className="flex-1 overflow-y-auto no-scrollbar">{aiFeedback ? formatMarkdown(aiFeedback) : "Analyzing..."}</div>
             <button onClick={()=>setShowFeedback(false)} className="w-full h-16 flex-shrink-0 bg-[#F88E7D] text-white rounded-[24px] font-black uppercase shadow-xl mt-8 active:scale-95 transition-transform">Got it!</button>

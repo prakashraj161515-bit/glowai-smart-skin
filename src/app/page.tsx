@@ -427,10 +427,10 @@ export default function Home() {
         {showDemoModal && (
           <motion.div
             key="demo-modal"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[200] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            initial={{ opacity: 0, x: "-50%" }}
+            animate={{ opacity: 1, x: "-50%" }}
+            exit={{ opacity: 0, x: "-50%" }}
+            className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[200] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
             onClick={() => setShowDemoModal(false)}
           >
             <motion.div
@@ -472,10 +472,10 @@ export default function Home() {
         {showLanding && (
           <motion.div 
             key="landing"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[100] bg-white flex flex-col overflow-y-auto"
+            initial={{ opacity: 0, x: "-50%" }}
+            animate={{ opacity: 1, x: "-50%" }}
+            exit={{ opacity: 0, x: "-50%" }}
+            className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[100] bg-white flex flex-col overflow-y-auto"
           >
             {/* Hero Section */}
             <div className="relative h-[45vh] flex-shrink-0 overflow-hidden">
@@ -557,10 +557,10 @@ export default function Home() {
         {showOnboarding && (
           <motion.div
             key="onboarding"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[110] bg-white flex flex-col overflow-y-auto"
+            initial={{ opacity: 0, x: "-50%" }}
+            animate={{ opacity: 1, x: "-50%" }}
+            exit={{ opacity: 0, x: "-50%" }}
+            className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[110] bg-white flex flex-col overflow-y-auto"
           >
             {/* Progress Bar */}
             <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
