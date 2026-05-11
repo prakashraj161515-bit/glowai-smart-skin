@@ -26,7 +26,7 @@ export default function RoutinePage() {
   useEffect(() => {
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
     if (savedGender) setGender(savedGender);
-    const savedCountry = localStorage.getItem("velmora_user_country");
+    const savedCountry = localStorage.getItem("velmora_country");
     if (savedCountry) setCountry(savedCountry);
     const scanData = localStorage.getItem("velmora_analysis");
     if (scanData) setLatestScan(JSON.parse(scanData));

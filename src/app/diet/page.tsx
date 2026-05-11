@@ -34,11 +34,14 @@ export default function DietPage() {
     setError("");
     
     let scanContext = "";
+    const country = localStorage.getItem("velmora_country") || "India";
     try {
       const scanData = localStorage.getItem("velmora_analysis");
       if (scanData) {
         const parsed = JSON.parse(scanData);
-        scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%, Gender: ${parsed.gender}.`;
+        scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%, Gender: ${parsed.gender}. My location is ${country}. Please provide a diet plan suitable for ${country} cuisine and food availability.`;
+      } else {
+        scanContext = `My location is ${country}. Please provide a general healthy skin diet plan suitable for ${country} cuisine and food availability.`;
       }
     } catch (e) {}
 

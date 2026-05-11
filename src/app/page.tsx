@@ -229,7 +229,7 @@ export default function Home() {
     localStorage.setItem("velmora_onboarding_complete", "true");
     localStorage.setItem("velmora_user_name", userName);
     localStorage.setItem("velmora_user_gender", gender);
-    localStorage.setItem("velmora_user_country", country);
+    localStorage.setItem("velmora_country", country);
     
     // Save to cloud so it persists across devices
     saveToCloud({
@@ -693,7 +693,7 @@ export default function Home() {
                         <p className="text-slate-400 text-sm mt-2 font-medium">We customize diet and product availability based on your region.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[300px] pr-1">
-                        {["India","USA","UK","UAE","Pakistan","Bangladesh","Canada","Australia","Singapore","Germany"].map(c => (
+                        {["India","USA","UK","UAE","Pakistan","Bangladesh","Canada","Australia","Singapore","Germany","France","Italy","Spain","Japan","South Korea","Brazil"].map(c => (
                           <button
                             key={c}
                             onClick={() => setCountry(c)}

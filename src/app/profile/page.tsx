@@ -31,7 +31,7 @@ export default function ProfilePage() {
   useEffect(() => {
     const premium = localStorage.getItem("velmora_is_premium") === "true";
     const savedGender = localStorage.getItem("velmora_user_gender") as "male" | "female";
-    const savedCountry = localStorage.getItem("velmora_user_country");
+    const savedCountry = localStorage.getItem("velmora_country");
     const savedSkin = localStorage.getItem("velmora_user_skin");
     
     if (savedGender) setGender(savedGender);
@@ -52,7 +52,7 @@ export default function ProfilePage() {
       localStorage.setItem("velmora_user_name", userName);
       localStorage.setItem("velmora_user_pic", profilePic);
       localStorage.setItem("velmora_user_gender", gender);
-      localStorage.setItem("velmora_user_country", country);
+      localStorage.setItem("velmora_country", country);
       localStorage.setItem("velmora_user_skin", skinType);
     }
   }, [isLoaded, userName, profilePic, gender, country, skinType]);
@@ -174,12 +174,9 @@ export default function ProfilePage() {
                 <div>
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Location / Country</p>
                   <select value={country} onChange={(e) => setCountry(e.target.value)} className="bg-transparent text-[15px] font-bold text-slate-800 outline-none cursor-pointer">
-                    <option value="India">India</option>
-                    <option value="USA">USA</option>
-                    <option value="UK">UK</option>
-                    <option value="UAE">UAE</option>
-                    <option value="Pakistan">Pakistan</option>
-                    <option value="Bangladesh">Bangladesh</option>
+                    {["India","USA","UK","UAE","Pakistan","Bangladesh","Canada","Australia","Singapore","Germany","France","Italy","Spain","Japan","South Korea","Brazil"].map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
                   </select>
                 </div>
               </div>
