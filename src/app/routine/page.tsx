@@ -356,7 +356,21 @@ Analyzing your choices for ${country} lifestyle...
         {showFeedback && (
           <motion.div initial={{opacity:0, y: 100, x: "-50%"}} animate={{opacity:1, y: 0, x: "-50%"}} exit={{opacity:0, y: 100, x: "-50%"}} className="fixed top-0 left-1/2 w-full max-w-[430px] h-[100dvh] z-[200] bg-white flex flex-col p-8 pb-12 shadow-2xl">
             <div className="flex justify-between mb-8"><h3 className="text-lg font-black">AI Skin Coach</h3><button onClick={()=>setShowFeedback(false)}><X size={24} /></button></div>
-            <div className="flex-1 overflow-y-auto no-scrollbar">{aiFeedback ? formatMarkdown(aiFeedback) : "Analyzing..."}</div>
+            <div className="flex-1 overflow-y-auto no-scrollbar">
+              {aiFeedback ? formatMarkdown(aiFeedback) : (
+                <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
+                  <div className="relative w-16 h-16">
+                    <div className="absolute inset-0 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Sparkles size={20} className="text-[#F88E7D] animate-pulse" />
+                    </div>
+                  </div>
+                  <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest animate-pulse">
+                    AI is Analyzing...
+                  </p>
+                </div>
+              )}
+            </div>
             <button onClick={()=>setShowFeedback(false)} className="w-full h-16 flex-shrink-0 bg-[#F88E7D] text-white rounded-[24px] font-black uppercase shadow-xl mt-8 active:scale-95 transition-transform">Got it!</button>
           </motion.div>
         )}
