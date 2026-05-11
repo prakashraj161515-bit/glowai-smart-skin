@@ -203,7 +203,7 @@ export default function ProfilePage() {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }} 
-            className="fixed inset-0 z-[200] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center px-6"
+            className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[200] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center px-6"
           >
             <motion.div 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}

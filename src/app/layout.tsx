@@ -16,10 +16,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${outfit.variable} font-outfit bg-[#FDF5F2] min-h-screen`}>
+      <body className={`${inter.variable} ${outfit.variable} font-outfit bg-[#FDF5F2]`}>
         <AuthProvider>
-          <main>{children}</main>
-          <BottomNav />
+          <div className="flex flex-col min-h-screen items-center overflow-x-hidden">
+            <div className="w-full max-w-[430px] min-h-screen bg-[#FDF5F2] relative shadow-[0_0_100px_rgba(248,142,125,0.1)]">
+              <main>{children}</main>
+              <BottomNav />
+            </div>
+          </div>
         </AuthProvider>
       </body>
     </html>
