@@ -96,7 +96,7 @@ export default function Home() {
               localStorage.setItem("velmora_history", JSON.stringify(data.history));
             }
             if (data.gender) { setGender(data.gender); localStorage.setItem("velmora_user_gender", data.gender); }
-            if (data.country) { setCountry(data.country); localStorage.setItem("velmora_user_country", data.country); }
+            if (data.country) { setCountry(data.country); localStorage.setItem("velmora_country", data.country); }
             if (data.skinType) setSkinType(data.skinType);
             
             if (data.onboardingComplete) {
