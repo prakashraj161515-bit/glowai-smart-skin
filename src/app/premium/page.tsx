@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   CheckCircle2, Gem, Sparkles, Zap, ShieldCheck, 
-  ArrowLeft, Star, Gift, ChevronRight, Target, BrainCircuit, Scan
+  ArrowLeft, Star, Gift, ChevronRight, Target, BrainCircuit, Scan, Utensils
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -45,6 +45,7 @@ export default function PremiumPage() {
     { title: "Download PDF Reports", desc: "Get professional dermatological reports", icon: ShieldCheck, color: "text-green-500", bg: "bg-green-50" },
     { title: "Unlimited AI Coach", desc: "24/7 expert chat with no daily limits", icon: Zap, color: "text-orange-500", bg: "bg-orange-50" },
     { title: "Product Scanner", desc: "Check if products match your skin type", icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
+    { title: "Full 7-Day Diet Plan", desc: "Unlock detailed, personalized daily nutrition", icon: Utensils, color: "text-emerald-500", bg: "bg-emerald-50" },
     { title: "Advanced Skin Metrics", desc: "Scan wrinkles, dark circles & skin age", icon: BrainCircuit, color: "text-pink-500", bg: "bg-pink-50" }
   ];
 

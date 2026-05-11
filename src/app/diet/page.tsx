@@ -48,10 +48,11 @@ export default function DietPage() {
     const fullContext = `${scanContext}${userInput ? `\nUser's specific concerns/disease: ${userInput}` : ""}`;
 
     try {
+      const isPremium = localStorage.getItem("velmora_is_premium") === "true";
       const res = await fetch("/api/ai/diet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context: fullContext }),
+        body: JSON.stringify({ context: fullContext, isPremium }),
       });
       const data = await res.json();
       if (data.text) {

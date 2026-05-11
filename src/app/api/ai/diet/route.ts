@@ -5,7 +5,7 @@ import { getSecureKey } from "@/lib/api-key-manager";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { context } = body;
+    const { context, isPremium } = body;
 
     const apiKey = getSecureKey();
     if (!apiKey) {
@@ -18,13 +18,17 @@ export async function POST(req: Request) {
       generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
     });
 
+    const premiumInstruction = isPremium 
+      ? "Generate a FULL, highly detailed 7-day skincare diet plan." 
+      : "Generate a PARTIAL, basic 3-day skincare diet plan sample. At the end, add a note saying: '🌟 Upgrade to Premium to unlock the full 7-day personalized diet plan!'";
+
     const prompt = `
 You are the Velmora Dietitian, a professional assistant. 
 Your primary expertise is skincare-focused nutrition, but you can help with any request.
 
 CORE RESPONSE LOGIC:
 1. IF the user's context or input is related to SKIN, FACE, or DERMATOLOGY:
-   - Generate a detailed 7-day skincare diet plan.
+   - ${premiumInstruction}
    - Use the SPECIAL FORMAT below.
    - Tailor all food recommendations to the USER'S LOCATION mentioned in the context.
 
@@ -35,7 +39,7 @@ CORE RESPONSE LOGIC:
 
 SKIN DIET FORMAT (ONLY for skin-related plans):
 - ALWAYS REPLY IN ENGLISH ONLY.
-- Structure the plan as a clean table or clear list for each day (Day 1 to Day 7).
+- Structure the plan as a clean table or clear list for each day.
 - For each day, include: Breakfast, Mid-Morning Snack, Lunch, Evening Snack, and Dinner.
 - Focus on ingredients that improve skin health (Anti-inflammatory, rich in Zinc, Vitamins A/C/E).
 - Add a "Daily Routine" section at the end for water intake and sleep.

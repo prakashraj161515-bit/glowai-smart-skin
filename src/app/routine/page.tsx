@@ -354,10 +354,10 @@ Analyzing your choices for ${country} lifestyle...
 
       <AnimatePresence>
         {showFeedback && (
-          <motion.div initial={{opacity:0, y: 100}} animate={{opacity:1, y: 0}} exit={{opacity:0, y: 100}} className="fixed top-0 bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[150] bg-white flex flex-col p-8">
+          <motion.div initial={{opacity:0, y: 100}} animate={{opacity:1, y: 0}} exit={{opacity:0, y: 100}} className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] h-[100dvh] z-[200] bg-white flex flex-col p-8 pb-12 shadow-2xl">
             <div className="flex justify-between mb-8"><h3 className="text-lg font-black">AI Skin Coach</h3><button onClick={()=>setShowFeedback(false)}><X size={24} /></button></div>
             <div className="flex-1 overflow-y-auto no-scrollbar">{aiFeedback ? formatMarkdown(aiFeedback) : "Analyzing..."}</div>
-            <button onClick={()=>setShowFeedback(false)} className="w-full h-16 bg-[#F88E7D] text-white rounded-[24px] font-black uppercase shadow-xl mt-8">Got it!</button>
+            <button onClick={()=>setShowFeedback(false)} className="w-full h-16 flex-shrink-0 bg-[#F88E7D] text-white rounded-[24px] font-black uppercase shadow-xl mt-8 active:scale-95 transition-transform">Got it!</button>
           </motion.div>
         )}
       </AnimatePresence>
