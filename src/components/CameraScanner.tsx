@@ -17,28 +17,36 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     async function startCamera() {
       setError(null);
       setIsReady(false);
-      try {
-        const constraints = { 
-          video: { 
-            facingMode: mode === "face" ? "user" : "environment",
-            width: { ideal: 640 },
-            height: { ideal: 480 }
-          } 
-        };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        streamRef = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          setIsReady(true);
+      
+      const tryStream = async (constraints: MediaStreamConstraints) => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia(constraints);
+          streamRef = stream;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            setIsReady(true);
+            return true;
+          }
+        } catch (e) {
+          return false;
         }
-      } catch (err: any) {
-        console.error("Camera access error:", err);
-        if (err.name === "NotAllowedError") {
-          setError("Camera permission denied. Please enable it in your browser settings.");
-        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
-          setError("No camera found on this device.");
-        } else {
-          setError("Could not access camera. Please try again or upload a photo instead.");
+        return false;
+      };
+
+      // Try specific mode first
+      const success = await tryStream({ 
+        video: { 
+          facingMode: mode === "face" ? "user" : "environment",
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        } 
+      });
+
+      if (!success) {
+        // Fallback to any camera
+        const fallbackSuccess = await tryStream({ video: true });
+        if (!fallbackSuccess) {
+          setError("Could not access camera. Please check permissions or upload a photo instead.");
         }
       }
     }
