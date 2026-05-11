@@ -427,7 +427,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+            className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[200] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
             onClick={() => setShowDemoModal(false)}
           >
             <motion.div
@@ -472,7 +472,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-white flex flex-col overflow-y-auto"
+            className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[100] bg-white flex flex-col overflow-y-auto"
           >
             {/* Hero Section */}
             <div className="relative h-[45vh] flex-shrink-0 overflow-hidden">
@@ -484,7 +484,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
               
               {/* Floating Logo */}
-              <div className="absolute top-12 left-0 right-0 flex justify-center">
+              <div className="absolute top-12 left-1/2 -translate-x-1/2 flex justify-center w-full">
                 <motion.div 
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -501,9 +501,9 @@ export default function Home() {
             <div className="px-6 -mt-16 relative z-10 flex flex-col gap-8 pb-12">
               
               {/* MAIN LOGIN CARD */}
-              <div className="bg-white rounded-[40px] p-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-orange-50 text-center">
-                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.4em] mb-3">Welcome to the future</p>
-                <h2 className="text-3xl font-black text-slate-900 leading-tight mb-6">Analyze Your Skin <br/> With Ai</h2>
+              <div className="bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-orange-50 text-center">
+                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.4em] mb-2">Welcome to the future</p>
+                <h2 className="text-2xl font-black text-slate-900 leading-tight mb-5">Analyze Your Skin <br/> With Ai</h2>
                 
                 <button 
                   onClick={handleLogin}
@@ -557,7 +557,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] bg-white flex flex-col overflow-y-auto"
+            className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-[110] bg-white flex flex-col overflow-y-auto"
           >
             {/* Progress Bar */}
             <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
@@ -578,14 +578,14 @@ export default function Home() {
                 {/* Step 1 – Name */}
                 {onboardingStep === 1 && (
                   <div className="flex flex-col flex-1">
-                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
                       <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80" alt="Welcome" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
                         <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 1 of 4</p>
-                        <h2 className="text-3xl font-black text-slate-900 mt-1">Hi! What&apos;s your name? 👋</h2>
+                        <h2 className="text-2xl font-black text-slate-900 mt-1">Hi! What&apos;s your name? 👋</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">We&apos;ll personalize your entire skincare experience just for you.</p>
                       </div>
                       <input
@@ -595,12 +595,12 @@ export default function Home() {
                         placeholder="Enter your name"
                         className="w-full bg-[#FDF5F2] h-16 px-6 rounded-[24px] border-2 border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
                       />
-                      <div className="space-y-3 mt-2">
-                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Premium Features Included</p>
+                      <div className="space-y-2 mt-1">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Premium Features Included</p>
                         <div className="grid grid-cols-2 gap-2">
                           {["🔬 AI Scan", "🥗 Diet Plan", "🛍️ Scanner", "🤖 AI Coach"].map((f, i) => (
-                            <div key={i} className="flex items-center gap-2 bg-[#FDF5F2] rounded-xl px-3 py-2 border border-[#F3EAE8]">
-                              <p className="text-[10px] font-black text-slate-700 uppercase tracking-tight">{f}</p>
+                            <div key={i} className="flex items-center gap-2 bg-[#FDF5F2] rounded-xl px-2.5 py-1.5 border border-[#F3EAE8]">
+                              <p className="text-[9px] font-black text-slate-700 uppercase tracking-tight">{f}</p>
                             </div>
                           ))}
                         </div>
@@ -612,14 +612,14 @@ export default function Home() {
                 {/* Step 2 – Gender */}
                 {onboardingStep === 2 && (
                   <div className="flex flex-col flex-1">
-                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
                       <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" alt="Gender" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
                         <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 4</p>
-                        <h2 className="text-3xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
+                        <h2 className="text-2xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">This helps Velmora understand your hormone balance and skin needs.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
@@ -651,14 +651,14 @@ export default function Home() {
                 {/* Step 3 – Skin Type */}
                 {onboardingStep === 3 && (
                   <div className="flex flex-col flex-1">
-                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
                       <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80" alt="Skin Type" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
                         <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 4</p>
-                        <h2 className="text-3xl font-black text-slate-900 mt-1">Skin type? ✨</h2>
+                        <h2 className="text-2xl font-black text-slate-900 mt-1">Skin type? ✨</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">Select your primary concern or type. You can change this later with a scan.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
@@ -682,14 +682,14 @@ export default function Home() {
                 {/* Step 4 – Country */}
                 {onboardingStep === 4 && (
                   <div className="flex flex-col flex-1">
-                    <div className="relative h-56 flex-shrink-0 overflow-hidden">
+                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
                       <img src="https://images.unsplash.com/photo-1604881988758-f76ad2f7aac1?w=600&q=80" alt="Location" className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
                         <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 4 of 4</p>
-                        <h2 className="text-3xl font-black text-slate-900 mt-1">Where are you? 🌍</h2>
+                        <h2 className="text-2xl font-black text-slate-900 mt-1">Where are you? 🌍</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">We customize diet and product availability based on your region.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-3 overflow-y-auto max-h-[300px] pr-1">
@@ -785,10 +785,10 @@ export default function Home() {
                             localStorage.setItem("velmora_user_name", userName);
                           }
                         }}
-                        className="text-[22px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-full whitespace-nowrap"
+                        className="text-[20px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-full"
                       />
                     ) : (
-                      <h1 onClick={() => setIsEditingName(true)} className="text-[22px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors whitespace-nowrap overflow-hidden text-ellipsis">Hi {userName},</h1>
+                      <h1 onClick={() => setIsEditingName(true)} className="text-[20px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors truncate max-w-[120px]">Hi {userName},</h1>
                     )}
                   </div>
                   <div className="flex items-center gap-2 mt-1">
@@ -802,9 +802,9 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2">
                 {!isPremium && (
-                  <Link href="/premium" className="flex items-center gap-2 bg-[#FFEDE8] px-4 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform">
-                    <Sparkles size={16} className="text-[#F88E7D] fill-[#F88E7D]" />
-                    <span className="text-[11px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
+                  <Link href="/premium" className="flex items-center gap-2 bg-[#FFEDE8] px-3 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform flex-shrink-0">
+                    <Sparkles size={14} className="text-[#F88E7D] fill-[#F88E7D]" />
+                    <span className="text-[10px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
                   </Link>
                 )}
                 <Link href="/routine">
@@ -820,12 +820,12 @@ export default function Home() {
             </div>
 
             {/* Promo Banner */}
-            <div className="relative bg-[#FFEDE8] rounded-[32px] p-8 overflow-hidden flex items-center justify-between group">
-              <div className="z-10 max-w-[140px]">
-                <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-widest mb-1.5">Find the right</p>
-                <h2 className="text-[22px] font-bold text-slate-800 leading-tight italic">Cream for your Skin</h2>
+            <div className="relative bg-[#FFEDE8] rounded-[32px] p-6 overflow-hidden flex items-center justify-between group">
+              <div className="z-10 max-w-[120px]">
+                <p className="text-[9px] font-black text-[#F88E7D] uppercase tracking-widest mb-1">Find the right</p>
+                <h2 className="text-[18px] font-bold text-slate-800 leading-tight italic">Cream for your Skin</h2>
               </div>
-              <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center p-4">
+              <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center p-2">
                 <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?w=300&q=80" alt="Product" className="w-full h-full object-contain rotate-12 transition-transform group-hover:scale-110" />
               </div>
             </div>

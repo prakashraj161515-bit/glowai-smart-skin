@@ -281,11 +281,11 @@ Analyzing your choices for ${country} lifestyle...
         </button>
       </header>
 
-      <div className="px-6 flex justify-between gap-2 mb-8">
+      <div className="px-4 grid grid-cols-7 gap-1 mb-8">
         {days.map((day, idx) => (
-          <button key={idx} onClick={() => setActiveDay(idx)} className={cn("flex-1 py-4 rounded-[24px] flex flex-col items-center justify-center gap-1 transition-all", activeDay === idx ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]")}>
-            <span className="text-[11px] font-black tracking-widest">{day.label}</span>
-            {activeDay === idx && <div className="w-1.5 h-1.5 rounded-full bg-white mt-1" />}
+          <button key={idx} onClick={() => setActiveDay(idx)} className={cn("py-3 rounded-[20px] flex flex-col items-center justify-center gap-1 transition-all", activeDay === idx ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]")}>
+            <span className="text-[9px] font-black tracking-tighter">{day.label}</span>
+            {activeDay === idx && <div className="w-1 h-1 rounded-full bg-white mt-0.5" />}
           </button>
         ))}
       </div>
