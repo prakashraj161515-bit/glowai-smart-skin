@@ -9,22 +9,37 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isReady, setIsReady] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let streamRef: MediaStream | null = null;
     
     async function startCamera() {
+      setError(null);
+      setIsReady(false);
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: { facingMode: mode === "face" ? "user" : "environment", width: 640, height: 480 } 
-        });
+        const constraints = { 
+          video: { 
+            facingMode: mode === "face" ? "user" : "environment",
+            width: { ideal: 640 },
+            height: { ideal: 480 }
+          } 
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         streamRef = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           setIsReady(true);
         }
-      } catch (err) {
-        console.error("Camera access denied", err);
+      } catch (err: any) {
+        console.error("Camera access error:", err);
+        if (err.name === "NotAllowedError") {
+          setError("Camera permission denied. Please enable it in your browser settings.");
+        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+          setError("No camera found on this device.");
+        } else {
+          setError("Could not access camera. Please try again or upload a photo instead.");
+        }
       }
     }
 
@@ -94,6 +109,22 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
         muted 
         className="w-full h-full object-cover" 
       />
+
+      {/* Error Message Overlay */}
+      {error && (
+        <div className="absolute inset-0 z-[60] bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
+          <div className="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-400 mb-4 animate-pulse">
+            <Camera size={32} />
+          </div>
+          <p className="text-sm font-bold mb-6 text-red-200">{error}</p>
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            className="bg-white text-slate-900 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+          >
+            Upload Photo Instead
+          </button>
+        </div>
+      )}
 
       {/* Flash Effect Overlay */}
       {showFlash && (

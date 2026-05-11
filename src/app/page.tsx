@@ -32,6 +32,7 @@ export default function Home() {
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
   const [scanLimitReached, setScanLimitReached] = useState(false);
+  const [limitReason, setLimitReason] = useState<"limit" | "premium">("limit");
   const [scanCount, setScanCount] = useState(0);
   const [activeTab, setActiveTab] = useState("All");
   const [showDemoModal, setShowDemoModal] = useState(false);
@@ -276,11 +277,13 @@ export default function Home() {
   const resetScanner = (newMode: "face" | "product") => {
     // Product scanner is strictly premium
     if (newMode === "product" && !isPremium) {
+      setLimitReason("premium");
       setScanLimitReached(true);
       return;
     }
     
     if (!canScan) {
+      setLimitReason("limit");
       setScanLimitReached(true);
       return;
     }
@@ -1204,9 +1207,14 @@ export default function Home() {
               <div className="w-20 h-20 bg-[#FFEDE8] rounded-[32px] flex items-center justify-center mx-auto mb-6 text-[#F88E7D] shadow-inner">
                 <AlertCircle size={40} />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 leading-tight mb-2">Scan Limit Reached!</h2>
+              <h2 className="text-2xl font-black text-slate-900 leading-tight mb-2">
+                {limitReason === "premium" ? "Premium Feature!" : "Scan Limit Reached!"}
+              </h2>
               <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mb-8 italic px-4">
-                Free users get 1 scan per day. Upgrade for unlimited analysis.
+                {limitReason === "premium" 
+                  ? "Product scanning is exclusive to Velmora Premium members."
+                  : "Free users get 1 scan per day. Upgrade for unlimited analysis."
+                }
               </p>
               <Link href="/premium" onClick={() => setScanLimitReached(false)} className="w-full h-16 bg-primary-gradient text-white font-black rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-orange-500/20 active:scale-95 transition-transform mb-4">
                 Unlock Unlimited Scans 🔓
