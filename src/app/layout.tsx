@@ -10,6 +10,7 @@ const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 export const metadata: Metadata = {
   title: "Velmora – Smart Skin Analysis",
   description: "AI-powered personalized skin analysis and coaching app.",
+  themeColor: "#FDF5F2",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
