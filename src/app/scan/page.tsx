@@ -84,15 +84,15 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <header className="flex items-center gap-4">
-        <button onClick={() => router.back()} className="glass-button p-2 rounded-full">
-          <RefreshCcw size={18} />
+    <div className="min-h-screen bg-[#FDF5F2] px-6 pt-12 pb-32 font-outfit">
+      <header className="flex items-center gap-4 mb-8">
+        <button onClick={() => router.back()} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-slate-100">
+          <ChevronLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold font-outfit">Skin Analysis</h1>
+        <h1 className="text-xl font-bold text-slate-800">Skin Analysis</h1>
       </header>
 
-      <div className="relative aspect-[3/4] rounded-3xl overflow-hidden glass-card flex flex-col items-center justify-center bg-black border border-purple-500/20 shadow-2xl shadow-purple-500/10">
+      <div className="relative aspect-[3/4] rounded-[40px] overflow-hidden glass-card flex flex-col items-center justify-center bg-black border border-purple-500/20 shadow-2xl shadow-purple-500/10 mb-8">
         {/* Camera Feed */}
         {!error ? (
           <video 
@@ -111,7 +111,7 @@ export default function ScanPage() {
 
         {/* Scan Frame Overlay */}
         <div className="absolute inset-0 border-[40px] border-black/40 pointer-events-none">
-          <div className="w-full h-full border-2 border-purple-500/30 rounded-[40px] relative">
+          <div className="w-full h-full border-2 border-purple-500/30 rounded-[32px] relative">
             <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-purple-400 rounded-tl-xl" />
             <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-purple-400 rounded-tr-xl" />
             <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-purple-400 rounded-bl-xl" />
@@ -134,12 +134,12 @@ export default function ScanPage() {
         {/* Progress Overlay */}
         {scanning && (
           <div className="absolute inset-x-0 bottom-12 px-8 z-30">
-            <div className="glass-card p-4 bg-background/80 backdrop-blur-xl border border-white/10">
+            <div className="glass-card p-4 bg-white/80 backdrop-blur-xl border border-white/10 rounded-3xl">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-purple-400">{analysisStatus}</span>
-                <span className="text-xs font-bold">{progress}%</span>
+                <span className="text-[10px] font-black text-purple-600 uppercase tracking-widest">{analysisStatus}</span>
+                <span className="text-[10px] font-black text-slate-800">{progress}%</span>
               </div>
-              <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+              <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div 
                   className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
                   initial={{ width: 0 }}
@@ -154,20 +154,28 @@ export default function ScanPage() {
       {!scanning && !error && (
         <button 
           onClick={handleScan}
-          className="w-full h-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg shadow-purple-500/20 active:scale-[0.98] transition-transform"
+          className="w-full h-16 bg-primary-gradient rounded-[24px] font-black text-white text-[15px] uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-orange-500/20 active:scale-95 transition-transform mb-6"
         >
           <Camera size={24} /> Start Face Scan
         </button>
       )}
 
-      <div className="glass-card p-4 flex gap-3">
-        <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+      <div className="bg-white rounded-[32px] p-5 border border-[#F3EAE8] shadow-sm flex gap-4">
+        <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-400 shrink-0">
           <Info size={18} />
         </div>
-        <p className="text-[11px] text-slate-400 leading-relaxed">
+        <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
           For best results, ensure you are in a well-lit area and have removed any makeup or glasses. Keep a neutral expression.
         </p>
       </div>
     </div>
+  );
+}
+
+function ChevronLeft({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
   );
 }

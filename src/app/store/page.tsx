@@ -123,7 +123,7 @@ export default function StorePage() {
   return (
     <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
       {/* Header */}
-      <header className="px-6 pt-12 pb-6 flex items-center justify-between sticky top-0 bg-[#FDF5F2]/80 backdrop-blur-md z-50">
+      <header className="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-6 pt-12 pb-6 flex items-center justify-between bg-[#FDF5F2]/80 backdrop-blur-md z-50">
         <Link href="/" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-[#F3EAE8]">
           <ChevronLeft size={24} />
         </Link>
@@ -217,7 +217,7 @@ export default function StorePage() {
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[48px] z-[110] min-h-[60vh] max-h-[90vh] flex flex-col"
+              className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white rounded-t-[48px] z-[110] min-h-[60vh] max-h-[90vh] flex flex-col overscroll-none"
             >
               <div className="px-8 pt-10 pb-6 flex items-center justify-between">
                 <div className="flex items-center gap-3">

@@ -29,7 +29,7 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 px-8 pb-8 pt-3 bg-gradient-to-t from-[#FDF5F2] via-[#FDF5F2]/90 to-transparent pointer-events-none z-50 max-w-[430px] mx-auto">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-8 pb-8 pt-3 bg-gradient-to-t from-[#FDF5F2] via-[#FDF5F2]/90 to-transparent pointer-events-none z-50">
       <nav className="h-20 bg-white border border-[#F3EAE8] rounded-[32px] shadow-2xl shadow-orange-500/10 px-4 flex items-center justify-around pointer-events-auto overflow-hidden">
         {navItems.map((item) => {
           const isActive = pathname === item.href;

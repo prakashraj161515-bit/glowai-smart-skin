@@ -300,7 +300,7 @@ export default function CoachPage() {
       </div>
 
       {/* Input & Limit Area */}
-      <div className="fixed bottom-[90px] left-6 right-6 z-40 space-y-2">
+      <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 w-full max-w-[430px] px-6 z-40 space-y-2">
         {/* Limit Warning */}
         {!isPremium && (
           <div className="flex items-center justify-between px-4 py-2 bg-white/50 backdrop-blur-md rounded-2xl border border-white/50 text-[10px] font-black text-slate-500 uppercase tracking-tight">

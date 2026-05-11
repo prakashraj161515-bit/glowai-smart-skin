@@ -135,7 +135,7 @@ export default function PremiumPage() {
       </div>
 
       {/* Footer Button - Lifted to avoid BottomNav overlap */}
-      <div className="fixed bottom-[85px] left-0 right-0 p-6 bg-gradient-to-t from-[#F4F6FF] via-[#F4F6FF] to-transparent z-40">
+      <div className="fixed bottom-[85px] left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-[#F4F6FF] via-[#F4F6FF] to-transparent z-40">
         <button 
           onClick={handleSubscribe}
           className="w-full h-16 bg-primary-gradient rounded-[24px] text-white font-black text-lg shadow-2xl shadow-purple-500/30 active:scale-95 transition-transform flex items-center justify-center gap-3"

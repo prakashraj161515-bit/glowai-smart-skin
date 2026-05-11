@@ -1188,7 +1188,7 @@ export default function Home() {
       {/* SCAN LIMIT MODAL */}
       <AnimatePresence>
         {scanLimitReached && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
+          <div className="fixed inset-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-6">
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
