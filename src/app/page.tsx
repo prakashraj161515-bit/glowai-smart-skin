@@ -512,9 +512,10 @@ export default function Home() {
                 {/* Step 1 – Name */}
                 {onboardingStep === 1 && (
                   <div className="flex flex-col flex-1">
-                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
-                      <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=600&q=80" alt="Welcome" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                    <div className="pt-14 px-6 pb-4">
+                      <div className="w-16 h-16 bg-[#FDF5F2] rounded-2xl flex items-center justify-center border-2 border-[#F3EAE8] mb-4">
+                        <User size={32} className="text-[#F88E7D]" />
+                      </div>
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
@@ -546,9 +547,10 @@ export default function Home() {
                 {/* Step 2 – Gender */}
                 {onboardingStep === 2 && (
                   <div className="flex flex-col flex-1">
-                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
-                      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&q=80" alt="Gender" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                    <div className="pt-14 px-6 pb-4">
+                      <div className="w-16 h-16 bg-[#FDF5F2] rounded-2xl flex items-center justify-center border-2 border-[#F3EAE8] mb-4">
+                        <ScanFace size={32} className="text-[#F88E7D]" />
+                      </div>
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
@@ -558,9 +560,9 @@ export default function Home() {
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         {[
-                          { g: "male", emoji: "👨", img: "https://images.unsplash.com/photo-1500048993953-d23a436266cf?w=200&q=80" },
-                          { g: "female", emoji: "👩", img: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=200&q=80" },
-                        ].map(({ g, emoji, img }) => (
+                          { g: "male", emoji: "👨", color: "bg-blue-50" },
+                          { g: "female", emoji: "👩", color: "bg-rose-50" },
+                        ].map(({ g, emoji, color }) => (
                           <button
                             key={g}
                             onClick={() => setGender(g as "male" | "female")}
@@ -569,11 +571,11 @@ export default function Home() {
                               gender === g ? "border-[#F88E7D] shadow-xl shadow-orange-500/20" : "border-slate-100"
                             )}
                           >
-                            <div className="h-32 overflow-hidden">
-                              <img src={img} alt={g} className="w-full h-full object-cover" />
+                            <div className={cn("h-32 flex items-center justify-center text-5xl transition-transform active:scale-90", color)}>
+                              {emoji}
                             </div>
                             <div className={cn("py-3 flex items-center justify-center gap-2 font-black text-sm uppercase tracking-wider", gender === g ? "bg-[#F88E7D] text-white" : "bg-white text-slate-500")}>
-                              <span>{emoji}</span> {g}
+                              {g}
                             </div>
                           </button>
                         ))}
