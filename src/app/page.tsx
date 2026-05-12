@@ -543,10 +543,10 @@ export default function Home() {
         {showOnboarding && (
           <motion.div
             key="onboarding"
-            initial={{ opacity: 0, x: "-50%" }}
-            animate={{ opacity: 1, x: "-50%" }}
-            exit={{ opacity: 0, x: "-50%" }}
-            className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[110] bg-white flex flex-col overflow-y-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] bg-[#FDF5F2] flex flex-col md:left-1/2 md:-translate-x-1/2 md:max-w-[430px] md:shadow-2xl overflow-hidden"
           >
             {/* Progress Bar */}
             <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
@@ -564,18 +564,21 @@ export default function Home() {
                 transition={{ duration: 0.25 }}
                 className="flex-1 flex flex-col"
               >
-                {/* Step 1 – Benefits */}
                 {onboardingStep === 1 && (
-                  <div className="flex flex-col flex-1 px-6">
-                    <div className="pt-14 pb-8 text-center">
-                      <div className="w-20 h-20 bg-orange-50 rounded-[28px] flex items-center justify-center mx-auto mb-6 shadow-xl shadow-orange-500/10">
-                        <Sparkles size={40} className="text-[#F88E7D]" />
-                      </div>
-                      <h2 className="text-3xl font-black text-slate-900 leading-tight">Get your Glow back in <span className="text-[#F88E7D]">30 Days</span> ✨</h2>
-                      <p className="text-slate-400 mt-4 font-medium">Join 50,000+ users transforming their skin health with AI.</p>
+                  <div className="flex flex-col flex-1 px-8">
+                    <div className="pt-10 pb-8 text-center">
+                      <motion.div 
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="w-24 h-24 bg-white rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-white"
+                      >
+                        <Sparkles size={48} className="text-[#F88E7D]" />
+                      </motion.div>
+                      <h2 className="text-[34px] font-black text-slate-900 leading-[1.1] tracking-tight">Your Journey to <span className="text-[#F88E7D]">Perfect Glow</span></h2>
+                      <p className="text-slate-400 mt-5 text-[17px] font-medium leading-relaxed">Join 50,000+ users transforming their skin health with AI.</p>
                     </div>
                     
-                    <div className="space-y-6 mt-4">
+                    <div className="space-y-4 mt-2">
                       {[
                         { icon: "✨", title: "Glass Skin Glow", desc: "Scientific routines to achieve that perfect radiance." },
                         { icon: "🛡️", title: "Healthier Skin Barrier", desc: "Strengthen your skin against pollution and stress." },
@@ -583,18 +586,18 @@ export default function Home() {
                         { icon: "🎯", title: "Targeted Results", desc: "Clear acne, dark spots, and texture in 30 days." }
                       ].map((benefit, i) => (
                         <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.1 }}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.2 + (i * 0.1) }}
                           key={i} 
-                          className="flex gap-4 items-start"
+                          className="flex gap-5 items-center p-4 rounded-[24px] bg-white/60 border border-white shadow-[0_8px_20px_rgba(0,0,0,0.02)] backdrop-blur-sm"
                         >
-                          <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-xl flex-shrink-0">
+                          <div className="w-14 h-14 rounded-[18px] bg-[#FDF5F2] flex items-center justify-center text-2xl flex-shrink-0">
                             {benefit.icon}
                           </div>
                           <div>
-                            <h3 className="font-bold text-slate-800 text-[15px]">{benefit.title}</h3>
-                            <p className="text-slate-400 text-xs mt-0.5 leading-relaxed font-medium">{benefit.desc}</p>
+                            <h3 className="font-bold text-slate-900 text-[17px]">{benefit.title}</h3>
+                            <p className="text-slate-400 text-[13px] mt-0.5 font-medium leading-snug">{benefit.desc}</p>
                           </div>
                         </motion.div>
                       ))}
