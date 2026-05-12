@@ -555,7 +555,8 @@ export default function Home() {
               ))}
             </div>
 
-            <AnimatePresence mode="wait">
+            <div className="flex-1 overflow-y-auto">
+              <AnimatePresence mode="wait">
               <motion.div
                 key={onboardingStep}
                 initial={{ opacity: 0, x: 40 }}
@@ -565,8 +566,8 @@ export default function Home() {
                 className="flex-1 flex flex-col"
               >
                 {onboardingStep === 1 && (
-                  <div className="flex flex-col flex-1 px-8">
-                    <div className="pt-10 pb-8 text-center">
+                  <div className="flex flex-col px-8 pb-10">
+                    <div className="pt-6 pb-6 text-center">
                       <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
@@ -715,7 +716,8 @@ export default function Home() {
                 )}
 
               </motion.div>
-            </AnimatePresence>
+              </AnimatePresence>
+            </div>
 
             {/* Bottom Buttons */}
             <div className="px-6 pb-10 pt-4 flex-shrink-0 space-y-3">
