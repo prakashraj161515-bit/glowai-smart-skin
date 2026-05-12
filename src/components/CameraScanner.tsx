@@ -46,7 +46,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
         // Fallback to any camera
         const fallbackSuccess = await tryStream({ video: true });
         if (!fallbackSuccess) {
-          setError("Could not access camera. Please check permissions or upload a photo instead.");
+          setError(mode === "face" ? "Could not access camera. Please check permissions." : "Could not access camera. Please check permissions or upload a photo instead.");
         }
       }
     }
@@ -126,10 +126,10 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
           </div>
           <p className="text-sm font-bold mb-6 text-red-200">{error}</p>
           <button 
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => mode === "face" ? window.location.reload() : fileInputRef.current?.click()}
             className="bg-white text-slate-900 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
           >
-            Upload Photo Instead
+            {mode === "face" ? "Refresh App" : "Upload Photo Instead"}
           </button>
         </div>
       )}
@@ -178,12 +178,16 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       <div className="absolute bottom-6 inset-x-0 flex flex-col items-center gap-4 px-6">
         <div className="flex items-center gap-6">
           {/* Upload Button */}
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="w-12 h-12 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all"
-          >
-            <Upload size={20} />
-          </button>
+          {mode === "product" ? (
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="w-12 h-12 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all"
+            >
+              <Upload size={20} />
+            </button>
+          ) : (
+            <div className="w-12 h-12" />
+          )}
 
           <input 
             type="file" 
