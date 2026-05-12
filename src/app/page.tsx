@@ -121,15 +121,26 @@ export default function Home() {
             }
             if (data.gender) { setGender(data.gender); localStorage.setItem("velmora_user_gender", data.gender); }
             if (data.country) { setCountry(data.country); localStorage.setItem("velmora_country", data.country); }
-            if (data.skinType) setSkinType(data.skinType);
+            if (data.skinType) { setSkinType(data.skinType); localStorage.setItem("velmora_user_skin_type", data.skinType); }
             
+            // Restore Premium & Scan Limits
+            if (data.isPremium) {
+              setIsPremium(true);
+              localStorage.setItem("velmora_is_premium", "true");
+            }
+            if (data.scanCount !== undefined) {
+              setScanCount(data.scanCount);
+              localStorage.setItem("velmora_scan_count", data.scanCount.toString());
+            }
+            if (data.lastScanDate) {
+              localStorage.setItem("velmora_last_scan_date", data.lastScanDate);
+            }
+
             if (data.onboardingComplete) {
               localStorage.setItem("velmora_onboarding_complete", "true");
               setShowOnboarding(false);
-              // Removed auto-hide landing
             } else {
               setShowOnboarding(true);
-              // Removed auto-hide landing
             }
           } else {
             const done = localStorage.getItem("velmora_onboarding_complete") === "true";
@@ -244,9 +255,13 @@ export default function Home() {
 
   const handleLogout = () => {
     signOut();
-    localStorage.removeItem("velmora_auth_status");
-    localStorage.removeItem("velmora_onboarding_complete");
+    localStorage.clear();
     setShowLanding(true);
+    // Reset local state to prevent "flash" of old data
+    setHistory([]);
+    setUserName("");
+    setIsPremium(false);
+    setScanCount(0);
   };
 
   const completeOnboarding = () => {
@@ -430,6 +445,9 @@ export default function Home() {
         country,
         skinType: detectedType,
         onboardingComplete: true,
+        scanCount: isPremium ? 0 : (scanCount + 1),
+        lastScanDate: new Date().toLocaleDateString(),
+        isPremium
       });
 
       if (showOnboarding) setOnboardingStep(5);

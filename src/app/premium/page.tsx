@@ -49,9 +49,22 @@ export default function PremiumPage() {
     { title: "Advanced Skin Metrics", desc: "Scan wrinkles, dark circles & skin age", icon: BrainCircuit, color: "text-pink-500", bg: "bg-pink-50" }
   ];
 
-  const handleSubscribe = () => {
+  const saveToCloud = async (payload: object) => {
+    try {
+      await fetch("/api/user/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      console.warn("Cloud save failed:", e);
+    }
+  };
+
+  const handleSubscribe = async () => {
     alert("This is a demo. Integrating payment gateway...");
     localStorage.setItem("velmora_is_premium", "true");
+    await saveToCloud({ isPremium: true });
     router.push("/profile");
   };
 
