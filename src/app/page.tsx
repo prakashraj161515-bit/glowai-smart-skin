@@ -495,7 +495,7 @@ export default function Home() {
           >
             {/* Progress Bar */}
             <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
-              {[1,2,3].map(s => (
+              {[1,2].map(s => (
                 <div key={s} className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", onboardingStep >= s ? "bg-[#F88E7D]" : "bg-slate-100")} />
               ))}
             </div>
@@ -518,7 +518,7 @@ export default function Home() {
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 1 of 3</p>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 1 of 2</p>
                         <h2 className="text-2xl font-black text-slate-900 mt-1">Hi! What&apos;s your name? 👋</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">We&apos;ll personalize your entire skincare experience just for you.</p>
                       </div>
@@ -552,7 +552,7 @@ export default function Home() {
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 3</p>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 2</p>
                         <h2 className="text-2xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">This helps Velmora understand your hormone balance and skin needs.</p>
                       </div>
@@ -582,36 +582,7 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Step 3 – Skin Type */}
-                {onboardingStep === 3 && (
-                  <div className="flex flex-col flex-1">
-                    <div className="relative h-48 flex-shrink-0 overflow-hidden">
-                      <img src="https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80" alt="Skin Type" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
-                    </div>
-                    <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
-                      <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 3</p>
-                        <h2 className="text-2xl font-black text-slate-900 mt-1">Skin type? ✨</h2>
-                        <p className="text-slate-400 text-sm mt-2 font-medium">Select your primary concern or type. You can change this later with a scan.</p>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {["Oily", "Dry", "Combination", "Normal", "Sensitive", "Acne-Prone"].map(t => (
-                          <button
-                            key={t}
-                            onClick={() => setSkinType(t)}
-                            className={cn(
-                              "h-14 rounded-[20px] border-2 font-black text-sm transition-all",
-                              skinType === t ? "bg-[#F88E7D] border-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-[#FDF5F2] border-transparent text-slate-600"
-                            )}
-                          >
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+
 
 
               </motion.div>
@@ -621,7 +592,7 @@ export default function Home() {
             <div className="px-6 pb-10 pt-4 flex-shrink-0 space-y-3">
               <button
                 onClick={() => {
-                  if (onboardingStep < 3) {
+                  if (onboardingStep < 2) {
                     setOnboardingStep(onboardingStep + 1);
                   } else {
                     completeOnboarding();
@@ -629,7 +600,7 @@ export default function Home() {
                 }}
                 className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
               >
-                {onboardingStep === 3 ? "Finish & Start Glow ✨" : "Continue →"}
+                {onboardingStep === 2 ? "Finish & Start Glow ✨" : "Continue →"}
               </button>
               {onboardingStep > 1 && (
                 <button
