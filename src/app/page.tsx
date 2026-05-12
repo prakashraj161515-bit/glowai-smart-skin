@@ -40,7 +40,7 @@ export default function Home() {
   }, []);
 
   const [waterIntake, setWaterIntake] = useState(0);
-  const [showLanding, setShowLanding] = useState(false);
+  const [showLanding, setShowLanding] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [userName, setUserName] = useState("");
@@ -68,6 +68,7 @@ export default function Home() {
       localStorage.clear();
       localStorage.setItem("velmora_app_version", APP_VERSION);
       signOut({ redirect: false });
+      setShowLanding(true);
       setShowOnboarding(false);
     }
   }, []);
@@ -95,7 +96,7 @@ export default function Home() {
     if (status === "authenticated" && session?.user) {
       // If already entered this session, hide landing immediately
       if (hasEntered) {
-        // setShowLanding(false);
+        setShowLanding(false);
       }
       // User is logged in
       const googleName = session.user.name || "User";
@@ -206,6 +207,7 @@ export default function Home() {
     if (status === "authenticated") {
       // Mark as entered for this session
       sessionStorage.setItem("velmora_entered", "true");
+      setShowLanding(false);
       return;
     }
 
@@ -227,6 +229,7 @@ export default function Home() {
     if (result?.ok || result === undefined) {
       // Login successful - close modal, show onboarding
       setShowDemoModal(false);
+      setShowLanding(false);
       setUserName(demoName.trim());
       const onboardingDone = localStorage.getItem("velmora_onboarding_complete") === "true";
       setShowOnboarding(!onboardingDone);
@@ -237,6 +240,7 @@ export default function Home() {
     signOut();
     localStorage.removeItem("velmora_auth_status");
     localStorage.removeItem("velmora_onboarding_complete");
+    setShowLanding(true);
   };
 
   const completeOnboarding = () => {
@@ -483,6 +487,62 @@ export default function Home() {
         )}
 
 
+
+        {/* IOS STYLE LANDING PAGE */}
+        {showLanding && (
+          <motion.div 
+            key="landing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-[#FDF5F2] flex flex-col items-center justify-between py-20 px-8"
+          >
+            {/* Branding */}
+            <div className="text-center mt-12">
+              <motion.div 
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="w-20 h-20 bg-white rounded-[24px] flex items-center justify-center shadow-2xl shadow-orange-500/10 mx-auto mb-6"
+              >
+                <Sparkles size={40} className="text-[#F88E7D]" />
+              </motion.div>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2 uppercase italic">Velmora</h1>
+              <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Smart Skin AI</p>
+            </div>
+
+            {/* Content */}
+            <div className="text-center px-4">
+              <h2 className="text-[32px] font-bold text-slate-800 leading-tight tracking-tight">
+                Analyze your skin<br />in seconds.
+              </h2>
+              <p className="text-slate-400 mt-4 text-[16px] font-medium max-w-[240px] mx-auto leading-relaxed">
+                Personalized AI coaching for your best glow yet.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="w-full space-y-4">
+              <button 
+                onClick={handleLogin}
+                className="w-full bg-white text-slate-900 h-16 rounded-2xl flex items-center justify-center gap-4 font-bold text-[17px] shadow-xl shadow-slate-200/50 active:scale-95 transition-transform border border-slate-100"
+              >
+                <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+                Continue with Google
+              </button>
+              
+              <button 
+                onClick={() => setShowLanding(false)}
+                className="w-full text-slate-400 font-bold text-[13px] uppercase tracking-widest py-2"
+              >
+                Try as Guest
+              </button>
+
+              <p className="text-[10px] text-slate-300 text-center px-8 leading-relaxed mt-6">
+                By continuing, you agree to our Terms of Service and Privacy Policy.
+              </p>
+            </div>
+          </motion.div>
+        )}
 
         {/* ONBOARDING FLOW */}
         {showOnboarding && (
