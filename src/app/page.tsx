@@ -577,10 +577,10 @@ export default function Home() {
                     
                     <div className="space-y-6 mt-4">
                       {[
-                        { icon: "✨", title: "Visible Glow in 30 Days", desc: "Scientific approach to reveal your natural radiance." },
-                        { icon: "🤖", title: "Personalized AI Coach", desc: "Real-time advice tailored to your unique skin type." },
-                        { icon: "📈", title: "Progress Tracking", desc: "See your skin health improve with daily AI scans." },
-                        { icon: "🧴", title: "Ingredient Analysis", desc: "Scan any product to see if it's safe for your skin." }
+                        { icon: "✨", title: "Glass Skin Glow", desc: "Scientific routines to achieve that perfect radiance." },
+                        { icon: "🛡️", title: "Healthier Skin Barrier", desc: "Strengthen your skin against pollution and stress." },
+                        { icon: "💧", title: "Deep Hydration", desc: "Expert advice to keep your skin plump and youthful." },
+                        { icon: "🎯", title: "Targeted Results", desc: "Clear acne, dark spots, and texture in 30 days." }
                       ].map((benefit, i) => (
                         <motion.div 
                           initial={{ opacity: 0, y: 10 }}
