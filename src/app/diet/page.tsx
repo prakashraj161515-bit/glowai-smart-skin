@@ -87,42 +87,36 @@ export default function DietPage() {
     localStorage.setItem("velmora_saved_diets", JSON.stringify(updated));
   };
 
-  const formatText = (content: string) => {
-    const lines = content.split('\n');
-    let currentCategory = "";
-    
-    return lines.map((line, i) => {
-      const trimmed = line.trim();
-      if (!trimmed) return null;
+  const formatMarkdown = (text: string) => {
+    return text.split("\n").map((line, i) => {
+      // Bold
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      
+      if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
+        return (
+          <div key={i} className="flex gap-3 mb-2 ml-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F88E7D] mt-2 flex-shrink-0 shadow-sm" />
+            <span className="text-[13px] font-medium text-slate-600 leading-snug" dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
+          </div>
+        );
+      }
 
-      if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
-        currentCategory = trimmed.replace(/\*\*/g, '');
+      if (line.trim().startsWith("**") && line.trim().endsWith("**")) {
         return (
           <div key={i} className="flex items-center gap-2 mt-8 mb-4">
             <div className="h-px bg-slate-200 flex-1" />
-            <span className="text-[10px] font-black text-[#F88E7D] uppercase tracking-[0.3em] whitespace-nowrap">
-              {currentCategory}
+            <span className="text-[10px] font-black text-[#F88E7D] uppercase tracking-[0.3em] whitespace-nowrap px-2">
+              {line.replace(/\*\*/g, '')}
             </span>
             <div className="h-px bg-slate-200 flex-1" />
           </div>
         );
       }
-
+      
+      if (line.trim() === "") return <div key={i} className="h-2" />;
+      
       return (
-        <motion.div 
-          key={i} 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.05 }}
-          className="bg-white rounded-[24px] p-5 mb-3 border border-orange-50 shadow-sm flex gap-4 items-start"
-        >
-          <div className="w-10 h-10 bg-[#FFEDE8] rounded-xl flex items-center justify-center flex-shrink-0 text-[#F88E7D]">
-            <Droplets size={20} />
-          </div>
-          <div className="flex-1 flex justify-between items-center">
-            <p className="text-[13px] font-bold text-slate-800 leading-snug">{trimmed.replace(/^[-*•]\s*/, '')}</p>
-          </div>
-        </motion.div>
+        <p key={i} className="mb-2 text-[13px] font-medium text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: formattedLine }} />
       );
     });
   };
@@ -301,8 +295,8 @@ export default function DietPage() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              {formatText(dietPlan)}
+            <div className="space-y-1 bg-white p-6 rounded-[32px] border border-[#F3EAE8] shadow-sm">
+              {formatMarkdown(dietPlan)}
             </div>
 
             <div className="bg-primary-gradient p-8 rounded-[40px] text-white shadow-xl shadow-orange-500/10">
