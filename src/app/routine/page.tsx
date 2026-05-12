@@ -241,24 +241,28 @@ export default function RoutinePage() {
     const completedDiet = dietItems.filter(item => completedItems.includes(item.name));
     const pendingDiet = dietItems.filter(item => !completedItems.includes(item.name));
 
-    const summary = `
+    const summaryText = `
 **Today's Diet Summary:**
 ${completedDiet.length > 0 ? "✅ **Completed:**\n" + completedDiet.map(i => "- " + i.name).join("\n") : ""}
 ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.name).join("\n") : ""}
-
-**AI Analysis:**
-Analyzing your choices for ${country} lifestyle...
     `;
-    setAiFeedback(summary);
+    
+    // We'll store the summary in a temp variable or state if needed, but let's just use aiFeedback
+    // for the final combined text. During loading, we'll show the summary + a spinner for the analysis.
+    setAiFeedback(summaryText); 
 
     const context = `User from ${country} is following a ${gender} diet plan. Today they completed ${completedDiet.length} out of ${dietItems.length} diet items. Completed: ${completedDiet.map(i=>i.name).join(", ")}. Pending: ${pendingDiet.map(i=>i.name).join(", ")}. Provide brief, encouraging feedback.`;
     
     try {
-      const res = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ customPrompt: context }) });
+      const res = await fetch("/api/generate", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ customPrompt: context }) 
+      });
       const data = await res.json();
-      setAiFeedback(summary.replace("Analyzing your choices for " + country + " lifestyle...", data.text));
+      setAiFeedback(summaryText + "\n\n**AI Analysis:**\n" + (data.text || "Great effort today! Keep sticking to the plan for better results. ✨"));
     } catch {
-      setAiFeedback(summary.replace("Analyzing your choices for " + country + " lifestyle...", "Great effort today! Keep sticking to the plan for better results. ✨"));
+      setAiFeedback(summaryText + "\n\n**AI Analysis:**\nGreat effort today! Keep sticking to the plan for better results. ✨");
     } finally {
       setIsAnalyzing(false);
     }
@@ -356,18 +360,29 @@ Analyzing your choices for ${country} lifestyle...
         {showFeedback && (
           <motion.div initial={{opacity:0, y: 100, x: "-50%"}} animate={{opacity:1, y: 0, x: "-50%"}} exit={{opacity:0, y: 100, x: "-50%"}} className="fixed top-0 left-1/2 w-full max-w-[430px] h-[100dvh] z-[200] bg-white flex flex-col p-8 pb-12 shadow-2xl">
             <div className="flex justify-between mb-8"><h3 className="text-lg font-black">AI Skin Coach</h3><button onClick={()=>setShowFeedback(false)}><X size={24} /></button></div>
-            <div className="flex-1 overflow-y-auto no-scrollbar">
-              {aiFeedback ? formatMarkdown(aiFeedback) : (
-                <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
-                  <div className="relative w-16 h-16">
-                    <div className="absolute inset-0 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin" />
+            <div className="flex-1 overflow-y-auto no-scrollbar pb-10">
+              {aiFeedback && formatMarkdown(aiFeedback)}
+              
+              {isAnalyzing && (
+                <div className="mt-8 p-6 bg-slate-50/50 rounded-[24px] border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="relative w-12 h-12">
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                      className="absolute inset-0 border-[3px] border-white border-t-[#F88E7D] rounded-full shadow-sm" 
+                    />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Sparkles size={20} className="text-[#F88E7D] animate-pulse" />
+                      <Sparkles size={16} className="text-[#F88E7D] animate-pulse" />
                     </div>
                   </div>
-                  <p className="text-[12px] font-black text-slate-400 uppercase tracking-widest animate-pulse">
-                    AI is Analyzing...
-                  </p>
+                  <div>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse mb-1">
+                      AI Skin Analysis
+                    </p>
+                    <p className="text-[12px] font-bold text-slate-500 italic">
+                      Evaluating your effort...
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
