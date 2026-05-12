@@ -184,17 +184,25 @@ export default function CoachPage() {
     if (timerRef.current) clearTimeout(timerRef.current);
   };
 
-  const formatMessage = (content: string) => {
-    const lines = content.split('\n');
-    return lines.map((line, i) => {
-      if (line.trim().startsWith('**') && line.trim().endsWith('**')) {
+  const formatMarkdown = (text: string) => {
+    return text.split("\n").map((line, i) => {
+      // Bold
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      
+      if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
-          <div key={i} className="text-[14px] font-black text-purple-600 mt-4 mb-1 tracking-tight uppercase border-b border-purple-100 pb-1">
-            {line.replace(/\*\*/g, '')}
+          <div key={i} className="flex gap-2 mb-1.5 ml-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 flex-shrink-0" />
+            <span dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
           </div>
         );
       }
-      return <div key={i} className="mb-0.5">{line}</div>;
+      
+      if (line.trim() === "") return <div key={i} className="h-2" />;
+      
+      return (
+        <p key={i} className="mb-2" dangerouslySetInnerHTML={{ __html: formattedLine }} />
+      );
     });
   };
 
@@ -255,7 +263,7 @@ export default function CoachPage() {
                 ? 'bg-primary-gradient text-white rounded-tr-none shadow-purple-500/10' 
                 : 'bg-white text-slate-700 rounded-tl-none border border-slate-100'
             }`}>
-              {formatMessage(msg.content)}
+              {formatMarkdown(msg.content)}
               {msg.isError && (
                 <button onClick={handleRetry} className="mt-3 flex items-center gap-1 text-[10px] font-black bg-red-50 text-red-500 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors">
                   <RefreshCcw size={12} /> Retry
