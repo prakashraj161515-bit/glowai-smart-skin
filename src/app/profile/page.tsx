@@ -18,7 +18,6 @@ export default function ProfilePage() {
   const [isPremium, setIsPremium] = useState(false);
   const [gender, setGender] = useState<"male" | "female">("female");
   const [country, setCountry] = useState("India");
-  const [skinType, setSkinType] = useState("Combination");
   
   const [userName, setUserName] = useState("User");
   const [profilePic, setProfilePic] = useState("");
@@ -36,7 +35,6 @@ export default function ProfilePage() {
     
     if (savedGender) setGender(savedGender);
     if (savedCountry) setCountry(savedCountry);
-    if (savedSkin) setSkinType(savedSkin);
     setIsPremium(premium);
 
     if (status === "authenticated" && session?.user) {
@@ -53,9 +51,8 @@ export default function ProfilePage() {
       localStorage.setItem("velmora_user_pic", profilePic);
       localStorage.setItem("velmora_user_gender", gender);
       localStorage.setItem("velmora_country", country);
-      localStorage.setItem("velmora_user_skin", skinType);
     }
-  }, [isLoaded, userName, profilePic, gender, country, skinType]);
+  }, [isLoaded, userName, profilePic, gender, country]);
 
   const handlePicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -143,17 +140,7 @@ export default function ProfilePage() {
         <section className="space-y-4">
           <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">My Skin Profile</h3>
           <div className="space-y-3">
-            <div className="card p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center"><Shield size={24} /></div>
-                <div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Skin Type</p>
-                  <select value={skinType} onChange={(e) => setSkinType(e.target.value)} className="bg-transparent text-[15px] font-bold text-slate-800 outline-none cursor-pointer">
-                    <option value="Oily">Oily Skin</option><option value="Dry">Dry Skin</option><option value="Combination">Combination Skin</option><option value="Sensitive">Sensitive Skin</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+
 
             <div className="card p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
