@@ -677,11 +677,43 @@ export default function Home() {
                   <div className="flex flex-col flex-1 px-6 pb-8">
                     <div className="mb-6">
                       <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 4 of 5</p>
-                      <h2 className="text-2xl font-black text-slate-900 mt-1">AI Skin Scan 📸</h2>
-                      <p className="text-slate-400 text-sm mt-2 font-medium">Position your face in the guide. Our AI will analyze Acne, Oil, and Glow.</p>
+                      <h2 className="text-2xl font-black text-slate-900 mt-1">
+                        {loading ? "Analyzing Skin... 🤖" : "AI Skin Scan 📸"}
+                      </h2>
+                      <p className="text-slate-400 text-sm mt-2 font-medium">
+                        {loading 
+                          ? "Our AI is detecting your skin patterns. Almost there..." 
+                          : "Position your face in the guide. Our AI will analyze Acne, Oil, and Glow."}
+                      </p>
                     </div>
-                    <div className="flex-1 min-h-[400px]">
-                      <CameraScanner onResult={handleResult} />
+                    <div className="flex-1 min-h-[400px] flex items-center justify-center bg-slate-50 rounded-[32px] overflow-hidden relative border-2 border-white shadow-inner">
+                      {loading ? (
+                        <div className="flex flex-col items-center gap-6 p-8 text-center">
+                           <div className="relative w-20 h-20">
+                             <div className="absolute inset-0 border-4 border-orange-100 rounded-full" />
+                             <div className="absolute inset-0 border-4 border-t-[#F88E7D] rounded-full animate-spin" />
+                           </div>
+                           <div>
+                             <p className="text-[13px] text-[#F88E7D] font-black uppercase tracking-[0.2em] animate-pulse">Deep Scan in Progress</p>
+                             <p className="text-[11px] text-slate-400 mt-2 font-medium">Analyzing pores, texture, and hydration...</p>
+                           </div>
+                        </div>
+                      ) : ai.startsWith("⚠️") ? (
+                        <div className="flex flex-col items-center gap-4 p-8 text-center">
+                          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center">
+                            <AlertCircle size={32} />
+                          </div>
+                          <p className="text-sm font-bold text-slate-800">{ai}</p>
+                          <button 
+                            onClick={() => { setAi(""); setLoading(false); }}
+                            className="bg-[#F88E7D] text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest"
+                          >
+                            Try Again
+                          </button>
+                        </div>
+                      ) : (
+                        <CameraScanner onResult={handleResult} />
+                      )}
                     </div>
                   </div>
                 )}
