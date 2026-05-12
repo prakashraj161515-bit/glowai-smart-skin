@@ -530,16 +530,7 @@ export default function Home() {
                         placeholder="Enter your name"
                         className="w-full bg-[#FDF5F2] h-16 px-6 rounded-[24px] border-2 border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
                       />
-                      <div className="space-y-2 mt-1">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Premium Features Included</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          {["🔬 AI Scan", "🥗 Diet Plan", "🛍️ Scanner", "🤖 AI Coach"].map((f, i) => (
-                            <div key={i} className="flex items-center gap-2 bg-[#FDF5F2] rounded-xl px-2.5 py-1.5 border border-[#F3EAE8]">
-                              <p className="text-[9px] font-black text-slate-700 uppercase tracking-tight">{f}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+
                     </div>
                   </div>
                 )}
