@@ -300,7 +300,7 @@ ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500"><Droplets size={20} /></div>
-              <div><h3 className="text-[14px] font-bold text-slate-900">Water</h3><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{waterIntake}ml / 2000ml</p></div>
+              <div><h3 className="text-[14px] font-bold text-slate-900">Water</h3><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{waterIntake}ml / 3000ml</p></div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => { if(waterIntake >= 250) { const n = waterIntake - 250; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); } }} className="bg-slate-50 px-3 py-1.5 rounded-xl text-slate-400 text-[10px] font-black uppercase tracking-widest border border-slate-100">-250ml</button>
@@ -308,7 +308,7 @@ ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.
             </div>
           </div>
           <div className="flex gap-1.5 h-1.5">
-            {[250,500,750,1000,1250,1500,1750,2000].map((i) => (<div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-blue-400" : "bg-slate-100")} />))}
+            {[250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000].map((i) => (<div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-blue-400" : "bg-slate-100")} />))}
           </div>
         </div>
         
