@@ -22,7 +22,7 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [country, setCountry] = useState("India");
   const [waterIntake, setWaterIntake] = useState(0);
-  const [showLanding, setShowLanding] = useState(true);
+  const [showLanding, setShowLanding] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [userName, setUserName] = useState("");
@@ -50,7 +50,6 @@ export default function Home() {
       localStorage.clear();
       localStorage.setItem("velmora_app_version", APP_VERSION);
       signOut({ redirect: false });
-      setShowLanding(true);
       setShowOnboarding(false);
     }
   }, []);
@@ -78,7 +77,7 @@ export default function Home() {
     if (status === "authenticated" && session?.user) {
       // If already entered this session, hide landing immediately
       if (hasEntered) {
-        setShowLanding(false);
+        // setShowLanding(false);
       }
       // User is logged in
       const googleName = session.user.name || "User";
@@ -189,7 +188,6 @@ export default function Home() {
     if (status === "authenticated") {
       // Mark as entered for this session
       sessionStorage.setItem("velmora_entered", "true");
-      setShowLanding(false);
       return;
     }
 
@@ -211,7 +209,6 @@ export default function Home() {
     if (result?.ok || result === undefined) {
       // Login successful - close modal, show onboarding
       setShowDemoModal(false);
-      setShowLanding(false);
       setUserName(demoName.trim());
       const onboardingDone = localStorage.getItem("velmora_onboarding_complete") === "true";
       setShowOnboarding(!onboardingDone);
@@ -222,7 +219,6 @@ export default function Home() {
     signOut();
     localStorage.removeItem("velmora_auth_status");
     localStorage.removeItem("velmora_onboarding_complete");
-    setShowLanding(true);
   };
 
   const completeOnboarding = () => {
@@ -468,90 +464,7 @@ export default function Home() {
           </motion.div>
         )}
 
-        {/* LANDING / LOGIN PAGE */}
-        {showLanding && (
-          <motion.div 
-            key="landing"
-            initial={{ opacity: 0, x: "-50%" }}
-            animate={{ opacity: 1, x: "-50%" }}
-            exit={{ opacity: 0, x: "-50%" }}
-            className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[100] bg-white flex flex-col overflow-y-auto"
-          >
-            {/* Hero Section */}
-            <div className="relative h-[45vh] flex-shrink-0 overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1596462502278-27bfac4033c8?w=800&q=80" 
-                alt="Velmora Skincare" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
-              
-              {/* Floating Logo */}
-              <div className="absolute top-12 left-1/2 -translate-x-1/2 flex justify-center w-full">
-                <motion.div 
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  className="bg-white/20 backdrop-blur-2xl px-6 py-2 rounded-full border border-white/40 shadow-2xl"
-                >
-                  <h1 className="text-2xl font-black text-slate-900 tracking-tighter italic flex items-center gap-2">
-                    <Sparkles size={20} className="text-[#F88E7D]" /> Velmora
-                  </h1>
-                </motion.div>
-              </div>
-            </div>
 
-            {/* Login & Features Container */}
-            <div className="px-6 -mt-16 relative z-10 flex flex-col gap-8 pb-12">
-              
-              {/* MAIN LOGIN CARD */}
-              <div className="bg-white rounded-[40px] p-6 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-orange-50 text-center">
-                <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.4em] mb-2">Welcome to the future</p>
-                <h2 className="text-2xl font-black text-slate-900 leading-tight mb-5">Analyze Your Skin <br/> With Ai</h2>
-                
-                <button 
-                  onClick={handleLogin}
-                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] flex items-center justify-center gap-4 font-black text-[16px] active:scale-95 transition-transform shadow-xl shadow-orange-500/30 mb-4"
-                >
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                    <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" />
-                  </div>
-                  {status === "authenticated" ? "Enter Your Account" : "Login with Google"}
-                </button>
-                
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest flex items-center justify-center gap-2">
-                  <ShieldCheck size={12} className="text-emerald-500" /> Secure Cloud Sync Enabled
-                </p>
-              </div>
-
-              {/* Skin Benefits section */}
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                  <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.25em]">Skin Benefits</p>
-                  <div className="h-px bg-slate-100 flex-1 ml-4" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { icon: <Sparkles className="text-blue-500" />, title: "Glass Glow", sub: "Clear Texture", bg: "bg-blue-50" },
-                    { icon: <ShieldCheck className="text-emerald-500" />, title: "Zero Risks", sub: "Safe Products", bg: "bg-emerald-50" },
-                    { icon: <TrendingUp className="text-orange-500" />, title: "Healing Map", sub: "Daily Progress", bg: "bg-orange-50" },
-                    { icon: <Utensils className="text-purple-500" />, title: "Skin Fuel", sub: "Expert Diet", bg: "bg-purple-50" }
-                  ].map((feat, i) => (
-                    <div key={i} className={cn("p-5 rounded-[32px] border border-white shadow-sm flex flex-col gap-3", feat.bg)}>
-                      <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                        {feat.icon}
-                      </div>
-                      <div>
-                        <p className="font-black text-slate-800 text-[14px] leading-tight">{feat.title}</p>
-                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">{feat.sub}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
 
         {/* ONBOARDING FLOW */}
         {showOnboarding && (
