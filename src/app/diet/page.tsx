@@ -245,18 +245,49 @@ export default function DietPage() {
         )}
 
         {isLoading && (
-          <div className="flex flex-col items-center justify-center py-24">
-            <div className="relative w-24 h-24">
+          <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
+            <div className="relative w-32 h-32 mb-12">
+              {/* Outer Pulsing Glow */}
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute inset-0 bg-[#F88E7D] rounded-full blur-2xl"
+              />
+              
+              {/* Main Spinner */}
               <motion.div 
                 animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-[6px] border-[#FFEDE8] border-t-[#F88E7D] rounded-full"
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-0 border-[4px] border-[#FFEDE8] border-t-[#F88E7D] rounded-full shadow-[0_0_20px_rgba(248,142,125,0.2)]"
               />
+              
+              {/* Center Icon */}
               <div className="absolute inset-0 flex items-center justify-center text-[#F88E7D]">
-                <Apple size={40} className="animate-pulse" />
+                <motion.div
+                  animate={{ y: [0, -5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <Apple size={48} className="drop-shadow-lg" />
+                </motion.div>
               </div>
             </div>
-            <p className="mt-8 text-slate-400 text-[11px] font-black uppercase tracking-[0.2em] animate-pulse">Crafting your meal plan...</p>
+            
+            <div className="space-y-3">
+               <motion.p 
+                 key={Math.floor(Date.now() / 2000)}
+                 initial={{ opacity: 0, y: 5 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 className="text-[#F88E7D] text-[13px] font-black uppercase tracking-[0.2em]"
+               >
+                 {(() => {
+                   const stages = ["Analyzing Skin Metrics", "Checking Nutrient Values", "Personalizing Menu", "Finalizing Routine"];
+                   return stages[Math.floor((Date.now() / 2000) % stages.length)];
+                 })()}
+               </motion.p>
+               <p className="text-slate-400 text-[11px] font-medium leading-relaxed max-w-[200px] mx-auto">
+                 Our AI Dietitian is crafting your perfect meal plan.
+               </p>
+            </div>
           </div>
         )}
 
