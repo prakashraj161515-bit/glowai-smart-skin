@@ -49,6 +49,12 @@ export default function Home() {
   const [userPic, setUserPic] = useState<string | null>(null);
   const [deepScanStep, setDeepScanStep] = useState<number>(0);
   const [isPremium, setIsPremium] = useState(false);
+
+  // Sync Premium Status
+  useEffect(() => {
+    const premium = localStorage.getItem("velmora_is_premium") === "true";
+    setIsPremium(premium);
+  }, []);
   const [scanLimitReached, setScanLimitReached] = useState(false);
   const [limitReason, setLimitReason] = useState<"limit" | "premium">("limit");
   const [scanCount, setScanCount] = useState(0);
