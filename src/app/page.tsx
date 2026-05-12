@@ -345,11 +345,6 @@ export default function Home() {
     // Show loading screen immediately with placeholder data
     setView("results");
     setLoading(true);
-    
-    // Complete onboarding if we are in it
-    if (showOnboarding) {
-      completeOnboarding();
-    }
 
     // Update scan count for free users
     if (!isPremium) {
@@ -431,7 +426,7 @@ export default function Home() {
         onboardingComplete: true,
       });
 
-      if (showOnboarding) setTimeout(() => completeOnboarding(), 500);
+      if (showOnboarding) setOnboardingStep(4);
 
     } catch (err: any) {
       setAi(`⚠️ Could not generate AI report: ${err.message}`);
@@ -555,7 +550,7 @@ export default function Home() {
           >
             {/* Progress Bar */}
             <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
-              {[1,2,3].map(s => (
+              {[1,2,3,4].map(s => (
                 <div key={s} className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", onboardingStep >= s ? "bg-[#F88E7D]" : "bg-slate-100")} />
               ))}
             </div>
@@ -579,7 +574,7 @@ export default function Home() {
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 1 of 3</p>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 1 of 4</p>
                         <h2 className="text-2xl font-black text-slate-900 mt-1">Hi! What&apos;s your name? 👋</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">We&apos;ll personalize your entire skincare experience just for you.</p>
                       </div>
@@ -605,7 +600,7 @@ export default function Home() {
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 3</p>
+                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 4</p>
                         <h2 className="text-2xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
                         <p className="text-slate-400 text-sm mt-2 font-medium">This helps Velmora understand your hormone balance and skin needs.</p>
                       </div>
@@ -639,7 +634,7 @@ export default function Home() {
                 {onboardingStep === 3 && (
                   <div className="flex flex-col flex-1 px-6 pb-8">
                     <div className="mb-6">
-                      <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 3</p>
+                      <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 4</p>
                       <h2 className="text-2xl font-black text-slate-900 mt-1">AI Skin Scan 📸</h2>
                       <p className="text-slate-400 text-sm mt-2 font-medium">Position your face in the guide. Our AI will analyze Acne, Oil, and Glow.</p>
                     </div>
@@ -649,25 +644,60 @@ export default function Home() {
                   </div>
                 )}
 
+                {/* Step 4 – Analysis Complete */}
+                {onboardingStep === 4 && (
+                  <div className="flex flex-col flex-1 px-6 items-center justify-center text-center">
+                    <motion.div 
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 mb-6"
+                    >
+                      <CheckCircle2 size={48} />
+                    </motion.div>
+                    <h2 className="text-3xl font-black text-slate-900 mb-2">You&apos;re all set! ✨</h2>
+                    <p className="text-slate-400 font-medium mb-8">Your skin has been analyzed. We&apos;ve prepared a personalized routine just for you.</p>
+                    
+                    <div className="w-full bg-[#FDF5F2] rounded-3xl p-6 mb-8 border-2 border-[#F3EAE8]">
+                       <div className="flex justify-between items-center mb-4">
+                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Initial Glow Score</span>
+                          <span className="text-2xl font-black text-[#F88E7D]">{data?.score || 0}%</span>
+                       </div>
+                       <div className="h-2 w-full bg-white rounded-full overflow-hidden">
+                          <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${data?.score || 0}%` }}
+                            className="h-full bg-[#F88E7D]"
+                          />
+                       </div>
+                    </div>
+                  </div>
+
 
               </motion.div>
             </AnimatePresence>
 
             {/* Bottom Buttons */}
             <div className="px-6 pb-10 pt-4 flex-shrink-0 space-y-3">
-              {onboardingStep < 3 ? (
+              {onboardingStep === 1 || onboardingStep === 2 ? (
                 <button
                   onClick={() => setOnboardingStep(onboardingStep + 1)}
                   className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
                 >
                   Continue →
                 </button>
-              ) : (
+              ) : onboardingStep === 3 ? (
                 <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest py-2">
                   Use the camera button to scan
                 </p>
+              ) : (
+                <button
+                  onClick={completeOnboarding}
+                  className="w-full bg-[#10b981] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
+                >
+                  Start My Glow Journey ✨
+                </button>
               )}
-              {onboardingStep > 1 && (
+              {onboardingStep > 1 && onboardingStep < 4 && (
                 <button
                   onClick={() => setOnboardingStep(onboardingStep - 1)}
                   className="w-full text-slate-400 font-bold text-xs uppercase tracking-widest py-2"
