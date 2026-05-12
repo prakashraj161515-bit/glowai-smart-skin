@@ -1151,7 +1151,7 @@ export default function Home() {
                           <BrainCircuit size={14} /> Expert Analysis & Solutions
                         </div>
                         <div className="text-[13px] text-slate-600 leading-relaxed font-medium relative">
-                          {!isPremium && !loading && (
+                          {!isPremium && !loading && history.length > 1 && (
                             <div className="absolute inset-0 bg-white/60 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-6">
                               <Lock className="text-[#F88E7D] mb-3" size={24} />
                               <p className="text-[14px] font-black text-slate-800 leading-tight mb-2">Detailed Report Locked</p>
@@ -1161,7 +1161,13 @@ export default function Home() {
                               </Link>
                             </div>
                           )}
-                          <div className={cn(isPremium ? "" : "blur-sm select-none")}>
+                          <div className={cn((isPremium || (history.length <= 1 && !loading)) ? "" : "blur-sm select-none")}>
+                            {(history.length <= 1 && !isPremium && !loading) && (
+                              <div className="flex items-center gap-2 mb-3 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full w-fit">
+                                <Sparkles size={12} />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/70">Welcome Gift: Free Expert Analysis</span>
+                              </div>
+                            )}
                             {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
                           </div>
                         </div>
