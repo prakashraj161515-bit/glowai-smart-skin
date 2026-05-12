@@ -12,13 +12,17 @@ export function BottomNav() {
   const { status } = useSession();
   const pathname = usePathname();
   const [isPremium, setIsPremium] = useState(false);
+  const [isDemoAuth, setIsDemoAuth] = useState(false);
 
   useEffect(() => {
     const premium = localStorage.getItem("velmora_is_premium") === "true";
     setIsPremium(premium);
+    
+    const demoAuth = localStorage.getItem("velmora_auth_status") === "authenticated";
+    setIsDemoAuth(demoAuth);
   }, [pathname]);
 
-  if (status !== "authenticated") return null;
+  if (status !== "authenticated" && !isDemoAuth) return null;
   if (pathname === "/coach") return null;
 
   const navItems = [

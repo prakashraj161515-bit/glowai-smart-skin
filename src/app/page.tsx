@@ -530,12 +530,7 @@ export default function Home() {
                 Continue with Google
               </button>
               
-              <button 
-                onClick={() => setShowLanding(false)}
-                className="w-full text-slate-400 font-bold text-[13px] uppercase tracking-widest py-2"
-              >
-                Try as Guest
-              </button>
+
 
               <p className="text-[10px] text-slate-300 text-center px-8 leading-relaxed mt-6">
                 By continuing, you agree to our Terms of Service and Privacy Policy.
