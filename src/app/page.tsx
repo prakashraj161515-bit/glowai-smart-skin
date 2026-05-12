@@ -158,12 +158,15 @@ export default function Home() {
           if (data.onboardingComplete) {
             localStorage.setItem("velmora_onboarding_complete", "true");
             setShowOnboarding(false);
+            setShowLanding(false); // Auto-enter app if data is restored
           } else {
             setShowOnboarding(true);
+            setShowLanding(false); // Go to onboarding
           }
         } else {
           const done = localStorage.getItem("velmora_onboarding_complete") === "true";
           setShowOnboarding(!done);
+          if (done) setShowLanding(false);
         }
       });
     }
