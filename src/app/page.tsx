@@ -647,8 +647,7 @@ export default function Home() {
                       <CameraScanner onResult={handleResult} />
                     </div>
                   </div>
-
-
+                )}
 
 
               </motion.div>
