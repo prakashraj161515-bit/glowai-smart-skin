@@ -141,9 +141,24 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       
       {/* Face Guide Overlay */}
       {mode === "face" && (
-        <div className="absolute inset-0 border-[40px] border-white/50 pointer-events-none">
-          <div className="w-full h-full border-2 border-dashed border-purple-500/30 rounded-[30%] flex items-center justify-center">
-            <div className="w-full h-0.5 bg-gradient-to-r from-transparent via-purple-500 to-transparent absolute scan-line" />
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <div className="relative w-[75%] h-[75%]">
+            {/* The actual face oval outline */}
+            <svg viewBox="0 0 100 100" className="w-full h-full text-[#F88E7D]/40 drop-shadow-lg">
+              <path 
+                d="M50 10 C 30 10, 18 30, 18 55 C 18 80, 30 90, 50 90 C 70 90, 82 80, 82 55 C 82 30, 70 10, 50 10 Z" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="1"
+                strokeDasharray="4 4"
+              />
+            </svg>
+            
+            {/* Subtle glow effect */}
+            <div className="absolute inset-0 rounded-[45%] border-2 border-[#F88E7D]/10 blur-[1px]" />
+            
+            {/* Scanning Line Animation */}
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent animate-scan" />
           </div>
         </div>
       )}
