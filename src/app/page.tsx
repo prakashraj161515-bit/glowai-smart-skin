@@ -40,7 +40,7 @@ export default function Home() {
   }, []);
 
   const [waterIntake, setWaterIntake] = useState(0);
-  const [showLanding, setShowLanding] = useState(true);
+  const showLanding = status === "unauthenticated";
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [userName, setUserName] = useState("");
@@ -74,7 +74,6 @@ export default function Home() {
       localStorage.clear();
       localStorage.setItem("velmora_app_version", APP_VERSION);
       signOut({ redirect: false });
-      setShowLanding(true);
       setShowOnboarding(false);
     }
   }, []);
@@ -96,79 +95,137 @@ export default function Home() {
   useEffect(() => {
     if (status === "loading") return;
 
-    // Check if user already entered this session
-    const hasEntered = typeof window !== "undefined" && sessionStorage.getItem("velmora_entered") === "true";
+    const todayStr = new Date().toDateString();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toDateString();
 
     if (status === "authenticated" && session?.user) {
-      // If already entered this session, hide landing immediately
-      if (hasEntered) {
-        setShowLanding(false);
-      }
       // User is logged in
       const googleName = session.user.name || "User";
       const googlePic = session.user.image || null;
       setUserName(googleName);
       setUserPic(googlePic);
       
-    const todayStr = new Date().toLocaleDateString();
-    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
-    const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
-    
-    if (lastScanDate !== todayStr) {
-      localStorage.setItem("velmora_last_scan_date", todayStr);
-      localStorage.setItem("velmora_scan_count", "0");
-      setScanCount(0);
-    } else {
-      setScanCount(count);
-    }
+      // Load local onboarding complete status first to avoid flash
+      const localOnboardingComplete = localStorage.getItem("velmora_onboarding_complete") === "true";
+      setShowOnboarding(!localOnboardingComplete);
 
-    // Load cloud data
-    fetch("/api/user/load")
-      .then(r => r.json())
-      .then(({ data }) => {
-        if (data) {
-          if (data.history?.length) {
-            setHistory(data.history);
-            localStorage.setItem("velmora_history", JSON.stringify(data.history));
-          }
-          if (data.gender) { setGender(data.gender); localStorage.setItem("velmora_user_gender", data.gender); }
-          if (data.country) { setCountry(data.country); localStorage.setItem("velmora_country", data.country); }
-          if (data.skinType) { setSkinType(data.skinType); localStorage.setItem("velmora_user_skin_type", data.skinType); }
-          
-          // Restore Premium & Scan Limits
-          if (data.isPremium) {
-            setIsPremium(true);
-            localStorage.setItem("velmora_is_premium", "true");
-          }
-          
-          // CRITICAL: Check if the cloud scan count is from today or an old date
-          if (data.lastScanDate === todayStr) {
-            if (data.scanCount !== undefined) {
-              setScanCount(data.scanCount);
-              localStorage.setItem("velmora_scan_count", data.scanCount.toString());
+      // --- CALCULATE LOCAL STREAK ---
+      const localLastLogin = localStorage.getItem("velmora_last_login_date");
+      const localStreak = parseInt(localStorage.getItem("velmora_streak") || "0");
+      
+      let computedStreak = localStreak;
+      let computedLastLogin = localLastLogin;
+
+      if (!localLastLogin) {
+        computedStreak = 1;
+        computedLastLogin = todayStr;
+      } else if (localLastLogin === todayStr) {
+        computedStreak = Math.max(1, localStreak);
+      } else if (localLastLogin === yesterdayStr) {
+        computedStreak = localStreak + 1;
+        computedLastLogin = todayStr;
+      } else {
+        computedStreak = 1;
+        computedLastLogin = todayStr;
+      }
+
+      if (localLastLogin !== computedLastLogin || localStreak !== computedStreak) {
+        localStorage.setItem("velmora_last_login_date", computedLastLogin);
+        localStorage.setItem("velmora_streak", computedStreak.toString());
+        saveToCloud({
+          streak: computedStreak,
+          lastLoginDate: computedLastLogin
+        });
+      }
+      setStreak(computedStreak);
+
+      const lastScanDate = localStorage.getItem("velmora_last_scan_date");
+      const count = parseInt(localStorage.getItem("velmora_scan_count") || "0");
+      
+      const localTodayStr = new Date().toLocaleDateString();
+      if (lastScanDate !== localTodayStr) {
+        localStorage.setItem("velmora_last_scan_date", localTodayStr);
+        localStorage.setItem("velmora_scan_count", "0");
+        setScanCount(0);
+      } else {
+        setScanCount(count);
+      }
+
+      // Load cloud data
+      fetch("/api/user/load")
+        .then(r => r.json())
+        .then(({ data }) => {
+          if (data) {
+            if (data.history?.length) {
+              setHistory(data.history);
+              localStorage.setItem("velmora_history", JSON.stringify(data.history));
             }
-            localStorage.setItem("velmora_last_scan_date", data.lastScanDate);
-          } else {
-            // It's a new day compared to cloud data! Reset.
-            setScanCount(0);
-            localStorage.setItem("velmora_scan_count", "0");
-            localStorage.setItem("velmora_last_scan_date", todayStr);
-          }
+            if (data.gender) { setGender(data.gender); localStorage.setItem("velmora_user_gender", data.gender); }
+            if (data.country) { setCountry(data.country); localStorage.setItem("velmora_country", data.country); }
+            if (data.skinType) { setSkinType(data.skinType); localStorage.setItem("velmora_user_skin_type", data.skinType); }
+            
+            // Restore Premium & Scan Limits
+            if (data.isPremium) {
+              setIsPremium(true);
+              localStorage.setItem("velmora_is_premium", "true");
+            }
+            
+            // --- SYNC CLOUD STREAK ---
+            const cloudStreak = data.streak || 0;
+            const cloudLastLogin = data.lastLoginDate || "";
+            
+            let finalStreak = computedStreak;
+            let finalLastLogin = computedLastLogin;
 
-          if (data.onboardingComplete) {
-            localStorage.setItem("velmora_onboarding_complete", "true");
-            setShowOnboarding(false);
-            setShowLanding(false); // Auto-enter app if data is restored
+            if (cloudLastLogin === todayStr) {
+              if (cloudStreak > finalStreak) {
+                finalStreak = cloudStreak;
+                finalLastLogin = cloudLastLogin;
+              }
+            } else if (cloudLastLogin === yesterdayStr) {
+              const cloudComputedVal = cloudStreak + 1;
+              if (cloudComputedVal > finalStreak) {
+                finalStreak = cloudComputedVal;
+                finalLastLogin = todayStr;
+              }
+            }
+
+            if (finalStreak !== computedStreak || finalLastLogin !== computedLastLogin) {
+              localStorage.setItem("velmora_last_login_date", finalLastLogin);
+              localStorage.setItem("velmora_streak", finalStreak.toString());
+              setStreak(finalStreak);
+              saveToCloud({
+                streak: finalStreak,
+                lastLoginDate: finalLastLogin
+              });
+            }
+
+            // Check scan count
+            if (data.lastScanDate === localTodayStr) {
+              if (data.scanCount !== undefined) {
+                setScanCount(data.scanCount);
+                localStorage.setItem("velmora_scan_count", data.scanCount.toString());
+              }
+              localStorage.setItem("velmora_last_scan_date", data.lastScanDate);
+            } else {
+              setScanCount(0);
+              localStorage.setItem("velmora_scan_count", "0");
+              localStorage.setItem("velmora_last_scan_date", localTodayStr);
+            }
+
+            if (data.onboardingComplete) {
+              localStorage.setItem("velmora_onboarding_complete", "true");
+              setShowOnboarding(false);
+            } else {
+              setShowOnboarding(true);
+            }
           } else {
-            setShowOnboarding(true);
-            setShowLanding(false); // Go to onboarding
+            const done = localStorage.getItem("velmora_onboarding_complete") === "true";
+            setShowOnboarding(!done);
           }
-        } else {
-          const done = localStorage.getItem("velmora_onboarding_complete") === "true";
-          setShowOnboarding(!done);
-          if (done) setShowLanding(false);
-        }
-      });
+        });
     }
   }, [status, session]);
 
@@ -213,7 +270,6 @@ export default function Home() {
     if (status === "authenticated") {
       // Mark as entered for this session
       sessionStorage.setItem("velmora_entered", "true");
-      setShowLanding(false);
       return;
     }
 
@@ -235,7 +291,6 @@ export default function Home() {
     if (result?.ok || result === undefined) {
       // Login successful - close modal, show onboarding
       setShowDemoModal(false);
-      setShowLanding(false);
       setUserName(demoName.trim());
       const onboardingDone = localStorage.getItem("velmora_onboarding_complete") === "true";
       setShowOnboarding(!onboardingDone);
@@ -245,7 +300,7 @@ export default function Home() {
   const handleLogout = () => {
     signOut();
     localStorage.clear();
-    setShowLanding(true);
+    setStreak(1);
     // Reset local state to prevent "flash" of old data
     setHistory([]);
     setUserName("");

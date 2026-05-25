@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { TrendingUp, AlertTriangle, CheckCircle2, ChevronRight, Award, Zap, Sparkles, Bot } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const data = [
   { day: "Mon", score: 65 },
@@ -16,10 +18,20 @@ const data = [
 ];
 
 export default function ProgressPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status, router]);
+
   const [scanData, setScanData] = useState<any>(null);
 
   useEffect(() => {
     try {
+      if (status !== "authenticated") return;
       const saved = localStorage.getItem('latestScan');
       if (saved) {
         const parsed = JSON.parse(saved);
