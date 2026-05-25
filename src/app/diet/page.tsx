@@ -17,14 +17,6 @@ export default function DietPage() {
     }
   }, [status, router]);
 
-  if (status === "loading" || status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
-      </div>
-    );
-  }
-
   const [dietPlan, setDietPlan] = useState("");
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -139,6 +131,14 @@ export default function DietPage() {
       );
     });
   };
+
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDF5F2] pb-32 font-outfit">

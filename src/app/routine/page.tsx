@@ -18,14 +18,6 @@ export default function RoutinePage() {
     }
   }, [status, router]);
 
-  if (status === "loading" || status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
-      </div>
-    );
-  }
-
   const [activeDay, setActiveDay] = useState(new Date().getDay());
   const [gender, setGender] = useState<"male" | "female">("female");
   const [country, setCountry] = useState("India");
@@ -292,6 +284,14 @@ ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.
   };
 
   const days = [{ label: "SUN" }, { label: "MON" }, { label: "TUE" }, { label: "WED" }, { label: "THU" }, { label: "FRI" }, { label: "SAT" }];
+
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">

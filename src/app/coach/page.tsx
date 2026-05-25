@@ -17,14 +17,6 @@ export default function CoachPage() {
     }
   }, [status, router]);
 
-  if (status === "loading" || status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
-      </div>
-    );
-  }
-
   const [messages, setMessages] = useState<{id: string, role: string, content: string, isError?: boolean, timestamp: number}[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -224,6 +216,14 @@ export default function CoachPage() {
       );
     });
   };
+
+  if (status === "loading" || status === "unauthenticated") {
+    return (
+      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-80px)] bg-[#F4F6FF]">
