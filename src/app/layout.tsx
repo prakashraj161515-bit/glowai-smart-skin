@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   description: "AI-powered personalized skin analysis and coaching app.",
   themeColor: "#FDF5F2",
   icons: {
-    icon: "/logo.png?v=4",
-    apple: "/logo.png?v=4",
+    icon: "/logo.png?v=5",
+    apple: "/logo.png?v=5",
   }
 };
 
