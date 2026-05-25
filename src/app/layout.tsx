@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   title: "GlowAI – Smart Skin Analysis",
   description: "AI-powered personalized skin analysis and coaching app.",
   themeColor: "#FDF5F2",
+  icons: {
+    icon: "/icon.png?v=3",
+    apple: "/apple-icon.png?v=3",
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
