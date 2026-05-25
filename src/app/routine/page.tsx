@@ -148,18 +148,21 @@ export default function RoutinePage() {
     const getDietImage = (name: string) => {
       const n = name.toLowerCase();
       if (n.includes("papaya")) return "https://images.unsplash.com/photo-1517282004455-f8238689bb4e?w=400&q=80";
-      if (n.includes("apple") || n.includes("seb")) return "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&q=80";
+      if (n.includes("apple") || n.includes("seb") || n.includes("pear")) return "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=400&q=80";
       if (n.includes("banana")) return "https://images.unsplash.com/photo-1571771894821-ad99024177c6?w=400&q=80";
       if (n.includes("watermelon") || n.includes("tarbooj")) return "https://images.unsplash.com/photo-1589733901241-5e5647c4464a?w=400&q=80";
-      if (n.includes("pomegranate")) return "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&q=80";
-      if (n.includes("orange") || n.includes("lemon")) return "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=400&q=80";
+      if (n.includes("pomegranate") || n.includes("anar")) return "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=400&q=80";
+      if (n.includes("orange") || n.includes("lemon") || n.includes("citrus")) return "https://images.unsplash.com/photo-1557800636-894a64c1696f?w=400&q=80";
       if (n.includes("guava") || n.includes("amrud")) return "https://images.unsplash.com/photo-1536511132770-e5066929976b?w=400&q=80";
-      if (n.includes("soup") || n.includes("stew") || n.includes("dal")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80";
-      if (n.includes("gourd") || n.includes("lauki") || n.includes("pumpkin")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80";
-      if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
-      if (n.includes("chicken") || n.includes("beef") || n.includes("turkey") || n.includes("salmon") || n.includes("shrimp")) return "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80";
-      if (n.includes("yogurt") || n.includes("chia") || n.includes("oatmeal") || n.includes("pudding")) return "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&q=80";
-      if (n.includes("toast") || n.includes("pie") || n.includes("muffin") || n.includes("pasta")) return "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&q=80";
+      if (n.includes("fruit") || n.includes("grapes") || n.includes("angoor") || n.includes("berries") || n.includes("berry") || n.includes("peaches") || n.includes("raspberries") || n.includes("blueberry")) return "https://images.unsplash.com/photo-1519996521430-02b798c1d881?w=400&q=80";
+      if (n.includes("gourd") || n.includes("lauki") || n.includes("pumpkin") || n.includes("turai") || n.includes("karela") || n.includes("kundru")) return "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=400&q=80";
+      if (n.includes("salad") || n.includes("carrot") || n.includes("cucumber") || n.includes("gajar") || n.includes("kheera") || n.includes("mooli") || n.includes("beetroot") || n.includes("radish") || n.includes("hummus") || n.includes("asparagus") || n.includes("broccoli") || n.includes("kale")) return "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80";
+      if (n.includes("sprouts") || n.includes("moong") || n.includes("makhana") || n.includes("nuts") || n.includes("seed") || n.includes("seeds") || n.includes("almond") || n.includes("almonds") || n.includes("walnut") || n.includes("walnuts") || n.includes("trail mix") || n.includes("ankurit") || n.includes("chickpea")) return "https://images.unsplash.com/photo-1596701062351-8c2c14d1fdd0?w=400&q=80";
+      if (n.includes("gobi") || n.includes("cabbage") || n.includes("beans") || n.includes("peas") || n.includes("matar") || n.includes("veg") || n.includes("veggie") || n.includes("sabzi") || n.includes("curry") || n.includes("dal") || n.includes("stew") || n.includes("tofu") || n.includes("quinoa") || n.includes("risotto") || n.includes("hotpot") || n.includes("mash") || n.includes("potato") || n.includes("rice") || n.includes("mushrooms")) return "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80";
+      if (n.includes("soup") || n.includes("moringa") || n.includes("palak") || n.includes("spinach")) return "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=80";
+      if (n.includes("yogurt") || n.includes("oatmeal") || n.includes("porridge") || n.includes("milk") || n.includes("pudding") || n.includes("cheese") || n.includes("cottage") || n.includes("chia") || n.includes("muesli")) return "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400&q=80";
+      if (n.includes("toast") || n.includes("bread") || n.includes("pancake") || n.includes("pancakes") || n.includes("wrap") || n.includes("pie") || n.includes("muffin") || n.includes("egg") || n.includes("eggs") || n.includes("scone") || n.includes("tea") || n.includes("digestive") || n.includes("oatcakes")) return "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&q=80";
+      if (n.includes("chicken") || n.includes("beef") || n.includes("turkey") || n.includes("salmon") || n.includes("shrimp") || n.includes("cod") || n.includes("sausages") || n.includes("lamb") || n.includes("fish") || n.includes("meat") || n.includes("steak") || n.includes("kipper")) return "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80";
       return "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&q=80";
     };
 
