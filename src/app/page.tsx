@@ -570,11 +570,11 @@ export default function Home() {
               <motion.div 
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="w-20 h-20 bg-white rounded-[24px] flex items-center justify-center shadow-2xl shadow-orange-500/10 mx-auto mb-6"
+                className="w-24 h-24 bg-white rounded-[28px] overflow-hidden flex items-center justify-center shadow-2xl shadow-orange-500/10 mx-auto mb-6 border-2 border-white"
               >
-                <Sparkles size={40} className="text-[#F88E7D]" />
+                <img src="/logo.png" className="w-full h-full object-cover" alt="GlowAI Logo" />
               </motion.div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2 uppercase italic">Velmora</h1>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2 uppercase italic">GlowAI</h1>
               <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Smart Skin AI</p>
             </div>
 
@@ -639,9 +639,9 @@ export default function Home() {
                       <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="w-24 h-24 bg-white rounded-[32px] flex items-center justify-center mx-auto mb-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border border-white"
+                        className="w-24 h-24 bg-white rounded-[32px] overflow-hidden flex items-center justify-center mx-auto mb-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border-2 border-white"
                       >
-                        <Sparkles size={48} className="text-[#F88E7D]" />
+                        <img src="/logo.png" className="w-full h-full object-cover" alt="GlowAI Logo" />
                       </motion.div>
                       <h2 className="text-[34px] font-black text-slate-900 leading-[1.1] tracking-tight">Your Journey to <span className="text-[#F88E7D]">Perfect Glow</span></h2>
                       <p className="text-slate-400 mt-5 text-[17px] font-medium leading-relaxed">Join 50,000+ users transforming their skin health with AI.</p>
