@@ -18,7 +18,7 @@ export const authOptions: AuthOptions = {
           return {
             id: "demo-" + Date.now(),
             name: credentials.name,
-            email: credentials.name.toLowerCase().replace(/\s/g, "") + "@velmora.demo",
+            email: credentials.name.toLowerCase().replace(/\s/g, "") + "@glowai.demo",
             image: null,
           };
         }

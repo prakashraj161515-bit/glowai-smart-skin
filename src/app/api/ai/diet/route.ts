@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       : "Generate a PARTIAL, basic 3-day skincare diet plan sample. At the end, add a note saying: '🌟 Upgrade to Premium to unlock the full 7-day personalized diet plan!'";
 
     const prompt = `
-You are the Velmora Expert Dietitian.
+You are the GlowAI Expert Dietitian.
 USER CONTEXT: ${context}
 
 YOUR MISSION:

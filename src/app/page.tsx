@@ -242,11 +242,11 @@ export default function Home() {
           animate={{ scale: 1, opacity: 1 }}
           className="flex flex-col items-center gap-6"
         >
-          <div className="w-20 h-20 bg-gradient-to-tr from-[#F88E7D] to-[#f97316] rounded-[24px] flex items-center justify-center shadow-2xl shadow-orange-500/20">
-            <Sparkles size={40} className="text-white" />
+          <div className="w-24 h-24 bg-white rounded-[28px] overflow-hidden flex items-center justify-center shadow-2xl shadow-orange-500/10 border-2 border-white">
+            <img src="/logo.png" className="w-full h-full object-cover" alt="GlowAI Logo" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">VELMORA</h1>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">GLOWAI</h1>
             <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] mt-1">Smart Skin AI</p>
           </div>
           <div className="mt-8 flex gap-1">
@@ -528,7 +528,7 @@ export default function Home() {
             >
               <div className="text-center mb-6">
                 <div className="text-5xl mb-3">✨</div>
-                <h2 className="text-2xl font-black text-slate-900">Welcome to Velmora</h2>
+                <h2 className="text-2xl font-black text-slate-900">Welcome to GlowAI</h2>
                 <p className="text-slate-400 text-sm mt-2 font-medium">Enter your name to get started</p>
               </div>
               <input
@@ -712,7 +712,7 @@ export default function Home() {
                       <div>
                         <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 5</p>
                         <h2 className="text-2xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
-                        <p className="text-slate-400 text-sm mt-2 font-medium">This helps Velmora understand your hormone balance and skin needs.</p>
+                        <p className="text-slate-400 text-sm mt-2 font-medium">This helps GlowAI understand your hormone balance and skin needs.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         {[
@@ -1329,7 +1329,7 @@ export default function Home() {
               </h2>
               <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mb-8 italic px-4">
                 {limitReason === "premium" 
-                  ? "Product scanning is exclusive to Velmora Premium members."
+                  ? "Product scanning is exclusive to GlowAI Premium members."
                   : "Free users get 1 scan per day. Upgrade for unlimited analysis."
                 }
               </p>
