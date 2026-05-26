@@ -9,7 +9,7 @@ export async function askCoach(question: string) {
   // In a real production app, you would use this key to call the Gemini API
   // Example: 
   // const genAI = new GoogleGenerativeAI(apiKey);
-  // const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  // const model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite" });
   
   console.log("Calling AI Coach with env key...");
   

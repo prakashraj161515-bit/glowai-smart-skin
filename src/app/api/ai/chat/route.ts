@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
+      model: "gemini-3.1-flash-lite",
       systemInstruction: `You are Velmora Expert Coach, an advanced AI skin specialist and all-around lifestyle expert. 
 You can answer ANY question the user asks (General Knowledge, Life, Skincare, Health, etc.).
 
@@ -26,7 +26,7 @@ FORMATTING RULES (MANDATORY):
 SKINCARE CONTEXT:
 If the user asks about skin, use these sections if applicable: **CAUSES**, **WHAT TO EAT**, **ROUTINE**. 
 ${body.context ? `\nUser's Current Skin Stats: ${body.context}` : ""}`,
-      generationConfig: { maxOutputTokens: 300, temperature: 0.7 } 
+      generationConfig: { maxOutputTokens: 800, temperature: 0.7 } 
     });
 
     const chat = model.startChat({
