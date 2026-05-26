@@ -201,12 +201,10 @@ export default function Home() {
             }
 
             // Check scan count
-            if (data.lastScanDate === localTodayStr) {
-              if (data.scanCount !== undefined) {
-                setScanCount(data.scanCount);
-                localStorage.setItem("velmora_scan_count", data.scanCount.toString());
-              }
-              localStorage.setItem("velmora_last_scan_date", data.lastScanDate);
+            const countLocal = parseInt(localStorage.getItem("velmora_scan_count") || "0");
+            const localLastDate = localStorage.getItem("velmora_last_scan_date");
+            if (localLastDate === localTodayStr) {
+              setScanCount(countLocal);
             } else {
               setScanCount(0);
               localStorage.setItem("velmora_scan_count", "0");
