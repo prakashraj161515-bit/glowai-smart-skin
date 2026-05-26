@@ -63,7 +63,7 @@ export default function Home() {
   const [demoName, setDemoName] = useState("");
   const [streak, setStreak] = useState(1);
 
-  const APP_VERSION = "2.0"; // Increment this to force restart for all users
+  const APP_VERSION = "3.0"; // Increment this to force restart for all users
 
   // ─── GLOBAL RESTART LOGIC ──────────────────────────────────────────────────
   useEffect(() => {
