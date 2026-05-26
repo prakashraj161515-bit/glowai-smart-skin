@@ -869,12 +869,13 @@ export default function Home() {
           <motion.div key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-6 pt-12 space-y-8">
             
             {/* HEADER */}
-            <div className="flex justify-between items-center mb-8 px-2 pt-4">
-              <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16">
+            <div className="flex justify-between items-center mb-8 px-2 pt-4 gap-2">
+              {/* Left Profile Area */}
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="relative w-12 h-12 shrink-0">
                   <div className="absolute inset-0 bg-primary-gradient rounded-full rotate-6 opacity-20" />
                   <div className="w-full h-full rounded-full bg-white border-2 border-white shadow-md overflow-hidden relative z-10 flex items-center justify-center">
-                    {userPic ? <img src={userPic} className="w-full h-full object-cover" alt="User" /> : <User className="text-slate-200" size={32} />}
+                    {userPic ? <img src={userPic} className="w-full h-full object-cover" alt="User" /> : <User className="text-slate-200" size={24} />}
                   </div>
                   <input 
                     type="file" 
@@ -893,8 +894,8 @@ export default function Home() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-20"
                   />
                 </div>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1">
                     {isEditingName ? (
                       <input 
                         autoFocus
@@ -910,25 +911,26 @@ export default function Home() {
                             localStorage.setItem("velmora_user_name", userName);
                           }
                         }}
-                        className="text-[20px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-full"
+                        className="text-[16px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-full"
                       />
                     ) : (
-                      <h1 onClick={() => setIsEditingName(true)} className="text-[20px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors truncate max-w-[120px]">Hi {userName},</h1>
+                      <h1 onClick={() => setIsEditingName(true)} className="text-[16px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors truncate w-full">Hi {userName},</h1>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex items-center gap-1 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">
-                      <Zap size={10} className="text-orange-500 fill-orange-500" />
-                      <span className="text-[9px] font-black text-orange-600 uppercase tracking-tighter">Login Streak: {streak} Days</span>
+                  <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                    <div className="flex items-center gap-0.5 bg-orange-50 px-1.5 py-0.5 rounded-full border border-orange-100 shrink-0">
+                      <Zap size={8} className="text-orange-500 fill-orange-500" />
+                      <span className="text-[8px] font-black text-orange-600 uppercase tracking-tighter">Streak: {streak}D</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 font-medium truncate">Glow Mode On ✨</p>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+
+              {/* Right Controls Area */}
+              <div className="flex items-center gap-1.5 shrink-0">
                 {!isPremium && (
                   <Link href="/premium" className="flex items-center gap-1 bg-[#FFEDE8] px-2.5 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform shrink-0">
-                    <Sparkles size={12} className="text-[#F88E7D] fill-[#F88E7D]" />
+                    <Sparkles size={11} className="text-[#F88E7D] fill-[#F88E7D]" />
                     <span className="text-[9px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
                   </Link>
                 )}
@@ -936,7 +938,7 @@ export default function Home() {
                   <motion.div 
                     animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="w-10 h-10 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8]"
+                    className="w-10 h-10 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8] shrink-0"
                   >
                     <BrainCircuit size={20} className="text-[#F88E7D]" />
                   </motion.div>
