@@ -28,6 +28,7 @@ export default function ProgressPage() {
   }, [status, router]);
 
   const [scanData, setScanData] = useState<any>(null);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     try {
@@ -39,10 +40,11 @@ export default function ProgressPage() {
           setScanData(parsed);
         }
       }
+      setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
     } catch (e) {
       console.error("Failed to parse scan data", e);
     }
-  }, []);
+  }, [status]);
 
   const metrics = scanData?.metrics || { score: 0, redness: 0, oiliness: 0, pores: 0 };
   const advice = scanData?.advice || {
@@ -54,21 +56,65 @@ export default function ProgressPage() {
     improvement_forecast: ""
   };
 
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
   return (
-    <div className="min-h-screen bg-[#FDF5F2] px-6 pt-12 pb-32 font-outfit">
-      <header className="flex items-center gap-4 mb-8">
-        <button onClick={() => window.history.back()} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-slate-100">
-          <ChevronLeft size={20} />
-        </button>
-        <div>
-          <h1 className="text-xl font-bold text-slate-800">Your AI Report</h1>
-          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Real-time analysis results</p>
+    <div className="min-h-screen bg-[#FDF5F2] px-6 pt-12 pb-32 font-outfit print:bg-white print:p-0 print:pb-0">
+      {/* Print Styles */}
+      <style jsx global>{`
+        @media print {
+          body {
+            background-color: white !important;
+            color: #0f172a !important;
+          }
+          header, .no-print, button {
+            display: none !important;
+          }
+          .min-h-screen {
+            min-height: auto !important;
+            padding: 0 !important;
+          }
+          .bg-white {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin-bottom: 2rem !important;
+          }
+          .rounded-\[40px\], .rounded-\[32px\] {
+            border-radius: 0 !important;
+          }
+          .border-l-\[6px\] {
+            border-left-width: 4px !important;
+          }
+        }
+      `}</style>
+
+      <header className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <button onClick={() => window.history.back()} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-slate-100">
+            <ChevronLeft size={20} />
+          </button>
+          <div>
+            <h1 className="text-xl font-bold text-slate-800">Your AI Report</h1>
+            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Real-time analysis results</p>
+          </div>
         </div>
+
+        {isPremium && (
+          <button 
+            onClick={handleDownloadPDF}
+            className="h-10 px-5 bg-primary-gradient text-white text-[11px] font-bold uppercase tracking-wider rounded-full shadow-lg shadow-orange-500/20 active:scale-95 transition-transform"
+          >
+            Download PDF Report
+          </button>
+        )}
       </header>
 
       {/* Main Score Card */}
       <div className="bg-white rounded-[40px] p-8 border border-[#F3EAE8] shadow-sm mb-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -mr-16 -mt-16" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl -mr-16 -mt-16 no-print" />
         <div className="flex justify-between items-start mb-6">
           <div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">AI Skin Score</p>
@@ -79,13 +125,13 @@ export default function ProgressPage() {
               {advice.improvement_forecast || "Scanning for updates..."}
             </div>
           </div>
-          <div className="w-16 h-16 rounded-[24px] bg-primary-gradient flex items-center justify-center shadow-lg shadow-orange-500/20">
+          <div className="w-16 h-16 rounded-[24px] bg-primary-gradient flex items-center justify-center shadow-lg shadow-orange-500/20 no-print">
             <Sparkles size={32} className="text-white fill-white" />
           </div>
         </div>
 
         {/* Mini chart */}
-        <div className="h-32 w-full mt-4">
+        <div className="h-32 w-full mt-4 no-print">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data}>
               <defs>

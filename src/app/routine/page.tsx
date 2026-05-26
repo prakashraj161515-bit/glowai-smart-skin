@@ -338,9 +338,19 @@ export default function RoutinePage() {
     audio.loop = true;
     audio.play().catch(() => {});
     setAlarmAudio(audio);
+
+    // Auto-stop alarm after 1 minute (60000ms)
+    const timeoutId = setTimeout(() => {
+      stopAlarm();
+    }, 60000);
+    (window as any)._alarmTimeoutId = timeoutId;
   };
 
   const stopAlarm = () => {
+    if ((window as any)._alarmTimeoutId) {
+      clearTimeout((window as any)._alarmTimeoutId);
+      (window as any)._alarmTimeoutId = null;
+    }
     if (alarmAudio) {
       alarmAudio.pause();
       alarmAudio.currentTime = 0;

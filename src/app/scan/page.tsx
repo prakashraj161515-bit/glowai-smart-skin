@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Camera, RefreshCcw, CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { Camera, RefreshCcw, CheckCircle2, AlertCircle, Info, Gem, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 
@@ -11,24 +11,35 @@ export default function ScanPage() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [analysisStatus, setAnalysisStatus] = useState<string>("");
+  const [isPremium, setIsPremium] = useState(false);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
+  const [showLimitModal, setShowLimitModal] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
 
   useEffect(() => {
-    startCamera();
-    return () => stopCamera();
+    setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
   }, []);
 
-  const startCamera = async () => {
+  useEffect(() => {
+    startCamera(facingMode);
+    return () => stopCamera();
+  }, [facingMode]);
+
+  const startCamera = async (mode: "user" | "environment") => {
     try {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "user", width: 1280, height: 720 },
+        video: { facingMode: mode, width: 1280, height: 720 },
         audio: false 
       });
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
+      setError(null);
     } catch (err) {
       setError("Camera access denied. Please enable permissions.");
       console.error(err);
@@ -41,7 +52,22 @@ export default function ScanPage() {
     }
   };
 
+  const toggleCamera = () => {
+    if (scanning) return;
+    const nextMode = facingMode === "user" ? "environment" : "user";
+    setFacingMode(nextMode);
+  };
+
   const handleScan = async () => {
+    // Check daily scan limit for free users
+    const todayStr = new Date().toDateString();
+    const lastScanDate = localStorage.getItem("velmora_last_scan_date");
+
+    if (!isPremium && lastScanDate === todayStr) {
+      setShowLimitModal(true);
+      return;
+    }
+
     setScanning(true);
     setAnalysisStatus("Analyzing skin texture...");
     setProgress(10);
@@ -51,7 +77,7 @@ export default function ScanPage() {
     setProgress(40);
     
     await new Promise(r => setTimeout(r, 1500));
-    setAnalysisStatus("Consulting Velmora Experts...");
+    setAnalysisStatus("Consulting GlowAI Experts...");
     setProgress(75);
 
     // Generate Dynamic Metrics
@@ -71,6 +97,8 @@ export default function ScanPage() {
       const aiAdvice = await res.json();
       localStorage.setItem('latestScan', JSON.stringify({ metrics: dynamicMetrics, advice: aiAdvice }));
       localStorage.setItem('velmora_analysis', JSON.stringify(dynamicMetrics));
+      // Save last scan date
+      localStorage.setItem('velmora_last_scan_date', todayStr);
     } catch (e) {
       console.error("Analysis failed", e);
     }
@@ -84,7 +112,7 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF5F2] px-6 pt-12 pb-32 font-outfit">
+    <div className="min-h-screen bg-[#FDF5F2] px-6 pt-12 pb-32 font-outfit relative">
       <header className="flex items-center gap-4 mb-8">
         <button onClick={() => router.back()} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-slate-100">
           <ChevronLeft size={20} />
@@ -107,6 +135,17 @@ export default function ScanPage() {
             <AlertCircle size={48} className="text-red-400" />
             <p className="text-sm text-red-400">{error}</p>
           </div>
+        )}
+
+        {/* Camera Swap Button inside Camera Preview */}
+        {!scanning && !error && (
+          <button 
+            onClick={toggleCamera} 
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-lg active:scale-90 transition-transform z-30"
+            title="Swap Camera"
+          >
+            <RefreshCcw size={20} />
+          </button>
         )}
 
         {/* Scan Frame Overlay */}
@@ -168,6 +207,58 @@ export default function ScanPage() {
           For best results, ensure you are in a well-lit area and have removed any makeup or glasses. Keep a neutral expression.
         </p>
       </div>
+
+      {/* Limit Modal */}
+      <AnimatePresence>
+        {showLimitModal && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-md flex items-center justify-center px-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-[40px] p-8 w-full max-w-sm text-center shadow-2xl relative overflow-hidden"
+            >
+              <button 
+                onClick={() => setShowLimitModal(false)}
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 active:scale-90 transition-transform"
+              >
+                <X size={16} />
+              </button>
+
+              <div className="w-20 h-20 bg-purple-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 text-purple-500">
+                <Gem size={36} className="fill-purple-500/10" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-800 mb-2">Limit Reached! 🌟</h3>
+              <p className="text-[13px] text-slate-400 font-bold mb-8 leading-relaxed">
+                You get 1 free skin scan daily. Upgrade to Premium for unlimited daily scans, PDF downloads, and expert coaching!
+              </p>
+              
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={() => {
+                    setShowLimitModal(false);
+                    router.push("/premium");
+                  }}
+                  className="w-full h-14 bg-primary-gradient text-white font-black rounded-2xl shadow-lg shadow-purple-500/20 active:scale-95 transition-transform"
+                >
+                  Upgrade to Premium ✨
+                </button>
+                <button 
+                  onClick={() => setShowLimitModal(false)}
+                  className="w-full h-14 bg-slate-50 text-slate-400 font-bold rounded-2xl active:scale-95 transition-transform"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

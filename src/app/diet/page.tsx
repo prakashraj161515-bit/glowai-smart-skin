@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Apple, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, AlertCircle, ChevronLeft } from "lucide-react";
+import { Apple, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, AlertCircle, ChevronLeft, Gem, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -24,10 +24,13 @@ export default function DietPage() {
   const [savedPlans, setSavedPlans] = useState<{id: string, text: string, date: string, concern: string}[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   const [dailyTip, setDailyTip] = useState("");
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("velmora_saved_diets");
     if (saved) setSavedPlans(JSON.parse(saved));
+    setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
 
     const tips = [
       "Add Vitamin C rich foods today for natural glow.",
@@ -41,6 +44,14 @@ export default function DietPage() {
   }, []);
 
   const generateDietPlan = async () => {
+    // Check daily free limit
+    const todayStr = new Date().toDateString();
+    const lastDietDate = localStorage.getItem("velmora_last_diet_date");
+    if (!isPremium && lastDietDate === todayStr) {
+      setShowLimitModal(true);
+      return;
+    }
+
     setIsLoading(true);
     setError("");
     
@@ -68,6 +79,8 @@ export default function DietPage() {
       const data = await res.json();
       if (data.text) {
         setDietPlan(data.text);
+        // Save today's date as last diet generation date
+        localStorage.setItem("velmora_last_diet_date", new Date().toDateString());
       } else {
         setError(data.error || "Failed to generate diet plan");
       }
@@ -372,6 +385,65 @@ export default function DietPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Premium Upgrade Modal */}
+      <AnimatePresence>
+        {showLimitModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLimitModal(false)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+            />
+            
+            {/* Modal Content */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[40px] p-8 text-center shadow-2xl border border-white/50 z-10"
+            >
+              {/* Close Button */}
+              <button 
+                onClick={() => setShowLimitModal(false)}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 active:scale-95 transition-transform"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="w-20 h-20 bg-amber-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 text-amber-500 shadow-inner">
+                <Gem size={40} className="animate-pulse" />
+              </div>
+
+              <h3 className="text-[20px] font-bold text-slate-800 mb-2">Daily Limit Reached</h3>
+              <p className="text-[11px] text-amber-600 font-black uppercase tracking-widest mb-4">Velmora Premium</p>
+              
+              <p className="text-[13px] font-medium text-slate-500 leading-relaxed mb-8">
+                Free plan users can generate 1 diet plan daily. Upgrade to Premium for unlimited scans, routines, and custom meal plans.
+              </p>
+
+              <div className="space-y-3">
+                <Link 
+                  href="/premium"
+                  className="w-full h-14 bg-primary-gradient text-white font-bold rounded-[20px] flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition-transform"
+                >
+                  <Gem size={18} />
+                  Upgrade for $4.99/mo
+                </Link>
+                <button 
+                  onClick={() => setShowLimitModal(false)}
+                  className="w-full h-14 bg-slate-50 text-slate-400 font-bold rounded-[20px] flex items-center justify-center active:scale-95 transition-transform border border-slate-100"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -46,6 +46,7 @@ export default function PremiumPage() {
     { title: "Unlimited AI Coach", desc: "24/7 expert chat with no daily limits", icon: Zap, color: "text-orange-500", bg: "bg-orange-50" },
     { title: "Product Scanner", desc: "Check if products match your skin type", icon: Target, color: "text-purple-500", bg: "bg-purple-50" },
     { title: "Full 7-Day Diet Plan", desc: "Unlock detailed, personalized daily nutrition", icon: Utensils, color: "text-emerald-500", bg: "bg-emerald-50" },
+    { title: "Ad-Free Experience", desc: "100% clean, distraction-free interface", icon: Star, color: "text-amber-500", bg: "bg-amber-50" },
     { title: "Advanced Skin Metrics", desc: "Scan wrinkles, dark circles & skin age", icon: BrainCircuit, color: "text-pink-500", bg: "bg-pink-50" }
   ];
 
