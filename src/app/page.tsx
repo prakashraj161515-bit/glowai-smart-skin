@@ -925,20 +925,20 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                 {!isPremium && (
-                  <Link href="/premium" className="flex items-center gap-2 bg-[#FFEDE8] px-3 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform flex-shrink-0">
-                    <Sparkles size={14} className="text-[#F88E7D] fill-[#F88E7D]" />
-                    <span className="text-[10px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
+                  <Link href="/premium" className="flex items-center gap-1 bg-[#FFEDE8] px-2.5 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform shrink-0">
+                    <Sparkles size={12} className="text-[#F88E7D] fill-[#F88E7D]" />
+                    <span className="text-[9px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
                   </Link>
                 )}
-                <Link href="/routine">
+                <Link href="/routine" className="shrink-0">
                   <motion.div 
                     animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="w-12 h-12 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8]"
+                    className="w-10 h-10 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8]"
                   >
-                    <BrainCircuit size={24} className="text-[#F88E7D]" />
+                    <BrainCircuit size={20} className="text-[#F88E7D]" />
                   </motion.div>
                 </Link>
               </div>
