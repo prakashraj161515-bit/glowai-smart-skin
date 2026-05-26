@@ -206,9 +206,11 @@ export default function Home() {
                 setScanCount(data.scanCount);
                 localStorage.setItem("velmora_scan_count", data.scanCount.toString());
               }
+              localStorage.setItem("velmora_last_scan_date", data.lastScanDate);
             } else {
               setScanCount(0);
               localStorage.setItem("velmora_scan_count", "0");
+              localStorage.removeItem("velmora_last_scan_date");
             }
 
             if (data.onboardingComplete) {
