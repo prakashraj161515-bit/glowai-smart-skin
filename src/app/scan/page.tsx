@@ -75,8 +75,7 @@ export default function ScanPage() {
   };
 
   const handleScan = async () => {
-    // Check daily scan limit for free users
-    const todayStr = new Date().toDateString();
+    const todayStr = new Date().toLocaleDateString();
     const lastScanDate = localStorage.getItem("velmora_last_scan_date");
 
     if (!isPremium && lastScanDate === todayStr) {
