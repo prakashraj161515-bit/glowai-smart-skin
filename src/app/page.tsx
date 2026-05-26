@@ -146,8 +146,6 @@ export default function Home() {
       
       const localTodayStr = new Date().toLocaleDateString();
       if (lastScanDate !== localTodayStr) {
-        localStorage.setItem("velmora_last_scan_date", localTodayStr);
-        localStorage.setItem("velmora_scan_count", "0");
         setScanCount(0);
       } else {
         setScanCount(count);
@@ -208,11 +206,9 @@ export default function Home() {
                 setScanCount(data.scanCount);
                 localStorage.setItem("velmora_scan_count", data.scanCount.toString());
               }
-              localStorage.setItem("velmora_last_scan_date", data.lastScanDate);
             } else {
               setScanCount(0);
               localStorage.setItem("velmora_scan_count", "0");
-              localStorage.setItem("velmora_last_scan_date", localTodayStr);
             }
 
             if (data.onboardingComplete) {
@@ -235,6 +231,7 @@ export default function Home() {
     if (typeof window !== "undefined") {
       const todayStr = new Date().toLocaleDateString();
       const lastScanDate = localStorage.getItem("velmora_last_scan_date");
+      if (!lastScanDate) return true;
       return lastScanDate !== todayStr;
     }
     return true;
