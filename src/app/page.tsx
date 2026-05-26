@@ -487,16 +487,23 @@ export default function Home() {
       localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
 
       // ☁️ Save to cloud so history persists across reinstalls
+      // EXCLUDE onboarding/login scans from counting towards the daily limit!
+      const isFirstLoginScan = showOnboarding;
+      
       saveToCloud({
         history: newHistory,
         gender,
         country,
         skinType: detectedType,
         onboardingComplete: true,
-        scanCount: isPremium ? 0 : (scanCount + 1),
-        lastScanDate: new Date().toLocaleDateString(),
+        scanCount: isPremium ? 0 : (isFirstLoginScan ? scanCount : (scanCount + 1)),
+        lastScanDate: isFirstLoginScan ? localStorage.getItem("velmora_last_scan_date") : new Date().toLocaleDateString(),
         isPremium
       });
+
+      if (!isFirstLoginScan && !isPremium) {
+        localStorage.setItem('velmora_last_scan_date', new Date().toLocaleDateString());
+      }
 
       if (showOnboarding) setOnboardingStep(5);
 
