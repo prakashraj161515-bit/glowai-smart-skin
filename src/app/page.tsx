@@ -95,10 +95,10 @@ export default function Home() {
   useEffect(() => {
     if (status === "loading") return;
 
-    const todayStr = new Date().toDateString();
+    const todayStr = new Date().toLocaleDateString();
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
+    const yesterdayStr = yesterday.toLocaleDateString();
 
     if (status === "authenticated" && session?.user) {
       // User is logged in
