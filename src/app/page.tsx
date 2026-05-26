@@ -231,7 +231,14 @@ export default function Home() {
 
 
 
-  const canScan = isPremium || scanCount < 1;
+  const canScan = isPremium || (() => {
+    if (typeof window !== "undefined") {
+      const todayStr = new Date().toLocaleDateString();
+      const lastScanDate = localStorage.getItem("velmora_last_scan_date");
+      return lastScanDate !== todayStr;
+    }
+    return true;
+  })();
 
   // ─── LOADING SPLASH SCREEN ──────────────────────────────────────────────────
   if (status === "loading") {
