@@ -440,7 +440,7 @@ export default function DietPage() {
                   className="w-full h-14 bg-primary-gradient text-white font-bold rounded-[20px] flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition-transform"
                 >
                   <Gem size={18} />
-                  Upgrade for $4.99/mo
+                  Upgrade to Premium ✨
                 </Link>
                 <button 
                   onClick={() => setShowLimitModal(false)}
