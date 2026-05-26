@@ -10,6 +10,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   const [isReady, setIsReady] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">(mode === "face" ? "user" : "environment");
 
   useEffect(() => {
     let streamRef: MediaStream | null = null;
@@ -36,7 +37,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       // Try specific mode first
       const success = await tryStream({ 
         video: { 
-          facingMode: mode === "face" ? "user" : "environment",
+          facingMode: facingMode === "environment" ? { exact: "environment" } : "user",
           width: { ideal: 640 },
           height: { ideal: 480 }
         } 
@@ -61,7 +62,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
         videoRef.current.srcObject = null;
       }
     };
-  }, [mode]);
+  }, [facingMode, mode]);
 
   const [showFlash, setShowFlash] = useState(false);
 
@@ -212,7 +213,18 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
             )}
           </button>
 
-          <div className="w-12 h-12" /> {/* Spacer */}
+          {/* Swap Camera Button */}
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              if (isAnalyzing) return;
+              setFacingMode(prev => prev === "user" ? "environment" : "user");
+            }}
+            className="w-12 h-12 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all"
+            title="Swap Camera"
+          >
+            <RefreshCcw size={20} />
+          </button>
         </div>
         
         <button 

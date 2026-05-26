@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Apple, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, AlertCircle, ChevronLeft, Gem, X } from "lucide-react";
+import { Apple, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, AlertCircle, ChevronLeft, Gem, X, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -353,6 +353,15 @@ export default function DietPage() {
                 </div>
               </div>
               <div className="flex gap-2">
+                {isPremium && (
+                  <button 
+                    onClick={() => window.print()}
+                    className="bg-[#F88E7D] px-4 py-2 rounded-2xl text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 active:scale-95 transition-transform"
+                    title="Download Diet PDF"
+                  >
+                    <Download size={14} /> PDF
+                  </button>
+                )}
                 <button onClick={saveCurrentPlan} className="bg-primary-gradient w-12 h-12 rounded-2xl text-white shadow-lg shadow-orange-500/20 flex items-center justify-center"><Bookmark size={20} /></button>
                 <button onClick={generateDietPlan} className="bg-[#FDF5F2] w-12 h-12 rounded-2xl text-slate-300 border border-[#F3EAE8] flex items-center justify-center"><RefreshCcw size={20} /></button>
               </div>

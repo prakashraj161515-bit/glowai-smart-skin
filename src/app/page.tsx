@@ -1127,6 +1127,16 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* PDF Product Report Download Option */}
+                  {isPremium && (
+                    <button 
+                      onClick={() => window.print()}
+                      className="w-full py-5 rounded-[24px] bg-primary-gradient text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
+                    >
+                      Download Ingredients Report PDF
+                    </button>
+                  )}
+
                   <button 
                     onClick={() => setView("home")}
                     className="w-full py-5 rounded-[24px] bg-slate-900 text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
@@ -1276,6 +1286,16 @@ export default function Home() {
                           <ChevronRight size={18} className="text-emerald-300" />
                         </div>
                       </div>
+
+                      {/* PDF Report Download Option */}
+                      {isPremium && (
+                        <button 
+                          onClick={() => window.print()}
+                          className="w-full h-16 bg-primary-gradient text-white rounded-2xl flex items-center justify-center gap-2 font-bold text-sm active:scale-95 transition-transform"
+                        >
+                          <Download size={18} /> Download Skin Report PDF
+                        </button>
+                      )}
 
                       <Link href="/routine" className="w-full h-16 bg-[#FDF5F2] border border-[#F3EAE8] rounded-2xl flex items-center justify-center gap-2 text-[#F88E7D] font-bold text-sm active:scale-95 transition-transform">
                         View Full Timeline Schedule <ChevronRight size={18} />
