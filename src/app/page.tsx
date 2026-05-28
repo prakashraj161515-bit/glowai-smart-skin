@@ -63,6 +63,7 @@ export default function Home() {
   const [demoName, setDemoName] = useState("");
   const [streak, setStreak] = useState(1);
   const [expandedSection, setExpandedSection] = useState<string | null>("insights");
+  const [premiumModal, setPremiumModal] = useState<string | null>(null);
 
   const APP_VERSION = "3.0"; // Increment this to force restart for all users
 
@@ -1690,13 +1691,20 @@ export default function Home() {
                   ].map(({ icon, title, desc }) => (
                     <motion.div
                       key={title}
-                      whileTap={{ scale: 0.96 }}
-                      className="bg-[#FDF5F2]/60 p-3.5 rounded-[18px] border border-[#F3EAE8]/40 relative overflow-hidden cursor-pointer"
+                      whileTap={{ scale: 0.94 }}
+                      onClick={() => setPremiumModal(title)}
+                      className="bg-[#FDF5F2]/60 p-3.5 rounded-[18px] border border-[#F3EAE8]/40 relative overflow-hidden cursor-pointer active:bg-[#FFEDE8]/60 transition-colors"
                     >
-                      <div className="absolute top-2.5 right-2.5 text-[#F88E7D]/60"><Lock size={10}/></div>
+                      <div className="absolute top-2.5 right-2.5 text-[#F88E7D]/70">
+                        {isPremium ? <Sparkles size={10}/> : <Lock size={10}/>}
+                      </div>
                       <div className="text-lg mb-1.5">{icon}</div>
                       <p className="text-[10.5px] font-black text-slate-700 leading-tight">{title}</p>
                       <p className="text-[8.5px] text-slate-400 mt-0.5 leading-snug">{desc}</p>
+                      <div className="mt-2 flex items-center gap-1 text-[#F88E7D]">
+                        <span className="text-[8px] font-black uppercase tracking-wider">{isPremium ? 'View' : 'Preview'}</span>
+                        <ChevronRight size={9}/>
+                      </div>
                     </motion.div>
                   ))}
                 </div>
@@ -1850,6 +1858,258 @@ export default function Home() {
               <button onClick={() => setScanLimitReached(false)} className="text-[11px] font-black text-slate-300 uppercase tracking-widest">Maybe Later</button>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══ PREMIUM FEATURE BOTTOM SHEET MODAL ═══ */}
+      <AnimatePresence>
+        {premiumModal && data && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setPremiumModal(null)}
+              className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[190] md:left-1/2 md:-translate-x-1/2 md:max-w-[430px] md:right-auto md:w-[430px]"
+            />
+            {/* Sheet */}
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              className="fixed bottom-0 left-0 right-0 z-[200] bg-white rounded-t-[32px] shadow-2xl md:left-1/2 md:-translate-x-1/2 md:max-w-[430px] overflow-hidden"
+              style={{ maxHeight: '88vh' }}
+            >
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 bg-slate-200 rounded-full" />
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-3 border-b border-slate-50">
+                <div>
+                  <p className="text-[9px] text-[#F88E7D] font-black uppercase tracking-widest">
+                    {["Deep Pore Scan","Skin Age Score","Weekly Reports","Custom Routine","Progress Insights","Ingredient Match"].find(t=>t===premiumModal) && "Premium Analytics"}
+                  </p>
+                  <h3 className="text-[17px] font-black text-slate-800">{premiumModal}</h3>
+                </div>
+                <button onClick={() => setPremiumModal(null)} className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 active:scale-90 transition-transform">
+                  <X size={16}/>
+                </button>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="overflow-y-auto px-5 pb-6 pt-4 space-y-4" style={{ maxHeight: 'calc(88vh - 90px)' }}>
+
+                {/* ── DEEP PORE SCAN ── */}
+                {premiumModal === "Deep Pore Scan" && (
+                  <div className="space-y-4">
+                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
+                      <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider mb-3">Pore Congestion Map</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[{zone:'T-Zone',level:data.oil>50?'High':data.oil>25?'Mod':'Low',color:data.oil>50?'#ef4444':data.oil>25?'#f59e0b':'#10b981'},{zone:'Left Cheek',level:data.acne>30?'Active':data.acne>15?'Mild':'Clear',color:data.acne>30?'#ef4444':data.acne>15?'#f59e0b':'#10b981'},{zone:'Right Cheek',level:data.acne>25?'Active':data.acne>10?'Mild':'Clear',color:data.acne>25?'#ef4444':data.acne>10?'#f59e0b':'#10b981'},{zone:'Nose',level:data.oil>40?'Clogged':data.oil>20?'Mild':'Clear',color:data.oil>40?'#ef4444':data.oil>20?'#f59e0b':'#10b981'},{zone:'Chin',level:data.acne>20?'Active':'Clear',color:data.acne>20?'#f59e0b':'#10b981'},{zone:'Forehead',level:data.oil>45?'Oily':data.oil>20?'Mild':'Clear',color:data.oil>45?'#ef4444':data.oil>20?'#f59e0b':'#10b981'}].map(z=>(
+                          <div key={z.zone} className="bg-white rounded-[14px] p-2.5 text-center border border-slate-100">
+                            <p className="text-[8px] text-slate-400 font-bold">{z.zone}</p>
+                            <p className="text-[10px] font-black mt-0.5" style={{color:z.color}}>{z.level}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Pore Care Tips</p>
+                      {["Use a salicylic acid toner 2× weekly to decongest pores.","Double cleanse with an oil-based cleanser to dissolve sebum plugs.","Clay mask on T-zone twice a week to absorb excess oil.",`Your pore congestion score: ${Math.round((data.oil+data.acne)/2)}% — ${data.oil+data.acne>80?'High priority':'Manageable'} care needed.`].map((tip,i)=>(
+                        <div key={i} className="flex gap-2.5 items-start bg-white p-3 rounded-[14px] border border-slate-100">
+                          <span className="w-5 h-5 rounded-full bg-[#F88E7D]/15 flex items-center justify-center text-[#F88E7D] text-[8px] font-black flex-shrink-0 mt-0.5">{i+1}</span>
+                          <p className="text-[10.5px] text-slate-600 leading-snug">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
+                      <Lock className="text-[#F88E7D] mx-auto mb-2" size={18}/>
+                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Pore Analysis Locked</p>
+                      <p className="text-[9.5px] text-slate-500 mb-3">Get UV-light pore mapping, blackhead density scores & more.</p>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade to Premium</Link>
+                    </div>}
+                  </div>
+                )}
+
+                {/* ── SKIN AGE SCORE ── */}
+                {premiumModal === "Skin Age Score" && (() => {
+                  const chrono = new Date().getFullYear() - 1998;
+                  const ageDelta = Math.round((data.acne * 0.15) + (data.oil * 0.1) + (data.pigmentation * 0.12) - (data.score * 0.08));
+                  const bioAge = Math.max(18, chrono + ageDelta);
+                  const ageColor = ageDelta <= 0 ? '#10b981' : ageDelta <= 3 ? '#f59e0b' : '#ef4444';
+                  return (
+                    <div className="space-y-4">
+                      <div className="bg-[#FDF5F2]/60 rounded-[20px] p-5 border border-[#F3EAE8]/50 text-center">
+                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider mb-2">Estimated Biological Skin Age</p>
+                        <div className="text-[52px] font-black leading-none" style={{color: ageColor}}>{bioAge}</div>
+                        <p className="text-[11px] font-bold text-slate-500 mt-1">years old (skin biological age)</p>
+                        <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9.5px] font-black" style={{background: ageDelta<=0?'#f0fdf4':'#fff7ed', color: ageColor}}>
+                          {ageDelta <= 0 ? '✨ Younger than chronological age!' : `⚠ +${ageDelta} years above chronological age`}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[{label:'Elasticity Score',val:`${Math.max(40,100-data.acne-data.oil/2)}%`,icon:'💪'},{label:'Collagen Index',val:`${Math.max(35,100-data.pigmentation-data.acne/3)}%`,icon:'🧬'},{label:'Hydration Level',val:`${Math.max(30,100-data.oil/2-data.acne/3)}%`,icon:'💧'},{label:'Skin Clarity',val:`${Math.max(40,100-data.acne-data.pigmentation/2)}%`,icon:'✨'}].map(m=>(
+                          <div key={m.label} className="bg-white rounded-[16px] p-3 border border-slate-100 text-center">
+                            <div className="text-xl mb-1">{m.icon}</div>
+                            <p className="text-[16px] font-black text-slate-800">{m.val}</p>
+                            <p className="text-[8.5px] text-slate-400 font-bold">{m.label}</p>
+                          </div>
+                        ))}
+                      </div>
+                      {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
+                        <p className="text-[12px] font-black text-slate-800 mb-1">Full Age Report Locked</p>
+                        <p className="text-[9.5px] text-slate-500 mb-3">Monthly aging rate, wrinkle prediction & anti-aging plan.</p>
+                        <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                      </div>}
+                    </div>
+                  );
+                })()}
+
+                {/* ── WEEKLY REPORTS ── */}
+                {premiumModal === "Weekly Reports" && (
+                  <div className="space-y-4">
+                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">Scan History Overview</p>
+                      {history.length <= 1 ? (
+                        <div className="text-center py-6">
+                          <div className="text-3xl mb-2">📊</div>
+                          <p className="text-[12px] font-black text-slate-600">Not enough data yet</p>
+                          <p className="text-[9.5px] text-slate-400 mt-1">Scan weekly to generate progress charts.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2.5">
+                          {history.slice(0,5).map((h,i)=>(
+                            <div key={i} className="flex items-center gap-3">
+                              <p className="text-[8.5px] text-slate-400 font-bold w-12 shrink-0">{h.date.slice(0,5)}</p>
+                              <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                                <motion.div initial={{width:0}} animate={{width:`${h.score}%`}} transition={{delay:i*0.1,duration:0.6}} className="h-full rounded-full" style={{background:i===0?'linear-gradient(90deg,#F88E7D,#f97316)':'#e2e8f0'}}/>
+                              </div>
+                              <p className="text-[9px] font-black text-slate-700 w-6 text-right">{h.score}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      {[{label:'Best Score',val:history.length?Math.max(...history.map(h=>h.score)):data.score,icon:'🏆'},{label:'Avg Score',val:history.length?Math.round(history.reduce((a,h)=>a+h.score,0)/history.length):data.score,icon:'📊'},{label:'Total Scans',val:history.length||1,icon:'🔬'}].map(m=>(
+                        <div key={m.label} className="bg-white rounded-[16px] p-3 border border-slate-100">
+                          <div className="text-xl mb-1">{m.icon}</div>
+                          <p className="text-[15px] font-black text-slate-800">{m.val}</p>
+                          <p className="text-[7.5px] text-slate-400 font-bold">{m.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
+                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Weekly Reports Locked</p>
+                      <p className="text-[9.5px] text-slate-500 mb-3">PDF exports, trend analysis & dermatologist summaries.</p>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                    </div>}
+                  </div>
+                )}
+
+                {/* ── CUSTOM ROUTINE ── */}
+                {premiumModal === "Custom Routine" && (
+                  <div className="space-y-4">
+                    {[{time:'🌅 Morning Routine',steps:[`Gentle ${data.oil>40?'foaming':'cream'} cleanser (30s)`,`Niacinamide serum${data.oil>40?' (10%) for oil control':'(5%) for glow'}`,data.pigmentation>25?'Vitamin C serum (5–15 min)':'Hyaluronic acid serum',`SPF ${data.acne>30?'50+ mineral':'30+ lightweight'} — non-comedogenic`]},{time:'🌙 Night Routine',steps:['Micellar water makeup removal',`${data.acne>30?'Salicylic acid cleanser (2%)':'Hydrating cream cleanser'}`,data.acne>20?'Adapalene gel (0.1%) — alternate nights':'Retinol 0.25% — 2× weekly',`${data.oil>40?'Oil-free':'Rich ceramide'} moisturizer + eye cream`]}].map(routine=>(
+                      <div key={routine.time} className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
+                        <p className="text-[11px] font-black text-slate-700 mb-3">{routine.time}</p>
+                        <div className="space-y-2">
+                          {routine.steps.map((step,i)=>(
+                            <div key={i} className="flex gap-2.5 items-start">
+                              <span className="w-5 h-5 rounded-full bg-[#F88E7D]/15 flex items-center justify-center text-[#F88E7D] text-[8px] font-black flex-shrink-0 mt-0.5">{i+1}</span>
+                              <p className="text-[10.5px] text-slate-600 leading-snug">{step}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
+                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Routine Plan Locked</p>
+                      <p className="text-[9.5px] text-slate-500 mb-3">Weekly routine adjustments, product recommendations & reminders.</p>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                    </div>}
+                  </div>
+                )}
+
+                {/* ── PROGRESS INSIGHTS ── */}
+                {premiumModal === "Progress Insights" && (
+                  <div className="space-y-4">
+                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">Current Status</p>
+                      {[
+                        {label:'Acne Trend', val:data.acne, icon:'🔴', tip:data.acne<20?'✓ Clear — maintain routine':'⚠ Reduce sugar & dairy intake'},
+                        {label:'Oil Control', val:data.oil, icon:'🟡', tip:data.oil<30?'✓ Balanced sebum':'⚠ Add niacinamide to routine'},
+                        {label:'Pigmentation', val:data.pigmentation, icon:'🟣', tip:data.pigmentation<20?'✓ Even tone':'⚠ Start Vit C + SPF daily'},
+                      ].map(m=>(
+                        <div key={m.label} className="mb-3 last:mb-0">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="text-[10px] font-black text-slate-600">{m.icon} {m.label}</span>
+                            <span className="text-[10px] font-black text-slate-700">{m.val}%</span>
+                          </div>
+                          <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <motion.div initial={{width:0}} animate={{width:`${m.val}%`}} transition={{duration:0.8}} className="h-full rounded-full" style={{background:`linear-gradient(90deg,#F88E7D,#f97316)`}}/>
+                          </div>
+                          <p className="text-[8.5px] text-slate-400 mt-1">{m.tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-white rounded-[20px] p-4 border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">AI Prediction</p>
+                      <p className="text-[11.5px] text-slate-700 leading-relaxed">
+                        {data.score>=75?'Your skin is on a positive trajectory. With consistent care, expect a 5–10 point improvement in 4 weeks.':data.score>=55?'Moderate improvements expected in 3–4 weeks with consistent routine adherence. Focus on oil control and SPF.':'Significant improvement possible in 6–8 weeks. Prioritize a consistent cleansing and barrier repair routine.'}
+                      </p>
+                    </div>
+                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
+                      <p className="text-[12px] font-black text-slate-800 mb-1">Long-term Insights Locked</p>
+                      <p className="text-[9.5px] text-slate-500 mb-3">90-day projection charts, milestone tracking & alerts.</p>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                    </div>}
+                  </div>
+                )}
+
+                {/* ── INGREDIENT MATCH ── */}
+                {premiumModal === "Ingredient Match" && (
+                  <div className="space-y-4">
+                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">✅ Recommended Ingredients</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          ...(data.acne>20?['Salicylic Acid','Niacinamide','Tea Tree Oil','Benzoyl Peroxide']:['Lactic Acid','Ceramides']),
+                          ...(data.oil>35?['Zinc','Clay','Witch Hazel']:['Squalane','Glycerin']),
+                          ...(data.pigmentation>20?['Vitamin C','Alpha Arbutin','Kojic Acid']:['Resveratrol']),
+                          'Hyaluronic Acid','SPF 50+'
+                        ].slice(0,8).map(ing=>(
+                          <span key={ing} className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[9px] font-black">✓ {ing}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-[20px] p-4 border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">❌ Avoid These</p>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          ...(data.acne>20?['Coconut Oil','Lanolin','Mineral Oil']:['Alcohol-heavy toners']),
+                          ...(data.oil>40?['Heavy Petrolatum','Thick butters']:['Drying Alcohols']),
+                          ...(data.pigmentation>25?['Photosensitizers without SPF']:['Harsh Sulfates']),
+                        ].slice(0,6).map(ing=>(
+                          <span key={ing} className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-200 rounded-full text-[9px] font-black">✗ {ing}</span>
+                        ))}
+                      </div>
+                    </div>
+                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
+                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Ingredient Database Locked</p>
+                      <p className="text-[9.5px] text-slate-500 mb-3">Product scanner, ingredient safety ratings & personalized picks.</p>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                    </div>}
+                  </div>
+                )}
+
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>
