@@ -1166,7 +1166,46 @@ export default function Home() {
 
         {/* RESULTS & DEEP ANALYSIS (FACE) */}
         {view === "results" && data && (
-          <motion.div key="results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen pb-36 bg-[#FDF5F2] overflow-x-hidden">
+          loading ? (
+            <motion.div key="results-loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#FDF5F2] z-[150] flex flex-col items-center justify-center p-6 text-center">
+              <div className="relative w-48 h-48 mb-8 rounded-[40px] overflow-hidden border-4 border-white shadow-2xl">
+                {data.image ? (
+                  <img src={data.image} alt="Scanning" className="w-full h-full object-cover scale-110" />
+                ) : (
+                  <div className="w-full h-full bg-[#FFEDE8] flex items-center justify-center text-[#F88E7D]">
+                    <ScanFace size={64} />
+                  </div>
+                )}
+                <motion.div 
+                  animate={{ y: ["-100%", "100%", "-100%"] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  className="absolute inset-x-0 h-1 bg-[#F88E7D] shadow-[0_0_15px_#F88E7D] z-10"
+                />
+                <div className="absolute inset-0 bg-slate-900/30" />
+              </div>
+
+              <div className="space-y-3 max-w-xs">
+                <div className="flex justify-center gap-1.5">
+                  {[0, 1, 2].map((i) => (
+                    <motion.div
+                      key={i}
+                      animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
+                      transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.2 }}
+                      className="w-2.5 h-2.5 bg-[#F88E7D] rounded-full"
+                    />
+                  ))}
+                </div>
+                <h3 className="text-xl font-black text-slate-800 tracking-tight">Analyzing Skin...</h3>
+                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider animate-pulse">Deep scanning dermal layers</p>
+                
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-100/50 mt-4 text-[11px] text-slate-500 font-medium leading-relaxed shadow-sm">
+                  Our AI model is evaluating skin hydration, sebum levels, and hyperpigmentation hotspots to build your custom report.
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div key="results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen pb-36 bg-[#FDF5F2] overflow-x-hidden">
+
 
             {/* ═══════════ FACE SCAN IMAGE AREA ═══════════ */}
             <div className="relative w-full h-[320px] bg-slate-950 overflow-hidden">
@@ -1708,9 +1747,11 @@ export default function Home() {
                     </motion.div>
                   ))}
                 </div>
-                <Link href="/premium" className="mt-4 w-full h-11 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest shadow-md shadow-orange-500/20 active:scale-95 transition-transform">
-                  <Gem size={13}/> Unlock All Premium Features
-                </Link>
+                {!isPremium && (
+                  <Link href="/premium" className="mt-4 w-full h-11 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest shadow-md shadow-orange-500/20 active:scale-95 transition-transform">
+                    <Gem size={13}/> Unlock All Premium Features
+                  </Link>
+                )}
               </div>
 
               {/* ── Progress Tracking ── */}
@@ -1802,6 +1843,7 @@ export default function Home() {
             </div>
 
           </motion.div>
+          )
         )}
 
 
