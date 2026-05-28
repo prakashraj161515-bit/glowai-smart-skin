@@ -1170,7 +1170,7 @@ export default function Home() {
               <img 
                 src={data.image || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80"} 
                 alt="Scan" 
-                className="w-full h-full object-cover opacity-70 scale-105 transition-transform duration-[4s]" 
+                className="w-full h-full object-cover opacity-70 scale-125 object-[center_62%] transition-transform duration-[4s]" 
               />
               
               {/* Futuristic SVG Dermal Mesh overlay */}
@@ -1179,46 +1179,46 @@ export default function Home() {
                 <path d="M10,20 L15,40 L20,60 L30,80 M90,20 L85,40 L80,60 L70,80 M50,10 L50,30 L50,55 L50,78" fill="none" stroke="currentColor" strokeWidth="0.2" />
                 <path d="M30,15 L35,35 L40,58 M70,15 L65,35 L60,58" fill="none" stroke="currentColor" strokeWidth="0.2" strokeDasharray="2,2" />
               </svg>
-
+ 
               {/* Glowing Scan Line Animation */}
               <motion.div 
                 animate={{ y: ["0px", "380px", "0px"] }} 
                 transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
                 className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_15px_#F88E7D] opacity-90 z-10"
               />
-
+ 
               {/* AI Detection Overlays based on real data */}
               <div className="absolute inset-0 pointer-events-none mix-blend-screen">
                 
                 {/* 9. Uneven Texture: Light Dermal Mesh Overlay */}
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(#ffffff 0.5px, transparent 0.5px)", backgroundSize: "8px 8px" }} />
-
+ 
                 {/* 2. Oiliness: Yellow/Orange Heatmap on T-Zone */}
                 <div className="absolute top-[8%] left-[25%] w-[50%] h-[14%] bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.3)_0%,transparent_70%)] blur-[4px]" />
                 <div className="absolute top-[20%] left-[43%] w-[14%] h-[24%] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.35)_0%,transparent_70%)] blur-[3px]" />
-
+ 
                 {/* 3. Pigmentation: Purple/Blue Overlay on Cheekbones */}
                 <div className="absolute top-[48%] left-[16%] w-[20%] h-[12%] bg-[radial-gradient(circle,rgba(168,85,247,0.25)_0%,transparent_75%)] blur-[4px]" />
                 <div className="absolute top-[50%] left-[64%] w-[20%] h-[12%] bg-[radial-gradient(circle,rgba(147,51,234,0.25)_0%,transparent_75%)] blur-[4px]" />
-
+ 
                 {/* 4. Dark Circles: Dark Blue Overlay Under Eyes */}
                 <div className="absolute top-[38%] left-[28%] w-[16%] h-[5%] bg-blue-900/30 blur-[4px] rounded-full mix-blend-multiply" />
                 <div className="absolute top-[38%] left-[56%] w-[16%] h-[5%] bg-blue-900/30 blur-[4px] rounded-full mix-blend-multiply" />
-
+ 
                 {/* 5. Dryness: White/Light Cyan Patches on Jawlines */}
                 <div className="absolute top-[62%] left-[14%] w-[15%] h-[10%] bg-cyan-200/15 border border-cyan-300/10 blur-[5px] rounded-full" />
                 <div className="absolute top-[64%] left-[71%] w-[15%] h-[10%] bg-cyan-200/15 border border-cyan-300/10 blur-[5px] rounded-full" />
-
+ 
                 {/* 6. Redness/Irritation: Pink-Red Glow on Inner Cheeks */}
                 <div className="absolute top-[44%] left-[36%] w-[12%] h-[8%] bg-rose-500/20 blur-[5px] rounded-full" />
                 <div className="absolute top-[44%] left-[52%] w-[12%] h-[8%] bg-rose-500/20 blur-[5px] rounded-full" />
-
+ 
                 {/* 7. Glow/Healthy Skin: Soft White Highlights */}
                 <div className="absolute top-[30%] left-[64%] w-[16%] h-[8%] bg-white/25 blur-[3px] rounded-full" />
                 <div className="absolute top-[68%] left-[45%] w-[10%] h-[6%] bg-white/20 blur-[2px] rounded-full" />
-
+ 
                 {/* 1. Acne Red Dots & Pulses */}
-                {data.acne > 15 && (
+                {data.acne >= 10 && (
                   <>
                     {/* Left Cheek Acne */}
                     <div className="absolute top-[46%] left-[24%]">
