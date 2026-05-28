@@ -62,6 +62,7 @@ export default function Home() {
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [demoName, setDemoName] = useState("");
   const [streak, setStreak] = useState(1);
+  const [expandedSection, setExpandedSection] = useState<string | null>("insights");
 
   const APP_VERSION = "3.0"; // Increment this to force restart for all users
 
@@ -1165,433 +1166,565 @@ export default function Home() {
         {/* RESULTS & DEEP ANALYSIS (FACE) */}
         {view === "results" && data && (
           <motion.div key="results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen pb-36 bg-[#FDF5F2] overflow-x-hidden">
-            {/* Background Image (The scanned face) with high-tech overlays */}
-            <div className="relative w-full h-[380px] bg-slate-900 overflow-hidden shadow-lg">
-              <img 
-                src={data.image || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80"} 
-                alt="Scan" 
-                className="w-full h-full object-cover opacity-70 scale-125 object-[center_62%] transition-transform duration-[4s]" 
+
+            {/* ═══════════ FACE SCAN IMAGE AREA ═══════════ */}
+            <div className="relative w-full h-[320px] bg-slate-950 overflow-hidden">
+              {/* Face Image - zoomed & centered */}
+              <img
+                src={data.image || "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80"}
+                alt="Scan"
+                className="w-full h-full object-cover scale-125 object-[center_60%] opacity-75"
               />
-              
-              {/* Futuristic SVG Dermal Mesh overlay */}
-              <svg className="absolute inset-0 w-full h-full text-[#F88E7D]/30 pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M10,20 L30,15 L50,10 L70,15 L90,20 M15,40 L35,35 L50,30 L65,35 L85,40 M20,60 L40,58 L50,55 L60,58 L80,60 M30,80 L50,78 L70,80" fill="none" stroke="currentColor" strokeWidth="0.25" strokeDasharray="1,1" />
-                <path d="M10,20 L15,40 L20,60 L30,80 M90,20 L85,40 L80,60 L70,80 M50,10 L50,30 L50,55 L50,78" fill="none" stroke="currentColor" strokeWidth="0.2" />
-                <path d="M30,15 L35,35 L40,58 M70,15 L65,35 L60,58" fill="none" stroke="currentColor" strokeWidth="0.2" strokeDasharray="2,2" />
+
+              {/* Cinematic vignette — darkens edges, focuses center */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.72)_100%)] pointer-events-none" />
+              {/* Extra bottom fade */}
+              <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-slate-950/80 to-transparent pointer-events-none" />
+
+              {/* ── Dermal Mesh SVG (face-aligned landmark lines) ── */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
+                {/* Forehead horizontal */}
+                <path d="M30,18 Q50,14 70,18" fill="none" stroke="#F88E7D" strokeWidth="0.2" strokeDasharray="1.5,2" />
+                {/* Cheekbone arcs */}
+                <path d="M22,42 Q30,38 40,40" fill="none" stroke="#F88E7D" strokeWidth="0.18" strokeDasharray="1,2" />
+                <path d="M60,40 Q70,38 78,42" fill="none" stroke="#F88E7D" strokeWidth="0.18" strokeDasharray="1,2" />
+                {/* Nose bridge */}
+                <path d="M47,30 L47,52 M53,30 L53,52" fill="none" stroke="#F88E7D" strokeWidth="0.15" />
+                {/* Jaw line */}
+                <path d="M28,72 Q50,80 72,72" fill="none" stroke="#F88E7D" strokeWidth="0.18" strokeDasharray="2,2" />
+                {/* Face oval */}
+                <ellipse cx="50" cy="50" rx="28" ry="36" fill="none" stroke="#F88E7D" strokeWidth="0.15" strokeDasharray="1,3" />
+                {/* Landmark dots */}
+                <circle cx="35" cy="40" r="0.6" fill="#F88E7D" opacity="0.7"/>
+                <circle cx="65" cy="40" r="0.6" fill="#F88E7D" opacity="0.7"/>
+                <circle cx="50" cy="30" r="0.6" fill="#F88E7D" opacity="0.7"/>
+                <circle cx="50" cy="55" r="0.6" fill="#F88E7D" opacity="0.6"/>
+                <circle cx="38" cy="65" r="0.5" fill="#F88E7D" opacity="0.5"/>
+                <circle cx="62" cy="65" r="0.5" fill="#F88E7D" opacity="0.5"/>
               </svg>
- 
-              {/* Glowing Scan Line Animation */}
-              <motion.div 
-                animate={{ y: ["0px", "380px", "0px"] }} 
-                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_15px_#F88E7D] opacity-90 z-10"
+
+              {/* ── Animated Scan Line ── */}
+              <motion.div
+                animate={{ y: ["0px", "320px", "0px"] }}
+                transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
+                className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_12px_#F88E7D] opacity-80 z-10 pointer-events-none"
               />
- 
-              {/* AI Detection Overlays based on real data */}
-              <div className="absolute inset-0 pointer-events-none mix-blend-screen">
-                
-                {/* 9. Uneven Texture: Light Dermal Mesh Overlay */}
-                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(#ffffff 0.5px, transparent 0.5px)", backgroundSize: "8px 8px" }} />
- 
-                {/* 2. Oiliness: Yellow/Orange Heatmap on T-Zone */}
-                <div className="absolute top-[8%] left-[25%] w-[50%] h-[14%] bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.3)_0%,transparent_70%)] blur-[4px]" />
-                <div className="absolute top-[20%] left-[43%] w-[14%] h-[24%] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.35)_0%,transparent_70%)] blur-[3px]" />
- 
-                {/* 3. Pigmentation: Purple/Blue Overlay on Cheekbones */}
-                <div className="absolute top-[48%] left-[16%] w-[20%] h-[12%] bg-[radial-gradient(circle,rgba(168,85,247,0.25)_0%,transparent_75%)] blur-[4px]" />
-                <div className="absolute top-[50%] left-[64%] w-[20%] h-[12%] bg-[radial-gradient(circle,rgba(147,51,234,0.25)_0%,transparent_75%)] blur-[4px]" />
- 
-                {/* 4. Dark Circles: Dark Blue Overlay Under Eyes */}
-                <div className="absolute top-[38%] left-[28%] w-[16%] h-[5%] bg-blue-900/30 blur-[4px] rounded-full mix-blend-multiply" />
-                <div className="absolute top-[38%] left-[56%] w-[16%] h-[5%] bg-blue-900/30 blur-[4px] rounded-full mix-blend-multiply" />
- 
-                {/* 5. Dryness: White/Light Cyan Patches on Jawlines */}
-                <div className="absolute top-[62%] left-[14%] w-[15%] h-[10%] bg-cyan-200/15 border border-cyan-300/10 blur-[5px] rounded-full" />
-                <div className="absolute top-[64%] left-[71%] w-[15%] h-[10%] bg-cyan-200/15 border border-cyan-300/10 blur-[5px] rounded-full" />
- 
-                {/* 6. Redness/Irritation: Pink-Red Glow on Inner Cheeks */}
-                <div className="absolute top-[44%] left-[36%] w-[12%] h-[8%] bg-rose-500/20 blur-[5px] rounded-full" />
-                <div className="absolute top-[44%] left-[52%] w-[12%] h-[8%] bg-rose-500/20 blur-[5px] rounded-full" />
- 
-                {/* 7. Glow/Healthy Skin: Soft White Highlights */}
-                <div className="absolute top-[30%] left-[64%] w-[16%] h-[8%] bg-white/25 blur-[3px] rounded-full" />
-                <div className="absolute top-[68%] left-[45%] w-[10%] h-[6%] bg-white/20 blur-[2px] rounded-full" />
- 
-                {/* 1. Acne Red Dots & Pulses */}
-                {data.acne >= 10 && (
-                  <>
-                    {/* Left Cheek Acne */}
-                    <div className="absolute top-[46%] left-[24%]">
-                      <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 2 }} className="w-4 h-4 rounded-full border border-red-500 bg-red-500/30 flex items-center justify-center shadow-[0_0_8px_#ef4444]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                      </motion.div>
-                    </div>
-                    {/* Right Cheek Acne */}
-                    <div className="absolute top-[52%] left-[72%]">
-                      <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 2.2 }} className="w-4 h-4 rounded-full border border-red-500 bg-red-500/30 flex items-center justify-center shadow-[0_0_8px_#ef4444]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                      </motion.div>
-                    </div>
-                  </>
-                )}
 
-                {/* 8. Pores: Small Orange Markers */}
-                <div className="absolute top-[34%] left-[46%] w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_4px_#f97316]" />
-                <div className="absolute top-[38%] left-[43%] w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_4px_#f97316]" />
-                <div className="absolute top-[37%] left-[51%] w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_4px_#f97316]" />
+              {/* ═══ SMART OVERLAYS — keyed to real facial regions ═══ */}
+              {/* All hidden while loading */}
+              {!loading && (
+                <div className="absolute inset-0 pointer-events-none">
 
+                  {/* FOREHEAD — Oiliness (T-zone top) */}
+                  {(data.oil || 0) >= 5 && (
+                    <div className="absolute top-[10%] left-[30%] w-[40%] h-[12%] rounded-full blur-[10px] mix-blend-screen" style={{
+                      background: `radial-gradient(ellipse at center, rgba(251,191,36,${Math.min(0.55, (data.oil||0)/130)}) 0%, transparent 75%)`
+                    }} />
+                  )}
+
+                  {/* NOSE BRIDGE — Pores / Oiliness T-zone center */}
+                  {(data.oil || 0) >= 15 && (
+                    <div className="absolute top-[30%] left-[43%] w-[14%] h-[22%] rounded-full blur-[6px] mix-blend-screen" style={{
+                      background: `radial-gradient(ellipse at center, rgba(245,158,11,${Math.min(0.5, (data.oil||0)/140)}) 0%, transparent 75%)`
+                    }} />
+                  )}
+
+                  {/* LEFT CHEEK — Pigmentation */}
+                  {(data.pigmentation || 0) >= 5 && (
+                    <div className="absolute top-[42%] left-[12%] w-[24%] h-[18%] rounded-full blur-[8px] mix-blend-screen" style={{
+                      background: `radial-gradient(circle, rgba(168,85,247,${Math.min(0.45, (data.pigmentation||0)/170)}) 0%, transparent 75%)`
+                    }} />
+                  )}
+
+                  {/* RIGHT CHEEK — Pigmentation */}
+                  {(data.pigmentation || 0) >= 5 && (
+                    <div className="absolute top-[42%] left-[64%] w-[24%] h-[18%] rounded-full blur-[8px] mix-blend-screen" style={{
+                      background: `radial-gradient(circle, rgba(147,51,234,${Math.min(0.45, (data.pigmentation||0)/170)}) 0%, transparent 75%)`
+                    }} />
+                  )}
+
+                  {/* UNDER EYES — Dark Circles */}
+                  {(data.acne || 0) >= 5 && (
+                    <>
+                      <div className="absolute top-[37%] left-[26%] w-[18%] h-[6%] rounded-full blur-[5px]" style={{
+                        background: `rgba(30,58,138,${Math.min(0.38, (data.acne||0)/180)})`,
+                        mixBlendMode: 'multiply'
+                      }} />
+                      <div className="absolute top-[37%] left-[56%] w-[18%] h-[6%] rounded-full blur-[5px]" style={{
+                        background: `rgba(30,58,138,${Math.min(0.38, (data.acne||0)/180)})`,
+                        mixBlendMode: 'multiply'
+                      }} />
+                    </>
+                  )}
+
+                  {/* JAWLINE — Dryness */}
+                  {(data.acne || 0) >= 5 && (
+                    <>
+                      <div className="absolute top-[68%] left-[16%] w-[16%] h-[8%] rounded-full blur-[8px] mix-blend-screen" style={{
+                        background: `rgba(165,243,252,${Math.min(0.3, (data.acne||0)/250)})`
+                      }} />
+                      <div className="absolute top-[68%] left-[68%] w-[16%] h-[8%] rounded-full blur-[8px] mix-blend-screen" style={{
+                        background: `rgba(165,243,252,${Math.min(0.3, (data.acne||0)/250)})`
+                      }} />
+                    </>
+                  )}
+
+                  {/* CHEEK REDNESS — Inner cheeks */}
+                  {(data.acne || 0) >= 10 && (
+                    <>
+                      <div className="absolute top-[46%] left-[34%] w-[13%] h-[9%] rounded-full blur-[6px] mix-blend-screen" style={{
+                        background: `rgba(244,63,94,${Math.min(0.35, (data.acne||0)/230)})`
+                      }} />
+                      <div className="absolute top-[46%] left-[53%] w-[13%] h-[9%] rounded-full blur-[6px] mix-blend-screen" style={{
+                        background: `rgba(244,63,94,${Math.min(0.35, (data.acne||0)/230)})`
+                      }} />
+                    </>
+                  )}
+
+                  {/* ACNE PULSE DOTS — cheeks (only if detected) */}
+                  {(data.acne || 0) >= 8 && (
+                    <>
+                      <div className="absolute top-[48%] left-[20%]">
+                        <motion.div
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.45, 1, 0.45] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                          className="rounded-full border border-red-400 flex items-center justify-center"
+                          style={{
+                            width: `${Math.max(10, Math.min(20, (data.acne||0)/5))}px`,
+                            height: `${Math.max(10, Math.min(20, (data.acne||0)/5))}px`,
+                            background: `rgba(239,68,68,${Math.min(0.45,(data.acne||0)/160)})`,
+                            boxShadow: `0 0 ${Math.max(4,(data.acne||0)/10)}px rgba(239,68,68,0.7)`
+                          }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                        </motion.div>
+                      </div>
+                      <div className="absolute top-[54%] left-[74%]">
+                        <motion.div
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.45, 1, 0.45] }}
+                          transition={{ repeat: Infinity, duration: 2.3, ease: "easeInOut" }}
+                          className="rounded-full border border-red-400 flex items-center justify-center"
+                          style={{
+                            width: `${Math.max(10, Math.min(18, (data.acne||0)/5.5))}px`,
+                            height: `${Math.max(10, Math.min(18, (data.acne||0)/5.5))}px`,
+                            background: `rgba(239,68,68,${Math.min(0.4,(data.acne||0)/170)})`,
+                            boxShadow: `0 0 ${Math.max(3,(data.acne||0)/12)}px rgba(239,68,68,0.6)`
+                          }}
+                        >
+                          <span className="w-1 h-1 rounded-full bg-red-500" />
+                        </motion.div>
+                      </div>
+                      {/* Forehead/chin dot for higher acne */}
+                      {(data.acne || 0) >= 28 && (
+                        <div className="absolute top-[18%] left-[48%]">
+                          <motion.div
+                            animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0.9, 0.3] }}
+                            transition={{ repeat: Infinity, duration: 1.8 }}
+                            className="w-2.5 h-2.5 rounded-full border border-red-400 flex items-center justify-center"
+                            style={{ background: `rgba(239,68,68,0.3)`, boxShadow: "0 0 5px rgba(239,68,68,0.5)" }}
+                          >
+                            <span className="w-1 h-1 rounded-full bg-red-400" />
+                          </motion.div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* PORE DOTS — nose bridge */}
+                  {(data.oil || 0) >= 20 && (
+                    <>
+                      {[{t:"34%",l:"46%"},{t:"38%",l:"44%"},{t:"37%",l:"52%"},{t:"41%",l:"48%"}].map((pos, i) => (
+                        <div key={i} className="absolute rounded-full" style={{
+                          top: pos.t, left: pos.l,
+                          width: `${Math.max(4, Math.min(8, (data.oil||0)/14))}px`,
+                          height: `${Math.max(4, Math.min(8, (data.oil||0)/14))}px`,
+                          background: `rgba(249,115,22,${Math.min(0.85,(data.oil||0)/100)})`,
+                          boxShadow: `0 0 4px rgba(249,115,22,0.6)`
+                        }} />
+                      ))}
+                    </>
+                  )}
+
+                  {/* HEALTHY GLOW — when score is high */}
+                  {(data.score || 0) >= 65 && (
+                    <div className="absolute top-[25%] left-[60%] w-[20%] h-[10%] rounded-full blur-[6px] mix-blend-screen" style={{
+                      background: `rgba(255,255,255,${Math.min(0.35,(data.score||0)/250)})`
+                    }} />
+                  )}
+
+                </div>
+              )}
+
+              {/* ── HUD Overlay — top controls ── */}
+              <div className="absolute top-8 left-5 right-5 flex justify-between items-center z-20">
+                <button
+                  onClick={() => setView("home")}
+                  className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-90 transition-transform shadow-lg"
+                >
+                  <ArrowLeft size={17} />
+                </button>
+                <button
+                  onClick={() => resetScanner("face")}
+                  className="px-4 py-2 rounded-full bg-black/40 backdrop-blur-md text-white font-black text-[10px] border border-white/10 active:scale-90 transition-transform tracking-widest uppercase shadow-lg"
+                >
+                  Rescan Skin
+                </button>
               </div>
 
-              {/* Success Badge & Dynamic Glassmorphic Legend */}
-              <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 z-10">
+              {/* ── Bottom HUD ── */}
+              <div className="absolute bottom-3 left-4 right-4 flex flex-col gap-1.5 z-10">
                 <div className="flex justify-between items-center">
-                  <div className="bg-black/45 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="bg-black/50 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-[8px] font-black text-white uppercase tracking-wider">AI Scan Active</span>
                   </div>
                   <div className="text-[8px] font-black text-white/60 uppercase tracking-widest bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full">
                     92% Confidence
                   </div>
                 </div>
-
-                {/* Believable Dermatology Scan Color Index Legend */}
-                <div className="bg-black/60 backdrop-blur-md border border-white/10 p-2.5 rounded-2xl flex flex-wrap justify-center gap-x-3 gap-y-1.5">
-                  <span className="flex items-center gap-1 text-[8px] font-black text-red-200 uppercase tracking-tighter">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_4px_#ef4444]" /> Acne
-                  </span>
-                  <span className="flex items-center gap-1 text-[8px] font-black text-amber-200 uppercase tracking-tighter">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_4px_#fbbf24]" /> Oil
-                  </span>
-                  <span className="flex items-center gap-1 text-[8px] font-black text-purple-200 uppercase tracking-tighter">
-                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shadow-[0_0_4px_#a855f7]" /> Pigment
-                  </span>
-                  <span className="flex items-center gap-1 text-[8px] font-black text-blue-200 uppercase tracking-tighter">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_4px_#3b82f6]" /> Circles
-                  </span>
-                  <span className="flex items-center gap-1 text-[8px] font-black text-cyan-200 uppercase tracking-tighter">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-300 shadow-[0_0_4px_#67e8f9]" /> Dryness
-                  </span>
-                  <span className="flex items-center gap-1 text-[8px] font-black text-white uppercase tracking-tighter">
-                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_4px_#ffffff]" /> Glow
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Back & Rescan Controls overlaying the scanner image */}
-            <div className="absolute top-8 left-6 right-6 flex justify-between items-center z-20">
-              <button 
-                onClick={() => setView("home")} 
-                className="w-11 h-11 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center text-white border border-white/10 active:scale-90 transition-transform shadow-lg"
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <button 
-                onClick={() => resetScanner("face")} 
-                className="px-5 py-2.5 rounded-full bg-black/40 backdrop-blur-md text-white font-black text-xs border border-white/10 active:scale-90 transition-transform tracking-widest uppercase shadow-lg"
-              >
-                Rescan Skin
-              </button>
-            </div>
-
-            {/* Premium Result Content Container */}
-            <div className="px-6 -mt-8 relative z-20 space-y-6">
-              
-              {/* Dermal Diagnostics Overview Card */}
-              <div className="bg-white rounded-[32px] p-6 shadow-xl shadow-orange-500/5 border border-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-[#FFEDE8] to-transparent rounded-full blur-xl opacity-70 pointer-events-none" />
-                
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-[14px] text-[#F88E7D] font-black uppercase tracking-widest">Dermal Diagnostic</h3>
-                    <h2 className="text-[24px] font-black text-slate-800 tracking-tight leading-tight mt-1">Overall Skin Health</h2>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-[28px] font-black text-slate-800 leading-none">
-                      {data.score}
-                      <span className="text-[14px] text-slate-300 font-bold ml-0.5">/100</span>
-                    </div>
-                    {/* Dynamic color status badge based on score logic */}
-                    <div className="mt-2.5">
-                      {data.score >= 80 ? (
-                        <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
-                          Excellent Condition
-                        </span>
-                      ) : data.score >= 65 ? (
-                        <span className="bg-amber-50 text-amber-600 border border-amber-100 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
-                          Moderate Condition
-                        </span>
-                      ) : (
-                        <span className="bg-red-50 text-red-600 border border-red-100 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
-                          Needs Attention
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Score progress bar bar */}
-                <div className="mt-6">
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: `${data.score}%` }}
-                      transition={{ duration: 1, ease: "easeOut" }}
-                      className={cn(
-                        "h-full rounded-full",
-                        data.score >= 80 ? "bg-emerald-400" : data.score >= 65 ? "bg-amber-400" : "bg-red-400"
-                      )}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* 3-Column Premium Metric Cards */}
-              <div className="grid grid-cols-3 gap-3">
-                {/* Acne Pill */}
-                <div className="bg-white rounded-[24px] p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-                  <div>
-                    <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center text-red-500 mb-2">
-                      <Target size={16} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-tight">Acne</p>
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-[20px] font-black text-slate-800 leading-none">{data.acne}%</p>
-                    <p className="text-[9px] text-slate-400 font-bold mt-1 leading-snug">
-                      {data.acne < 20 ? "Clear Dermal" : data.acne < 40 ? "Mild activity" : "Active flares"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Oil Pill */}
-                <div className="bg-white rounded-[24px] p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-                  <div>
-                    <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 mb-2">
-                      <Droplets size={16} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-tight">Oil</p>
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-[20px] font-black text-slate-800 leading-none">{data.oil}%</p>
-                    <p className="text-[9px] text-slate-400 font-bold mt-1 leading-snug">
-                      {data.oil < 30 ? "Dry / Balanced" : data.oil < 60 ? "Balanced/Oily" : "Excess Sebum"}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pigmentation Pill */}
-                <div className="bg-white rounded-[24px] p-4 shadow-sm border border-slate-100 flex flex-col justify-between">
-                  <div>
-                    <div className="w-8 h-8 rounded-xl bg-pink-50 flex items-center justify-center text-[#F88E7D] mb-2">
-                      <Sparkles size={16} />
-                    </div>
-                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-tight">Pigment</p>
-                  </div>
-                  <div className="mt-2">
-                    <p className="text-[20px] font-black text-slate-800 leading-none">{data.pigmentation}%</p>
-                    <p className="text-[9px] text-slate-400 font-bold mt-1 leading-snug">
-                      {data.pigmentation < 20 ? "Even distribution" : data.pigmentation < 40 ? "Minor spots" : "Melanin shifts"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Personalized Intro Block & Trust Indicators */}
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
-                <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
-                  <BrainCircuit size={14} /> AI Analysis Insights
-                </div>
-                
-                {/* Dynamically formulated personalized believable insight intro paragraph */}
-                <p className="text-[13px] font-bold text-slate-700 leading-relaxed italic border-l-4 border-[#F88E7D]/40 pl-3">
-                  {`"${data.acne > 25 ? "Minor acne activity detected around the cheek and chin area." : "No significant acne flares detected. Skin looks relatively clear."} ${data.oil > 45 ? "Skin texture indicates slight dehydration leading to compensatory sebum." : "Secretion levels are balanced, showing healthy dermal hydration."} ${data.pigmentation > 25 ? "Pigmentation irregularities appear mild and manageable with targeted care." : "Melanin distribution is mostly uniform."}"`}
-                </p>
-
-                <p className="text-[11px] text-slate-400 leading-relaxed font-medium">
-                  Analysis completed successfully. Your dermal profile has been generated based on deep texture, sebum sheen, and melanin tone analysis.
-                </p>
-                <div className="h-[1px] bg-slate-100 w-full" />
-                <p className="text-[9px] text-slate-300 font-bold uppercase tracking-wider leading-relaxed">
-                  ⚠️ Disclaimer: AI-generated skincare insights. Not a medical diagnosis or treatment plan.
-                </p>
-              </div>
-
-              {/* Expert Deep Report Card (Locked/Unlocked) */}
-              <div className="bg-white rounded-[32px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden">
-                <div className="flex items-center gap-2 mb-4 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
-                  <Sparkles size={14} /> Complete AI Skincare Report
-                </div>
-                
-                <div className="text-[13px] text-slate-600 leading-relaxed font-medium relative">
-                  {!isPremium && !loading && history.length > 1 && (
-                    <div className="absolute inset-0 bg-white/70 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-6 rounded-[24px]">
-                      <Lock className="text-[#F88E7D] mb-3" size={24} />
-                      <p className="text-[14px] font-black text-slate-800 leading-tight mb-2">Detailed Report Locked</p>
-                      <p className="text-[10px] text-slate-500 font-bold mb-4 px-6">Upgrade to Premium to read full analysis and customized dermatological recommendations.</p>
-                      <Link href="/premium" className="bg-primary-gradient text-white px-6 py-2.5 rounded-full text-[11px] font-black uppercase tracking-widest shadow-lg shadow-orange-500/20 active:scale-95 transition-transform">
-                        Unlock Now ✨
-                      </Link>
-                    </div>
-                  )}
-
-                  <div className={cn((isPremium || (history.length <= 1 && !loading)) ? "" : "blur-sm select-none")}>
-                    {loading ? (
-                      <div className="py-12 flex flex-col items-center gap-4">
-                        <div className="w-10 h-10 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin" />
-                        <p className="text-[11px] text-slate-400 font-black uppercase animate-pulse">Generating Report...</p>
-                      </div>
-                    ) : (
-                      <>
-                        {history.length <= 1 && !isPremium && (
-                          <div className="flex items-center gap-2 mb-3 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full w-fit">
-                            <Sparkles size={12} />
-                            <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600/70">Welcome Gift: Free Expert Analysis</span>
-                          </div>
-                        )}
-                        {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Skin Improvement Plan checklist card */}
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
-                <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
-                  <ShieldCheck size={14} /> Skin Improvement Plan
-                </div>
-                
-                <div className="space-y-3">
+                {/* Legend */}
+                <div className="bg-black/55 backdrop-blur-md border border-white/10 p-2 rounded-2xl flex flex-wrap justify-center gap-x-3 gap-y-1">
                   {[
-                    { title: "Hydration Focus", desc: "Drink 2.5L of water daily to flush dermal toxins and maintain hydration." },
-                    { title: "UV Protection", desc: "Apply SPF 50+ mineral sunscreen daily to prevent hyperpigmentation." },
-                    { title: "Restorative Sleep", desc: "Aim for 7-8 hours of sleep to support natural skin barrier repair." },
-                    { title: "Targeted Diet Plan", desc: data.acne > 30 ? "Reduce high-glycemic foods and dairy flare triggers." : "Incorporate healthy antioxidants and Omega-3 rich seeds." },
-                    { title: "Barrier Support", desc: "Avoid harsh scrubs; use rich ceramides nightly to lock in moisture." }
-                  ].map((plan, index) => (
-                    <div key={index} className="flex gap-3.5 items-start p-3 bg-[#FDF5F2]/40 rounded-[20px] border border-[#F3EAE8]/30">
-                      <div className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 mt-0.5 flex-shrink-0">
-                        <CheckCircle2 size={12} className="fill-emerald-500 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="text-[12px] font-bold text-slate-800">{plan.title}</h4>
-                        <p className="text-[10px] text-slate-400 mt-0.5 leading-snug font-medium">{plan.desc}</p>
-                      </div>
-                    </div>
+                    {color:"#ef4444",label:"Acne",glow:"#ef4444"},
+                    {color:"#fbbf24",label:"Oil",glow:"#fbbf24"},
+                    {color:"#a855f7",label:"Pigment",glow:"#a855f7"},
+                    {color:"#60a5fa",label:"Circles",glow:"#60a5fa"},
+                    {color:"#ffffff",label:"Glow",glow:"#ffffff"},
+                  ].map(({color,label,glow}) => (
+                    <span key={label} className="flex items-center gap-1 text-[7.5px] font-black text-white/70 uppercase tracking-tighter">
+                      <span className="w-1.5 h-1.5 rounded-full" style={{background:color, boxShadow:`0 0 4px ${glow}`}} /> {label}
+                    </span>
                   ))}
                 </div>
               </div>
+            </div>
 
-              {/* PREMIUM FEATURE TEASERS */}
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
-                <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
-                  <Gem size={14} /> Premium Skincare Analytics 🔒
+            {/* ═══════════ CONTENT AREA ═══════════ */}
+            <div className="px-5 -mt-6 relative z-20 space-y-4 pb-2">
+
+              {/* ── Score Overview Card (overlaps image) ── */}
+              <div className="bg-white rounded-[28px] p-5 shadow-xl shadow-orange-500/8 border border-white/80 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-[#FFEDE8]/60 to-transparent rounded-full blur-2xl pointer-events-none" />
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">Dermal Diagnostic</p>
+                    <h2 className="text-[20px] font-black text-slate-800 tracking-tight leading-tight mt-0.5">Overall Skin Health</h2>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[30px] font-black text-slate-800 leading-none tabular-nums">
+                      {data.score}<span className="text-[13px] text-slate-300 font-bold">/100</span>
+                    </div>
+                    <div className="mt-1.5">
+                      {data.score >= 80 ? (
+                        <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Excellent ✨</span>
+                      ) : data.score >= 65 ? (
+                        <span className="bg-amber-50 text-amber-600 border border-amber-100 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Moderate</span>
+                      ) : (
+                        <span className="bg-red-50 text-red-500 border border-red-100 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Needs Care</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-[#FDF5F2]/60 p-4 rounded-[20px] border border-[#F3EAE8]/30 relative overflow-hidden">
-                    <div className="absolute top-2 right-2 text-[#F88E7D]"><Lock size={12} /></div>
-                    <h4 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">Deep Pore Scan</h4>
-                    <p className="text-[9px] text-slate-400 mt-1 leading-snug">Detect micro-clogs before they break out.</p>
-                  </div>
-                  <div className="bg-[#FDF5F2]/60 p-4 rounded-[20px] border border-[#F3EAE8]/30 relative overflow-hidden">
-                    <div className="absolute top-2 right-2 text-[#F88E7D]"><Lock size={12} /></div>
-                    <h4 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">Skin Age Analysis</h4>
-                    <p className="text-[9px] text-slate-400 mt-1 leading-snug">Evaluate biological elasticity & collagen.</p>
-                  </div>
-                  <div className="bg-[#FDF5F2]/60 p-4 rounded-[20px] border border-[#F3EAE8]/30 relative overflow-hidden">
-                    <div className="absolute top-2 right-2 text-[#F88E7D]"><Lock size={12} /></div>
-                    <h4 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">Weekly Reports</h4>
-                    <p className="text-[9px] text-slate-400 mt-1 leading-snug">Get professional charts tracking progress.</p>
-                  </div>
-                  <div className="bg-[#FDF5F2]/60 p-4 rounded-[20px] border border-[#F3EAE8]/30 relative overflow-hidden">
-                    <div className="absolute top-2 right-2 text-[#F88E7D]"><Lock size={12} /></div>
-                    <h4 className="text-[11px] font-black text-slate-700 uppercase tracking-tight">Personalized Routine</h4>
-                    <p className="text-[9px] text-slate-400 mt-1 leading-snug">AI-driven morning and night schedule tweaks.</p>
-                  </div>
+                {/* Animated score bar */}
+                <div className="mt-4 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${data.score}%` }}
+                    transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+                    className={cn("h-full rounded-full", data.score >= 80 ? "bg-emerald-400" : data.score >= 65 ? "bg-amber-400" : "bg-red-400")}
+                  />
                 </div>
               </div>
 
-              {/* Skin Improving History Mini Graph / Timeline */}
-              <div className="bg-white rounded-[32px] p-6 shadow-sm border border-slate-100 space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[11px] uppercase tracking-widest">
-                    <TrendingUp size={14} /> Skin Progress Tracking
+              {/* ── 3-Column Metric Cards with Severity Dots ── */}
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  {
+                    label: "Acne", value: data.acne, icon: <Target size={14}/>,
+                    color: "text-red-500", bg: "bg-red-50",
+                    desc: data.acne < 15 ? "Clear" : data.acne < 35 ? "Mild" : data.acne < 60 ? "Moderate" : "Severe",
+                    dotColor: "#ef4444"
+                  },
+                  {
+                    label: "Oil", value: data.oil, icon: <Droplets size={14}/>,
+                    color: "text-amber-500", bg: "bg-amber-50",
+                    desc: data.oil < 25 ? "Balanced" : data.oil < 50 ? "Moderate" : "Excess",
+                    dotColor: "#f59e0b"
+                  },
+                  {
+                    label: "Pigment", value: data.pigmentation, icon: <Sparkles size={14}/>,
+                    color: "text-purple-500", bg: "bg-purple-50",
+                    desc: data.pigmentation < 20 ? "Even" : data.pigmentation < 40 ? "Minor" : "Uneven",
+                    dotColor: "#a855f7"
+                  }
+                ].map(({ label, value, icon, color, bg, desc, dotColor }) => (
+                  <motion.div
+                    key={label}
+                    whileTap={{ scale: 0.97 }}
+                    className="bg-white rounded-[20px] p-3.5 shadow-sm border border-slate-100 flex flex-col gap-1.5"
+                  >
+                    <div className={cn("w-7 h-7 rounded-xl flex items-center justify-center", bg, color)}>
+                      {icon}
+                    </div>
+                    <p className="text-[9px] text-slate-400 font-black uppercase tracking-tight">{label}</p>
+                    <p className="text-[18px] font-black text-slate-800 leading-none">{value}%</p>
+                    {/* Severity dots */}
+                    <div className="flex gap-0.5 items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className="w-2 h-2 rounded-full transition-all" style={{
+                          background: i < Math.ceil((value||0)/20) ? dotColor : "#e2e8f0",
+                          opacity: i < Math.ceil((value||0)/20) ? 1 : 0.4
+                        }} />
+                      ))}
+                    </div>
+                    <p className="text-[8.5px] text-slate-400 font-bold">{desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* ── Accordion Sections ── */}
+
+              {/* SECTION: AI Insights */}
+              {[
+                {
+                  key: "insights",
+                  icon: <BrainCircuit size={13}/>,
+                  title: "AI Analysis Insights",
+                  content: (
+                    <div className="space-y-3">
+                      <p className="text-[12.5px] font-semibold text-slate-700 leading-relaxed italic border-l-4 border-[#F88E7D]/40 pl-3">
+                        {`"${data.acne > 25 ? "Minor acne activity detected around the cheek and chin area." : "No significant acne flares detected. Skin looks relatively clear."} ${data.oil > 45 ? "T-zone shows visible sebum secretion indicating compensatory oiliness." : "Sebum levels are well-balanced."} ${data.pigmentation > 25 ? "Pigmentation irregularities visible — manageable with consistent targeted care." : "Melanin distribution appears mostly uniform."}"`}
+                      </p>
+                      <p className="text-[10.5px] text-slate-400 leading-relaxed">
+                        Analysis based on deep texture, sebum sheen, and melanin tone mapping.
+                      </p>
+                      <p className="text-[8.5px] text-slate-300 font-bold uppercase tracking-wider">
+                        ⚠️ AI-generated insights. Not a medical diagnosis.
+                      </p>
+                    </div>
+                  )
+                },
+                {
+                  key: "report",
+                  icon: <Sparkles size={13}/>,
+                  title: "Complete AI Skin Report",
+                  locked: !isPremium && history.length > 1,
+                  content: (
+                    <div className="text-[12.5px] text-slate-600 leading-relaxed font-medium relative">
+                      {!isPremium && history.length > 1 && (
+                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center p-4 rounded-[16px]">
+                          <Lock className="text-[#F88E7D] mb-2" size={20}/>
+                          <p className="text-[13px] font-black text-slate-800 mb-1">Report Locked</p>
+                          <p className="text-[9.5px] text-slate-500 font-bold mb-3 px-4">Upgrade to read full dermatological recommendations</p>
+                          <Link href="/premium" className="bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md shadow-orange-500/20 active:scale-95 transition-transform">
+                            Unlock Now ✨
+                          </Link>
+                        </div>
+                      )}
+                      <div className={cn((isPremium || history.length <= 1) ? "" : "blur-sm select-none")}>
+                        {loading ? (
+                          <div className="py-8 flex flex-col items-center gap-3">
+                            <div className="w-8 h-8 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin"/>
+                            <p className="text-[10px] text-slate-400 font-black uppercase animate-pulse">Generating Report…</p>
+                          </div>
+                        ) : (
+                          <>
+                            {history.length <= 1 && !isPremium && (
+                              <div className="flex items-center gap-2 mb-3 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full w-fit">
+                                <Sparkles size={11}/>
+                                <span className="text-[8.5px] font-black uppercase tracking-widest text-emerald-600/70">Welcome Gift: Free Analysis</span>
+                              </div>
+                            )}
+                            {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  )
+                },
+                {
+                  key: "plan",
+                  icon: <ShieldCheck size={13}/>,
+                  title: "Skin Improvement Plan",
+                  content: (
+                    <div className="space-y-2.5">
+                      {[
+                        { title: "Hydration Focus", desc: "Drink 2.5L of water daily to flush dermal toxins and maintain barrier hydration.", num: "01" },
+                        { title: "UV Protection", desc: "Apply SPF 50+ mineral sunscreen every morning to prevent hyperpigmentation worsening.", num: "02" },
+                        { title: "Restorative Sleep", desc: "7–8 hours of sleep allows natural skin barrier repair and collagen synthesis.", num: "03" },
+                        { title: "Diet Adjustment", desc: data.acne > 30 ? "Reduce high-glycemic foods and dairy triggers that worsen inflammatory acne." : "Incorporate antioxidant-rich fruits and Omega-3 seeds for radiance.", num: "04" },
+                        { title: "Barrier Support", desc: "Avoid harsh scrubs — use ceramide-rich moisturizers nightly to lock in moisture.", num: "05" },
+                      ].map((item) => (
+                        <div key={item.num} className="flex gap-3 items-start p-3 bg-[#FDF5F2]/50 rounded-[16px] border border-[#F3EAE8]/40">
+                          <div className="w-6 h-6 rounded-full bg-[#F88E7D]/15 flex items-center justify-center text-[#F88E7D] text-[9px] font-black flex-shrink-0 mt-0.5">{item.num}</div>
+                          <div>
+                            <p className="text-[11.5px] font-black text-slate-700">{item.title}</p>
+                            <p className="text-[9.5px] text-slate-400 mt-0.5 leading-snug">{item.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                }
+              ].map(({ key, icon, title, content }) => (
+                <div key={key} className="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden">
+                  <button
+                    onClick={() => setExpandedSection(expandedSection === key ? null : key)}
+                    className="w-full flex items-center justify-between px-5 py-4 active:bg-slate-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[10.5px] uppercase tracking-widest">
+                      {icon} {title}
+                    </div>
+                    <motion.div
+                      animate={{ rotate: expandedSection === key ? 180 : 0 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <ChevronRight size={14} className="text-slate-300 rotate-90" />
+                    </motion.div>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {expandedSection === key && (
+                      <motion.div
+                        key={key + "_body"}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-5 pb-5 pt-1 border-t border-slate-50">
+                          {content}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))}
+
+              {/* ── Premium Locked Features ── */}
+              <div className="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100">
+                <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[10.5px] uppercase tracking-widest mb-4">
+                  <Gem size={13}/> Premium Analytics
+                </div>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {[
+                    { icon: "🔬", title: "Deep Pore Scan", desc: "Detect micro-clogs before breakouts." },
+                    { icon: "🧬", title: "Skin Age Score", desc: "Biological elasticity & collagen map." },
+                    { icon: "📊", title: "Weekly Reports", desc: "Pro charts tracking your progress." },
+                    { icon: "🌙", title: "Custom Routine", desc: "AI morning + night schedule." },
+                    { icon: "📈", title: "Progress Insights", desc: "Long-term improvement curves." },
+                    { icon: "💊", title: "Ingredient Match", desc: "Products matched to your skin DNA." },
+                  ].map(({ icon, title, desc }) => (
+                    <motion.div
+                      key={title}
+                      whileTap={{ scale: 0.96 }}
+                      className="bg-[#FDF5F2]/60 p-3.5 rounded-[18px] border border-[#F3EAE8]/40 relative overflow-hidden cursor-pointer"
+                    >
+                      <div className="absolute top-2.5 right-2.5 text-[#F88E7D]/60"><Lock size={10}/></div>
+                      <div className="text-lg mb-1.5">{icon}</div>
+                      <p className="text-[10.5px] font-black text-slate-700 leading-tight">{title}</p>
+                      <p className="text-[8.5px] text-slate-400 mt-0.5 leading-snug">{desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
+                <Link href="/premium" className="mt-4 w-full h-11 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest shadow-md shadow-orange-500/20 active:scale-95 transition-transform">
+                  <Gem size={13}/> Unlock All Premium Features
+                </Link>
+              </div>
+
+              {/* ── Progress Tracking ── */}
+              <div className="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100">
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[10.5px] uppercase tracking-widest">
+                    <TrendingUp size={13}/> Skin Progress
                   </div>
                   {history.length > 1 && (
-                    <button onClick={() => setView("history")} className="text-[10px] font-bold text-[#F88E7D] hover:underline">
-                      View History
-                    </button>
+                    <button onClick={() => setView("history")} className="text-[9.5px] font-black text-[#F88E7D]">View All →</button>
                   )}
                 </div>
 
                 {history.length <= 1 ? (
-                  <div className="text-center py-6 px-4 bg-[#FDF5F2]/40 rounded-[24px] border border-[#F3EAE8]/30">
-                    <p className="text-[12px] font-bold text-slate-600 leading-snug">
-                      Track weekly improvements with AI skin history.
+                  <div className="text-center py-6 bg-[#FDF5F2]/40 rounded-[18px] border border-[#F3EAE8]/30">
+                    <div className="text-3xl mb-2">📈</div>
+                    <p className="text-[12px] font-black text-slate-700">No previous scans yet</p>
+                    <p className="text-[9.5px] text-slate-400 mt-1 leading-snug px-4">
+                      Scan weekly to build your skin improvement timeline and see real progress.
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      Perform subsequent weekly scans to generate visual progress timelines.
-                    </p>
-                    <button 
-                      onClick={() => setView("history")} 
-                      className="mt-4 bg-[#FFEDE8] text-[#F88E7D] px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider border border-[#F3EAE8] active:scale-95 transition-transform"
+                    <button
+                      onClick={() => resetScanner("face")}
+                      className="mt-4 bg-[#FFEDE8] text-[#F88E7D] px-5 py-2 rounded-full text-[9.5px] font-black uppercase tracking-wider border border-[#F3EAE8] active:scale-95 transition-transform"
                     >
                       Start Tracking Progress
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <div className="bg-emerald-50 rounded-[20px] p-4 border border-emerald-100/50 flex items-center justify-between">
-                      <div>
-                        <p className="text-[12px] font-bold text-slate-800">
-                          {data.score > history[1]?.score ? "Your skin shows significant progress! 🎉" : "Follow routine closely to see spikes."}
-                        </p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">Last scan: {history[1]?.date || "N/A"}</p>
+                  <div className="space-y-2.5">
+                    {/* Mini timeline bars */}
+                    {history.slice(0, 3).map((h, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <p className="text-[9px] text-slate-400 font-bold w-16 shrink-0">{h.date.slice(0,5)}</p>
+                        <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${h.score}%` }}
+                            transition={{ duration: 0.8, delay: i * 0.15 }}
+                            className={cn("h-full rounded-full", i === 0 ? "bg-[#F88E7D]" : "bg-slate-300")}
+                          />
+                        </div>
+                        <p className="text-[9px] font-black text-slate-600 w-7 text-right">{h.score}</p>
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-[11px] font-black">
-                        {data.score > history[1]?.score ? `+${data.score - history[1].score}%` : `${data.score - history[1].score}%`}
+                    ))}
+                    <div className={cn("rounded-[16px] p-3 flex items-center justify-between mt-1", data.score > (history[1]?.score || 0) ? "bg-emerald-50 border border-emerald-100" : "bg-amber-50 border border-amber-100")}>
+                      <p className="text-[11px] font-black text-slate-700">
+                        {data.score > (history[1]?.score || 0) ? "📈 Great progress this week!" : "📉 Stick to your routine closely"}
+                      </p>
+                      <div className={cn("text-[10px] font-black px-2.5 py-1 rounded-full", data.score > (history[1]?.score || 0) ? "text-emerald-600 bg-emerald-100" : "text-amber-600 bg-amber-100")}>
+                        {data.score > (history[1]?.score || 0) ? `+${data.score - history[1].score}` : `${data.score - history[1].score}`}
                       </div>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* PDF Report Option & Routine CTAs */}
-              <div className="space-y-3">
-                {isPremium && (
-                  <button 
-                    onClick={() => window.print()}
-                    className="w-full h-15 bg-[#FFEDE8] text-[#F88E7D] rounded-[20px] border border-[#F3EAE8] flex items-center justify-center gap-2 font-bold text-xs active:scale-95 transition-transform"
-                  >
-                    <Download size={14} /> Download Skin Report PDF
-                  </button>
-                )}
-              </div>
+              {/* PDF Download (premium only) */}
+              {isPremium && (
+                <button
+                  onClick={() => window.print()}
+                  className="w-full h-12 bg-[#FFEDE8] text-[#F88E7D] rounded-[18px] border border-[#F3EAE8] flex items-center justify-center gap-2 font-black text-[10.5px] uppercase tracking-widest active:scale-95 transition-transform"
+                >
+                  <Download size={13}/> Download Skin Report PDF
+                </button>
+              )}
 
             </div>
 
-            {/* STICKY BOTTOM ACTION BAR */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/70 backdrop-blur-lg border-t border-slate-100 flex items-center justify-center gap-3 z-50 md:left-1/2 md:-translate-x-1/2 md:max-w-[430px]">
-              <Link 
-                href="/progress" 
-                onClick={() => setView("progress")}
-                className="flex-1 h-14 bg-slate-50 border border-slate-100 text-slate-500 rounded-[20px] flex items-center justify-center gap-1.5 font-bold text-[12px] uppercase tracking-wider active:scale-95 transition-transform"
+            {/* ═══ STICKY BOTTOM CTA BAR ═══ */}
+            <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/75 backdrop-blur-xl border-t border-slate-100 flex items-center gap-2.5 z-50 md:left-1/2 md:-translate-x-1/2 md:max-w-[430px]">
+              <button
+                onClick={() => resetScanner("face")}
+                className="w-12 h-12 bg-slate-100 text-slate-400 rounded-[16px] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform border border-slate-200"
               >
-                <TrendingUp size={14} />
-                Track Progress
-              </Link>
-              <Link 
-                href="/routine" 
-                className="flex-[2] h-14 bg-primary-gradient text-white rounded-[20px] flex items-center justify-center gap-1.5 font-bold text-[12px] uppercase tracking-wider active:scale-95 transition-transform shadow-lg shadow-orange-500/20"
+                <RefreshCcw size={15}/>
+              </button>
+              <button
+                onClick={() => setView("history")}
+                className="flex-1 h-12 bg-slate-50 border border-slate-100 text-slate-500 rounded-[16px] flex items-center justify-center gap-1.5 font-black text-[10.5px] uppercase tracking-wide active:scale-95 transition-transform"
               >
-                <Sparkles size={14} />
-                Personalized Routine
+                <TrendingUp size={13}/> Track Progress
+              </button>
+              <Link
+                href="/routine"
+                className="flex-[1.6] h-12 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-1.5 font-black text-[10.5px] uppercase tracking-wide active:scale-95 transition-transform shadow-lg shadow-orange-500/20"
+              >
+                <Sparkles size={13}/> Get Routine
               </Link>
             </div>
+
           </motion.div>
         )}
+
+
+
 
         {/* HISTORY PAGE */}
         {view === "history" && (
