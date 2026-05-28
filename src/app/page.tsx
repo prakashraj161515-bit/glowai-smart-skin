@@ -1203,12 +1203,20 @@ export default function Home() {
                 <circle cx="62" cy="65" r="0.5" fill="#F88E7D" opacity="0.5"/>
               </svg>
 
-              {/* ── Animated Scan Line ── */}
+              {/* ── Animated Scan Line + corner brackets ── */}
               <motion.div
                 animate={{ y: ["0px", "320px", "0px"] }}
                 transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
-                className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_12px_#F88E7D] opacity-80 z-10 pointer-events-none"
-              />
+                className="absolute left-0 right-0 z-10 pointer-events-none"
+              >
+                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_14px_#F88E7D] opacity-90" />
+                <div className="absolute -top-0.5 left-4 right-4 h-[3px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+              </motion.div>
+              {/* Corner scan brackets */}
+              <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[#F88E7D]/60 rounded-tl-sm pointer-events-none z-10" />
+              <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[#F88E7D]/60 rounded-tr-sm pointer-events-none z-10" />
+              <div className="absolute bottom-16 left-4 w-6 h-6 border-l-2 border-b-2 border-[#F88E7D]/60 rounded-bl-sm pointer-events-none z-10" />
+              <div className="absolute bottom-16 right-4 w-6 h-6 border-r-2 border-b-2 border-[#F88E7D]/60 rounded-br-sm pointer-events-none z-10" />
 
               {/* ═══ SMART OVERLAYS — keyed to real facial regions ═══ */}
               {/* All hidden while loading */}
@@ -1403,35 +1411,44 @@ export default function Home() {
             <div className="px-5 -mt-6 relative z-20 space-y-4 pb-2">
 
               {/* ── Score Overview Card (overlaps image) ── */}
-              <div className="bg-white rounded-[28px] p-5 shadow-xl shadow-orange-500/8 border border-white/80 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-[#FFEDE8]/60 to-transparent rounded-full blur-2xl pointer-events-none" />
+              <div className="bg-white/95 backdrop-blur-xl rounded-[28px] p-5 shadow-xl shadow-orange-500/10 border border-white relative overflow-hidden" style={{boxShadow: '0 8px 32px rgba(248,142,125,0.12), 0 1px 0 rgba(255,255,255,0.8) inset'}}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#FFEDE8]/80 to-transparent rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-[#FFF5F2]/60 to-transparent rounded-full blur-xl pointer-events-none" />
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">Dermal Diagnostic</p>
-                    <h2 className="text-[20px] font-black text-slate-800 tracking-tight leading-tight mt-0.5">Overall Skin Health</h2>
+                    <p className="text-[9.5px] text-[#F88E7D] font-black uppercase tracking-[0.18em]">Dermal Diagnostic</p>
+                    <h2 className="text-[21px] font-black text-slate-800 tracking-tight leading-tight mt-0.5">Overall Skin Health</h2>
                   </div>
                   <div className="text-right">
-                    <div className="text-[30px] font-black text-slate-800 leading-none tabular-nums">
+                    <div className="text-[32px] font-black leading-none tabular-nums" style={{color: data.score >= 80 ? '#059669' : data.score >= 65 ? '#d97706' : '#ef4444'}}>
                       {data.score}<span className="text-[13px] text-slate-300 font-bold">/100</span>
                     </div>
                     <div className="mt-1.5">
                       {data.score >= 80 ? (
-                        <span className="bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Excellent ✨</span>
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-emerald-100">Excellent ✨</span>
                       ) : data.score >= 65 ? (
-                        <span className="bg-amber-50 text-amber-600 border border-amber-100 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Moderate</span>
+                        <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-amber-100">Moderate</span>
                       ) : (
-                        <span className="bg-red-50 text-red-500 border border-red-100 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">Needs Care</span>
+                        <span className="bg-red-50 text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-red-100">Needs Care</span>
                       )}
                     </div>
                   </div>
                 </div>
-                {/* Animated score bar */}
-                <div className="mt-4 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                {/* Animated score bar — gradient */}
+                <div className="mt-4 h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${data.score}%` }}
-                    transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
-                    className={cn("h-full rounded-full", data.score >= 80 ? "bg-emerald-400" : data.score >= 65 ? "bg-amber-400" : "bg-red-400")}
+                    transition={{ duration: 1.4, ease: "easeOut", delay: 0.4 }}
+                    className="h-full rounded-full"
+                    style={{
+                      background: data.score >= 80
+                        ? 'linear-gradient(90deg,#34d399,#10b981)'
+                        : data.score >= 65
+                        ? 'linear-gradient(90deg,#fbbf24,#f59e0b)'
+                        : 'linear-gradient(90deg,#f87171,#ef4444)',
+                      boxShadow: data.score >= 80 ? '0 0 8px rgba(16,185,129,0.4)' : data.score >= 65 ? '0 0 8px rgba(245,158,11,0.4)' : '0 0 8px rgba(239,68,68,0.4)'
+                    }}
                   />
                 </div>
               </div>
@@ -1460,24 +1477,43 @@ export default function Home() {
                 ].map(({ label, value, icon, color, bg, desc, dotColor }) => (
                   <motion.div
                     key={label}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: label === 'Acne' ? 0.1 : label === 'Oil' ? 0.2 : 0.3 }}
                     whileTap={{ scale: 0.97 }}
-                    className="bg-white rounded-[20px] p-3.5 shadow-sm border border-slate-100 flex flex-col gap-1.5"
+                    className="bg-white rounded-[20px] p-3.5 border border-slate-100/80 flex flex-col gap-1.5 relative overflow-hidden"
+                    style={{ boxShadow: `0 4px 16px ${dotColor}18, 0 1px 0 rgba(255,255,255,0.9) inset` }}
                   >
+                    <div className="absolute top-0 right-0 w-10 h-10 rounded-full blur-xl opacity-30 pointer-events-none" style={{ background: dotColor }} />
                     <div className={cn("w-7 h-7 rounded-xl flex items-center justify-center", bg, color)}>
                       {icon}
                     </div>
                     <p className="text-[9px] text-slate-400 font-black uppercase tracking-tight">{label}</p>
-                    <p className="text-[18px] font-black text-slate-800 leading-none">{value}%</p>
+                    <motion.p
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                      className="text-[19px] font-black leading-none"
+                      style={{ color: value < 20 ? '#374151' : value < 50 ? dotColor : dotColor }}
+                    >{value}%</motion.p>
                     {/* Severity dots */}
                     <div className="flex gap-0.5 items-center">
                       {[...Array(5)].map((_, i) => (
-                        <span key={i} className="w-2 h-2 rounded-full transition-all" style={{
-                          background: i < Math.ceil((value||0)/20) ? dotColor : "#e2e8f0",
-                          opacity: i < Math.ceil((value||0)/20) ? 1 : 0.4
-                        }} />
+                        <motion.span
+                          key={i}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ delay: 0.6 + i * 0.07 }}
+                          className="w-2 h-2 rounded-full"
+                          style={{
+                            background: i < Math.ceil((value||0)/20) ? dotColor : '#e2e8f0',
+                            opacity: i < Math.ceil((value||0)/20) ? 1 : 0.35,
+                            boxShadow: i < Math.ceil((value||0)/20) ? `0 0 4px ${dotColor}80` : 'none'
+                          }}
+                        />
                       ))}
                     </div>
-                    <p className="text-[8.5px] text-slate-400 font-bold">{desc}</p>
+                    <p className="text-[8.5px] font-black" style={{ color: dotColor }}>{desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -1491,16 +1527,25 @@ export default function Home() {
                   icon: <BrainCircuit size={13}/>,
                   title: "AI Analysis Insights",
                   content: (
-                    <div className="space-y-3">
-                      <p className="text-[12.5px] font-semibold text-slate-700 leading-relaxed italic border-l-4 border-[#F88E7D]/40 pl-3">
-                        {`"${data.acne > 25 ? "Minor acne activity detected around the cheek and chin area." : "No significant acne flares detected. Skin looks relatively clear."} ${data.oil > 45 ? "T-zone shows visible sebum secretion indicating compensatory oiliness." : "Sebum levels are well-balanced."} ${data.pigmentation > 25 ? "Pigmentation irregularities visible — manageable with consistent targeted care." : "Melanin distribution appears mostly uniform."}"`}
+                    <div className="space-y-3.5">
+                      {/* AI verdict quote */}
+                      <p className="text-[12.5px] font-semibold text-slate-700 leading-relaxed italic border-l-[3px] border-[#F88E7D] pl-3.5 bg-[#FDF5F2]/40 py-2 rounded-r-xl">
+                        {`"${data.acne > 25 ? "Mild acne activity detected around cheek and chin regions." : "No significant acne flares — skin surface appears relatively clear."} ${data.oil > 45 ? "T-zone shows elevated sebum indicating compensatory oiliness." : "Sebum secretion appears balanced and well-controlled."} ${data.pigmentation > 25 ? "Pigmentation irregularities are visible but manageable with targeted care." : "Melanin distribution looks mostly uniform with good clarity."}"`}
                       </p>
-                      <p className="text-[10.5px] text-slate-400 leading-relaxed">
-                        Analysis based on deep texture, sebum sheen, and melanin tone mapping.
-                      </p>
-                      <p className="text-[8.5px] text-slate-300 font-bold uppercase tracking-wider">
-                        ⚠️ AI-generated insights. Not a medical diagnosis.
-                      </p>
+                      {/* Color-coded condition tags */}
+                      <div className="flex flex-wrap gap-1.5">
+                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-black uppercase tracking-wide" style={{ background: data.acne < 20 ? '#f0fdf4' : '#fff1f2', color: data.acne < 20 ? '#16a34a' : '#ef4444', border: `1px solid ${data.acne < 20 ? '#bbf7d0' : '#fecaca'}` }}>Acne: {data.acne < 20 ? 'Clear ✓' : data.acne < 40 ? 'Mild ⚠' : 'Active !'}</span>
+                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-black uppercase tracking-wide" style={{ background: data.oil < 35 ? '#fffbeb' : '#fff7ed', color: data.oil < 35 ? '#d97706' : '#ea580c', border: '1px solid #fed7aa' }}>Oil: {data.oil < 25 ? 'Balanced ✓' : data.oil < 50 ? 'Moderate ⚠' : 'High !'}</span>
+                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-black uppercase tracking-wide" style={{ background: '#faf5ff', color: '#9333ea', border: '1px solid #e9d5ff' }}>Pigment: {data.pigmentation < 20 ? 'Even ✓' : 'Minor spots ⚠'}</span>
+                      </div>
+                      {/* Quick tip */}
+                      <div className="bg-[#F88E7D]/8 border border-[#F88E7D]/15 rounded-[14px] p-3">
+                        <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-wider mb-1">💡 Top Priority</p>
+                        <p className="text-[11px] text-slate-600 leading-snug font-medium">
+                          {data.acne > 30 ? "Focus on a gentle salicylic acid cleanser morning & night to reduce active breakouts first." : data.oil > 50 ? "Use a niacinamide serum to regulate sebum production without stripping skin." : data.pigmentation > 30 ? "Add a vitamin C serum every morning + SPF 50 to reduce dark spot formation." : "Your skin is in decent health — maintain hydration and consistent SPF use."}
+                        </p>
+                      </div>
+                      <p className="text-[8px] text-slate-300 font-bold uppercase tracking-wider">⚠️ AI-generated insights. Not a medical diagnosis.</p>
                     </div>
                   )
                 },
@@ -1523,9 +1568,37 @@ export default function Home() {
                       )}
                       <div className={cn((isPremium || history.length <= 1) ? "" : "blur-sm select-none")}>
                         {loading ? (
-                          <div className="py-8 flex flex-col items-center gap-3">
-                            <div className="w-8 h-8 border-4 border-[#FFEDE8] border-t-[#F88E7D] rounded-full animate-spin"/>
-                            <p className="text-[10px] text-slate-400 font-black uppercase animate-pulse">Generating Report…</p>
+                          <div className="py-8 flex flex-col items-center gap-4">
+                            {/* Multi-ring loader */}
+                            <div className="relative w-14 h-14">
+                              <div className="absolute inset-0 rounded-full border-4 border-[#FFEDE8]" />
+                              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F88E7D] animate-spin" />
+                              <div className="absolute inset-[4px] rounded-full border-2 border-transparent border-t-[#F88E7D]/40 animate-spin" style={{animationDirection:'reverse',animationDuration:'1.2s'}} />
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <BrainCircuit size={16} className="text-[#F88E7D]" />
+                              </div>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-[11px] text-slate-600 font-black uppercase tracking-widest animate-pulse">AI Analyzing Skin…</p>
+                              <p className="text-[9px] text-slate-400 mt-1">Mapping dermal texture & pigmentation</p>
+                            </div>
+                            {/* Progress steps */}
+                            <div className="w-full space-y-1.5 px-2">
+                              {['Scanning face geometry', 'Detecting skin conditions', 'Generating report'].map((step, i) => (
+                                <div key={step} className="flex items-center gap-2">
+                                  <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ delay: i * 0.4 }}
+                                    className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
+                                    style={{ background: '#F88E7D' }}
+                                  >
+                                    <CheckCircle2 size={10} className="text-white" />
+                                  </motion.div>
+                                  <p className="text-[9.5px] text-slate-500 font-bold">{step}</p>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         ) : (
                           <>
