@@ -70,40 +70,21 @@ export async function POST(req: Request) {
       // REAL AI FACE SCAN — returns structured JSON
       isFaceScan = true;
       const { userName = "User", country = "India" } = body;
-      prompt = `You are GlowAI, a certified AI dermatologist trained on thousands of clinical skin images. You MUST analyze the actual photo provided — do NOT give generic or average scores.
+      prompt = `You are GlowAI, a world-class AI dermatologist. Analyze the facial skin in the image carefully and provide REAL scores based on actual visual analysis.
 
-STEP 1 — CAREFULLY LOOK at the actual face in the photo:
-- Count visible pimples, pustules, blackheads, whiteheads, red inflamed spots, cystic bumps
-- Check forehead, nose, chin (T-zone) for oily shine, sebum, greasy texture
-- Look at cheeks, forehead for dark patches, uneven skin tone, sunspots, hyperpigmentation
-- Check under eyes for dark circles, puffiness
-- Assess overall skin clarity, radiance, and health
+Carefully examine:
+- Acne, pimples, blemishes, redness (for acne score)
+- Shine, oiliness, sebum on skin surface (for oil score)
+- Dark spots, uneven tone, hyperpigmentation (for pigmentation score)
+- Overall healthy glow based on all factors (for glow score)
 
-STEP 2 — SCORE based on what you ACTUALLY SEE (not averages):
-- acne: 0 = no pimples at all, 100 = severe cystic acne everywhere. Even 1-2 pimples = at least 10-15.
-- oil: 0 = perfectly matte dry skin, 100 = visibly greasy/shiny all over. Slight T-zone shine = 25-40.
-- pigmentation: 0 = perfectly even tone, 100 = severe dark spots everywhere. Minor uneven tone = 15-25.
-- score: overall skin health score (higher = healthier skin). Calculate as: 100 - (acne*0.35 + oil*0.25 + pigmentation*0.25 + other_issues*0.15)
-
-STEP 3 — Also detect and include these additional fields in your JSON:
-- "darkCircles": integer 0-100 (under-eye darkness)
-- "dryness": integer 0-100 (skin dryness/flakiness)  
-- "redness": integer 0-100 (irritation/redness/rosiness)
-- "pores": integer 0-100 (visible pore size)
-- "texture": integer 0-100 (uneven skin texture/roughness)
-
-Return ONLY a valid JSON object, no extra text:
+Return ONLY a valid JSON object, no extra text, in this exact format:
 {
-  "score": <integer 0-100>,
-  "acne": <integer 0-100>,
-  "oil": <integer 0-100>,
-  "pigmentation": <integer 0-100>,
-  "darkCircles": <integer 0-100>,
-  "dryness": <integer 0-100>,
-  "redness": <integer 0-100>,
-  "pores": <integer 0-100>,
-  "texture": <integer 0-100>,
-  "report": "<detailed markdown report for ${userName} with sections: **SKIN ANALYSIS FINDINGS** (list exactly what you observed), **ROOT CAUSES**, **DIET & HYDRATION** (local ${country} foods), **RECOMMENDED ROUTINE** (morning + night with specific products). Be specific about what you saw in this person's skin, not generic advice.>"
+  "score": <integer 0-100, overall glow/health score>,
+  "acne": <integer 0-100, acne severity>,
+  "oil": <integer 0-100, oiliness level>,
+  "pigmentation": <integer 0-100, dark spots level>,
+  "report": "<a detailed multiline markdown report for ${userName} (${gender}) with sections: **SKIN IMPROVEMENT ANALYSIS**, **CAUSES**, **WHAT TO EAT & DRINK** (foods available in ${country}), **RECOMMENDED PRODUCTS & TIMING**. Use bullet points. Tailor specifically for ${gender} skin physiology.>"
 }`;
     } else {
       prompt = `You are GlowAI, a world-class dermatological assistant. Provide professional skincare advice.`;
@@ -119,10 +100,10 @@ Return ONLY a valid JSON object, no extra text:
     ];
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: { 
-        maxOutputTokens: 3000, 
-        temperature: 0.3,
+        maxOutputTokens: 2000, 
+        temperature: 0.4,
         ...(isFaceScan ? { responseMimeType: "application/json" } : {})
       },
       safetySettings,
@@ -133,24 +114,17 @@ Return ONLY a valid JSON object, no extra text:
 
     if (isFaceScan) {
       try {
-        // Clean potential markdown code fences from response
-        const cleanText = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-        const parsed = JSON.parse(cleanText);
+        const parsed = JSON.parse(text);
         return NextResponse.json({ 
-          score: parsed.score ?? 70,
-          acne: parsed.acne ?? 0,
-          oil: parsed.oil ?? 0,
-          pigmentation: parsed.pigmentation ?? 0,
-          darkCircles: parsed.darkCircles ?? 0,
-          dryness: parsed.dryness ?? 0,
-          redness: parsed.redness ?? 0,
-          pores: parsed.pores ?? 0,
-          texture: parsed.texture ?? 0,
-          report: parsed.report ?? "Analysis complete.",
-          text: parsed.report ?? "Analysis complete."
+          score: parsed.score,
+          acne: parsed.acne,
+          oil: parsed.oil,
+          pigmentation: parsed.pigmentation,
+          report: parsed.report,
+          text: parsed.report
         });
       } catch {
-        // If JSON parse fails, return raw text
+        // If JSON parse fails, try to extract from text
         return NextResponse.json({ text });
       }
     }

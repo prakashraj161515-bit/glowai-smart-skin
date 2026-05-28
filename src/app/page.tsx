@@ -465,18 +465,13 @@ export default function Home() {
       setSkinType(detectedType);
       localStorage.setItem("velmora_user_skin_type", detectedType);
 
-      // Build final analysis object from REAL AI data (all 9 metrics)
+      // Build final analysis object from REAL AI data
       const analysisData = {
         image: res.image,
         score: realScore,
         acne: realAcne,
         oil: realOil,
         pigmentation: realPigmentation,
-        darkCircles: typeof aiData.darkCircles === "number" ? aiData.darkCircles : 0,
-        dryness: typeof aiData.dryness === "number" ? aiData.dryness : 0,
-        redness: typeof aiData.redness === "number" ? aiData.redness : 0,
-        pores: typeof aiData.pores === "number" ? aiData.pores : 0,
-        texture: typeof aiData.texture === "number" ? aiData.texture : 0,
         gender,
         date: new Date().toLocaleDateString()
       };
@@ -1192,145 +1187,58 @@ export default function Home() {
                 className="absolute left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_15px_#F88E7D] opacity-90 z-10"
               />
  
-              {/* AI Detection Overlays - 100% REAL DATA from AI scores */}
+              {/* AI Detection Overlays based on real data */}
               <div className="absolute inset-0 pointer-events-none mix-blend-screen">
                 
-                {/* Texture mesh — always subtle, stronger with high texture score */}
-                <div className="absolute inset-0" style={{ 
-                  backgroundImage: "radial-gradient(#ffffff 0.5px, transparent 0.5px)", 
-                  backgroundSize: "8px 8px",
-                  opacity: Math.max(0.05, (data.texture || 0) / 500)
-                }} />
-
-                {/* Oiliness: Yellow/Orange T-Zone heatmap — scales with oil score */}
-                {(data.oil || 0) >= 5 && (<>
-                  <div className="absolute top-[8%] left-[25%] w-[50%] h-[14%] blur-[4px]" style={{
-                    background: `radial-gradient(ellipse at center, rgba(251,191,36,${Math.min(0.6, (data.oil||0)/150)}) 0%, transparent 70%)`
-                  }} />
-                  <div className="absolute top-[20%] left-[43%] w-[14%] h-[24%] blur-[3px]" style={{
-                    background: `radial-gradient(ellipse at center, rgba(245,158,11,${Math.min(0.6, (data.oil||0)/140)}) 0%, transparent 70%)`
-                  }} />
-                </>)}
-
-                {/* Pigmentation: Purple/Blue cheekbone patches — scales with pigmentation score */}
-                {(data.pigmentation || 0) >= 5 && (<>
-                  <div className="absolute top-[48%] left-[16%] w-[20%] h-[12%] blur-[4px]" style={{
-                    background: `radial-gradient(circle, rgba(168,85,247,${Math.min(0.55, (data.pigmentation||0)/160)}) 0%, transparent 75%)`
-                  }} />
-                  <div className="absolute top-[50%] left-[64%] w-[20%] h-[12%] blur-[4px]" style={{
-                    background: `radial-gradient(circle, rgba(147,51,234,${Math.min(0.55, (data.pigmentation||0)/160)}) 0%, transparent 75%)`
-                  }} />
-                </>)}
-
-                {/* Dark Circles: Dark blue under eyes — scales with darkCircles score */}
-                {(data.darkCircles || 0) >= 5 && (<>
-                  <div className="absolute top-[38%] left-[28%] w-[16%] h-[5%] rounded-full blur-[4px] mix-blend-multiply" style={{
-                    background: `rgba(30,58,138,${Math.min(0.5, (data.darkCircles||0)/180)})`
-                  }} />
-                  <div className="absolute top-[38%] left-[56%] w-[16%] h-[5%] rounded-full blur-[4px] mix-blend-multiply" style={{
-                    background: `rgba(30,58,138,${Math.min(0.5, (data.darkCircles||0)/180)})`
-                  }} />
-                </>)}
-
-                {/* Dryness: Cyan jawline patches — scales with dryness score */}
-                {(data.dryness || 0) >= 5 && (<>
-                  <div className="absolute top-[62%] left-[14%] w-[15%] h-[10%] rounded-full blur-[5px]" style={{
-                    background: `rgba(165,243,252,${Math.min(0.4, (data.dryness||0)/200)})`
-                  }} />
-                  <div className="absolute top-[64%] left-[71%] w-[15%] h-[10%] rounded-full blur-[5px]" style={{
-                    background: `rgba(165,243,252,${Math.min(0.4, (data.dryness||0)/200)})`
-                  }} />
-                </>)}
-
-                {/* Redness/Irritation: Rose inner cheeks — scales with redness score */}
-                {(data.redness || 0) >= 5 && (<>
-                  <div className="absolute top-[44%] left-[36%] w-[12%] h-[8%] rounded-full blur-[5px]" style={{
-                    background: `rgba(244,63,94,${Math.min(0.45, (data.redness||0)/200)})`
-                  }} />
-                  <div className="absolute top-[44%] left-[52%] w-[12%] h-[8%] rounded-full blur-[5px]" style={{
-                    background: `rgba(244,63,94,${Math.min(0.45, (data.redness||0)/200)})`
-                  }} />
-                </>)}
-
-                {/* Glow/Healthy highlight: soft white — stronger when skin score is high */}
-                {(data.score || 0) >= 60 && (<>
-                  <div className="absolute top-[30%] left-[64%] w-[16%] h-[8%] bg-white/25 blur-[3px] rounded-full" style={{
-                    opacity: Math.min(0.5, (data.score||0)/200)
-                  }} />
-                </>)}
-
-                {/* Pores: Orange nose-bridge markers — scales with pores score */}
-                {(data.pores || 0) >= 10 && (<>
-                  <div className="absolute top-[34%] left-[46%] rounded-full shadow-[0_0_4px_#f97316]" style={{
-                    width: `${Math.max(6, Math.min(10, (data.pores||0)/10))}px`,
-                    height: `${Math.max(6, Math.min(10, (data.pores||0)/10))}px`,
-                    background: `rgba(249,115,22,${Math.min(0.9, (data.pores||0)/100)})`
-                  }} />
-                  <div className="absolute top-[38%] left-[43%] rounded-full shadow-[0_0_4px_#f97316]" style={{
-                    width: `${Math.max(6, Math.min(10, (data.pores||0)/10))}px`,
-                    height: `${Math.max(6, Math.min(10, (data.pores||0)/10))}px`,
-                    background: `rgba(249,115,22,${Math.min(0.9, (data.pores||0)/100)})`
-                  }} />
-                  <div className="absolute top-[37%] left-[51%] rounded-full shadow-[0_0_4px_#f97316]" style={{
-                    width: `${Math.max(6, Math.min(10, (data.pores||0)/10))}px`,
-                    height: `${Math.max(6, Math.min(10, (data.pores||0)/10))}px`,
-                    background: `rgba(249,115,22,${Math.min(0.9, (data.pores||0)/100)})`
-                  }} />
-                </>)}
-
-                {/* Acne: Red pulsing dots — appear for any acne >= 5, intensity scales with score */}
-                {(data.acne || 0) >= 5 && (
+                {/* 9. Uneven Texture: Light Dermal Mesh Overlay */}
+                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(#ffffff 0.5px, transparent 0.5px)", backgroundSize: "8px 8px" }} />
+ 
+                {/* 2. Oiliness: Yellow/Orange Heatmap on T-Zone */}
+                <div className="absolute top-[8%] left-[25%] w-[50%] h-[14%] bg-[radial-gradient(ellipse_at_center,rgba(251,191,36,0.3)_0%,transparent_70%)] blur-[4px]" />
+                <div className="absolute top-[20%] left-[43%] w-[14%] h-[24%] bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.35)_0%,transparent_70%)] blur-[3px]" />
+ 
+                {/* 3. Pigmentation: Purple/Blue Overlay on Cheekbones */}
+                <div className="absolute top-[48%] left-[16%] w-[20%] h-[12%] bg-[radial-gradient(circle,rgba(168,85,247,0.25)_0%,transparent_75%)] blur-[4px]" />
+                <div className="absolute top-[50%] left-[64%] w-[20%] h-[12%] bg-[radial-gradient(circle,rgba(147,51,234,0.25)_0%,transparent_75%)] blur-[4px]" />
+ 
+                {/* 4. Dark Circles: Dark Blue Overlay Under Eyes */}
+                <div className="absolute top-[38%] left-[28%] w-[16%] h-[5%] bg-blue-900/30 blur-[4px] rounded-full mix-blend-multiply" />
+                <div className="absolute top-[38%] left-[56%] w-[16%] h-[5%] bg-blue-900/30 blur-[4px] rounded-full mix-blend-multiply" />
+ 
+                {/* 5. Dryness: White/Light Cyan Patches on Jawlines */}
+                <div className="absolute top-[62%] left-[14%] w-[15%] h-[10%] bg-cyan-200/15 border border-cyan-300/10 blur-[5px] rounded-full" />
+                <div className="absolute top-[64%] left-[71%] w-[15%] h-[10%] bg-cyan-200/15 border border-cyan-300/10 blur-[5px] rounded-full" />
+ 
+                {/* 6. Redness/Irritation: Pink-Red Glow on Inner Cheeks */}
+                <div className="absolute top-[44%] left-[36%] w-[12%] h-[8%] bg-rose-500/20 blur-[5px] rounded-full" />
+                <div className="absolute top-[44%] left-[52%] w-[12%] h-[8%] bg-rose-500/20 blur-[5px] rounded-full" />
+ 
+                {/* 7. Glow/Healthy Skin: Soft White Highlights */}
+                <div className="absolute top-[30%] left-[64%] w-[16%] h-[8%] bg-white/25 blur-[3px] rounded-full" />
+                <div className="absolute top-[68%] left-[45%] w-[10%] h-[6%] bg-white/20 blur-[2px] rounded-full" />
+ 
+                {/* 1. Acne Red Dots & Pulses */}
+                {data.acne >= 10 && (
                   <>
                     {/* Left Cheek Acne */}
                     <div className="absolute top-[46%] left-[24%]">
-                      <motion.div 
-                        animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }} 
-                        transition={{ repeat: Infinity, duration: 2 }} 
-                        className="rounded-full border border-red-500 flex items-center justify-center"
-                        style={{
-                          width: `${Math.max(12, Math.min(22, (data.acne||0)/4))}px`,
-                          height: `${Math.max(12, Math.min(22, (data.acne||0)/4))}px`,
-                          background: `rgba(239,68,68,${Math.min(0.5, (data.acne||0)/150)})`,
-                          boxShadow: `0 0 ${Math.max(4, (data.acne||0)/8)}px #ef4444`
-                        }}
-                      >
+                      <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 2 }} className="w-4 h-4 rounded-full border border-red-500 bg-red-500/30 flex items-center justify-center shadow-[0_0_8px_#ef4444]">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                       </motion.div>
                     </div>
                     {/* Right Cheek Acne */}
                     <div className="absolute top-[52%] left-[72%]">
-                      <motion.div 
-                        animate={{ scale: [1, 1.4, 1], opacity: [0.4, 1, 0.4] }} 
-                        transition={{ repeat: Infinity, duration: 2.2 }} 
-                        className="rounded-full border border-red-500 flex items-center justify-center"
-                        style={{
-                          width: `${Math.max(12, Math.min(22, (data.acne||0)/4))}px`,
-                          height: `${Math.max(12, Math.min(22, (data.acne||0)/4))}px`,
-                          background: `rgba(239,68,68,${Math.min(0.5, (data.acne||0)/150)})`,
-                          boxShadow: `0 0 ${Math.max(4, (data.acne||0)/8)}px #ef4444`
-                        }}
-                      >
+                      <motion.div animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }} transition={{ repeat: Infinity, duration: 2.2 }} className="w-4 h-4 rounded-full border border-red-500 bg-red-500/30 flex items-center justify-center shadow-[0_0_8px_#ef4444]">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                       </motion.div>
                     </div>
-                    {/* Chin/Forehead Acne — only if acne is moderate or higher */}
-                    {(data.acne || 0) >= 25 && (
-                      <div className="absolute top-[20%] left-[47%]">
-                        <motion.div 
-                          animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.9, 0.3] }} 
-                          transition={{ repeat: Infinity, duration: 1.8 }} 
-                          className="rounded-full border border-red-400 flex items-center justify-center"
-                          style={{
-                            width: "10px", height: "10px",
-                            background: `rgba(239,68,68,${Math.min(0.4, (data.acne||0)/200)})`,
-                          }}
-                        >
-                          <span className="w-1 h-1 rounded-full bg-red-400" />
-                        </motion.div>
-                      </div>
-                    )}
                   </>
                 )}
+
+                {/* 8. Pores: Small Orange Markers */}
+                <div className="absolute top-[34%] left-[46%] w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_4px_#f97316]" />
+                <div className="absolute top-[38%] left-[43%] w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_4px_#f97316]" />
+                <div className="absolute top-[37%] left-[51%] w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_4px_#f97316]" />
 
               </div>
 
