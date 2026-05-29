@@ -128,7 +128,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
           <p className="text-sm font-bold mb-6 text-red-200">{error}</p>
           <button 
             onClick={() => mode === "face" ? window.location.reload() : fileInputRef.current?.click()}
-            className="bg-white text-slate-900 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+            className="bg-white text-[#2C1F1A] px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
           >
             {mode === "face" ? "Refresh App" : "Upload Photo Instead"}
           </button>
@@ -145,7 +145,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
           <div className="relative w-[75%] h-[75%]">
             {/* The actual face oval outline */}
-            <svg viewBox="0 0 100 100" className="w-full h-full text-[#F88E7D]/40 drop-shadow-lg">
+            <svg viewBox="0 0 100 100" className="w-full h-full text-[#F0886A]/40 drop-shadow-lg">
               <path 
                 d="M50 10 C 30 10, 18 30, 18 55 C 18 80, 30 90, 50 90 C 70 90, 82 80, 82 55 C 82 30, 70 10, 50 10 Z" 
                 fill="none" 
@@ -156,10 +156,10 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
             </svg>
             
             {/* Subtle glow effect */}
-            <div className="absolute inset-0 rounded-[45%] border-2 border-[#F88E7D]/10 blur-[1px]" />
+            <div className="absolute inset-0 rounded-[45%] border-2 border-[#F0886A]/10 blur-[1px]" />
             
             {/* Scanning Line Animation */}
-            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent animate-scan" />
+            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#F0886A] to-transparent animate-scan" />
           </div>
         </div>
       )}

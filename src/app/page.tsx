@@ -242,18 +242,18 @@ export default function Home() {
   // ─── LOADING SPLASH SCREEN ──────────────────────────────────────────────────
   if (status === "loading") {
     return (
-      <div className="fixed inset-0 bg-[#FDF5F2] flex flex-col items-center justify-center z-[200]">
+      <div className="fixed inset-0 bg-[#FAF8F6] flex flex-col items-center justify-center z-[200]">
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="flex flex-col items-center gap-6"
         >
-          <div className="w-24 h-24 bg-white rounded-[28px] overflow-hidden flex items-center justify-center shadow-2xl shadow-orange-500/10 border-2 border-white">
+          <div className="w-24 h-24 bg-white rounded-[22px] overflow-hidden flex items-center justify-center shadow-2xl shadow-[#F0886A]/10 border-2 border-white">
             <img src="/logo.png" className="w-full h-full object-cover" alt="GlowAI Logo" />
           </div>
           <div className="text-center">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">GLOWAI</h1>
-            <p className="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] mt-1">Smart Skin AI</p>
+            <h1 className="text-2xl font-bold text-[#2C1F1A] tracking-[-0.3px]">GLOWAI</h1>
+            <p className="text-[rgba(44,31,26,0.38)] text-xs font-bold uppercase tracking-[0.3em] mt-1">Smart Skin AI</p>
           </div>
           <div className="mt-8 flex gap-1">
             {[0, 1, 2].map((i) => (
@@ -261,7 +261,7 @@ export default function Home() {
                 key={i}
                 animate={{ scale: [1, 1.5, 1] }}
                 transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
-                className="w-1.5 h-1.5 bg-[#F88E7D] rounded-full"
+                className="w-1.5 h-1.5 bg-[#F0886A] rounded-full"
               />
             ))}
           </div>
@@ -344,12 +344,12 @@ export default function Home() {
   const formatMarkdown = (text: string) => {
     return text.split("\n").map((line, i) => {
       // Bold
-      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#2C1F1A] font-bold">$1</strong>');
       
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
           <div key={i} className="flex gap-2 mb-1.5 ml-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#F88E7D] mt-2 flex-shrink-0" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F0886A] mt-2 flex-shrink-0" />
             <span dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
           </div>
         );
@@ -518,7 +518,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
+    <div className="min-h-screen bg-[#FAF8F6] font-sans pb-32">
 
       <AnimatePresence mode="wait">
         
@@ -536,13 +536,13 @@ export default function Home() {
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: "spring", damping: 25 }}
-              className="bg-white rounded-[32px] p-8 w-full max-w-sm shadow-2xl"
+              className="bg-white rounded-[22px] p-8 w-full max-w-sm shadow-2xl"
               onClick={e => e.stopPropagation()}
             >
               <div className="text-center mb-6">
                 <div className="text-5xl mb-3">✨</div>
-                <h2 className="text-2xl font-black text-slate-900">Welcome to GlowAI</h2>
-                <p className="text-slate-400 text-sm mt-2 font-medium">Enter your name to get started</p>
+                <h2 className="text-2xl font-bold text-[#2C1F1A]">Welcome to GlowAI</h2>
+                <p className="text-[rgba(44,31,26,0.38)] text-sm mt-2 font-medium">Enter your name to get started</p>
               </div>
               <input
                 type="text"
@@ -551,16 +551,16 @@ export default function Home() {
                 onKeyDown={e => e.key === "Enter" && handleDemoLogin()}
                 placeholder="Your name"
                 autoFocus
-                className="w-full bg-[#FDF5F2] h-14 px-5 rounded-[20px] border-2 border-[#F3EAE8] font-bold text-base outline-none focus:border-[#F88E7D] transition-colors mb-4"
+                className="w-full bg-[#FAF8F6] h-14 px-5 rounded-[20px] border-2 border-[rgba(60,30,20,0.08)] font-bold text-base outline-none focus:border-[#F0886A] transition-colors mb-4"
               />
               <button
                 onClick={handleDemoLogin}
                 disabled={!demoName.trim()}
-                className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-14 rounded-[20px] font-black text-[15px] active:scale-95 transition-transform shadow-lg shadow-orange-500/25 disabled:opacity-40"
+                className="w-full bg-gradient-to-r from-[#F0886A] to-[#f97316] text-white h-14 rounded-[20px] font-bold text-[15px] active:scale-95 transition-transform shadow-lg shadow-[#F0886A]/25 disabled:opacity-40"
               >
                 Continue →
               </button>
-              <p className="text-center text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-4">
+              <p className="text-center text-[10px] text-[rgba(44,31,26,0.30)] font-bold uppercase tracking-widest mt-4">
                 Add Google credentials in Vercel for full login
               </p>
             </motion.div>
@@ -576,27 +576,27 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-[#FDF5F2] flex flex-col items-center justify-between py-20 px-8"
+            className="fixed inset-0 z-[100] bg-[#FAF8F6] flex flex-col items-center justify-between py-20 px-8"
           >
             {/* Branding */}
             <div className="text-center mt-12">
               <motion.div 
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                className="w-24 h-24 bg-white rounded-[28px] overflow-hidden flex items-center justify-center shadow-2xl shadow-orange-500/10 mx-auto mb-6 border-2 border-white"
+                className="w-24 h-24 bg-white rounded-[22px] overflow-hidden flex items-center justify-center shadow-2xl shadow-[#F0886A]/10 mx-auto mb-6 border-2 border-white"
               >
                 <img src="/logo.png" className="w-full h-full object-cover" alt="GlowAI Logo" />
               </motion.div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-2 uppercase italic">GlowAI</h1>
-              <p className="text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px]">Smart Skin AI</p>
+              <h1 className="text-4xl font-bold text-[#2C1F1A] tracking-[-0.3px] mb-2 uppercase italic">GlowAI</h1>
+              <p className="text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-[0.3em] text-[10px]">Smart Skin AI</p>
             </div>
 
             {/* Content */}
             <div className="text-center px-4">
-              <h2 className="text-[32px] font-bold text-slate-800 leading-tight tracking-tight">
+              <h2 className="text-[32px] font-bold text-[#2C1F1A] leading-tight tracking-[-0.3px]">
                 Analyze your skin<br />in seconds.
               </h2>
-              <p className="text-slate-400 mt-4 text-[16px] font-medium max-w-[240px] mx-auto leading-relaxed">
+              <p className="text-[rgba(44,31,26,0.38)] mt-4 text-[16px] font-medium max-w-[240px] mx-auto leading-relaxed">
                 Personalized AI coaching for your best glow yet.
               </p>
             </div>
@@ -605,7 +605,7 @@ export default function Home() {
             <div className="w-full space-y-4">
               <button 
                 onClick={handleLogin}
-                className="w-full bg-white text-slate-900 h-16 rounded-2xl flex items-center justify-center gap-4 font-bold text-[17px] shadow-xl shadow-slate-200/50 active:scale-95 transition-transform border border-slate-100"
+                className="w-full bg-white text-[#2C1F1A] h-16 rounded-2xl flex items-center justify-center gap-4 font-bold text-[17px] shadow-xl shadow-slate-200/50 active:scale-95 transition-transform border border-[rgba(60,30,20,0.08)]"
               >
                 <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
                 Continue with Google
@@ -613,7 +613,7 @@ export default function Home() {
               
 
 
-              <p className="text-[10px] text-slate-300 text-center px-8 leading-relaxed mt-6">
+              <p className="text-[10px] text-[rgba(44,31,26,0.30)] text-center px-8 leading-relaxed mt-6">
                 By continuing, you agree to our Terms of Service and Privacy Policy.
               </p>
             </div>
@@ -627,12 +627,12 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110] bg-[#FDF5F2] flex flex-col md:left-1/2 md:-translate-x-1/2 md:max-w-[430px] md:shadow-2xl overflow-hidden"
+            className="fixed inset-0 z-[110] bg-[#FAF8F6] flex flex-col md:left-1/2 md:-translate-x-1/2 md:max-w-[430px] md:shadow-2xl overflow-hidden"
           >
             {/* Progress Bar */}
             <div className="flex gap-2 px-6 pt-14 pb-4 flex-shrink-0">
               {[1,2,3,4,5].map(s => (
-                <div key={s} className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", onboardingStep >= s ? "bg-[#F88E7D]" : "bg-slate-100")} />
+                <div key={s} className={cn("h-1.5 flex-1 rounded-full transition-all duration-500", onboardingStep >= s ? "bg-[#F0886A]" : "bg-slate-100")} />
               ))}
             </div>
 
@@ -652,12 +652,12 @@ export default function Home() {
                       <motion.div 
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="w-24 h-24 bg-white rounded-[32px] overflow-hidden flex items-center justify-center mx-auto mb-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border-2 border-white"
+                        className="w-24 h-24 bg-white rounded-[22px] overflow-hidden flex items-center justify-center mx-auto mb-8 shadow-[0_20px_50px_rgba(248,142,125,0.15)] border-2 border-white"
                       >
                         <img src="/logo.png" className="w-full h-full object-cover" alt="GlowAI Logo" />
                       </motion.div>
-                      <h2 className="text-[34px] font-black text-slate-900 leading-[1.1] tracking-tight">Your Journey to <span className="text-[#F88E7D]">Perfect Glow</span></h2>
-                      <p className="text-slate-400 mt-5 text-[17px] font-medium leading-relaxed">Join 50,000+ users transforming their skin health with AI.</p>
+                      <h2 className="text-[34px] text-[#2C1F1A] leading-[1.1]" style={{ fontFamily: "'Instrument Serif', Georgia, serif", fontStyle: "italic" }}>Your Journey to <span className="text-[#F0886A]">Perfect Glow</span></h2>
+                      <p className="text-[rgba(44,31,26,0.38)] mt-5 text-[17px] font-medium leading-relaxed">Join 50,000+ users transforming their skin health with AI.</p>
                     </div>
                     
                     <div className="space-y-4 mt-2">
@@ -674,12 +674,12 @@ export default function Home() {
                           key={i} 
                           className="flex gap-5 items-center p-4 rounded-[24px] bg-white/60 border border-white shadow-[0_8px_20px_rgba(0,0,0,0.02)] backdrop-blur-sm"
                         >
-                          <div className="w-14 h-14 rounded-[18px] bg-[#FDF5F2] flex items-center justify-center text-2xl flex-shrink-0">
+                          <div className="w-14 h-14 rounded-[18px] bg-[#FAF8F6] flex items-center justify-center text-2xl flex-shrink-0">
                             {benefit.icon}
                           </div>
                           <div>
-                            <h3 className="font-bold text-slate-900 text-[17px]">{benefit.title}</h3>
-                            <p className="text-slate-400 text-[13px] mt-0.5 font-medium leading-snug">{benefit.desc}</p>
+                            <h3 className="font-bold text-[#2C1F1A] text-[17px]">{benefit.title}</h3>
+                            <p className="text-[rgba(44,31,26,0.38)] text-[13px] mt-0.5 font-medium leading-snug">{benefit.desc}</p>
                           </div>
                         </motion.div>
                       ))}
@@ -691,22 +691,22 @@ export default function Home() {
                 {onboardingStep === 2 && (
                   <div className="flex flex-col flex-1">
                     <div className="pt-14 px-6 pb-4">
-                      <div className="w-16 h-16 bg-[#FDF5F2] rounded-2xl flex items-center justify-center border-2 border-[#F3EAE8] mb-4">
-                        <User size={32} className="text-[#F88E7D]" />
+                      <div className="w-16 h-16 bg-[#FAF8F6] rounded-2xl flex items-center justify-center border-2 border-[rgba(60,30,20,0.08)] mb-4">
+                        <User size={32} className="text-[#F0886A]" />
                       </div>
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 2 of 5</p>
-                        <h2 className="text-2xl font-black text-slate-900 mt-1">Hi! What&apos;s your name? 👋</h2>
-                        <p className="text-slate-400 text-sm mt-2 font-medium">We&apos;ll personalize your entire skincare experience just for you.</p>
+                        <p className="text-[11px] font-bold text-[#F0886A] uppercase tracking-[0.3em]">Step 2 of 5</p>
+                        <h2 className="text-2xl font-bold text-[#2C1F1A] mt-1">Hi! What&apos;s your name? 👋</h2>
+                        <p className="text-[rgba(44,31,26,0.38)] text-sm mt-2 font-medium">We&apos;ll personalize your entire skincare experience just for you.</p>
                       </div>
                       <input
                         type="text"
                         value={userName}
                         onChange={(e) => setUserName(e.target.value)}
                         placeholder="Enter your name"
-                        className="w-full bg-[#FDF5F2] h-16 px-6 rounded-[24px] border-2 border-[#F3EAE8] font-bold text-lg outline-none focus:border-[#F88E7D] transition-colors"
+                        className="w-full bg-[#FAF8F6] h-16 px-6 rounded-[24px] border-2 border-[rgba(60,30,20,0.08)] font-bold text-lg outline-none focus:border-[#F0886A] transition-colors"
                       />
 
                     </div>
@@ -717,15 +717,15 @@ export default function Home() {
                 {onboardingStep === 3 && (
                   <div className="flex flex-col flex-1">
                     <div className="pt-14 px-6 pb-4">
-                      <div className="w-16 h-16 bg-[#FDF5F2] rounded-2xl flex items-center justify-center border-2 border-[#F3EAE8] mb-4">
-                        <ScanFace size={32} className="text-[#F88E7D]" />
+                      <div className="w-16 h-16 bg-[#FAF8F6] rounded-2xl flex items-center justify-center border-2 border-[rgba(60,30,20,0.08)] mb-4">
+                        <ScanFace size={32} className="text-[#F0886A]" />
                       </div>
                     </div>
                     <div className="px-6 pt-2 pb-8 flex flex-col gap-6 flex-1">
                       <div>
-                        <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 3 of 5</p>
-                        <h2 className="text-2xl font-black text-slate-900 mt-1">Your gender? 🧬</h2>
-                        <p className="text-slate-400 text-sm mt-2 font-medium">This helps GlowAI understand your hormone balance and skin needs.</p>
+                        <p className="text-[11px] font-bold text-[#F0886A] uppercase tracking-[0.3em]">Step 3 of 5</p>
+                        <h2 className="text-2xl font-bold text-[#2C1F1A] mt-1">Your gender? 🧬</h2>
+                        <p className="text-[rgba(44,31,26,0.38)] text-sm mt-2 font-medium">This helps GlowAI understand your hormone balance and skin needs.</p>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         {[
@@ -736,14 +736,14 @@ export default function Home() {
                             key={g}
                             onClick={() => setGender(g as "male" | "female")}
                             className={cn(
-                              "rounded-[28px] border-2 overflow-hidden transition-all flex flex-col",
-                              gender === g ? "border-[#F88E7D] shadow-xl shadow-orange-500/20" : "border-slate-100"
+                              "rounded-[22px] border-2 overflow-hidden transition-all flex flex-col",
+                              gender === g ? "border-[#F0886A] shadow-xl shadow-[#F0886A]/20" : "border-[rgba(60,30,20,0.08)]"
                             )}
                           >
                             <div className={cn("h-32 flex items-center justify-center text-5xl transition-transform active:scale-90", color)}>
                               {emoji}
                             </div>
-                            <div className={cn("py-3 flex items-center justify-center gap-2 font-black text-sm uppercase tracking-wider", gender === g ? "bg-[#F88E7D] text-white" : "bg-white text-slate-500")}>
+                            <div className={cn("py-3 flex items-center justify-center gap-2 font-bold text-sm uppercase tracking-wider", gender === g ? "bg-[#F0886A] text-white" : "bg-white text-slate-500")}>
                               {g}
                             </div>
                           </button>
@@ -757,26 +757,26 @@ export default function Home() {
                 {onboardingStep === 4 && (
                   <div className="flex flex-col flex-1 px-6 pb-8">
                     <div className="mb-6">
-                      <p className="text-[11px] font-black text-[#F88E7D] uppercase tracking-[0.3em]">Step 4 of 5</p>
-                      <h2 className="text-2xl font-black text-slate-900 mt-1">
+                      <p className="text-[11px] font-bold text-[#F0886A] uppercase tracking-[0.3em]">Step 4 of 5</p>
+                      <h2 className="text-2xl font-bold text-[#2C1F1A] mt-1">
                         {loading ? "Analyzing Skin... 🤖" : "AI Skin Scan 📸"}
                       </h2>
-                      <p className="text-slate-400 text-sm mt-2 font-medium">
+                      <p className="text-[rgba(44,31,26,0.38)] text-sm mt-2 font-medium">
                         {loading 
                           ? "Our AI is detecting your skin patterns. Almost there..." 
                           : "Position your face in the guide. Our AI will analyze Acne, Oil, and Glow."}
                       </p>
                     </div>
-                    <div className="flex-1 min-h-[400px] flex items-center justify-center bg-slate-50 rounded-[32px] overflow-hidden relative border-2 border-white shadow-inner">
+                    <div className="flex-1 min-h-[400px] flex items-center justify-center bg-[#F5F1EE] rounded-[22px] overflow-hidden relative border-2 border-white shadow-inner">
                       {loading ? (
                         <div className="flex flex-col items-center gap-6 p-8 text-center">
                            <div className="relative w-20 h-20">
                              <div className="absolute inset-0 border-4 border-orange-100 rounded-full" />
-                             <div className="absolute inset-0 border-4 border-t-[#F88E7D] rounded-full animate-spin" />
+                             <div className="absolute inset-0 border-4 border-t-[#F0886A] rounded-full animate-spin" />
                            </div>
                            <div>
-                             <p className="text-[13px] text-[#F88E7D] font-black uppercase tracking-[0.2em] animate-pulse">Deep Scan in Progress</p>
-                             <p className="text-[11px] text-slate-400 mt-2 font-medium">Analyzing pores, texture, and hydration...</p>
+                             <p className="text-[13px] text-[#F0886A] font-bold uppercase tracking-[0.2em] animate-pulse">Deep Scan in Progress</p>
+                             <p className="text-[11px] text-[rgba(44,31,26,0.38)] mt-2 font-medium">Analyzing pores, texture, and hydration...</p>
                            </div>
                         </div>
                       ) : ai.startsWith("⚠️") ? (
@@ -784,10 +784,10 @@ export default function Home() {
                           <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center">
                             <AlertCircle size={32} />
                           </div>
-                          <p className="text-sm font-bold text-slate-800">{ai}</p>
+                          <p className="text-sm font-bold text-[#2C1F1A]">{ai}</p>
                           <button 
                             onClick={() => { setAi(""); setLoading(false); }}
-                            className="bg-[#F88E7D] text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest"
+                            className="bg-[#F0886A] text-white px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest"
                           >
                             Try Again
                           </button>
@@ -809,19 +809,19 @@ export default function Home() {
                     >
                       <CheckCircle2 size={48} />
                     </motion.div>
-                    <h2 className="text-3xl font-black text-slate-900 mb-2">You&apos;re all set! ✨</h2>
-                    <p className="text-slate-400 font-medium mb-8">Your skin has been analyzed. We&apos;ve prepared a personalized routine just for you.</p>
+                    <h2 className="text-3xl font-bold text-[#2C1F1A] mb-2">You&apos;re all set! ✨</h2>
+                    <p className="text-[rgba(44,31,26,0.38)] font-medium mb-8">Your skin has been analyzed. We&apos;ve prepared a personalized routine just for you.</p>
                     
-                    <div className="w-full bg-[#FDF5F2] rounded-3xl p-6 mb-8 border-2 border-[#F3EAE8]">
+                    <div className="w-full bg-[#FAF8F6] rounded-[22px] p-6 mb-8 border-2 border-[rgba(60,30,20,0.08)]">
                        <div className="flex justify-between items-center mb-4">
-                          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Initial Glow Score</span>
-                          <span className="text-2xl font-black text-[#F88E7D]">{data?.score || 0}%</span>
+                          <span className="text-xs font-bold text-[rgba(44,31,26,0.38)] uppercase tracking-widest">Initial Glow Score</span>
+                          <span className="text-2xl font-bold text-[#F0886A]">{data?.score || 0}%</span>
                        </div>
                        <div className="h-2 w-full bg-white rounded-full overflow-hidden">
                           <motion.div 
                             initial={{ width: 0 }}
                             animate={{ width: `${data?.score || 0}%` }}
-                            className="h-full bg-[#F88E7D]"
+                            className="h-full bg-[#F0886A]"
                           />
                        </div>
                     </div>
@@ -837,18 +837,18 @@ export default function Home() {
               {onboardingStep <= 3 ? (
                 <button
                   onClick={() => setOnboardingStep(onboardingStep + 1)}
-                  className="w-full bg-gradient-to-r from-[#F88E7D] to-[#f97316] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-[#F0886A] to-[#f97316] text-white h-16 rounded-[24px] font-bold text-[15px] uppercase tracking-widest shadow-xl shadow-[#F0886A]/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
                 >
                   Continue →
                 </button>
               ) : onboardingStep === 4 ? (
-                <p className="text-center text-[10px] text-slate-400 font-bold uppercase tracking-widest py-2">
+                <p className="text-center text-[10px] text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-widest py-2">
                   Use the camera button to scan
                 </p>
               ) : (
                 <button
                   onClick={completeOnboarding}
-                  className="w-full bg-[#10b981] text-white h-16 rounded-[24px] font-black text-[15px] uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
+                  className="w-full bg-[#10b981] text-white h-16 rounded-[24px] font-bold text-[15px] uppercase tracking-widest shadow-xl shadow-emerald-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2"
                 >
                   Start My Glow Journey ✨
                 </button>
@@ -856,7 +856,7 @@ export default function Home() {
               {onboardingStep > 1 && onboardingStep < 5 && (
                 <button
                   onClick={() => setOnboardingStep(onboardingStep - 1)}
-                  className="w-full text-slate-400 font-bold text-xs uppercase tracking-widest py-2"
+                  className="w-full text-[rgba(44,31,26,0.38)] font-bold text-xs uppercase tracking-widest py-2"
                 >
                   ← Go Back
                 </button>
@@ -913,16 +913,16 @@ export default function Home() {
                             localStorage.setItem("velmora_user_name", userName);
                           }
                         }}
-                        className="text-[16px] font-bold text-slate-800 leading-tight bg-transparent border-b border-[#F88E7D] outline-none w-full"
+                        className="text-[16px] font-bold text-[#2C1F1A] leading-tight bg-transparent border-b border-[#F0886A] outline-none w-full"
                       />
                     ) : (
-                      <h1 onClick={() => setIsEditingName(true)} className="text-[16px] font-bold text-slate-800 leading-tight cursor-pointer hover:text-[#F88E7D] transition-colors truncate w-full">Hi {userName},</h1>
+                      <h1 onClick={() => setIsEditingName(true)} className="text-[16px] font-bold text-[#2C1F1A] leading-tight cursor-pointer hover:text-[#F0886A] transition-colors truncate w-full">Hi {userName},</h1>
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
                     <div className="flex items-center gap-0.5 bg-orange-50 px-1.5 py-0.5 rounded-full border border-orange-100 shrink-0">
                       <Zap size={8} className="text-orange-500 fill-orange-500" />
-                      <span className="text-[8px] font-black text-orange-600 uppercase tracking-tighter">Streak: {streak}D</span>
+                      <span className="text-[8px] font-bold text-orange-600 uppercase tracking-[-0.3px]er">Streak: {streak}D</span>
                     </div>
                   </div>
                 </div>
@@ -931,28 +931,28 @@ export default function Home() {
               {/* Right Controls Area */}
               <div className="flex items-center gap-1.5 shrink-0">
                 {!isPremium && (
-                  <Link href="/premium" className="flex items-center gap-1 bg-[#FFEDE8] px-2.5 py-2 rounded-2xl border border-[#F3EAE8] shadow-sm active:scale-95 transition-transform shrink-0">
-                    <Sparkles size={11} className="text-[#F88E7D] fill-[#F88E7D]" />
-                    <span className="text-[9px] font-black text-[#F88E7D] uppercase tracking-wider">Premium</span>
+                  <Link href="/premium" className="flex items-center gap-1 bg-[rgba(240,136,106,0.10)] px-2.5 py-2 rounded-2xl border border-[rgba(60,30,20,0.08)] shadow-sm active:scale-95 transition-transform shrink-0">
+                    <Sparkles size={11} className="text-[#F0886A] fill-[#F0886A]" />
+                    <span className="text-[9px] font-bold text-[#F0886A] uppercase tracking-wider">Premium</span>
                   </Link>
                 )}
                 <Link href="/routine" className="shrink-0">
                   <motion.div 
                     animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="w-10 h-10 rounded-2xl bg-white shadow-xl shadow-orange-500/10 flex items-center justify-center border border-[#F3EAE8] shrink-0"
+                    className="w-10 h-10 rounded-2xl bg-white shadow-xl shadow-[#F0886A]/10 flex items-center justify-center border border-[rgba(60,30,20,0.08)] shrink-0"
                   >
-                    <BrainCircuit size={20} className="text-[#F88E7D]" />
+                    <BrainCircuit size={20} className="text-[#F0886A]" />
                   </motion.div>
                 </Link>
               </div>
             </div>
 
             {/* Promo Banner */}
-            <div className="relative bg-[#FFEDE8] rounded-[32px] p-6 overflow-hidden flex items-center justify-between group">
+            <div className="relative bg-[rgba(240,136,106,0.10)] rounded-[22px] p-6 overflow-hidden flex items-center justify-between group">
               <div className="z-10 max-w-[120px]">
-                <p className="text-[9px] font-black text-[#F88E7D] uppercase tracking-widest mb-1">Find the right</p>
-                <h2 className="text-[18px] font-bold text-slate-800 leading-tight italic">Cream for your Skin</h2>
+                <p className="text-[9px] font-bold text-[#F0886A] uppercase tracking-widest mb-1">Find the right</p>
+                <h2 className="text-[18px] font-bold text-[#2C1F1A] leading-tight italic">Cream for your Skin</h2>
               </div>
               <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center p-2">
                 <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?w=300&q=80" alt="Product" className="w-full h-full object-contain rotate-12 transition-transform group-hover:scale-110" />
@@ -962,7 +962,7 @@ export default function Home() {
             {/* AI Scan Button */}
             <button 
               onClick={() => resetScanner("face")}
-              className="w-full bg-[#F88E7D] border-2 border-[#F88E7D]/20 rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-xl shadow-orange-500/20 text-white"
+              className="w-full bg-[#F0886A] border-2 border-[#F0886A]/20 rounded-[22px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-xl shadow-[#F0886A]/20 text-white"
             >
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
@@ -978,21 +978,21 @@ export default function Home() {
 
             {/* Growth Insight Card */}
             {history.length >= 2 && (
-              <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm flex items-center justify-between">
+              <div className="bg-white rounded-[22px] p-6 border border-[rgba(60,30,20,0.08)] shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
                     <Zap size={24} />
                   </div>
                   <div>
-                    <p className="text-[14px] font-bold text-slate-800">
+                    <p className="text-[14px] font-bold text-[#2C1F1A]">
                       {history[0].score > history[1].score ? "Skin improving!" : "Skin needs care"}
                     </p>
-                    <p className="text-[11px] text-slate-400 font-medium">
+                    <p className="text-[11px] text-[rgba(44,31,26,0.38)] font-medium">
                       Glow score {history[0].score > history[1].score ? "up" : "down"} by {Math.abs(history[0].score - history[1].score)}%
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-emerald-500 font-black text-xs">
+                <div className="flex items-center gap-1 text-emerald-500 font-bold text-xs">
                   {history[0].score > history[1].score ? "+" : "-"}{Math.abs(history[0].score - history[1].score)}%
                 </div>
               </div>
@@ -1001,39 +1001,39 @@ export default function Home() {
 
             {/* Main Features Grid */}
             <div className="grid grid-cols-2 gap-4">
-              <Link href="/diet" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
+              <Link href="/diet" className="bg-white border border-[rgba(60,30,20,0.08)] rounded-[22px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
                   <Info size={24} />
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-slate-800">Diet Plan</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Nutrition for skin</p>
+                  <p className="text-[14px] font-bold text-[#2C1F1A]">Diet Plan</p>
+                  <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-medium">Nutrition for skin</p>
                 </div>
               </Link>
-              <Link href="/coach" className="bg-white border border-[#F3EAE8] rounded-[32px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
+              <Link href="/coach" className="bg-white border border-[rgba(60,30,20,0.08)] rounded-[22px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
                 <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
                   <Sparkles size={24} />
                 </div>
                 <div>
-                  <p className="text-[14px] font-bold text-slate-800">AI Coach</p>
-                  <p className="text-[10px] text-slate-400 font-medium">Expert advice</p>
+                  <p className="text-[14px] font-bold text-[#2C1F1A]">AI Coach</p>
+                  <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-medium">Expert advice</p>
                 </div>
               </Link>
 
               <button 
                 onClick={() => resetScanner("product")}
-                className="col-span-2 bg-white border border-[#F3EAE8] rounded-[32px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
+                className="col-span-2 bg-white border border-[rgba(60,30,20,0.08)] rounded-[22px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
               >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
                     <Target size={24} />
                   </div>
                   <div className="text-left">
-                    <p className="text-[15px] font-bold text-slate-800">Product Scanner</p>
-                    <p className="text-[10px] text-slate-400 font-medium">Analyze product ingredients</p>
+                    <p className="text-[15px] font-bold text-[#2C1F1A]">Product Scanner</p>
+                    <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-medium">Analyze product ingredients</p>
                   </div>
                 </div>
-                <ChevronRight size={20} className="text-slate-300 group-hover:text-orange-500 transition-colors" />
+                <ChevronRight size={20} className="text-[rgba(44,31,26,0.30)] group-hover:text-orange-500 transition-colors" />
               </button>
             </div>
           </motion.div>
@@ -1043,15 +1043,15 @@ export default function Home() {
         {view === "scanner" && (
           <motion.div key="scanner" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-5 space-y-4">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-black text-slate-900">{scanMode === "face" ? "Position Your Face" : "Scan Product Label"}</h2>
-              <button onClick={()=>setView("home")} className="text-slate-400 text-sm font-bold bg-white px-4 py-2 rounded-xl shadow border border-slate-100">Cancel</button>
+              <h2 className="text-xl font-bold text-[#2C1F1A]">{scanMode === "face" ? "Position Your Face" : "Scan Product Label"}</h2>
+              <button onClick={()=>setView("home")} className="text-[rgba(44,31,26,0.38)] text-sm font-bold bg-white px-4 py-2 rounded-xl shadow border border-[rgba(60,30,20,0.08)]">Cancel</button>
             </div>
             
             <CameraScanner onResult={handleResult} mode={scanMode}/>
 
             {scanMode === "product" && (
-              <div className="bg-white rounded-[28px] border border-[#EEF0FF] shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2 text-purple-600 font-black text-xs uppercase tracking-tight">
+              <div className="bg-white rounded-[22px] border border-[#EEF0FF] shadow-sm p-5 space-y-4">
+                <div className="flex items-center gap-2 text-purple-600 font-bold text-xs uppercase tracking-[-0.3px]">
                   <Info size={16} strokeWidth={1.2} /> How to scan properly?
                 </div>
                 <div className="flex gap-4 items-center">
@@ -1059,7 +1059,7 @@ export default function Home() {
                     <img src="/product_example.png" alt="Example" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 space-y-1.5">
-                    <p className="text-[11px] text-slate-600 font-medium leading-tight">• Focus on the <span className="text-purple-600 font-black uppercase">Ingredients</span> list.</p>
+                    <p className="text-[11px] text-slate-600 font-medium leading-tight">• Focus on the <span className="text-purple-600 font-bold uppercase">Ingredients</span> list.</p>
                     <p className="text-[11px] text-slate-600 font-medium leading-tight">• Ensure bright lighting for clear text.</p>
                     <p className="text-[11px] text-slate-600 font-medium leading-tight">• Keep the bottle steady while clicking.</p>
                   </div>
@@ -1083,7 +1083,7 @@ export default function Home() {
               <button onClick={()=>setView("home")} className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 active:scale-90 transition-transform">
                 <ArrowLeft size={20} />
               </button>
-              <div className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-md text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/20 flex items-center gap-2">
+              <div className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-md text-white font-bold text-[10px] uppercase tracking-[0.2em] border border-white/20 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 Live Analysis
               </div>
@@ -1098,13 +1098,13 @@ export default function Home() {
             >
               <div className="flex justify-between items-start mb-6">
                 <div className="space-y-1">
-                  <h3 className="text-[20px] font-black text-slate-900 tracking-tight">Ingredient Analysis</h3>
-                  <div className="flex items-center gap-2 text-emerald-500 font-black text-[10px] uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full w-fit">
+                  <h3 className="text-[20px] font-bold text-[#2C1F1A] tracking-[-0.3px]">Ingredient Analysis</h3>
+                  <div className="flex items-center gap-2 text-emerald-500 font-bold text-[10px] uppercase tracking-widest bg-emerald-50 px-3 py-1 rounded-full w-fit">
                     <CheckCircle2 size={12} strokeWidth={3} /> AI Approved
                   </div>
                 </div>
-                <div className="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center text-slate-400 relative overflow-hidden group">
-                  <ShoppingBag size={24} strokeWidth={1.2} className="text-slate-300" />
+                <div className="w-16 h-16 rounded-2xl bg-[#F5F1EE] border border-[rgba(60,30,20,0.08)] flex flex-col items-center justify-center text-[rgba(44,31,26,0.38)] relative overflow-hidden group">
+                  <ShoppingBag size={24} strokeWidth={1.2} className="text-[rgba(44,31,26,0.30)]" />
                   <div className="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors" />
                 </div>
               </div>
@@ -1112,31 +1112,31 @@ export default function Home() {
               {loading ? (
                 <div className="py-20 flex flex-col items-center gap-6 text-center">
                   <div className="relative">
-                    <div className="w-16 h-16 border-4 border-slate-100 border-t-blue-500 rounded-full animate-spin" />
+                    <div className="w-16 h-16 border-4 border-[rgba(60,30,20,0.08)] border-t-blue-500 rounded-full animate-spin" />
                     <Sparkles className="absolute inset-0 m-auto text-blue-500 animate-pulse" size={24} />
                   </div>
                   <div>
-                    <p className="text-[12px] text-slate-400 font-bold uppercase tracking-widest animate-pulse">Scanning Molecular Data...</p>
-                    <p className="text-[10px] text-slate-300 font-medium mt-1">Checking against 10,000+ medical databases</p>
+                    <p className="text-[12px] text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-widest animate-pulse">Scanning Molecular Data...</p>
+                    <p className="text-[10px] text-[rgba(44,31,26,0.30)] font-medium mt-1">Checking against 10,000+ medical databases</p>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-6">
                   {/* Doctor/Expert Badge */}
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-[28px] p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-[22px] p-5 text-white shadow-lg shadow-blue-500/20 relative overflow-hidden">
                     <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
                     <div className="flex items-center gap-4 relative z-10">
                       <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shrink-0">
                         <BrainCircuit size={24} />
                       </div>
                       <div>
-                        <p className="text-[14px] font-black leading-tight uppercase tracking-wide">Doctor Approved Analysis</p>
+                        <p className="text-[14px] font-bold leading-tight uppercase tracking-wide">Doctor Approved Analysis</p>
                         <p className="text-[10px] text-blue-100 font-medium">Safe for {skinType} Skin</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white rounded-[32px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden min-h-[200px]">
+                  <div className="bg-white rounded-[22px] p-6 border border-[#EEF0FF] shadow-sm relative overflow-hidden min-h-[200px]">
                     <div className="text-[14px] text-slate-600 leading-relaxed font-medium">
                       {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
                     </div>
@@ -1146,7 +1146,7 @@ export default function Home() {
                   {isPremium && (
                     <button 
                       onClick={() => window.print()}
-                      className="w-full py-5 rounded-[24px] bg-primary-gradient text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
+                      className="w-full py-5 rounded-[24px] bg-primary-gradient text-white font-bold text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
                     >
                       Download Ingredients Report PDF
                     </button>
@@ -1154,7 +1154,7 @@ export default function Home() {
 
                   <button 
                     onClick={() => setView("home")}
-                    className="w-full py-5 rounded-[24px] bg-slate-900 text-white font-black text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
+                    className="w-full py-5 rounded-[24px] bg-slate-900 text-white font-bold text-sm uppercase tracking-[0.2em] shadow-xl active:scale-[0.98] transition-transform"
                   >
                     Done & Save Analysis
                   </button>
@@ -1167,19 +1167,19 @@ export default function Home() {
         {/* RESULTS & DEEP ANALYSIS (FACE) */}
         {view === "results" && data && (
           loading ? (
-            <motion.div key="results-loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#FDF5F2] z-[150] flex flex-col items-center justify-center p-6 text-center">
+            <motion.div key="results-loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#FAF8F6] z-[150] flex flex-col items-center justify-center p-6 text-center">
               <div className="relative w-48 h-48 mb-8 rounded-[40px] overflow-hidden border-4 border-white shadow-2xl">
                 {data.image ? (
                   <img src={data.image} alt="Scanning" className="w-full h-full object-cover scale-110" />
                 ) : (
-                  <div className="w-full h-full bg-[#FFEDE8] flex items-center justify-center text-[#F88E7D]">
+                  <div className="w-full h-full bg-[rgba(240,136,106,0.10)] flex items-center justify-center text-[#F0886A]">
                     <ScanFace size={64} />
                   </div>
                 )}
                 <motion.div 
                   animate={{ y: ["-100%", "100%", "-100%"] }}
                   transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="absolute inset-x-0 h-1 bg-[#F88E7D] shadow-[0_0_15px_#F88E7D] z-10"
+                  className="absolute inset-x-0 h-1 bg-[#F0886A] shadow-[0_0_15px_#F0886A] z-10"
                 />
                 <div className="absolute inset-0 bg-slate-900/30" />
               </div>
@@ -1191,20 +1191,20 @@ export default function Home() {
                       key={i}
                       animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
                       transition={{ repeat: Infinity, duration: 1.2, delay: i * 0.2 }}
-                      className="w-2.5 h-2.5 bg-[#F88E7D] rounded-full"
+                      className="w-2.5 h-2.5 bg-[#F0886A] rounded-full"
                     />
                   ))}
                 </div>
-                <h3 className="text-xl font-black text-slate-800 tracking-tight">Analyzing Skin...</h3>
-                <p className="text-xs text-slate-400 font-bold uppercase tracking-wider animate-pulse">Deep scanning dermal layers</p>
+                <h3 className="text-xl font-bold text-[#2C1F1A] tracking-[-0.3px]">Analyzing Skin...</h3>
+                <p className="text-xs text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-wider animate-pulse">Deep scanning dermal layers</p>
                 
-                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-slate-100/50 mt-4 text-[11px] text-slate-500 font-medium leading-relaxed shadow-sm">
+                <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-[rgba(60,30,20,0.08)]/50 mt-4 text-[11px] text-slate-500 font-medium leading-relaxed shadow-sm">
                   Our AI model is evaluating skin hydration, sebum levels, and hyperpigmentation hotspots to build your custom report.
                 </div>
               </div>
             </motion.div>
           ) : (
-            <motion.div key="results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen pb-36 bg-[#FDF5F2] overflow-x-hidden">
+            <motion.div key="results" initial={{opacity:0}} animate={{opacity:1}} className="relative min-h-screen pb-36 bg-[#FAF8F6] overflow-x-hidden">
 
 
             {/* ═══════════ FACE SCAN IMAGE AREA ═══════════ */}
@@ -1224,23 +1224,23 @@ export default function Home() {
               {/* ── Dermal Mesh SVG (face-aligned landmark lines) ── */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
                 {/* Forehead horizontal */}
-                <path d="M30,18 Q50,14 70,18" fill="none" stroke="#F88E7D" strokeWidth="0.2" strokeDasharray="1.5,2" />
+                <path d="M30,18 Q50,14 70,18" fill="none" stroke="#F0886A" strokeWidth="0.2" strokeDasharray="1.5,2" />
                 {/* Cheekbone arcs */}
-                <path d="M22,42 Q30,38 40,40" fill="none" stroke="#F88E7D" strokeWidth="0.18" strokeDasharray="1,2" />
-                <path d="M60,40 Q70,38 78,42" fill="none" stroke="#F88E7D" strokeWidth="0.18" strokeDasharray="1,2" />
+                <path d="M22,42 Q30,38 40,40" fill="none" stroke="#F0886A" strokeWidth="0.18" strokeDasharray="1,2" />
+                <path d="M60,40 Q70,38 78,42" fill="none" stroke="#F0886A" strokeWidth="0.18" strokeDasharray="1,2" />
                 {/* Nose bridge */}
-                <path d="M47,30 L47,52 M53,30 L53,52" fill="none" stroke="#F88E7D" strokeWidth="0.15" />
+                <path d="M47,30 L47,52 M53,30 L53,52" fill="none" stroke="#F0886A" strokeWidth="0.15" />
                 {/* Jaw line */}
-                <path d="M28,72 Q50,80 72,72" fill="none" stroke="#F88E7D" strokeWidth="0.18" strokeDasharray="2,2" />
+                <path d="M28,72 Q50,80 72,72" fill="none" stroke="#F0886A" strokeWidth="0.18" strokeDasharray="2,2" />
                 {/* Face oval */}
-                <ellipse cx="50" cy="50" rx="28" ry="36" fill="none" stroke="#F88E7D" strokeWidth="0.15" strokeDasharray="1,3" />
+                <ellipse cx="50" cy="50" rx="28" ry="36" fill="none" stroke="#F0886A" strokeWidth="0.15" strokeDasharray="1,3" />
                 {/* Landmark dots */}
-                <circle cx="35" cy="40" r="0.6" fill="#F88E7D" opacity="0.7"/>
-                <circle cx="65" cy="40" r="0.6" fill="#F88E7D" opacity="0.7"/>
-                <circle cx="50" cy="30" r="0.6" fill="#F88E7D" opacity="0.7"/>
-                <circle cx="50" cy="55" r="0.6" fill="#F88E7D" opacity="0.6"/>
-                <circle cx="38" cy="65" r="0.5" fill="#F88E7D" opacity="0.5"/>
-                <circle cx="62" cy="65" r="0.5" fill="#F88E7D" opacity="0.5"/>
+                <circle cx="35" cy="40" r="0.6" fill="#F0886A" opacity="0.7"/>
+                <circle cx="65" cy="40" r="0.6" fill="#F0886A" opacity="0.7"/>
+                <circle cx="50" cy="30" r="0.6" fill="#F0886A" opacity="0.7"/>
+                <circle cx="50" cy="55" r="0.6" fill="#F0886A" opacity="0.6"/>
+                <circle cx="38" cy="65" r="0.5" fill="#F0886A" opacity="0.5"/>
+                <circle cx="62" cy="65" r="0.5" fill="#F0886A" opacity="0.5"/>
               </svg>
 
               {/* ── Animated Scan Line + corner brackets ── */}
@@ -1249,14 +1249,14 @@ export default function Home() {
                 transition={{ repeat: Infinity, duration: 3.5, ease: "linear" }}
                 className="absolute left-0 right-0 z-10 pointer-events-none"
               >
-                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#F88E7D] to-transparent shadow-[0_0_14px_#F88E7D] opacity-90" />
+                <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-[#F0886A] to-transparent shadow-[0_0_14px_#F0886A] opacity-90" />
                 <div className="absolute -top-0.5 left-4 right-4 h-[3px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               </motion.div>
               {/* Corner scan brackets */}
-              <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[#F88E7D]/60 rounded-tl-sm pointer-events-none z-10" />
-              <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[#F88E7D]/60 rounded-tr-sm pointer-events-none z-10" />
-              <div className="absolute bottom-16 left-4 w-6 h-6 border-l-2 border-b-2 border-[#F88E7D]/60 rounded-bl-sm pointer-events-none z-10" />
-              <div className="absolute bottom-16 right-4 w-6 h-6 border-r-2 border-b-2 border-[#F88E7D]/60 rounded-br-sm pointer-events-none z-10" />
+              <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 border-[#F0886A]/60 rounded-tl-sm pointer-events-none z-10" />
+              <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 border-[#F0886A]/60 rounded-tr-sm pointer-events-none z-10" />
+              <div className="absolute bottom-16 left-4 w-6 h-6 border-l-2 border-b-2 border-[#F0886A]/60 rounded-bl-sm pointer-events-none z-10" />
+              <div className="absolute bottom-16 right-4 w-6 h-6 border-r-2 border-b-2 border-[#F0886A]/60 rounded-br-sm pointer-events-none z-10" />
 
               {/* ═══ SMART OVERLAYS — keyed to real facial regions ═══ */}
               {/* All hidden while loading */}
@@ -1413,7 +1413,7 @@ export default function Home() {
                 </button>
                 <button
                   onClick={() => resetScanner("face")}
-                  className="px-4 py-2 rounded-full bg-black/40 backdrop-blur-md text-white font-black text-[10px] border border-white/10 active:scale-90 transition-transform tracking-widest uppercase shadow-lg"
+                  className="px-4 py-2 rounded-full bg-black/40 backdrop-blur-md text-white font-bold text-[10px] border border-white/10 active:scale-90 transition-transform tracking-widest uppercase shadow-lg"
                 >
                   Rescan Skin
                 </button>
@@ -1424,9 +1424,9 @@ export default function Home() {
                 <div className="flex justify-between items-center">
                   <div className="bg-black/50 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[8px] font-black text-white uppercase tracking-wider">AI Scan Active</span>
+                    <span className="text-[8px] font-bold text-white uppercase tracking-wider">AI Scan Active</span>
                   </div>
-                  <div className="text-[8px] font-black text-white/60 uppercase tracking-widest bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full">
+                  <div className="text-[8px] font-bold text-white/60 uppercase tracking-widest bg-black/30 backdrop-blur-sm px-2 py-1 rounded-full">
                     92% Confidence
                   </div>
                 </div>
@@ -1439,7 +1439,7 @@ export default function Home() {
                     {color:"#60a5fa",label:"Circles",glow:"#60a5fa"},
                     {color:"#ffffff",label:"Glow",glow:"#ffffff"},
                   ].map(({color,label,glow}) => (
-                    <span key={label} className="flex items-center gap-1 text-[7.5px] font-black text-white/70 uppercase tracking-tighter">
+                    <span key={label} className="flex items-center gap-1 text-[7.5px] font-bold text-white/70 uppercase tracking-[-0.3px]er">
                       <span className="w-1.5 h-1.5 rounded-full" style={{background:color, boxShadow:`0 0 4px ${glow}`}} /> {label}
                     </span>
                   ))}
@@ -1451,25 +1451,25 @@ export default function Home() {
             <div className="px-5 -mt-6 relative z-20 space-y-4 pb-2">
 
               {/* ── Score Overview Card (overlaps image) ── */}
-              <div className="bg-white/95 backdrop-blur-xl rounded-[28px] p-5 shadow-xl shadow-orange-500/10 border border-white relative overflow-hidden" style={{boxShadow: '0 8px 32px rgba(248,142,125,0.12), 0 1px 0 rgba(255,255,255,0.8) inset'}}>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#FFEDE8]/80 to-transparent rounded-full blur-2xl pointer-events-none" />
+              <div className="bg-white/95 backdrop-blur-xl rounded-[22px] p-5 shadow-xl shadow-[#F0886A]/10 border border-white relative overflow-hidden" style={{boxShadow: '0 8px 32px rgba(248,142,125,0.12), 0 1px 0 rgba(255,255,255,0.8) inset'}}>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[rgba(240,136,106,0.10)]/80 to-transparent rounded-full blur-2xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-[#FFF5F2]/60 to-transparent rounded-full blur-xl pointer-events-none" />
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-[9.5px] text-[#F88E7D] font-black uppercase tracking-[0.18em]">Dermal Diagnostic</p>
-                    <h2 className="text-[21px] font-black text-slate-800 tracking-tight leading-tight mt-0.5">Overall Skin Health</h2>
+                    <p className="text-[9.5px] text-[#F0886A] font-bold uppercase tracking-[0.18em]">Dermal Diagnostic</p>
+                    <h2 className="text-[21px] font-bold text-[#2C1F1A] tracking-[-0.3px] leading-tight mt-0.5">Overall Skin Health</h2>
                   </div>
                   <div className="text-right">
-                    <div className="text-[32px] font-black leading-none tabular-nums" style={{color: data.score >= 80 ? '#059669' : data.score >= 65 ? '#d97706' : '#ef4444'}}>
-                      {data.score}<span className="text-[13px] text-slate-300 font-bold">/100</span>
+                    <div className="text-[32px] font-bold leading-none tabular-nums" style={{color: data.score >= 80 ? '#059669' : data.score >= 65 ? '#d97706' : '#ef4444'}}>
+                      {data.score}<span className="text-[13px] text-[rgba(44,31,26,0.30)] font-bold">/100</span>
                     </div>
                     <div className="mt-1.5">
                       {data.score >= 80 ? (
-                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-emerald-100">Excellent ✨</span>
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-emerald-100">Excellent ✨</span>
                       ) : data.score >= 65 ? (
-                        <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-amber-100">Moderate</span>
+                        <span className="bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-amber-100">Moderate</span>
                       ) : (
-                        <span className="bg-red-50 text-red-600 border border-red-200 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-red-100">Needs Care</span>
+                        <span className="bg-red-50 text-red-600 border border-red-200 text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full shadow-sm shadow-red-100">Needs Care</span>
                       )}
                     </div>
                   </div>
@@ -1521,19 +1521,19 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: label === 'Acne' ? 0.1 : label === 'Oil' ? 0.2 : 0.3 }}
                     whileTap={{ scale: 0.97 }}
-                    className="bg-white rounded-[20px] p-3.5 border border-slate-100/80 flex flex-col gap-1.5 relative overflow-hidden"
+                    className="bg-white rounded-[20px] p-3.5 border border-[rgba(60,30,20,0.08)]/80 flex flex-col gap-1.5 relative overflow-hidden"
                     style={{ boxShadow: `0 4px 16px ${dotColor}18, 0 1px 0 rgba(255,255,255,0.9) inset` }}
                   >
                     <div className="absolute top-0 right-0 w-10 h-10 rounded-full blur-xl opacity-30 pointer-events-none" style={{ background: dotColor }} />
                     <div className={cn("w-7 h-7 rounded-xl flex items-center justify-center", bg, color)}>
                       {icon}
                     </div>
-                    <p className="text-[9px] text-slate-400 font-black uppercase tracking-tight">{label}</p>
+                    <p className="text-[9px] text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-[-0.3px]">{label}</p>
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.5 }}
-                      className="text-[19px] font-black leading-none"
+                      className="text-[19px] font-bold leading-none"
                       style={{ color: value < 20 ? '#374151' : value < 50 ? dotColor : dotColor }}
                     >{value}%</motion.p>
                     {/* Severity dots */}
@@ -1553,7 +1553,7 @@ export default function Home() {
                         />
                       ))}
                     </div>
-                    <p className="text-[8.5px] font-black" style={{ color: dotColor }}>{desc}</p>
+                    <p className="text-[8.5px] font-bold" style={{ color: dotColor }}>{desc}</p>
                   </motion.div>
                 ))}
               </div>
@@ -1569,23 +1569,23 @@ export default function Home() {
                   content: (
                     <div className="space-y-3.5">
                       {/* AI verdict quote */}
-                      <p className="text-[12.5px] font-semibold text-slate-700 leading-relaxed italic border-l-[3px] border-[#F88E7D] pl-3.5 bg-[#FDF5F2]/40 py-2 rounded-r-xl">
+                      <p className="text-[12.5px] font-semibold text-[rgba(44,31,26,0.75)] leading-relaxed italic border-l-[3px] border-[#F0886A] pl-3.5 bg-white/60 py-2 rounded-r-xl">
                         {`"${data.acne > 25 ? "Mild acne activity detected around cheek and chin regions." : "No significant acne flares — skin surface appears relatively clear."} ${data.oil > 45 ? "T-zone shows elevated sebum indicating compensatory oiliness." : "Sebum secretion appears balanced and well-controlled."} ${data.pigmentation > 25 ? "Pigmentation irregularities are visible but manageable with targeted care." : "Melanin distribution looks mostly uniform with good clarity."}"`}
                       </p>
                       {/* Color-coded condition tags */}
                       <div className="flex flex-wrap gap-1.5">
-                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-black uppercase tracking-wide" style={{ background: data.acne < 20 ? '#f0fdf4' : '#fff1f2', color: data.acne < 20 ? '#16a34a' : '#ef4444', border: `1px solid ${data.acne < 20 ? '#bbf7d0' : '#fecaca'}` }}>Acne: {data.acne < 20 ? 'Clear ✓' : data.acne < 40 ? 'Mild ⚠' : 'Active !'}</span>
-                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-black uppercase tracking-wide" style={{ background: data.oil < 35 ? '#fffbeb' : '#fff7ed', color: data.oil < 35 ? '#d97706' : '#ea580c', border: '1px solid #fed7aa' }}>Oil: {data.oil < 25 ? 'Balanced ✓' : data.oil < 50 ? 'Moderate ⚠' : 'High !'}</span>
-                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-black uppercase tracking-wide" style={{ background: '#faf5ff', color: '#9333ea', border: '1px solid #e9d5ff' }}>Pigment: {data.pigmentation < 20 ? 'Even ✓' : 'Minor spots ⚠'}</span>
+                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-bold uppercase tracking-wide" style={{ background: data.acne < 20 ? '#f0fdf4' : '#fff1f2', color: data.acne < 20 ? '#16a34a' : '#ef4444', border: `1px solid ${data.acne < 20 ? '#bbf7d0' : '#fecaca'}` }}>Acne: {data.acne < 20 ? 'Clear ✓' : data.acne < 40 ? 'Mild ⚠' : 'Active !'}</span>
+                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-bold uppercase tracking-wide" style={{ background: data.oil < 35 ? '#fffbeb' : '#fff7ed', color: data.oil < 35 ? '#d97706' : '#ea580c', border: '1px solid #fed7aa' }}>Oil: {data.oil < 25 ? 'Balanced ✓' : data.oil < 50 ? 'Moderate ⚠' : 'High !'}</span>
+                        <span className="px-2.5 py-1 rounded-full text-[8.5px] font-bold uppercase tracking-wide" style={{ background: '#faf5ff', color: '#9333ea', border: '1px solid #e9d5ff' }}>Pigment: {data.pigmentation < 20 ? 'Even ✓' : 'Minor spots ⚠'}</span>
                       </div>
                       {/* Quick tip */}
-                      <div className="bg-[#F88E7D]/8 border border-[#F88E7D]/15 rounded-[14px] p-3">
-                        <p className="text-[10px] font-black text-[#F88E7D] uppercase tracking-wider mb-1">💡 Top Priority</p>
+                      <div className="bg-[#F0886A]/8 border border-[#F0886A]/15 rounded-[14px] p-3">
+                        <p className="text-[10px] font-bold text-[#F0886A] uppercase tracking-wider mb-1">💡 Top Priority</p>
                         <p className="text-[11px] text-slate-600 leading-snug font-medium">
                           {data.acne > 30 ? "Focus on a gentle salicylic acid cleanser morning & night to reduce active breakouts first." : data.oil > 50 ? "Use a niacinamide serum to regulate sebum production without stripping skin." : data.pigmentation > 30 ? "Add a vitamin C serum every morning + SPF 50 to reduce dark spot formation." : "Your skin is in decent health — maintain hydration and consistent SPF use."}
                         </p>
                       </div>
-                      <p className="text-[8px] text-slate-300 font-bold uppercase tracking-wider">⚠️ AI-generated insights. Not a medical diagnosis.</p>
+                      <p className="text-[8px] text-[rgba(44,31,26,0.30)] font-bold uppercase tracking-wider">⚠️ AI-generated insights. Not a medical diagnosis.</p>
                     </div>
                   )
                 },
@@ -1598,10 +1598,10 @@ export default function Home() {
                     <div className="text-[12.5px] text-slate-600 leading-relaxed font-medium relative">
                       {!isPremium && history.length > 1 && (
                         <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-center p-4 rounded-[16px]">
-                          <Lock className="text-[#F88E7D] mb-2" size={20}/>
-                          <p className="text-[13px] font-black text-slate-800 mb-1">Report Locked</p>
+                          <Lock className="text-[#F0886A] mb-2" size={20}/>
+                          <p className="text-[13px] font-bold text-[#2C1F1A] mb-1">Report Locked</p>
                           <p className="text-[9.5px] text-slate-500 font-bold mb-3 px-4">Upgrade to read full dermatological recommendations</p>
-                          <Link href="/premium" className="bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-md shadow-orange-500/20 active:scale-95 transition-transform">
+                          <Link href="/premium" className="bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md shadow-[#F0886A]/20 active:scale-95 transition-transform">
                             Unlock Now ✨
                           </Link>
                         </div>
@@ -1611,16 +1611,16 @@ export default function Home() {
                           <div className="py-8 flex flex-col items-center gap-4">
                             {/* Multi-ring loader */}
                             <div className="relative w-14 h-14">
-                              <div className="absolute inset-0 rounded-full border-4 border-[#FFEDE8]" />
-                              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F88E7D] animate-spin" />
-                              <div className="absolute inset-[4px] rounded-full border-2 border-transparent border-t-[#F88E7D]/40 animate-spin" style={{animationDirection:'reverse',animationDuration:'1.2s'}} />
+                              <div className="absolute inset-0 rounded-full border-4 border-[rgba(240,136,106,0.10)]" />
+                              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#F0886A] animate-spin" />
+                              <div className="absolute inset-[4px] rounded-full border-2 border-transparent border-t-[#F0886A]/40 animate-spin" style={{animationDirection:'reverse',animationDuration:'1.2s'}} />
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <BrainCircuit size={16} className="text-[#F88E7D]" />
+                                <BrainCircuit size={16} className="text-[#F0886A]" />
                               </div>
                             </div>
                             <div className="text-center">
-                              <p className="text-[11px] text-slate-600 font-black uppercase tracking-widest animate-pulse">AI Analyzing Skin…</p>
-                              <p className="text-[9px] text-slate-400 mt-1">Mapping dermal texture & pigmentation</p>
+                              <p className="text-[11px] text-slate-600 font-bold uppercase tracking-widest animate-pulse">AI Analyzing Skin…</p>
+                              <p className="text-[9px] text-[rgba(44,31,26,0.38)] mt-1">Mapping dermal texture & pigmentation</p>
                             </div>
                             {/* Progress steps */}
                             <div className="w-full space-y-1.5 px-2">
@@ -1631,7 +1631,7 @@ export default function Home() {
                                     animate={{ scale: 1 }}
                                     transition={{ delay: i * 0.4 }}
                                     className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
-                                    style={{ background: '#F88E7D' }}
+                                    style={{ background: '#F0886A' }}
                                   >
                                     <CheckCircle2 size={10} className="text-white" />
                                   </motion.div>
@@ -1645,7 +1645,7 @@ export default function Home() {
                             {history.length <= 1 && !isPremium && (
                               <div className="flex items-center gap-2 mb-3 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full w-fit">
                                 <Sparkles size={11}/>
-                                <span className="text-[8.5px] font-black uppercase tracking-widest text-emerald-600/70">Welcome Gift: Free Analysis</span>
+                                <span className="text-[8.5px] font-bold uppercase tracking-widest text-emerald-600/70">Welcome Gift: Free Analysis</span>
                               </div>
                             )}
                             {ai ? formatMarkdown(ai) : "Scanning complete. Your personalized report is ready."}
@@ -1668,11 +1668,11 @@ export default function Home() {
                         { title: "Diet Adjustment", desc: data.acne > 30 ? "Reduce high-glycemic foods and dairy triggers that worsen inflammatory acne." : "Incorporate antioxidant-rich fruits and Omega-3 seeds for radiance.", num: "04" },
                         { title: "Barrier Support", desc: "Avoid harsh scrubs — use ceramide-rich moisturizers nightly to lock in moisture.", num: "05" },
                       ].map((item) => (
-                        <div key={item.num} className="flex gap-3 items-start p-3 bg-[#FDF5F2]/50 rounded-[16px] border border-[#F3EAE8]/40">
-                          <div className="w-6 h-6 rounded-full bg-[#F88E7D]/15 flex items-center justify-center text-[#F88E7D] text-[9px] font-black flex-shrink-0 mt-0.5">{item.num}</div>
+                        <div key={item.num} className="flex gap-3 items-start p-3 bg-white/65 rounded-[16px] border border-[rgba(60,30,20,0.08)]/40">
+                          <div className="w-6 h-6 rounded-full bg-[#F0886A]/15 flex items-center justify-center text-[#F0886A] text-[9px] font-bold flex-shrink-0 mt-0.5">{item.num}</div>
                           <div>
-                            <p className="text-[11.5px] font-black text-slate-700">{item.title}</p>
-                            <p className="text-[9.5px] text-slate-400 mt-0.5 leading-snug">{item.desc}</p>
+                            <p className="text-[11.5px] font-bold text-[rgba(44,31,26,0.75)]">{item.title}</p>
+                            <p className="text-[9.5px] text-[rgba(44,31,26,0.38)] mt-0.5 leading-snug">{item.desc}</p>
                           </div>
                         </div>
                       ))}
@@ -1680,19 +1680,19 @@ export default function Home() {
                   )
                 }
               ].map(({ key, icon, title, content }) => (
-                <div key={key} className="bg-white rounded-[24px] shadow-sm border border-slate-100 overflow-hidden">
+                <div key={key} className="bg-white rounded-[24px] shadow-sm border border-[rgba(60,30,20,0.08)] overflow-hidden">
                   <button
                     onClick={() => setExpandedSection(expandedSection === key ? null : key)}
-                    className="w-full flex items-center justify-between px-5 py-4 active:bg-slate-50 transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4 active:bg-[#F5F1EE] transition-colors"
                   >
-                    <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[10.5px] uppercase tracking-widest">
+                    <div className="flex items-center gap-2 text-[#F0886A] font-bold text-[10.5px] uppercase tracking-widest">
                       {icon} {title}
                     </div>
                     <motion.div
                       animate={{ rotate: expandedSection === key ? 180 : 0 }}
                       transition={{ duration: 0.25 }}
                     >
-                      <ChevronRight size={14} className="text-slate-300 rotate-90" />
+                      <ChevronRight size={14} className="text-[rgba(44,31,26,0.30)] rotate-90" />
                     </motion.div>
                   </button>
                   <AnimatePresence initial={false}>
@@ -1715,8 +1715,8 @@ export default function Home() {
               ))}
 
               {/* ── Premium Locked Features ── */}
-              <div className="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100">
-                <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[10.5px] uppercase tracking-widest mb-4">
+              <div className="bg-white rounded-[24px] p-5 shadow-sm border border-[rgba(60,30,20,0.08)]">
+                <div className="flex items-center gap-2 text-[#F0886A] font-bold text-[10.5px] uppercase tracking-widest mb-4">
                   <Gem size={13}/> Premium Analytics
                 </div>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -1732,49 +1732,49 @@ export default function Home() {
                       key={title}
                       whileTap={{ scale: 0.94 }}
                       onClick={() => setPremiumModal(title)}
-                      className="bg-[#FDF5F2]/60 p-3.5 rounded-[18px] border border-[#F3EAE8]/40 relative overflow-hidden cursor-pointer active:bg-[#FFEDE8]/60 transition-colors"
+                      className="bg-white/70 p-3.5 rounded-[18px] border border-[rgba(60,30,20,0.08)]/40 relative overflow-hidden cursor-pointer active:bg-[rgba(240,136,106,0.10)]/60 transition-colors"
                     >
-                      <div className="absolute top-2.5 right-2.5 text-[#F88E7D]/70">
+                      <div className="absolute top-2.5 right-2.5 text-[#F0886A]/70">
                         {isPremium ? <Sparkles size={10}/> : <Lock size={10}/>}
                       </div>
                       <div className="text-lg mb-1.5">{icon}</div>
-                      <p className="text-[10.5px] font-black text-slate-700 leading-tight">{title}</p>
-                      <p className="text-[8.5px] text-slate-400 mt-0.5 leading-snug">{desc}</p>
-                      <div className="mt-2 flex items-center gap-1 text-[#F88E7D]">
-                        <span className="text-[8px] font-black uppercase tracking-wider">{isPremium ? 'View' : 'Preview'}</span>
+                      <p className="text-[10.5px] font-bold text-[rgba(44,31,26,0.75)] leading-tight">{title}</p>
+                      <p className="text-[8.5px] text-[rgba(44,31,26,0.38)] mt-0.5 leading-snug">{desc}</p>
+                      <div className="mt-2 flex items-center gap-1 text-[#F0886A]">
+                        <span className="text-[8px] font-bold uppercase tracking-wider">{isPremium ? 'View' : 'Preview'}</span>
                         <ChevronRight size={9}/>
                       </div>
                     </motion.div>
                   ))}
                 </div>
                 {!isPremium && (
-                  <Link href="/premium" className="mt-4 w-full h-11 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-2 font-black text-[11px] uppercase tracking-widest shadow-md shadow-orange-500/20 active:scale-95 transition-transform">
+                  <Link href="/premium" className="mt-4 w-full h-11 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-2 font-bold text-[11px] uppercase tracking-widest shadow-md shadow-[#F0886A]/20 active:scale-95 transition-transform">
                     <Gem size={13}/> Unlock All Premium Features
                   </Link>
                 )}
               </div>
 
               {/* ── Progress Tracking ── */}
-              <div className="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100">
+              <div className="bg-white rounded-[24px] p-5 shadow-sm border border-[rgba(60,30,20,0.08)]">
                 <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-2 text-[#F88E7D] font-black text-[10.5px] uppercase tracking-widest">
+                  <div className="flex items-center gap-2 text-[#F0886A] font-bold text-[10.5px] uppercase tracking-widest">
                     <TrendingUp size={13}/> Skin Progress
                   </div>
                   {history.length > 1 && (
-                    <button onClick={() => setView("history")} className="text-[9.5px] font-black text-[#F88E7D]">View All →</button>
+                    <button onClick={() => setView("history")} className="text-[9.5px] font-bold text-[#F0886A]">View All →</button>
                   )}
                 </div>
 
                 {history.length <= 1 ? (
-                  <div className="text-center py-6 bg-[#FDF5F2]/40 rounded-[18px] border border-[#F3EAE8]/30">
+                  <div className="text-center py-6 bg-white/60 rounded-[18px] border border-[rgba(60,30,20,0.08)]/30">
                     <div className="text-3xl mb-2">📈</div>
-                    <p className="text-[12px] font-black text-slate-700">No previous scans yet</p>
-                    <p className="text-[9.5px] text-slate-400 mt-1 leading-snug px-4">
+                    <p className="text-[12px] font-bold text-[rgba(44,31,26,0.75)]">No previous scans yet</p>
+                    <p className="text-[9.5px] text-[rgba(44,31,26,0.38)] mt-1 leading-snug px-4">
                       Scan weekly to build your skin improvement timeline and see real progress.
                     </p>
                     <button
                       onClick={() => resetScanner("face")}
-                      className="mt-4 bg-[#FFEDE8] text-[#F88E7D] px-5 py-2 rounded-full text-[9.5px] font-black uppercase tracking-wider border border-[#F3EAE8] active:scale-95 transition-transform"
+                      className="mt-4 bg-[rgba(240,136,106,0.10)] text-[#F0886A] px-5 py-2 rounded-full text-[9.5px] font-bold uppercase tracking-wider border border-[rgba(60,30,20,0.08)] active:scale-95 transition-transform"
                     >
                       Start Tracking Progress
                     </button>
@@ -1784,23 +1784,23 @@ export default function Home() {
                     {/* Mini timeline bars */}
                     {history.slice(0, 3).map((h, i) => (
                       <div key={i} className="flex items-center gap-3">
-                        <p className="text-[9px] text-slate-400 font-bold w-16 shrink-0">{h.date.slice(0,5)}</p>
+                        <p className="text-[9px] text-[rgba(44,31,26,0.38)] font-bold w-16 shrink-0">{h.date.slice(0,5)}</p>
                         <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${h.score}%` }}
                             transition={{ duration: 0.8, delay: i * 0.15 }}
-                            className={cn("h-full rounded-full", i === 0 ? "bg-[#F88E7D]" : "bg-slate-300")}
+                            className={cn("h-full rounded-full", i === 0 ? "bg-[#F0886A]" : "bg-slate-300")}
                           />
                         </div>
-                        <p className="text-[9px] font-black text-slate-600 w-7 text-right">{h.score}</p>
+                        <p className="text-[9px] font-bold text-slate-600 w-7 text-right">{h.score}</p>
                       </div>
                     ))}
                     <div className={cn("rounded-[16px] p-3 flex items-center justify-between mt-1", data.score > (history[1]?.score || 0) ? "bg-emerald-50 border border-emerald-100" : "bg-amber-50 border border-amber-100")}>
-                      <p className="text-[11px] font-black text-slate-700">
+                      <p className="text-[11px] font-bold text-[rgba(44,31,26,0.75)]">
                         {data.score > (history[1]?.score || 0) ? "📈 Great progress this week!" : "📉 Stick to your routine closely"}
                       </p>
-                      <div className={cn("text-[10px] font-black px-2.5 py-1 rounded-full", data.score > (history[1]?.score || 0) ? "text-emerald-600 bg-emerald-100" : "text-amber-600 bg-amber-100")}>
+                      <div className={cn("text-[10px] font-bold px-2.5 py-1 rounded-full", data.score > (history[1]?.score || 0) ? "text-emerald-600 bg-emerald-100" : "text-amber-600 bg-amber-100")}>
                         {data.score > (history[1]?.score || 0) ? `+${data.score - history[1].score}` : `${data.score - history[1].score}`}
                       </div>
                     </div>
@@ -1812,7 +1812,7 @@ export default function Home() {
               {isPremium && (
                 <button
                   onClick={() => window.print()}
-                  className="w-full h-12 bg-[#FFEDE8] text-[#F88E7D] rounded-[18px] border border-[#F3EAE8] flex items-center justify-center gap-2 font-black text-[10.5px] uppercase tracking-widest active:scale-95 transition-transform"
+                  className="w-full h-12 bg-[rgba(240,136,106,0.10)] text-[#F0886A] rounded-[18px] border border-[rgba(60,30,20,0.08)] flex items-center justify-center gap-2 font-bold text-[10.5px] uppercase tracking-widest active:scale-95 transition-transform"
                 >
                   <Download size={13}/> Download Skin Report PDF
                 </button>
@@ -1821,22 +1821,22 @@ export default function Home() {
             </div>
 
             {/* ═══ STICKY BOTTOM CTA BAR ═══ */}
-            <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/75 backdrop-blur-xl border-t border-slate-100 flex items-center gap-2.5 z-50 md:left-1/2 md:-translate-x-1/2 md:max-w-[430px]">
+            <div className="fixed bottom-0 left-0 right-0 p-3 bg-white/75 backdrop-blur-xl border-t border-[rgba(60,30,20,0.08)] flex items-center gap-2.5 z-50 md:left-1/2 md:-translate-x-1/2 md:max-w-[430px]">
               <button
                 onClick={() => resetScanner("face")}
-                className="w-12 h-12 bg-slate-100 text-slate-400 rounded-[16px] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform border border-slate-200"
+                className="w-12 h-12 bg-slate-100 text-[rgba(44,31,26,0.38)] rounded-[16px] flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform border border-[rgba(60,30,20,0.10)]"
               >
                 <RefreshCcw size={15}/>
               </button>
               <button
                 onClick={() => setView("history")}
-                className="flex-1 h-12 bg-slate-50 border border-slate-100 text-slate-500 rounded-[16px] flex items-center justify-center gap-1.5 font-black text-[10.5px] uppercase tracking-wide active:scale-95 transition-transform"
+                className="flex-1 h-12 bg-[#F5F1EE] border border-[rgba(60,30,20,0.08)] text-slate-500 rounded-[16px] flex items-center justify-center gap-1.5 font-bold text-[10.5px] uppercase tracking-wide active:scale-95 transition-transform"
               >
                 <TrendingUp size={13}/> Track Progress
               </button>
               <Link
                 href="/routine"
-                className="flex-[1.6] h-12 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-1.5 font-black text-[10.5px] uppercase tracking-wide active:scale-95 transition-transform shadow-lg shadow-orange-500/20"
+                className="flex-[1.6] h-12 bg-primary-gradient text-white rounded-[16px] flex items-center justify-center gap-1.5 font-bold text-[10.5px] uppercase tracking-wide active:scale-95 transition-transform shadow-lg shadow-[#F0886A]/20"
               >
                 <Sparkles size={13}/> Get Routine
               </Link>
@@ -1853,13 +1853,13 @@ export default function Home() {
         {view === "history" && (
           <motion.div key="history" initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} exit={{opacity:0}} className="px-5 pb-32">
             <div className="flex items-center gap-3 mb-5 pt-2">
-              <button onClick={()=>setView(data ? "results" : "home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-slate-400 border border-slate-100"><ArrowLeft size={18} strokeWidth={1.2} /></button>
-              <h2 className="text-[18px] font-black text-slate-900 text-center flex-1 pr-10">Scan History</h2>
+              <button onClick={()=>setView(data ? "results" : "home")} className="w-10 h-10 rounded-full bg-white shadow flex items-center justify-center text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]"><ArrowLeft size={18} strokeWidth={1.2} /></button>
+              <h2 className="text-[18px] font-bold text-[#2C1F1A] text-center flex-1 pr-10">Scan History</h2>
             </div>
             {history.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 gap-4"><div className="text-6xl">📭</div><p className="text-[15px] font-bold text-slate-400">No scans yet</p><button onClick={()=>setView("scanner")} className="bg-primary-gradient text-white font-black px-6 py-3 rounded-2xl text-sm">Start First Scan ✨</button></div>
+              <div className="flex flex-col items-center justify-center py-20 gap-4"><div className="text-6xl">📭</div><p className="text-[15px] font-bold text-[rgba(44,31,26,0.38)]">No scans yet</p><button onClick={()=>setView("scanner")} className="bg-primary-gradient text-white font-bold px-6 py-3 rounded-2xl text-sm">Start First Scan ✨</button></div>
             ) : (
-              <div className="space-y-3">{history.map((h,i)=>(<div key={i} className="bg-white rounded-[20px] border border-[#EEF0FF] shadow-sm p-4 flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-lg flex-shrink-0">🧴</div><div className="flex-1"><p className="text-[12px] font-bold text-slate-800">{h.date}</p><div className="flex gap-3 mt-1"><p className="text-[9px] text-slate-400">Acne <span className="text-slate-600 font-bold">{h.acne}%</span></p><p className="text-[9px] text-slate-400">Oil <span className="text-slate-600 font-bold">{h.oil}%</span></p><p className="text-[9px] text-slate-400">Pigment <span className="text-slate-600 font-bold">{h.pigmentation}%</span></p></div></div><div className="w-10 h-10 rounded-full bg-primary-gradient flex items-center justify-center flex-shrink-0"><p className="text-[10px] font-black text-white">{h.score}%</p></div></div>))}</div>
+              <div className="space-y-3">{history.map((h,i)=>(<div key={i} className="bg-white rounded-[20px] border border-[#EEF0FF] shadow-sm p-4 flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-lg flex-shrink-0">🧴</div><div className="flex-1"><p className="text-[12px] font-bold text-[#2C1F1A]">{h.date}</p><div className="flex gap-3 mt-1"><p className="text-[9px] text-[rgba(44,31,26,0.38)]">Acne <span className="text-slate-600 font-bold">{h.acne}%</span></p><p className="text-[9px] text-[rgba(44,31,26,0.38)]">Oil <span className="text-slate-600 font-bold">{h.oil}%</span></p><p className="text-[9px] text-[rgba(44,31,26,0.38)]">Pigment <span className="text-slate-600 font-bold">{h.pigmentation}%</span></p></div></div><div className="w-10 h-10 rounded-full bg-primary-gradient flex items-center justify-center flex-shrink-0"><p className="text-[10px] font-bold text-white">{h.score}%</p></div></div>))}</div>
             )}
           </motion.div>
         )}
@@ -1878,26 +1878,26 @@ export default function Home() {
             >
               <button 
                 onClick={() => setScanLimitReached(false)}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-[#F5F1EE] flex items-center justify-center text-[rgba(44,31,26,0.38)]"
               >
                 <X size={20} />
               </button>
-              <div className="w-20 h-20 bg-[#FFEDE8] rounded-[32px] flex items-center justify-center mx-auto mb-6 text-[#F88E7D] shadow-inner">
+              <div className="w-20 h-20 bg-[rgba(240,136,106,0.10)] rounded-[22px] flex items-center justify-center mx-auto mb-6 text-[#F0886A] shadow-inner">
                 <AlertCircle size={40} />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 leading-tight mb-2">
+              <h2 className="text-2xl font-bold text-[#2C1F1A] leading-tight mb-2">
                 {limitReason === "premium" ? "Premium Feature!" : "Scan Limit Reached!"}
               </h2>
-              <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mb-8 italic px-4">
+              <p className="text-[11px] text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-widest mb-8 italic px-4">
                 {limitReason === "premium" 
                   ? "Product scanning is exclusive to GlowAI Premium members."
                   : "Free users get 1 scan per day. Upgrade for unlimited analysis."
                 }
               </p>
-              <Link href="/premium" onClick={() => setScanLimitReached(false)} className="w-full h-16 bg-primary-gradient text-white font-black rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-orange-500/20 active:scale-95 transition-transform mb-4">
+              <Link href="/premium" onClick={() => setScanLimitReached(false)} className="w-full h-16 bg-primary-gradient text-white font-bold rounded-[24px] flex items-center justify-center gap-3 shadow-xl shadow-[#F0886A]/20 active:scale-95 transition-transform mb-4">
                 Unlock Unlimited Scans 🔓
               </Link>
-              <button onClick={() => setScanLimitReached(false)} className="text-[11px] font-black text-slate-300 uppercase tracking-widest">Maybe Later</button>
+              <button onClick={() => setScanLimitReached(false)} className="text-[11px] font-bold text-[rgba(44,31,26,0.30)] uppercase tracking-widest">Maybe Later</button>
             </motion.div>
           </div>
         )}
@@ -1932,12 +1932,12 @@ export default function Home() {
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-3 border-b border-slate-50">
                 <div>
-                  <p className="text-[9px] text-[#F88E7D] font-black uppercase tracking-widest">
+                  <p className="text-[9px] text-[#F0886A] font-bold uppercase tracking-widest">
                     {["Deep Pore Scan","Skin Age Score","Weekly Reports","Custom Routine","Progress Insights","Ingredient Match"].find(t=>t===premiumModal) && "Premium Analytics"}
                   </p>
-                  <h3 className="text-[17px] font-black text-slate-800">{premiumModal}</h3>
+                  <h3 className="text-[17px] font-bold text-[#2C1F1A]">{premiumModal}</h3>
                 </div>
-                <button onClick={() => setPremiumModal(null)} className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 active:scale-90 transition-transform">
+                <button onClick={() => setPremiumModal(null)} className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-[rgba(44,31,26,0.38)] active:scale-90 transition-transform">
                   <X size={16}/>
                 </button>
               </div>
@@ -1948,31 +1948,31 @@ export default function Home() {
                 {/* ── DEEP PORE SCAN ── */}
                 {premiumModal === "Deep Pore Scan" && (
                   <div className="space-y-4">
-                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
-                      <p className="text-[11px] font-black text-slate-500 uppercase tracking-wider mb-3">Pore Congestion Map</p>
+                    <div className="bg-white/70 rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]/50">
+                      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-3">Pore Congestion Map</p>
                       <div className="grid grid-cols-3 gap-2">
                         {[{zone:'T-Zone',level:data.oil>50?'High':data.oil>25?'Mod':'Low',color:data.oil>50?'#ef4444':data.oil>25?'#f59e0b':'#10b981'},{zone:'Left Cheek',level:data.acne>30?'Active':data.acne>15?'Mild':'Clear',color:data.acne>30?'#ef4444':data.acne>15?'#f59e0b':'#10b981'},{zone:'Right Cheek',level:data.acne>25?'Active':data.acne>10?'Mild':'Clear',color:data.acne>25?'#ef4444':data.acne>10?'#f59e0b':'#10b981'},{zone:'Nose',level:data.oil>40?'Clogged':data.oil>20?'Mild':'Clear',color:data.oil>40?'#ef4444':data.oil>20?'#f59e0b':'#10b981'},{zone:'Chin',level:data.acne>20?'Active':'Clear',color:data.acne>20?'#f59e0b':'#10b981'},{zone:'Forehead',level:data.oil>45?'Oily':data.oil>20?'Mild':'Clear',color:data.oil>45?'#ef4444':data.oil>20?'#f59e0b':'#10b981'}].map(z=>(
-                          <div key={z.zone} className="bg-white rounded-[14px] p-2.5 text-center border border-slate-100">
-                            <p className="text-[8px] text-slate-400 font-bold">{z.zone}</p>
-                            <p className="text-[10px] font-black mt-0.5" style={{color:z.color}}>{z.level}</p>
+                          <div key={z.zone} className="bg-white rounded-[14px] p-2.5 text-center border border-[rgba(60,30,20,0.08)]">
+                            <p className="text-[8px] text-[rgba(44,31,26,0.38)] font-bold">{z.zone}</p>
+                            <p className="text-[10px] font-bold mt-0.5" style={{color:z.color}}>{z.level}</p>
                           </div>
                         ))}
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Pore Care Tips</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Pore Care Tips</p>
                       {["Use a salicylic acid toner 2× weekly to decongest pores.","Double cleanse with an oil-based cleanser to dissolve sebum plugs.","Clay mask on T-zone twice a week to absorb excess oil.",`Your pore congestion score: ${Math.round((data.oil+data.acne)/2)}% — ${data.oil+data.acne>80?'High priority':'Manageable'} care needed.`].map((tip,i)=>(
-                        <div key={i} className="flex gap-2.5 items-start bg-white p-3 rounded-[14px] border border-slate-100">
-                          <span className="w-5 h-5 rounded-full bg-[#F88E7D]/15 flex items-center justify-center text-[#F88E7D] text-[8px] font-black flex-shrink-0 mt-0.5">{i+1}</span>
+                        <div key={i} className="flex gap-2.5 items-start bg-white p-3 rounded-[14px] border border-[rgba(60,30,20,0.08)]">
+                          <span className="w-5 h-5 rounded-full bg-[#F0886A]/15 flex items-center justify-center text-[#F0886A] text-[8px] font-bold flex-shrink-0 mt-0.5">{i+1}</span>
                           <p className="text-[10.5px] text-slate-600 leading-snug">{tip}</p>
                         </div>
                       ))}
                     </div>
-                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
-                      <Lock className="text-[#F88E7D] mx-auto mb-2" size={18}/>
-                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Pore Analysis Locked</p>
+                    {!isPremium && <div className="bg-gradient-to-br from-[rgba(240,136,106,0.10)] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[rgba(60,30,20,0.08)]">
+                      <Lock className="text-[#F0886A] mx-auto mb-2" size={18}/>
+                      <p className="text-[12px] font-bold text-[#2C1F1A] mb-1">Full Pore Analysis Locked</p>
                       <p className="text-[9.5px] text-slate-500 mb-3">Get UV-light pore mapping, blackhead density scores & more.</p>
-                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade to Premium</Link>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#F0886A]/20"><Gem size={11}/> Upgrade to Premium</Link>
                     </div>}
                   </div>
                 )}
@@ -1985,27 +1985,27 @@ export default function Home() {
                   const ageColor = ageDelta <= 0 ? '#10b981' : ageDelta <= 3 ? '#f59e0b' : '#ef4444';
                   return (
                     <div className="space-y-4">
-                      <div className="bg-[#FDF5F2]/60 rounded-[20px] p-5 border border-[#F3EAE8]/50 text-center">
-                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-wider mb-2">Estimated Biological Skin Age</p>
-                        <div className="text-[52px] font-black leading-none" style={{color: ageColor}}>{bioAge}</div>
+                      <div className="bg-white/70 rounded-[20px] p-5 border border-[rgba(60,30,20,0.08)]/50 text-center">
+                        <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-wider mb-2">Estimated Biological Skin Age</p>
+                        <div className="text-[52px] font-bold leading-none" style={{color: ageColor}}>{bioAge}</div>
                         <p className="text-[11px] font-bold text-slate-500 mt-1">years old (skin biological age)</p>
-                        <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9.5px] font-black" style={{background: ageDelta<=0?'#f0fdf4':'#fff7ed', color: ageColor}}>
+                        <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[9.5px] font-bold" style={{background: ageDelta<=0?'#f0fdf4':'#fff7ed', color: ageColor}}>
                           {ageDelta <= 0 ? '✨ Younger than chronological age!' : `⚠ +${ageDelta} years above chronological age`}
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         {[{label:'Elasticity Score',val:`${Math.max(40,100-data.acne-data.oil/2)}%`,icon:'💪'},{label:'Collagen Index',val:`${Math.max(35,100-data.pigmentation-data.acne/3)}%`,icon:'🧬'},{label:'Hydration Level',val:`${Math.max(30,100-data.oil/2-data.acne/3)}%`,icon:'💧'},{label:'Skin Clarity',val:`${Math.max(40,100-data.acne-data.pigmentation/2)}%`,icon:'✨'}].map(m=>(
-                          <div key={m.label} className="bg-white rounded-[16px] p-3 border border-slate-100 text-center">
+                          <div key={m.label} className="bg-white rounded-[16px] p-3 border border-[rgba(60,30,20,0.08)] text-center">
                             <div className="text-xl mb-1">{m.icon}</div>
-                            <p className="text-[16px] font-black text-slate-800">{m.val}</p>
-                            <p className="text-[8.5px] text-slate-400 font-bold">{m.label}</p>
+                            <p className="text-[16px] font-bold text-[#2C1F1A]">{m.val}</p>
+                            <p className="text-[8.5px] text-[rgba(44,31,26,0.38)] font-bold">{m.label}</p>
                           </div>
                         ))}
                       </div>
-                      {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
-                        <p className="text-[12px] font-black text-slate-800 mb-1">Full Age Report Locked</p>
+                      {!isPremium && <div className="bg-gradient-to-br from-[rgba(240,136,106,0.10)] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[rgba(60,30,20,0.08)]">
+                        <p className="text-[12px] font-bold text-[#2C1F1A] mb-1">Full Age Report Locked</p>
                         <p className="text-[9.5px] text-slate-500 mb-3">Monthly aging rate, wrinkle prediction & anti-aging plan.</p>
-                        <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                        <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#F0886A]/20"><Gem size={11}/> Upgrade</Link>
                       </div>}
                     </div>
                   );
@@ -2014,23 +2014,23 @@ export default function Home() {
                 {/* ── WEEKLY REPORTS ── */}
                 {premiumModal === "Weekly Reports" && (
                   <div className="space-y-4">
-                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">Scan History Overview</p>
+                    <div className="bg-white/70 rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]/50">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Scan History Overview</p>
                       {history.length <= 1 ? (
                         <div className="text-center py-6">
                           <div className="text-3xl mb-2">📊</div>
-                          <p className="text-[12px] font-black text-slate-600">Not enough data yet</p>
-                          <p className="text-[9.5px] text-slate-400 mt-1">Scan weekly to generate progress charts.</p>
+                          <p className="text-[12px] font-bold text-slate-600">Not enough data yet</p>
+                          <p className="text-[9.5px] text-[rgba(44,31,26,0.38)] mt-1">Scan weekly to generate progress charts.</p>
                         </div>
                       ) : (
                         <div className="space-y-2.5">
                           {history.slice(0,5).map((h,i)=>(
                             <div key={i} className="flex items-center gap-3">
-                              <p className="text-[8.5px] text-slate-400 font-bold w-12 shrink-0">{h.date.slice(0,5)}</p>
+                              <p className="text-[8.5px] text-[rgba(44,31,26,0.38)] font-bold w-12 shrink-0">{h.date.slice(0,5)}</p>
                               <div className="flex-1 h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                                <motion.div initial={{width:0}} animate={{width:`${h.score}%`}} transition={{delay:i*0.1,duration:0.6}} className="h-full rounded-full" style={{background:i===0?'linear-gradient(90deg,#F88E7D,#f97316)':'#e2e8f0'}}/>
+                                <motion.div initial={{width:0}} animate={{width:`${h.score}%`}} transition={{delay:i*0.1,duration:0.6}} className="h-full rounded-full" style={{background:i===0?'linear-gradient(90deg,#F0886A,#f97316)':'#e2e8f0'}}/>
                               </div>
-                              <p className="text-[9px] font-black text-slate-700 w-6 text-right">{h.score}</p>
+                              <p className="text-[9px] font-bold text-[rgba(44,31,26,0.75)] w-6 text-right">{h.score}</p>
                             </div>
                           ))}
                         </div>
@@ -2038,17 +2038,17 @@ export default function Home() {
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       {[{label:'Best Score',val:history.length?Math.max(...history.map(h=>h.score)):data.score,icon:'🏆'},{label:'Avg Score',val:history.length?Math.round(history.reduce((a,h)=>a+h.score,0)/history.length):data.score,icon:'📊'},{label:'Total Scans',val:history.length||1,icon:'🔬'}].map(m=>(
-                        <div key={m.label} className="bg-white rounded-[16px] p-3 border border-slate-100">
+                        <div key={m.label} className="bg-white rounded-[16px] p-3 border border-[rgba(60,30,20,0.08)]">
                           <div className="text-xl mb-1">{m.icon}</div>
-                          <p className="text-[15px] font-black text-slate-800">{m.val}</p>
-                          <p className="text-[7.5px] text-slate-400 font-bold">{m.label}</p>
+                          <p className="text-[15px] font-bold text-[#2C1F1A]">{m.val}</p>
+                          <p className="text-[7.5px] text-[rgba(44,31,26,0.38)] font-bold">{m.label}</p>
                         </div>
                       ))}
                     </div>
-                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
-                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Weekly Reports Locked</p>
+                    {!isPremium && <div className="bg-gradient-to-br from-[rgba(240,136,106,0.10)] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[rgba(60,30,20,0.08)]">
+                      <p className="text-[12px] font-bold text-[#2C1F1A] mb-1">Full Weekly Reports Locked</p>
                       <p className="text-[9.5px] text-slate-500 mb-3">PDF exports, trend analysis & dermatologist summaries.</p>
-                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#F0886A]/20"><Gem size={11}/> Upgrade</Link>
                     </div>}
                   </div>
                 )}
@@ -2057,22 +2057,22 @@ export default function Home() {
                 {premiumModal === "Custom Routine" && (
                   <div className="space-y-4">
                     {[{time:'🌅 Morning Routine',steps:[`Gentle ${data.oil>40?'foaming':'cream'} cleanser (30s)`,`Niacinamide serum${data.oil>40?' (10%) for oil control':'(5%) for glow'}`,data.pigmentation>25?'Vitamin C serum (5–15 min)':'Hyaluronic acid serum',`SPF ${data.acne>30?'50+ mineral':'30+ lightweight'} — non-comedogenic`]},{time:'🌙 Night Routine',steps:['Micellar water makeup removal',`${data.acne>30?'Salicylic acid cleanser (2%)':'Hydrating cream cleanser'}`,data.acne>20?'Adapalene gel (0.1%) — alternate nights':'Retinol 0.25% — 2× weekly',`${data.oil>40?'Oil-free':'Rich ceramide'} moisturizer + eye cream`]}].map(routine=>(
-                      <div key={routine.time} className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
-                        <p className="text-[11px] font-black text-slate-700 mb-3">{routine.time}</p>
+                      <div key={routine.time} className="bg-white/70 rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]/50">
+                        <p className="text-[11px] font-bold text-[rgba(44,31,26,0.75)] mb-3">{routine.time}</p>
                         <div className="space-y-2">
                           {routine.steps.map((step,i)=>(
                             <div key={i} className="flex gap-2.5 items-start">
-                              <span className="w-5 h-5 rounded-full bg-[#F88E7D]/15 flex items-center justify-center text-[#F88E7D] text-[8px] font-black flex-shrink-0 mt-0.5">{i+1}</span>
+                              <span className="w-5 h-5 rounded-full bg-[#F0886A]/15 flex items-center justify-center text-[#F0886A] text-[8px] font-bold flex-shrink-0 mt-0.5">{i+1}</span>
                               <p className="text-[10.5px] text-slate-600 leading-snug">{step}</p>
                             </div>
                           ))}
                         </div>
                       </div>
                     ))}
-                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
-                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Routine Plan Locked</p>
+                    {!isPremium && <div className="bg-gradient-to-br from-[rgba(240,136,106,0.10)] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[rgba(60,30,20,0.08)]">
+                      <p className="text-[12px] font-bold text-[#2C1F1A] mb-1">Full Routine Plan Locked</p>
                       <p className="text-[9.5px] text-slate-500 mb-3">Weekly routine adjustments, product recommendations & reminders.</p>
-                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#F0886A]/20"><Gem size={11}/> Upgrade</Link>
                     </div>}
                   </div>
                 )}
@@ -2080,8 +2080,8 @@ export default function Home() {
                 {/* ── PROGRESS INSIGHTS ── */}
                 {premiumModal === "Progress Insights" && (
                   <div className="space-y-4">
-                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">Current Status</p>
+                    <div className="bg-white/70 rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]/50">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Current Status</p>
                       {[
                         {label:'Acne Trend', val:data.acne, icon:'🔴', tip:data.acne<20?'✓ Clear — maintain routine':'⚠ Reduce sugar & dairy intake'},
                         {label:'Oil Control', val:data.oil, icon:'🟡', tip:data.oil<30?'✓ Balanced sebum':'⚠ Add niacinamide to routine'},
@@ -2089,26 +2089,26 @@ export default function Home() {
                       ].map(m=>(
                         <div key={m.label} className="mb-3 last:mb-0">
                           <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-black text-slate-600">{m.icon} {m.label}</span>
-                            <span className="text-[10px] font-black text-slate-700">{m.val}%</span>
+                            <span className="text-[10px] font-bold text-slate-600">{m.icon} {m.label}</span>
+                            <span className="text-[10px] font-bold text-[rgba(44,31,26,0.75)]">{m.val}%</span>
                           </div>
                           <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <motion.div initial={{width:0}} animate={{width:`${m.val}%`}} transition={{duration:0.8}} className="h-full rounded-full" style={{background:`linear-gradient(90deg,#F88E7D,#f97316)`}}/>
+                            <motion.div initial={{width:0}} animate={{width:`${m.val}%`}} transition={{duration:0.8}} className="h-full rounded-full" style={{background:`linear-gradient(90deg,#F0886A,#f97316)`}}/>
                           </div>
-                          <p className="text-[8.5px] text-slate-400 mt-1">{m.tip}</p>
+                          <p className="text-[8.5px] text-[rgba(44,31,26,0.38)] mt-1">{m.tip}</p>
                         </div>
                       ))}
                     </div>
-                    <div className="bg-white rounded-[20px] p-4 border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">AI Prediction</p>
-                      <p className="text-[11.5px] text-slate-700 leading-relaxed">
+                    <div className="bg-white rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">AI Prediction</p>
+                      <p className="text-[11.5px] text-[rgba(44,31,26,0.75)] leading-relaxed">
                         {data.score>=75?'Your skin is on a positive trajectory. With consistent care, expect a 5–10 point improvement in 4 weeks.':data.score>=55?'Moderate improvements expected in 3–4 weeks with consistent routine adherence. Focus on oil control and SPF.':'Significant improvement possible in 6–8 weeks. Prioritize a consistent cleansing and barrier repair routine.'}
                       </p>
                     </div>
-                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
-                      <p className="text-[12px] font-black text-slate-800 mb-1">Long-term Insights Locked</p>
+                    {!isPremium && <div className="bg-gradient-to-br from-[rgba(240,136,106,0.10)] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[rgba(60,30,20,0.08)]">
+                      <p className="text-[12px] font-bold text-[#2C1F1A] mb-1">Long-term Insights Locked</p>
                       <p className="text-[9.5px] text-slate-500 mb-3">90-day projection charts, milestone tracking & alerts.</p>
-                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#F0886A]/20"><Gem size={11}/> Upgrade</Link>
                     </div>}
                   </div>
                 )}
@@ -2116,8 +2116,8 @@ export default function Home() {
                 {/* ── INGREDIENT MATCH ── */}
                 {premiumModal === "Ingredient Match" && (
                   <div className="space-y-4">
-                    <div className="bg-[#FDF5F2]/60 rounded-[20px] p-4 border border-[#F3EAE8]/50">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">✅ Recommended Ingredients</p>
+                    <div className="bg-white/70 rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]/50">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">✅ Recommended Ingredients</p>
                       <div className="flex flex-wrap gap-2">
                         {[
                           ...(data.acne>20?['Salicylic Acid','Niacinamide','Tea Tree Oil','Benzoyl Peroxide']:['Lactic Acid','Ceramides']),
@@ -2125,26 +2125,26 @@ export default function Home() {
                           ...(data.pigmentation>20?['Vitamin C','Alpha Arbutin','Kojic Acid']:['Resveratrol']),
                           'Hyaluronic Acid','SPF 50+'
                         ].slice(0,8).map(ing=>(
-                          <span key={ing} className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[9px] font-black">✓ {ing}</span>
+                          <span key={ing} className="px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full text-[9px] font-bold">✓ {ing}</span>
                         ))}
                       </div>
                     </div>
-                    <div className="bg-white rounded-[20px] p-4 border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-3">❌ Avoid These</p>
+                    <div className="bg-white rounded-[20px] p-4 border border-[rgba(60,30,20,0.08)]">
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">❌ Avoid These</p>
                       <div className="flex flex-wrap gap-2">
                         {[
                           ...(data.acne>20?['Coconut Oil','Lanolin','Mineral Oil']:['Alcohol-heavy toners']),
                           ...(data.oil>40?['Heavy Petrolatum','Thick butters']:['Drying Alcohols']),
                           ...(data.pigmentation>25?['Photosensitizers without SPF']:['Harsh Sulfates']),
                         ].slice(0,6).map(ing=>(
-                          <span key={ing} className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-200 rounded-full text-[9px] font-black">✗ {ing}</span>
+                          <span key={ing} className="px-2.5 py-1 bg-red-50 text-red-600 border border-red-200 rounded-full text-[9px] font-bold">✗ {ing}</span>
                         ))}
                       </div>
                     </div>
-                    {!isPremium && <div className="bg-gradient-to-br from-[#FFEDE8] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[#F3EAE8]">
-                      <p className="text-[12px] font-black text-slate-800 mb-1">Full Ingredient Database Locked</p>
+                    {!isPremium && <div className="bg-gradient-to-br from-[rgba(240,136,106,0.10)] to-[#FFF5F2] rounded-[20px] p-4 text-center border border-[rgba(60,30,20,0.08)]">
+                      <p className="text-[12px] font-bold text-[#2C1F1A] mb-1">Full Ingredient Database Locked</p>
                       <p className="text-[9.5px] text-slate-500 mb-3">Product scanner, ingredient safety ratings & personalized picks.</p>
-                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-wider shadow-md shadow-orange-500/20"><Gem size={11}/> Upgrade</Link>
+                      <Link href="/premium" onClick={()=>setPremiumModal(null)} className="inline-flex items-center gap-1.5 bg-primary-gradient text-white px-5 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-md shadow-[#F0886A]/20"><Gem size={11}/> Upgrade</Link>
                     </div>}
                   </div>
                 )}

@@ -33,28 +33,28 @@ export function BottomNav() {
   ];
 
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-8 pb-8 pt-3 bg-gradient-to-t from-[#FDF5F2] via-[#FDF5F2]/90 to-transparent pointer-events-none z-50">
-      <nav className="h-20 bg-white border border-[#F3EAE8] rounded-[32px] shadow-2xl shadow-orange-500/10 px-4 flex items-center justify-around pointer-events-auto overflow-hidden">
+    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-3 pb-5 pointer-events-none z-50"
+      style={{ background: "linear-gradient(to top, #FAF8F6 62%, transparent)" }}>
+      <nav className="h-[62px] rounded-[26px] px-1 flex items-center justify-around pointer-events-auto overflow-hidden"
+        style={{ background: "rgba(255,255,255,0.96)", backdropFilter: "blur(20px)", border: "1px solid rgba(60,30,20,0.08)", boxShadow: "0 6px 24px rgba(60,30,20,0.12)" }}>
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (
-            <Link key={item.name} href={item.href} className="relative group flex flex-col items-center justify-center flex-1">
+            <Link key={item.name} href={item.href}
+              className="relative flex flex-col items-center justify-center flex-1 h-full gap-[3px]">
               <div className={cn(
-                "flex flex-col items-center justify-center gap-1 transition-all duration-300",
-                isActive ? "text-[#F88E7D] scale-110" : "text-slate-300 hover:text-slate-400"
+                "flex items-center justify-center w-[34px] h-[26px] rounded-[9px] transition-all duration-200",
+                isActive ? "bg-[rgba(240,136,106,0.12)]" : ""
               )}>
-                <item.icon 
-                  size={24} 
-                  className={cn(
-                    isActive ? "stroke-[2.5px] fill-[#F88E7D]/10" : "stroke-[2px]"
-                  )} 
-                />
+                <item.icon size={22}
+                  style={{ color: isActive ? "#F0886A" : "rgba(44,31,26,0.33)", strokeWidth: isActive ? 2.2 : 1.7 }} />
               </div>
+              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? "#F0886A" : "rgba(44,31,26,0.33)" }}>
+                {item.name}
+              </span>
               {isActive && (
-                <motion.div
-                  layoutId="nav-dot"
-                  className="absolute -bottom-2 w-1.5 h-1.5 bg-[#F88E7D] rounded-full"
-                />
+                <motion.div layoutId="nav-dot"
+                  className="absolute bottom-0 w-1 h-1 rounded-full" style={{ backgroundColor: "#F0886A" }} />
               )}
             </Link>
           );

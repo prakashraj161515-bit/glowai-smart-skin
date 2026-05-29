@@ -361,11 +361,11 @@ export default function RoutinePage() {
 
   const formatMarkdown = (text: string) => {
     return text.split("\n").map((line, i) => {
-      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#2C1F1A] font-bold">$1</strong>');
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
           <div key={i} className="flex gap-2 mb-1.5 ml-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#F88E7D] mt-2 flex-shrink-0" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F0886A] mt-2 flex-shrink-0" />
             <span dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
           </div>
         );
@@ -414,80 +414,80 @@ ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.
 
   if (status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
+      <div className="min-h-screen bg-[#FAF8F6] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F0886A]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF5F2] font-outfit pb-32">
+    <div className="min-h-screen bg-[#FAF8F6] font-sans pb-32">
       <header className="px-6 pt-12 pb-6 flex items-center justify-between">
-        <Link href="/" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-400 shadow-sm border border-[#F3EAE8]">
+        <Link href="/" className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[rgba(44,31,26,0.38)] shadow-sm border border-[rgba(60,30,20,0.08)]">
           <ChevronLeft size={24} />
         </Link>
         <div className="text-center">
-          <h1 className="text-[17px] font-bold text-slate-800">Daily Schedule</h1>
-          <p className="text-[10px] text-[#F88E7D] font-black uppercase tracking-widest">{gender} &bull; {country}</p>
+          <h1 className="text-[17px] font-bold text-[#2C1F1A]">Daily Schedule</h1>
+          <p className="text-[10px] text-[#F0886A] font-extrabold uppercase tracking-widest">{gender} &bull; {country}</p>
         </div>
-        <button onClick={() => setDietSeed(s => s + 1)} className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#F88E7D] shadow-sm border border-[#F3EAE8] active:scale-90 transition-transform">
+        <button onClick={() => setDietSeed(s => s + 1)} className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[#F0886A] shadow-sm border border-[rgba(60,30,20,0.08)] active:scale-90 transition-transform">
           <RefreshCcw size={20} />
         </button>
       </header>
 
       <div className="px-4 grid grid-cols-7 gap-1 mb-8">
         {days.map((day, idx) => (
-          <button key={idx} onClick={() => setActiveDay(idx)} className={cn("py-3 rounded-[20px] flex flex-col items-center justify-center gap-1 transition-all", activeDay === idx ? "bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20" : "bg-white text-slate-400 border border-[#F3EAE8]")}>
-            <span className="text-[9px] font-black tracking-tighter">{day.label}</span>
+          <button key={idx} onClick={() => setActiveDay(idx)} className={cn("py-3 rounded-[20px] flex flex-col items-center justify-center gap-1 transition-all", activeDay === idx ? "bg-[#F0886A] text-white shadow-lg shadow-[#F0886A]/20" : "bg-white text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]")}>
+            <span className="text-[9px] font-extrabold tracking-tighter">{day.label}</span>
             {activeDay === idx && <div className="w-1 h-1 rounded-full bg-white mt-0.5" />}
           </button>
         ))}
       </div>
 
       <div className="px-6 space-y-4">
-        <h2 className="text-[20px] font-bold text-slate-800 mb-4">Today&apos;s Progress</h2>
-        <div className="bg-white rounded-[32px] p-6 border border-[#F3EAE8] shadow-sm mb-8">
+        <h2 className="text-[20px] font-bold text-[#2C1F1A] mb-4">Today&apos;s Progress</h2>
+        <div className="bg-white rounded-[22px] p-6 border border-[rgba(60,30,20,0.08)] shadow-sm mb-8">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500"><Droplets size={20} /></div>
-              <div><h3 className="text-[14px] font-bold text-slate-900">Water</h3><p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{waterIntake}ml / 3000ml</p></div>
+              <div><h3 className="text-[14px] font-bold text-[#2C1F1A]">Water</h3><p className="text-[10px] text-[rgba(44,31,26,0.38)] font-bold uppercase tracking-widest">{waterIntake}ml / 3000ml</p></div>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => { if(waterIntake >= 250) { const n = waterIntake - 250; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); } }} className="bg-slate-50 px-3 py-1.5 rounded-xl text-slate-400 text-[10px] font-black uppercase tracking-widest border border-slate-100">-250ml</button>
-              <button onClick={() => { const n = waterIntake + 250; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); }} className="bg-blue-50 px-3 py-1.5 rounded-xl text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100 hover:bg-blue-100 transition-colors">+250ml</button>
+              <button onClick={() => { if(waterIntake >= 250) { const n = waterIntake - 250; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); } }} className="bg-[#F5F1EE] px-3 py-1.5 rounded-xl text-[rgba(44,31,26,0.38)] text-[10px] font-extrabold uppercase tracking-widest border border-[rgba(60,30,20,0.08)]">-250ml</button>
+              <button onClick={() => { const n = waterIntake + 250; setWaterIntake(n); localStorage.setItem("velmora_water_intake", n.toString()); }} className="bg-blue-50 px-3 py-1.5 rounded-xl text-blue-600 text-[10px] font-extrabold uppercase tracking-widest border border-blue-100 hover:bg-blue-100 transition-colors">+250ml</button>
             </div>
           </div>
           <div className="flex gap-1.5 h-1.5">
-            {[250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000].map((i) => (<div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-blue-400" : "bg-slate-100")} />))}
+            {[250,500,750,1000,1250,1500,1750,2000,2250,2500,2750,3000].map((i) => (<div key={i} className={cn("flex-1 rounded-full transition-all duration-500", i <= waterIntake ? "bg-blue-400" : "bg-[#F5F1EE]")} />))}
           </div>
         </div>
         
-        <div className="flex bg-slate-100/50 p-1.5 rounded-[24px] mb-8">
-          <button onClick={() => setActiveTab("skincare")} className={cn("flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase tracking-widest transition-all", activeTab === "skincare" ? "bg-white text-[#F88E7D] shadow-sm" : "text-slate-400")}>Facewash</button>
-          <button onClick={() => setActiveTab("diet")} className={cn("flex-1 py-4 rounded-[20px] text-[11px] font-black uppercase tracking-widest transition-all", activeTab === "diet" ? "bg-white text-emerald-500 shadow-sm" : "text-slate-400")}>Diet Plan</button>
+        <div className="flex bg-[#F5F1EE]/50 p-1.5 rounded-[24px] mb-8">
+          <button onClick={() => setActiveTab("skincare")} className={cn("flex-1 py-4 rounded-[20px] text-[11px] font-extrabold uppercase tracking-widest transition-all", activeTab === "skincare" ? "bg-white text-[#F0886A] shadow-sm" : "text-[rgba(44,31,26,0.38)]")}>Facewash</button>
+          <button onClick={() => setActiveTab("diet")} className={cn("flex-1 py-4 rounded-[20px] text-[11px] font-extrabold uppercase tracking-widest transition-all", activeTab === "diet" ? "bg-white text-emerald-500 shadow-sm" : "text-[rgba(44,31,26,0.38)]")}>Diet Plan</button>
         </div>
 
         <div className="space-y-6 relative">
-          <div className="absolute left-[31px] top-4 bottom-4 w-0.5 bg-slate-100" />
+          <div className="absolute left-[31px] top-4 bottom-4 w-0.5 bg-[#F5F1EE]" />
           {fullSchedule.filter(item => item.type === activeTab).map((item, idx) => (
             <motion.div key={idx} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: idx * 0.05 }} className="flex items-center gap-6 relative">
               <div className="w-16 flex-shrink-0 text-right">
-                <p className="text-[13px] font-bold text-slate-800">{item.time.split(' ')[0]}</p>
-                <p className="text-[9px] font-black text-slate-400 tracking-tight uppercase">{item.time.split(' ')[1]}</p>
+                <p className="text-[13px] font-bold text-[#2C1F1A]">{item.time.split(' ')[0]}</p>
+                <p className="text-[9px] font-extrabold text-[rgba(44,31,26,0.38)] tracking-tight uppercase">{item.time.split(' ')[1]}</p>
               </div>
-              <div className={cn("absolute left-[28px] w-2 h-2 rounded-full border-2 border-white z-10", completedItems.includes(item.name) ? "bg-emerald-500" : (item.type === "skincare" ? "bg-[#F88E7D]" : "bg-emerald-500 opacity-30"))} />
-              <div onClick={() => toggleItem(item.name)} className={cn("flex-1 p-5 rounded-[32px] flex items-center gap-4 border transition-all cursor-pointer relative overflow-hidden bg-white shadow-sm hover:border-[#F88E7D]/30", completedItems.includes(item.name) && "opacity-60")}>
+              <div className={cn("absolute left-[28px] w-2 h-2 rounded-full border-2 border-white z-10", completedItems.includes(item.name) ? "bg-emerald-500" : (item.type === "skincare" ? "bg-[#F0886A]" : "bg-emerald-500 opacity-30"))} />
+              <div onClick={() => toggleItem(item.name)} className={cn("flex-1 p-5 rounded-[22px] flex items-center gap-4 border transition-all cursor-pointer relative overflow-hidden bg-white shadow-sm hover:border-[#F0886A]/30", completedItems.includes(item.name) && "opacity-60")}>
                 <div className="w-16 h-16 rounded-2xl bg-white overflow-hidden flex-shrink-0 shadow-inner"><img src={item.image} alt={item.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = "https://images.unsplash.com/photo-1490818387583-1baba5e638af?w=400&q=80"; }} /></div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
-                    <button onClick={(e) => { e.stopPropagation(); toggleReminder(item.name); }} className={cn("p-1.5 rounded-full", reminders.includes(item.name) ? "bg-slate-800 text-white" : "text-slate-300")}>
+                    <p className="text-[10px] font-extrabold text-[rgba(44,31,26,0.38)] uppercase tracking-widest">{item.label}</p>
+                    <button onClick={(e) => { e.stopPropagation(); toggleReminder(item.name); }} className={cn("p-1.5 rounded-full", reminders.includes(item.name) ? "bg-slate-800 text-white" : "text-[rgba(44,31,26,0.30)]")}>
                       {reminders.includes(item.name) ? <Bell size={14} className="animate-bounce fill-white" /> : <BellOff size={14} />}
                     </button>
                   </div>
                   <div className="flex items-center justify-between mt-1">
-                    <p className={cn("text-[14px] font-bold text-slate-800 leading-snug", completedItems.includes(item.name) && "line-through")}>{item.name}</p>
-                    <div className={cn("w-6 h-6 rounded-lg border-2 flex items-center justify-center", completedItems.includes(item.name) ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-200")}>{completedItems.includes(item.name) && <CheckCircle2 size={16} />}</div>
+                    <p className={cn("text-[14px] font-bold text-[#2C1F1A] leading-snug", completedItems.includes(item.name) && "line-through")}>{item.name}</p>
+                    <div className={cn("w-6 h-6 rounded-lg border-2 flex items-center justify-center", completedItems.includes(item.name) ? "bg-emerald-500 border-emerald-500 text-white" : "border-[rgba(60,30,20,0.10)]")}>{completedItems.includes(item.name) && <CheckCircle2 size={16} />}</div>
                   </div>
                 </div>
               </div>
@@ -498,10 +498,10 @@ ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.
 
       <AnimatePresence>
         {activeAlarm && (
-          <motion.div initial={{scale:0.8, opacity:0, x: "-50%"}} animate={{scale:1, opacity:1, x: "-50%"}} exit={{scale:0.8, opacity:0, x: "-50%"}} className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[200] bg-[#F88E7D]/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
+          <motion.div initial={{scale:0.8, opacity:0, x: "-50%"}} animate={{scale:1, opacity:1, x: "-50%"}} exit={{scale:0.8, opacity:0, x: "-50%"}} className="fixed top-0 bottom-0 left-1/2 w-full max-w-[430px] z-[200] bg-[#F0886A]/95 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
             <Bell size={48} className="animate-bounce mb-8" />
-            <h2 className="text-4xl font-black mb-2">Time for {activeAlarm}!</h2>
-            <button onClick={stopAlarm} className="w-full h-20 bg-white text-[#F88E7D] rounded-[32px] text-2xl font-black uppercase shadow-2xl active:scale-95 transition-transform">Stop Alarm</button>
+            <h2 className="text-4xl font-extrabold mb-2">Time for {activeAlarm}!</h2>
+            <button onClick={stopAlarm} className="w-full h-20 bg-white text-[#F0886A] rounded-[22px] text-2xl font-extrabold uppercase shadow-2xl active:scale-95 transition-transform">Stop Alarm</button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -509,40 +509,40 @@ ${pendingDiet.length > 0 ? "⏳ **Pending:**\n" + pendingDiet.map(i => "- " + i.
       <AnimatePresence>
         {showFeedback && (
           <motion.div initial={{opacity:0, y: 100, x: "-50%"}} animate={{opacity:1, y: 0, x: "-50%"}} exit={{opacity:0, y: 100, x: "-50%"}} className="fixed top-0 left-1/2 w-full max-w-[430px] h-[100dvh] z-[200] bg-white flex flex-col p-8 pb-12 shadow-2xl">
-            <div className="flex justify-between mb-8"><h3 className="text-lg font-black">AI Skin Coach</h3><button onClick={()=>setShowFeedback(false)}><X size={24} /></button></div>
+            <div className="flex justify-between mb-8"><h3 className="text-lg font-extrabold">AI Skin Coach</h3><button onClick={()=>setShowFeedback(false)}><X size={24} /></button></div>
             <div className="flex-1 overflow-y-auto no-scrollbar pb-10">
               {aiFeedback && formatMarkdown(aiFeedback)}
               
               {isAnalyzing && (
-                <div className="mt-8 p-6 bg-slate-50/50 rounded-[24px] border border-dashed border-slate-200 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="mt-8 p-6 bg-[#F5F1EE]/50 rounded-[24px] border border-dashed border-[rgba(60,30,20,0.10)] flex flex-col items-center justify-center text-center space-y-4">
                   <div className="relative w-12 h-12">
                     <motion.div 
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 border-[3px] border-white border-t-[#F88E7D] rounded-full shadow-sm" 
+                      className="absolute inset-0 border-[3px] border-white border-t-[#F0886A] rounded-full shadow-sm" 
                     />
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <Sparkles size={16} className="text-[#F88E7D] animate-pulse" />
+                      <Sparkles size={16} className="text-[#F0886A] animate-pulse" />
                     </div>
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse mb-1">
+                    <p className="text-[10px] font-extrabold text-[rgba(44,31,26,0.38)] uppercase tracking-widest animate-pulse mb-1">
                       AI Skin Analysis
                     </p>
-                    <p className="text-[12px] font-bold text-slate-500 italic">
+                    <p className="text-[12px] font-bold text-[rgba(44,31,26,0.55)] italic">
                       Evaluating your effort...
                     </p>
                   </div>
                 </div>
               )}
             </div>
-            <button onClick={()=>setShowFeedback(false)} className="w-full h-16 flex-shrink-0 bg-[#F88E7D] text-white rounded-[24px] font-black uppercase shadow-xl mt-8 active:scale-95 transition-transform">Got it!</button>
+            <button onClick={()=>setShowFeedback(false)} className="w-full h-16 flex-shrink-0 bg-[#F0886A] text-white rounded-[24px] font-extrabold uppercase shadow-xl mt-8 active:scale-95 transition-transform">Got it!</button>
           </motion.div>
         )}
       </AnimatePresence>
 
       {!showFeedback && !activeAlarm && (
-        <button onClick={getDailyFeedback} className="fixed bottom-32 left-1/2 translate-x-[110px] w-16 h-16 bg-primary-gradient rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-500/40 z-50 animate-pulse active:scale-90 transition-transform">
+        <button onClick={getDailyFeedback} className="fixed bottom-32 left-1/2 translate-x-[110px] w-16 h-16 bg-primary-gradient rounded-full flex items-center justify-center text-white shadow-2xl shadow-[#F0886A]/40 z-50 animate-pulse active:scale-90 transition-transform">
           <Sparkles size={32} className="fill-white" />
         </button>
       )}

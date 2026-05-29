@@ -114,13 +114,13 @@ export default function DietPage() {
   const formatMarkdown = (text: string) => {
     return text.split("\n").map((line, i) => {
       // Bold
-      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#2C1F1A] font-bold">$1</strong>');
       
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
           <div key={i} className="flex gap-3 mb-2 ml-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#F88E7D] mt-2 flex-shrink-0 shadow-sm" />
-            <span className="text-[13px] font-medium text-slate-600 leading-snug" dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#F0886A] mt-2 flex-shrink-0 shadow-sm" />
+            <span className="text-[13px] font-medium text-[rgba(44,31,26,0.65)] leading-snug" dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
           </div>
         );
       }
@@ -129,7 +129,7 @@ export default function DietPage() {
         return (
           <div key={i} className="flex items-center gap-2 mt-8 mb-4">
             <div className="h-px bg-slate-200 flex-1" />
-            <span className="text-[10px] font-black text-[#F88E7D] uppercase tracking-[0.3em] whitespace-nowrap px-2">
+            <span className="text-[10px] font-extrabold text-[#F0886A] uppercase tracking-[0.3em] whitespace-nowrap px-2">
               {line.replace(/\*\*/g, '')}
             </span>
             <div className="h-px bg-slate-200 flex-1" />
@@ -140,34 +140,34 @@ export default function DietPage() {
       if (line.trim() === "") return <div key={i} className="h-2" />;
       
       return (
-        <p key={i} className="mb-2 text-[13px] font-medium text-slate-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: formattedLine }} />
+        <p key={i} className="mb-2 text-[13px] font-medium text-[rgba(44,31,26,0.75)] leading-relaxed" dangerouslySetInnerHTML={{ __html: formattedLine }} />
       );
     });
   };
 
   if (status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
+      <div className="min-h-screen bg-[#FAF8F6] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F0886A]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FDF5F2] pb-32 font-outfit">
+    <div className="min-h-screen bg-[#FAF8F6] pb-32 font-sans">
       <header className="px-6 pt-12 flex justify-between items-center mb-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-[#F3EAE8]">
+          <Link href="/" className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]">
             <ChevronLeft size={24} />
           </Link>
           <div>
-            <h1 className="text-[20px] font-bold text-slate-800">Diet Planner</h1>
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Smart Meal Plans</p>
+            <h1 className="text-[20px] font-bold text-[#2C1F1A]">Diet Planner</h1>
+            <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-extrabold uppercase tracking-widest">Smart Meal Plans</p>
           </div>
         </div>
         <button 
           onClick={() => setShowSaved(!showSaved)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${showSaved ? 'bg-[#F88E7D] text-white shadow-lg shadow-orange-500/20' : 'bg-white shadow-sm text-slate-400 border border-[#F3EAE8]'}`}
+          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${showSaved ? 'bg-[#F0886A] text-white shadow-lg shadow-[#F0886A]/20' : 'bg-white shadow-sm text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]'}`}
         >
           <Bookmark size={20} />
         </button>
@@ -189,14 +189,14 @@ export default function DietPage() {
             const randomTip = tips[Math.floor(Math.random() * tips.length)];
             setDailyTip(randomTip);
           }}
-          className="mb-8 bg-white/60 border border-white rounded-[32px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md cursor-pointer active:scale-95 transition-transform group"
+          className="mb-8 bg-white/60 border border-white rounded-[22px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md cursor-pointer active:scale-95 transition-transform group"
         >
           <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:rotate-180 transition-transform duration-500">
             <RefreshCcw size={22} />
           </div>
           <div className="flex-1">
-            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Daily Skin Boost • Tap to Shuffle</p>
-            <p className="text-[13px] font-bold text-slate-700 mt-0.5 italic">&quot;{dailyTip}&quot;</p>
+            <p className="text-[9px] font-extrabold text-emerald-500 uppercase tracking-widest">Daily Skin Boost • Tap to Shuffle</p>
+            <p className="text-[13px] font-bold text-[rgba(44,31,26,0.75)] mt-0.5 italic">&quot;{dailyTip}&quot;</p>
           </div>
         </div>
 
@@ -208,23 +208,23 @@ export default function DietPage() {
               exit={{ opacity: 0, y: -10 }}
               className="mb-8 space-y-4"
             >
-              <h3 className="text-[11px] font-bold text-[#F88E7D] uppercase tracking-widest flex items-center gap-2">
+              <h3 className="text-[11px] font-bold text-[#F0886A] uppercase tracking-widest flex items-center gap-2">
                 <Bookmark size={14} /> My Saved Plans
               </h3>
               {savedPlans.length === 0 ? (
-                <div className="card p-6 text-center text-[11px] text-slate-300 font-bold uppercase tracking-widest">No saved plans yet</div>
+                <div className="card p-6 text-center text-[11px] text-[rgba(44,31,26,0.30)] font-bold uppercase tracking-widest">No saved plans yet</div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {savedPlans.map(plan => (
                     <div key={plan.id} className="card p-5 flex justify-between items-center group bg-white/50">
                       <div>
-                        <p className="text-[14px] font-bold text-slate-800 mb-0.5">{plan.concern}</p>
-                        <p className="text-[10px] text-slate-400 font-bold">{plan.date}</p>
+                        <p className="text-[14px] font-bold text-[#2C1F1A] mb-0.5">{plan.concern}</p>
+                        <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-bold">{plan.date}</p>
                       </div>
                       <div className="flex gap-2">
                         <button 
                           onClick={() => { setDietPlan(plan.text); setShowSaved(false); }} 
-                          className="bg-[#FFEDE8] text-[#F88E7D] px-4 py-2 rounded-2xl text-[11px] font-bold border border-[#F3EAE8]"
+                          className="bg-[rgba(240,136,106,0.10)] text-[#F0886A] px-4 py-2 rounded-2xl text-[11px] font-bold border border-[rgba(60,30,20,0.08)]"
                         >
                           View
                         </button>
@@ -249,11 +249,11 @@ export default function DietPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="card p-8 text-center bg-white/80 backdrop-blur-sm"
           >
-            <div className="w-20 h-20 bg-[#FFEDE8] rounded-[32px] flex items-center justify-center mx-auto mb-6 text-[#F88E7D] shadow-inner animate-float">
+            <div className="w-20 h-20 bg-[rgba(240,136,106,0.10)] rounded-[22px] flex items-center justify-center mx-auto mb-6 text-[#F0886A] shadow-inner animate-float">
               <Apple size={40} />
             </div>
-            <h2 className="text-[22px] font-bold text-slate-800 mb-2">Ready to Glow?</h2>
-            <p className="text-[11px] text-slate-400 font-black uppercase tracking-widest mb-8 italic">
+            <h2 className="text-[22px] font-bold text-[#2C1F1A] mb-2">Ready to Glow?</h2>
+            <p className="text-[11px] text-[rgba(44,31,26,0.38)] font-extrabold uppercase tracking-widest mb-8 italic">
               Personalized for your skin type
             </p>
             
@@ -262,13 +262,13 @@ export default function DietPage() {
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
                 placeholder="Describe your skin issues (e.g. acne, oily, dry skin)..."
-                className="w-full bg-[#FDF5F2] border-2 border-transparent rounded-[32px] p-6 text-[14px] font-medium text-slate-700 focus:outline-none focus:border-[#FFB5A7] transition-all h-40 resize-none placeholder:text-slate-300"
+                className="w-full bg-[#FAF8F6] border-2 border-transparent rounded-[22px] p-6 text-[14px] font-medium text-[rgba(44,31,26,0.75)] focus:outline-none focus:border-[#F5C0A8] transition-all h-40 resize-none placeholder:text-[rgba(44,31,26,0.30)]"
               />
             </div>
 
             <button 
               onClick={generateDietPlan}
-              className="w-full h-16 bg-primary-gradient text-white font-bold rounded-[24px] transition-all flex items-center justify-center gap-2 shadow-xl shadow-orange-500/20 active:scale-95"
+              className="w-full h-16 bg-primary-gradient text-white font-bold rounded-[24px] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#F0886A]/20 active:scale-95"
             >
               <Sparkles size={22} />
               Generate Diet Plan
@@ -283,18 +283,18 @@ export default function DietPage() {
               <motion.div 
                 animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 bg-[#F88E7D] rounded-full blur-2xl"
+                className="absolute inset-0 bg-[#F0886A] rounded-full blur-2xl"
               />
               
               {/* Main Spinner */}
               <motion.div 
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-[4px] border-[#FFEDE8] border-t-[#F88E7D] rounded-full shadow-[0_0_20px_rgba(248,142,125,0.2)]"
+                className="absolute inset-0 border-[4px] border-[rgba(240,136,106,0.10)] border-t-[#F0886A] rounded-full shadow-[0_0_20px_rgba(248,142,125,0.2)]"
               />
               
               {/* Center Icon */}
-              <div className="absolute inset-0 flex items-center justify-center text-[#F88E7D]">
+              <div className="absolute inset-0 flex items-center justify-center text-[#F0886A]">
                 <motion.div
                   animate={{ y: [0, -5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
@@ -309,14 +309,14 @@ export default function DietPage() {
                  key={Math.floor(Date.now() / 2000)}
                  initial={{ opacity: 0, y: 5 }}
                  animate={{ opacity: 1, y: 0 }}
-                 className="text-[#F88E7D] text-[13px] font-black uppercase tracking-[0.2em]"
+                 className="text-[#F0886A] text-[13px] font-extrabold uppercase tracking-[0.2em]"
                >
                  {(() => {
                    const stages = ["Analyzing Skin Metrics", "Checking Nutrient Values", "Personalizing Menu", "Finalizing Routine"];
                    return stages[Math.floor((Date.now() / 2000) % stages.length)];
                  })()}
                </motion.p>
-               <p className="text-slate-400 text-[11px] font-medium leading-relaxed max-w-[200px] mx-auto">
+               <p className="text-[rgba(44,31,26,0.38)] text-[11px] font-medium leading-relaxed max-w-[200px] mx-auto">
                  Our AI Dietitian is crafting your perfect meal plan.
                </p>
             </div>
@@ -333,7 +333,7 @@ export default function DietPage() {
             </div>
             <button 
               onClick={generateDietPlan} 
-              className="w-full h-16 bg-[#F88E7D] text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95"
+              className="w-full h-16 bg-[#F0886A] text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#F0886A]/20 active:scale-95"
             >
               <RefreshCcw size={20} /> Retry Now
             </button>
@@ -342,36 +342,36 @@ export default function DietPage() {
 
         {dietPlan && !isLoading && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-20">
-            <div className="flex justify-between items-center bg-white p-5 rounded-[32px] shadow-sm border border-[#F3EAE8]">
+            <div className="flex justify-between items-center bg-white p-5 rounded-[22px] shadow-sm border border-[rgba(60,30,20,0.08)]">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[#FFEDE8] text-[#F88E7D] rounded-2xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-[rgba(240,136,106,0.10)] text-[#F0886A] rounded-2xl flex items-center justify-center">
                   <Calendar size={22} />
                 </div>
                 <div>
-                  <p className="text-[15px] font-bold text-slate-800">Your Plan</p>
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Personalized AI</p>
+                  <p className="text-[15px] font-bold text-[#2C1F1A]">Your Plan</p>
+                  <p className="text-[9px] font-extrabold text-[rgba(44,31,26,0.38)] uppercase tracking-widest">Personalized AI</p>
                 </div>
               </div>
               <div className="flex gap-2">
                 {isPremium && (
                   <button 
                     onClick={() => window.print()}
-                    className="bg-[#F88E7D] px-4 py-2 rounded-2xl text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 active:scale-95 transition-transform"
+                    className="bg-[#F0886A] px-4 py-2 rounded-2xl text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 active:scale-95 transition-transform"
                     title="Download Diet PDF"
                   >
                     <Download size={14} /> PDF
                   </button>
                 )}
-                <button onClick={saveCurrentPlan} className="bg-primary-gradient w-12 h-12 rounded-2xl text-white shadow-lg shadow-orange-500/20 flex items-center justify-center"><Bookmark size={20} /></button>
-                <button onClick={generateDietPlan} className="bg-[#FDF5F2] w-12 h-12 rounded-2xl text-slate-300 border border-[#F3EAE8] flex items-center justify-center"><RefreshCcw size={20} /></button>
+                <button onClick={saveCurrentPlan} className="bg-primary-gradient w-12 h-12 rounded-2xl text-white shadow-lg shadow-[#F0886A]/20 flex items-center justify-center"><Bookmark size={20} /></button>
+                <button onClick={generateDietPlan} className="bg-[#FAF8F6] w-12 h-12 rounded-2xl text-[rgba(44,31,26,0.30)] border border-[rgba(60,30,20,0.08)] flex items-center justify-center"><RefreshCcw size={20} /></button>
               </div>
             </div>
 
-            <div className="space-y-1 bg-white p-6 rounded-[32px] border border-[#F3EAE8] shadow-sm">
+            <div className="space-y-1 bg-white p-6 rounded-[22px] border border-[rgba(60,30,20,0.08)] shadow-sm">
               {formatMarkdown(dietPlan)}
             </div>
 
-            <div className="bg-primary-gradient p-8 rounded-[40px] text-white shadow-xl shadow-orange-500/10">
+            <div className="bg-primary-gradient p-8 rounded-[40px] text-white shadow-[0_4px_16px_rgba(60,30,20,0.07)]">
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
                   <Droplets size={24} />
@@ -418,33 +418,33 @@ export default function DietPage() {
               {/* Close Button */}
               <button 
                 onClick={() => setShowLimitModal(false)}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 active:scale-95 transition-transform"
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[#F5F1EE] border border-[rgba(60,30,20,0.08)] flex items-center justify-center text-[rgba(44,31,26,0.38)] active:scale-95 transition-transform"
               >
                 <X size={18} />
               </button>
 
-              <div className="w-20 h-20 bg-amber-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 text-amber-500 shadow-inner">
+              <div className="w-20 h-20 bg-amber-50 rounded-[22px] flex items-center justify-center mx-auto mb-6 text-amber-500 shadow-inner">
                 <Gem size={40} className="animate-pulse" />
               </div>
 
-              <h3 className="text-[20px] font-bold text-slate-800 mb-2">Daily Limit Reached</h3>
-              <p className="text-[11px] text-amber-600 font-black uppercase tracking-widest mb-4">Velmora Premium</p>
+              <h3 className="text-[20px] font-bold text-[#2C1F1A] mb-2">Daily Limit Reached</h3>
+              <p className="text-[11px] text-amber-600 font-extrabold uppercase tracking-widest mb-4">Velmora Premium</p>
               
-              <p className="text-[13px] font-medium text-slate-500 leading-relaxed mb-8">
+              <p className="text-[13px] font-medium text-[rgba(44,31,26,0.55)] leading-relaxed mb-8">
                 Free plan users can generate 1 diet plan daily. Upgrade to Premium for unlimited scans, routines, and custom meal plans.
               </p>
 
               <div className="space-y-3">
                 <Link 
                   href="/premium"
-                  className="w-full h-14 bg-primary-gradient text-white font-bold rounded-[20px] flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 transition-transform"
+                  className="w-full h-14 bg-primary-gradient text-white font-bold rounded-[20px] flex items-center justify-center gap-2 shadow-lg shadow-[#F0886A]/20 active:scale-95 transition-transform"
                 >
                   <Gem size={18} />
                   Upgrade to Premium ✨
                 </Link>
                 <button 
                   onClick={() => setShowLimitModal(false)}
-                  className="w-full h-14 bg-slate-50 text-slate-400 font-bold rounded-[20px] flex items-center justify-center active:scale-95 transition-transform border border-slate-100"
+                  className="w-full h-14 bg-[#F5F1EE] text-[rgba(44,31,26,0.38)] font-bold rounded-[20px] flex items-center justify-center active:scale-95 transition-transform border border-[rgba(60,30,20,0.08)]"
                 >
                   Maybe Later
                 </button>

@@ -127,12 +127,12 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF5F2] px-6 pt-12 pb-32 font-outfit relative">
+    <div className="min-h-screen bg-[#FAF8F6] px-6 pt-12 pb-32 font-sans relative">
       <header className="flex items-center gap-4 mb-8">
-        <button onClick={() => router.back()} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 border border-slate-100">
+        <button onClick={() => router.back()} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]">
           <ChevronLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold text-slate-800">Skin Analysis</h1>
+        <h1 className="text-xl font-bold text-[#2C1F1A]">Skin Analysis</h1>
       </header>
 
       <div className="relative aspect-[3/4] rounded-[40px] overflow-hidden glass-card flex flex-col items-center justify-center bg-black border border-purple-500/20 shadow-2xl shadow-purple-500/10 mb-8">
@@ -191,7 +191,7 @@ export default function ScanPage() {
             <div className="glass-card p-4 bg-white/80 backdrop-blur-xl border border-white/10 rounded-3xl">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-[10px] font-black text-purple-600 uppercase tracking-widest">{analysisStatus}</span>
-                <span className="text-[10px] font-black text-slate-800">{progress}%</span>
+                <span className="text-[10px] font-black text-[#2C1F1A]">{progress}%</span>
               </div>
               <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
                 <motion.div 
@@ -208,17 +208,17 @@ export default function ScanPage() {
       {!scanning && !error && (
         <button 
           onClick={handleScan}
-          className="w-full h-16 bg-primary-gradient rounded-[24px] font-black text-white text-[15px] uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-orange-500/20 active:scale-95 transition-transform mb-6"
+          className="w-full h-16 bg-primary-gradient rounded-[24px] font-black text-white text-[15px] uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-[#F0886A]/20 active:scale-95 transition-transform mb-6"
         >
           <Camera size={24} /> Start Face Scan
         </button>
       )}
 
-      <div className="bg-white rounded-[32px] p-5 border border-[#F3EAE8] shadow-sm flex gap-4">
+      <div className="bg-white rounded-[32px] p-5 border border-[rgba(60,30,20,0.08)] shadow-sm flex gap-4">
         <div className="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-400 shrink-0">
           <Info size={18} />
         </div>
-        <p className="text-[11px] text-slate-400 font-medium leading-relaxed">
+        <p className="text-[11px] text-[rgba(44,31,26,0.38)] font-medium leading-relaxed">
           For best results, ensure you are in a well-lit area and have removed any makeup or glasses. Keep a neutral expression.
         </p>
       </div>
@@ -240,7 +240,7 @@ export default function ScanPage() {
             >
               <button 
                 onClick={() => setShowLimitModal(false)}
-                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 active:scale-90 transition-transform"
+                className="absolute top-6 right-6 w-8 h-8 rounded-full bg-[#F5F1EE] flex items-center justify-center text-[rgba(44,31,26,0.38)] active:scale-90 transition-transform"
               >
                 <X size={16} />
               </button>
@@ -248,8 +248,8 @@ export default function ScanPage() {
               <div className="w-20 h-20 bg-purple-50 rounded-[32px] flex items-center justify-center mx-auto mb-6 text-purple-500">
                 <Gem size={36} className="fill-purple-500/10" />
               </div>
-              <h3 className="text-2xl font-black text-slate-800 mb-2">Limit Reached! 🌟</h3>
-              <p className="text-[13px] text-slate-400 font-bold mb-8 leading-relaxed">
+              <h3 className="text-2xl font-black text-[#2C1F1A] mb-2">Limit Reached! 🌟</h3>
+              <p className="text-[13px] text-[rgba(44,31,26,0.38)] font-bold mb-8 leading-relaxed">
                 You get 1 free skin scan daily. Upgrade to Premium for unlimited daily scans, PDF downloads, and expert coaching!
               </p>
               
@@ -265,7 +265,7 @@ export default function ScanPage() {
                 </button>
                 <button 
                   onClick={() => setShowLimitModal(false)}
-                  className="w-full h-14 bg-slate-50 text-slate-400 font-bold rounded-2xl active:scale-95 transition-transform"
+                  className="w-full h-14 bg-[#F5F1EE] text-[rgba(44,31,26,0.38)] font-bold rounded-2xl active:scale-95 transition-transform"
                 >
                   Maybe Later
                 </button>

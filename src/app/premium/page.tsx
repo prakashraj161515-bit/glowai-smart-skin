@@ -85,7 +85,7 @@ export default function PremiumPage() {
           <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md border border-white/30 shadow-2xl">
             <Gem size={28} className="text-purple-300 fill-purple-300" />
           </div>
-          <h1 className="text-2xl font-black mb-1">GlowAI Premium</h1>
+          <h1 className="text-2xl font-extrabold mb-1">GlowAI Premium</h1>
           <p className="text-white/80 font-bold text-[10px] uppercase tracking-[0.2em]">Upgrade for clinical results</p>
         </motion.div>
       </div>
@@ -104,25 +104,25 @@ export default function PremiumPage() {
             }`}
           >
             {plan.popular && (
-              <div className="absolute -top-2.5 right-6 bg-yellow-400 text-slate-900 text-[8px] font-black px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1 uppercase tracking-tighter">
+              <div className="absolute -top-2.5 right-6 bg-yellow-400 text-[#2C1F1A] text-[8px] font-extrabold px-2.5 py-1 rounded-full shadow-lg flex items-center gap-1 uppercase tracking-tighter">
                 <Sparkles size={8} /> Most Popular
               </div>
             )}
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[12px] font-black text-slate-900">{plan.name}</p>
+                <p className="text-[12px] font-extrabold text-[#2C1F1A]">{plan.name}</p>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <h2 className="text-xl font-black text-slate-900">{plan.price}</h2>
-                  <span className="text-[9px] text-slate-400 font-bold">{plan.period}</span>
+                  <h2 className="text-xl font-extrabold text-[#2C1F1A]">{plan.price}</h2>
+                  <span className="text-[9px] text-[rgba(44,31,26,0.38)] font-bold">{plan.period}</span>
                 </div>
                 {plan.save && (
-                  <p className="text-[9px] text-green-500 font-black uppercase mt-1 flex items-center gap-1">
+                  <p className="text-[9px] text-green-500 font-extrabold uppercase mt-1 flex items-center gap-1">
                     <Gift size={9} /> {plan.save}
                   </p>
                 )}
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                selectedPlan === plan.id ? "border-purple-600 bg-purple-600" : "border-slate-200"
+                selectedPlan === plan.id ? "border-purple-600 bg-purple-600" : "border-[rgba(60,30,20,0.10)]"
               }`}>
                 {selectedPlan === plan.id && <div className="w-2 h-2 bg-white rounded-full" />}
               </div>
@@ -133,16 +133,16 @@ export default function PremiumPage() {
 
       {/* Features */}
       <div className="px-6 mt-8 space-y-5">
-        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] px-1 text-center">Premium Benefits</h3>
+        <h3 className="text-[10px] font-extrabold text-[rgba(44,31,26,0.38)] uppercase tracking-[0.2em] px-1 text-center">Premium Benefits</h3>
         <div className="grid grid-cols-1 gap-3">
           {features.map((f, i) => (
-            <div key={i} className="flex gap-3 items-center bg-white p-3 rounded-2xl border border-slate-100 shadow-sm">
+            <div key={i} className="flex gap-3 items-center bg-white p-3 rounded-2xl border border-[rgba(60,30,20,0.08)] shadow-sm">
               <div className={`w-9 h-9 rounded-xl ${f.bg} ${f.color} flex items-center justify-center flex-shrink-0`}>
                 <f.icon size={18} strokeWidth={2.5} />
               </div>
               <div>
-                <h4 className="text-[13px] font-black text-slate-900">{f.title}</h4>
-                <p className="text-[10px] text-slate-500 font-medium leading-tight">{f.desc}</p>
+                <h4 className="text-[13px] font-extrabold text-[#2C1F1A]">{f.title}</h4>
+                <p className="text-[10px] text-[rgba(44,31,26,0.55)] font-medium leading-tight">{f.desc}</p>
               </div>
             </div>
           ))}
@@ -153,11 +153,11 @@ export default function PremiumPage() {
       <div className="fixed bottom-[85px] left-1/2 -translate-x-1/2 w-full max-w-[430px] p-6 bg-gradient-to-t from-[#F4F6FF] via-[#F4F6FF] to-transparent z-40">
         <button 
           onClick={handleSubscribe}
-          className="w-full h-16 bg-primary-gradient rounded-[24px] text-white font-black text-lg shadow-2xl shadow-purple-500/30 active:scale-95 transition-transform flex items-center justify-center gap-3"
+          className="w-full h-16 bg-primary-gradient rounded-[24px] text-white font-extrabold text-lg shadow-2xl shadow-purple-500/30 active:scale-95 transition-transform flex items-center justify-center gap-3"
         >
           Subscribe Now <ChevronRight size={20} />
         </button>
-        <p className="text-center text-[10px] text-slate-400 font-bold mt-4">Cancel anytime • Secure Payment</p>
+        <p className="text-center text-[10px] text-[rgba(44,31,26,0.38)] font-bold mt-4">Cancel anytime • Secure Payment</p>
       </div>
     </div>
   );

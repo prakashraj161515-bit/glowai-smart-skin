@@ -198,7 +198,7 @@ export default function CoachPage() {
   const formatMarkdown = (text: string) => {
     return text.split("\n").map((line, i) => {
       // Bold
-      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-800 font-bold">$1</strong>');
+      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#2C1F1A] font-bold">$1</strong>');
       
       if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
         return (
@@ -219,8 +219,8 @@ export default function CoachPage() {
 
   if (status === "loading" || status === "unauthenticated") {
     return (
-      <div className="min-h-screen bg-[#FDF5F2] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F88E7D]"></div>
+      <div className="min-h-screen bg-[#FAF8F6] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F0886A]"></div>
       </div>
     );
   }
@@ -230,17 +230,17 @@ export default function CoachPage() {
       {/* Header */}
       <header className="px-6 pt-8 flex items-center justify-between mb-4">
         <div className="flex items-center gap-4">
-          <Link href="/" className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-400 border border-slate-100">
+          <Link href="/" className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]">
             <ChevronLeft size={20} />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg font-black text-slate-900">Expert Coach</h1>
+              <h1 className="text-lg font-extrabold text-[#2C1F1A]">Expert Coach</h1>
               {isPremium && (
                 <div className="bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 p-[1px] rounded-full">
                   <div className="bg-white rounded-full px-2 py-0.5 flex items-center gap-1">
                     <Gem size={8} className="text-purple-600 fill-purple-500" />
-                    <span className="text-[7px] font-black text-purple-700 uppercase">Pro</span>
+                    <span className="text-[7px] font-extrabold text-purple-700 uppercase">Pro</span>
                   </div>
                 </div>
               )}
@@ -255,7 +255,7 @@ export default function CoachPage() {
             setMessages([{ id: '1', role: "assistant", content: "Hi! I'm your Velmora Coach. How can I help you today? ✨", timestamp: Date.now() }]);
             localStorage.removeItem("velmora_chat_history");
           }
-        }} className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-400 border border-slate-100">
+        }} className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]">
           <Trash2 size={18} />
         </button>
       </header>
@@ -275,16 +275,16 @@ export default function CoachPage() {
             onPointerUp={endPress}
             onPointerLeave={endPress}
           >
-            <div className={`max-w-[85%] p-4 rounded-3xl text-[13px] whitespace-pre-wrap transition-all shadow-sm ${
+            <div className={`max-w-[85%] p-4 rounded-[22px] text-[13px] whitespace-pre-wrap transition-all shadow-sm ${
               longPressId === msg.id ? 'ring-2 ring-purple-600 scale-[0.98]' : ''
             } ${
               msg.role === 'user' 
                 ? 'bg-primary-gradient text-white rounded-tr-none shadow-purple-500/10' 
-                : 'bg-white text-slate-700 rounded-tl-none border border-slate-100'
+                : 'bg-white text-[rgba(44,31,26,0.75)] rounded-tl-none border border-[rgba(60,30,20,0.08)]'
             }`}>
               {formatMarkdown(msg.content)}
               {msg.isError && (
-                <button onClick={handleRetry} className="mt-3 flex items-center gap-1 text-[10px] font-black bg-red-50 text-red-500 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors">
+                <button onClick={handleRetry} className="mt-3 flex items-center gap-1 text-[10px] font-extrabold bg-red-50 text-red-500 px-3 py-1.5 rounded-full hover:bg-red-100 transition-colors">
                   <RefreshCcw size={12} /> Retry
                 </button>
               )}
@@ -297,17 +297,17 @@ export default function CoachPage() {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  className="absolute z-50 bg-white border border-slate-100 p-1.5 rounded-2xl shadow-2xl flex gap-1 -top-12 left-1/2 -translate-x-1/2"
+                  className="absolute z-50 bg-white border border-[rgba(60,30,20,0.08)] p-1.5 rounded-2xl shadow-2xl flex gap-1 -top-12 left-1/2 -translate-x-1/2"
                 >
                   {msg.role === 'user' && (
-                    <button onClick={() => handleEditInit(msg.id, msg.content)} className="p-2 hover:bg-slate-50 rounded-xl text-purple-600">
+                    <button onClick={() => handleEditInit(msg.id, msg.content)} className="p-2 hover:bg-[#F5F1EE] rounded-xl text-purple-600">
                       <Edit2 size={16} />
                     </button>
                   )}
                   <button onClick={() => handleDelete(msg.id)} className="p-2 hover:bg-red-50 rounded-xl text-red-500">
                     <Trash2 size={16} />
                   </button>
-                  <button onClick={() => setLongPressId(null)} className="p-2 hover:bg-slate-50 rounded-xl text-slate-400">
+                  <button onClick={() => setLongPressId(null)} className="p-2 hover:bg-[#F5F1EE] rounded-xl text-[rgba(44,31,26,0.38)]">
                     <X size={16} />
                   </button>
                 </motion.div>
@@ -317,7 +317,7 @@ export default function CoachPage() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="p-4 bg-white rounded-3xl rounded-tl-none flex gap-1.5 shadow-sm border border-slate-100">
+            <div className="p-4 bg-white rounded-[22px] rounded-tl-none flex gap-1.5 shadow-sm border border-[rgba(60,30,20,0.08)]">
               <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></span>
               <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
               <span className="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
@@ -330,7 +330,7 @@ export default function CoachPage() {
       <div className="fixed bottom-[90px] left-1/2 -translate-x-1/2 w-full max-w-[430px] px-6 z-40 space-y-2">
         {/* Limit Warning */}
         {!isPremium && (
-          <div className="flex items-center justify-between px-4 py-2 bg-white/50 backdrop-blur-md rounded-2xl border border-white/50 text-[10px] font-black text-slate-500 uppercase tracking-tight">
+          <div className="flex items-center justify-between px-4 py-2 bg-white/50 backdrop-blur-md rounded-2xl border border-white/50 text-[10px] font-extrabold text-[rgba(44,31,26,0.55)] uppercase tracking-tight">
             <span>{messagesLeft} Messages Left Today</span>
             <Link href="/premium" className="text-purple-600 flex items-center gap-1">Upgrade <Plus size={10} /></Link>
           </div>
@@ -340,21 +340,21 @@ export default function CoachPage() {
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white p-4 rounded-3xl border border-red-100 shadow-xl flex flex-col items-center gap-3"
+            className="bg-white p-4 rounded-[22px] border border-red-100 shadow-xl flex flex-col items-center gap-3"
           >
             <div className="flex items-center gap-2 text-red-500">
               <AlertCircle size={18} />
-              <p className="text-xs font-black uppercase tracking-tight">Daily Chat Limit Reached!</p>
+              <p className="text-xs font-extrabold uppercase tracking-tight">Daily Chat Limit Reached!</p>
             </div>
-            <p className="text-[10px] text-slate-400 text-center font-bold">Free users get 5 messages per day. Upgrade for unlimited coaching.</p>
-            <Link href="/premium" className="w-full h-11 bg-primary-gradient rounded-2xl text-white font-black text-xs flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <p className="text-[10px] text-[rgba(44,31,26,0.38)] text-center font-bold">Free users get 5 messages per day. Upgrade for unlimited coaching.</p>
+            <Link href="/premium" className="w-full h-11 bg-primary-gradient rounded-2xl text-white font-extrabold text-xs flex items-center justify-center shadow-lg shadow-purple-500/20">
               Unlock Unlimited Chat 🔓
             </Link>
           </motion.div>
         ) : (
-          <div className="bg-white/80 backdrop-blur-2xl p-2.5 rounded-3xl border border-white shadow-2xl shadow-purple-500/10">
+          <div className="bg-white/80 backdrop-blur-2xl p-2.5 rounded-[22px] border border-white shadow-2xl shadow-purple-500/10">
             {editingId && (
-              <div className="flex items-center justify-between px-3 py-1.5 mb-1 text-[9px] text-purple-600 font-black uppercase">
+              <div className="flex items-center justify-between px-3 py-1.5 mb-1 text-[9px] text-purple-600 font-extrabold uppercase">
                 <span>Editing Message</span>
                 <button onClick={() => { setEditingId(null); setInput(""); }} className="text-red-500">Cancel</button>
               </div>
@@ -367,7 +367,7 @@ export default function CoachPage() {
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                 placeholder={editingId ? "Update your message..." : "Ask anything about skincare..."}
                 disabled={isLoading}
-                className="flex-1 bg-transparent px-4 py-3 text-[13px] font-medium text-slate-700 focus:outline-none disabled:opacity-50"
+                className="flex-1 bg-transparent px-4 py-3 text-[13px] font-medium text-[rgba(44,31,26,0.75)] focus:outline-none disabled:opacity-50"
               />
               <button 
                 onClick={handleSend}
