@@ -866,176 +866,200 @@ export default function Home() {
         )}
 
 
-        {/* HOME */}
+        {/* HOME — NEW DESIGN */}
         {view === "home" && (
-          <motion.div key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-6 pt-12 space-y-8">
-            
-            {/* HEADER */}
-            <div className="flex justify-between items-center mb-8 px-2 pt-4 gap-2">
-              {/* Left Profile Area */}
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="relative w-16 h-16 shrink-0">
-                  <div className="absolute inset-0 bg-primary-gradient rounded-full rotate-6 opacity-20" />
-                  <div className="w-full h-full rounded-full bg-white border-2 border-white shadow-md overflow-hidden relative z-10 flex items-center justify-center">
-                    {userPic ? <img src={userPic} className="w-full h-full object-cover" alt="User" /> : <User className="text-slate-200" size={32} />}
-                  </div>
-                  <input 
-                    type="file" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          setUserPic(base64);
-                          localStorage.setItem("velmora_user_pic", base64);
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="absolute inset-0 opacity-0 cursor-pointer z-20"
-                  />
+          <motion.div key="home" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+            className="pb-36 overflow-y-auto">
+
+            {/* ── GREETING ROW ── */}
+            <div className="flex items-center justify-between px-5 pt-14 pb-5">
+              <div>
+                <div className="flex items-center gap-1">
+                  {isEditingName ? (
+                    <input autoFocus value={userName}
+                      onChange={e => setUserName(e.target.value)}
+                      onBlur={() => { setIsEditingName(false); localStorage.setItem("velmora_user_name", userName); }}
+                      onKeyDown={e => { if(e.key==="Enter"){ setIsEditingName(false); localStorage.setItem("velmora_user_name", userName); }}}
+                      className="text-[22px] font-bold text-[#2C1F1A] bg-transparent border-b border-[#F0886A] outline-none" />
+                  ) : (
+                    <h1 onClick={() => setIsEditingName(true)}
+                      className="text-[22px] font-bold text-[#2C1F1A] cursor-pointer leading-tight">
+                      Hi {userName}, ✦
+                    </h1>
+                  )}
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1">
-                    {isEditingName ? (
-                      <input 
-                        autoFocus
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        onBlur={() => {
-                          setIsEditingName(false);
-                          localStorage.setItem("velmora_user_name", userName);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            setIsEditingName(false);
-                            localStorage.setItem("velmora_user_name", userName);
-                          }
-                        }}
-                        className="text-[16px] font-bold text-[#2C1F1A] leading-tight bg-transparent border-b border-[#F0886A] outline-none w-full"
-                      />
-                    ) : (
-                      <h1 onClick={() => setIsEditingName(true)} className="text-[16px] font-bold text-[#2C1F1A] leading-tight cursor-pointer hover:text-[#F0886A] transition-colors truncate w-full">Hi {userName},</h1>
-                    )}
+                <p className="text-[13px] text-[rgba(44,31,26,0.56)] mt-1">Transform Your Skin&apos;s Health</p>
+              </div>
+              <div className="relative w-[46px] h-[46px] rounded-full overflow-hidden flex-shrink-0"
+                style={{ backgroundColor: "#F0886A" }}>
+                {userPic
+                  ? <img src={userPic} className="w-full h-full object-cover" alt="User" />
+                  : <span className="w-full h-full flex items-center justify-center text-[#241712] font-serif text-xl">{userName?.[0]?.toUpperCase() || "U"}</span>
+                }
+                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  onChange={e => {
+                    const file = e.target.files?.[0];
+                    if(file){ const r=new FileReader(); r.onloadend=()=>{ const b=r.result as string; setUserPic(b); localStorage.setItem("velmora_user_pic",b); }; r.readAsDataURL(file); }
+                  }} />
+              </div>
+            </div>
+
+            {/* ── HERO BANNER ── */}
+            <div className="mx-5 mb-4">
+              <button onClick={() => resetScanner("face")} className="w-full active:scale-[0.98] transition-transform">
+                <div className="relative rounded-[22px] overflow-hidden min-h-[148px] text-left"
+                  style={{ background: "linear-gradient(125deg, #F9DDD0 0%, #F5C9B5 55%, #F0B8A2 100%)" }}>
+                  <div className="p-5 relative z-10">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.8px] mb-1.5" style={{ color:"rgba(60,30,20,0.50)" }}>Find the right</p>
+                    <h2 className="text-[28px] leading-[1.05] mb-3" style={{ fontFamily:"'Instrument Serif',Georgia,serif", fontStyle:"italic", color:"#2C1F1A" }}>
+                      Routine<br/>for your<br/>Skin
+                    </h2>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[13px] font-bold" style={{ color:"#C44E28" }}>View My Score</span>
+                      <ChevronRight size={14} color="#C44E28" strokeWidth={2.5} />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
-                    <div className="flex items-center gap-0.5 bg-orange-50 px-1.5 py-0.5 rounded-full border border-orange-100 shrink-0">
-                      <Zap size={8} className="text-orange-500 fill-orange-500" />
-                      <span className="text-[8px] font-bold text-orange-600 uppercase tracking-[-0.3px]er">Streak: {streak}D</span>
+                  {/* Bottle SVG illustration */}
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col items-center" style={{ filter:"drop-shadow(0 8px 20px rgba(180,80,40,0.20))" }}>
+                    <div className="w-8 h-3 rounded-md mb-0" style={{ backgroundColor:"rgba(200,100,60,0.55)" }} />
+                    <div className="w-7 h-5 rounded-lg" style={{ backgroundColor:"rgba(255,255,255,0.65)" }} />
+                    <div className="w-12 h-20 rounded-[18px] relative overflow-hidden" style={{ background:"linear-gradient(135deg,rgba(255,220,200,0.7),rgba(240,160,120,0.4))" }}>
+                      <div className="absolute inset-x-2 top-3 bottom-3 rounded-[10px]" style={{ backgroundColor:"rgba(255,255,255,0.45)" }}>
+                        <div className="h-0.5 w-full mb-1.5 mt-2 mx-auto" style={{ backgroundColor:"rgba(180,80,40,0.4)", width:"70%" }} />
+                        <div className="h-px w-full mb-1 mx-auto" style={{ backgroundColor:"rgba(180,80,40,0.25)", width:"55%" }} />
+                        <div className="h-px w-full mx-auto" style={{ backgroundColor:"rgba(180,80,40,0.20)", width:"70%" }} />
+                      </div>
+                      <div className="absolute right-1.5 top-2 bottom-2 w-1.5 rounded-full" style={{ backgroundColor:"rgba(255,255,255,0.5)" }} />
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Right Controls Area */}
-              <div className="flex items-center gap-1.5 shrink-0">
-                {!isPremium && (
-                  <Link href="/premium" className="flex items-center gap-1 bg-[rgba(240,136,106,0.10)] px-2.5 py-2 rounded-2xl border border-[rgba(60,30,20,0.08)] shadow-sm active:scale-95 transition-transform shrink-0">
-                    <Sparkles size={11} className="text-[#F0886A] fill-[#F0886A]" />
-                    <span className="text-[9px] font-bold text-[#F0886A] uppercase tracking-wider">Premium</span>
-                  </Link>
-                )}
-                <Link href="/routine" className="shrink-0">
-                  <motion.div 
-                    animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
-                    className="w-10 h-10 rounded-2xl bg-white shadow-xl shadow-[#F0886A]/10 flex items-center justify-center border border-[rgba(60,30,20,0.08)] shrink-0"
-                  >
-                    <BrainCircuit size={20} className="text-[#F0886A]" />
-                  </motion.div>
-                </Link>
-              </div>
+              </button>
             </div>
 
-            {/* Promo Banner */}
-            <div className="relative bg-[rgba(240,136,106,0.10)] rounded-[22px] p-6 overflow-hidden flex items-center justify-between group">
-              <div className="z-10 max-w-[120px]">
-                <p className="text-[9px] font-bold text-[#F0886A] uppercase tracking-widest mb-1">Find the right</p>
-                <h2 className="text-[18px] font-bold text-[#2C1F1A] leading-tight italic">Cream for your Skin</h2>
-              </div>
-              <div className="absolute right-0 top-0 bottom-0 w-1/2 flex items-center justify-center p-2">
-                <img src="https://images.unsplash.com/photo-1612817288484-6f916006741a?w=300&q=80" alt="Product" className="w-full h-full object-contain rotate-12 transition-transform group-hover:scale-110" />
-              </div>
+            {/* ── QUICK ACTIONS ── */}
+            <div className="px-5 grid grid-cols-2 gap-3 mb-5">
+              <button onClick={() => resetScanner("face")} className="flex items-center gap-3 p-3.5 rounded-[18px] bg-white border active:scale-95 transition-transform text-left" style={{ borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 4px 16px rgba(60,30,20,0.07)" }}>
+                <div className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor:"rgba(240,136,106,0.12)" }}>
+                  <ScanFace size={20} color="#C44E28" />
+                </div>
+                <div>
+                  <p className="text-[14px] font-bold text-[#2C1F1A] leading-tight">Scan Skin</p>
+                  <p className="text-[11px]" style={{ color:"rgba(44,31,26,0.56)" }}>AI analysis</p>
+                </div>
+              </button>
+              <button onClick={() => resetScanner("product")} className="flex items-center gap-3 p-3.5 rounded-[18px] border active:scale-95 transition-transform text-left" style={{ backgroundColor:"#EBF3FE", borderColor:"rgba(78,142,212,0.20)", boxShadow:"0 4px 16px rgba(60,30,20,0.07)" }}>
+                <div className="w-10 h-10 rounded-[12px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor:"rgba(78,142,212,0.16)" }}>
+                  <Target size={20} color="#4E8ED4" />
+                </div>
+                <div>
+                  <p className="text-[14px] font-bold text-[#2C1F1A] leading-tight">Scan Product</p>
+                  <p className="text-[11px]" style={{ color:"rgba(44,31,26,0.56)" }}>Ingredients</p>
+                </div>
+              </button>
             </div>
 
-            {/* AI Scan Button */}
-            <button 
-              onClick={() => resetScanner("face")}
-              className="w-full bg-[#F0886A] border-2 border-[#F0886A]/20 rounded-[22px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-xl shadow-[#F0886A]/20 text-white"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                  <ScanFace size={28} />
+            {/* ── AI CHAT BANNER ── */}
+            <div className="px-5 mb-5">
+              <Link href="/coach" className="flex items-center gap-3.5 px-4 py-3.5 rounded-[18px] active:scale-[0.98] transition-transform" style={{ background:"linear-gradient(120deg,#F9DDD0,#F5C9B5)", border:"1px solid rgba(196,78,40,0.15)", boxShadow:"0 4px 16px rgba(196,78,40,0.10)" }}>
+                <div className="w-[42px] h-[42px] rounded-[13px] flex items-center justify-center flex-shrink-0" style={{ backgroundColor:"#F0886A", boxShadow:"0 4px 14px rgba(240,136,106,0.40)" }}>
+                  <Sparkles size={20} color="white" fill="white" />
                 </div>
-                <div className="text-left">
-                  <span className="block text-[16px] font-bold">Scan your face</span>
-                  <span className="block text-[11px] text-white/70 font-medium italic">Instant AI Analysis</span>
+                <div className="flex-1">
+                  <p className="text-[16px] font-bold text-[#2C1F1A]">Ask GlowAI</p>
+                  <p className="text-[12px]" style={{ color:"rgba(44,31,26,0.55)" }}>Expert skin advice, anytime</p>
                 </div>
-              </div>
-              <ChevronRight size={20} className="text-white/50 group-hover:text-white transition-colors" />
-            </button>
+                <ChevronRight size={18} color="rgba(44,31,26,0.35)" />
+              </Link>
+            </div>
 
-            {/* Growth Insight Card */}
-            {history.length >= 2 && (
-              <div className="bg-white rounded-[22px] p-6 border border-[rgba(60,30,20,0.08)] shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-                    <Zap size={24} />
+            {/* ── SCORE CARD (if scan exists) ── */}
+            {data && (
+              <div className="px-5 mb-5">
+                <div className="bg-white rounded-[22px] p-4 border flex items-center gap-4" style={{ borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 4px 20px rgba(60,30,20,0.08)" }}>
+                  {/* SVG Score Ring */}
+                  <div className="relative w-[90px] h-[90px] flex-shrink-0">
+                    <svg width="90" height="90" className="absolute inset-0" style={{ transform:"rotate(-90deg)" }}>
+                      <circle cx="45" cy="45" r="36" fill="none" stroke="#F5F1EE" strokeWidth="8" />
+                      <circle cx="45" cy="45" r="36" fill="none"
+                        stroke={data.score >= 80 ? "#D9B86A" : data.score >= 60 ? "#7FB389" : data.score >= 40 ? "#E8A24C" : "#E0685C"}
+                        strokeWidth="8" strokeLinecap="round"
+                        strokeDasharray={`${2*Math.PI*36 * data.score/100} ${2*Math.PI*36}`}
+                        style={{ filter:`drop-shadow(0 0 6px ${data.score>=80?"#D9B86A":data.score>=60?"#7FB389":data.score>=40?"#E8A24C":"#E0685C"})` }} />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[24px] font-bold leading-none" style={{ fontFamily:"'Space Grotesk',monospace", color:"#2C1F1A" }}>{data.score}</span>
+                      <span className="text-[9px] font-semibold" style={{ color: data.score>=80?"#D9B86A":data.score>=60?"#7FB389":data.score>=40?"#E8A24C":"#E0685C" }}>
+                        {data.score>=80?"Radiant":data.score>=60?"Good":data.score>=40?"Fair":"Needs care"}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[14px] font-bold text-[#2C1F1A]">
-                      {history[0].score > history[1].score ? "Skin improving!" : "Skin needs care"}
-                    </p>
-                    <p className="text-[11px] text-[rgba(44,31,26,0.38)] font-medium">
-                      Glow score {history[0].score > history[1].score ? "up" : "down"} by {Math.abs(history[0].score - history[1].score)}%
-                    </p>
+                  <div className="flex-1">
+                    <p className="text-[18px] text-[#2C1F1A] leading-tight mb-2" style={{ fontFamily:"'Instrument Serif',Georgia,serif" }}>Your Skin<br/>Score</p>
+                    <button onClick={() => setView("results")} className="flex items-center gap-1.5 text-[13px] font-bold text-[#C44E28]">
+                      View full report <ChevronRight size={14} strokeWidth={2.5} />
+                    </button>
                   </div>
-                </div>
-                <div className="flex items-center gap-1 text-emerald-500 font-bold text-xs">
-                  {history[0].score > history[1].score ? "+" : "-"}{Math.abs(history[0].score - history[1].score)}%
                 </div>
               </div>
             )}
 
-
-            {/* Main Features Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <Link href="/diet" className="bg-white border border-[rgba(60,30,20,0.08)] rounded-[22px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-500">
-                  <Info size={24} />
-                </div>
-                <div>
-                  <p className="text-[14px] font-bold text-[#2C1F1A]">Diet Plan</p>
-                  <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-medium">Nutrition for skin</p>
-                </div>
-              </Link>
-              <Link href="/coach" className="bg-white border border-[rgba(60,30,20,0.08)] rounded-[22px] p-5 flex flex-col gap-3 group active:scale-95 transition-transform shadow-sm">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
-                  <Sparkles size={24} />
-                </div>
-                <div>
-                  <p className="text-[14px] font-bold text-[#2C1F1A]">AI Coach</p>
-                  <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-medium">Expert advice</p>
-                </div>
-              </Link>
-
-              <button 
-                onClick={() => resetScanner("product")}
-                className="col-span-2 bg-white border border-[rgba(60,30,20,0.08)] rounded-[22px] p-6 flex items-center justify-between group active:scale-95 transition-transform shadow-sm"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
-                    <Target size={24} />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[15px] font-bold text-[#2C1F1A]">Product Scanner</p>
-                    <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-medium">Analyze product ingredients</p>
-                  </div>
-                </div>
-                <ChevronRight size={20} className="text-[rgba(44,31,26,0.30)] group-hover:text-orange-500 transition-colors" />
-              </button>
+            {/* ── CATEGORY PILLS ── */}
+            <div className="px-5 mb-4">
+              <div className="flex gap-2 overflow-x-auto">
+                {["All","Skincare","Routine","Diet","Progress"].map(c => (
+                  <Link key={c} href={c==="Routine"?"/routine":c==="Diet"?"/diet":c==="Progress"?"/progress":"#"}
+                    className="px-4 py-2 rounded-full text-[14px] font-bold flex-shrink-0 transition-colors"
+                    style={{ backgroundColor: c==="All"?"#F0886A":"#F5F1EE", color: c==="All"?"#241712":"rgba(44,31,26,0.56)" }}>
+                    {c}
+                  </Link>
+                ))}
+              </div>
             </div>
+
+            {/* ── FEATURE GRID ── */}
+            <div className="px-5 grid grid-cols-2 gap-3">
+              {[
+                { href:"/routine", bg:"#FEF0EB", icon:"📋", title:"Daily Routine",  sub:"Step-by-step plan" },
+                { href:"/store",   bg:"#EFF0FD", icon:"🧴", title:"Products",       sub:"Curated for you" },
+                { href:"/diet",    bg:"#EDF7EE", icon:"🥗", title:"Diet Plan",       sub:"Skin nutrition" },
+                { href:"/coach",   bg:"#EBF3FE", icon:"✦",  title:"AI Coach",        sub:"Expert advice" },
+                { href:"/progress",bg:"#FEF7EB", icon:"📈", title:"Progress",        sub:"Track results" },
+                { href:"/premium", bg:"#FDEDF0", icon:"💎", title:"Premium",         sub:"Unlock all features" },
+              ].map(item => (
+                <Link key={item.title} href={item.href}
+                  className="rounded-[20px] overflow-hidden bg-white border active:scale-95 transition-transform"
+                  style={{ borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 3px 14px rgba(60,30,20,0.07)" }}>
+                  <div className="h-[100px] flex items-center justify-center text-4xl" style={{ backgroundColor: item.bg }}>{item.icon}</div>
+                  <div className="p-3">
+                    <p className="text-[13.5px] font-bold text-[#2C1F1A] leading-tight">{item.title}</p>
+                    <p className="text-[11px] mt-0.5" style={{ color:"rgba(44,31,26,0.56)" }}>{item.sub}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {/* ── INSIGHT STRIP (if history) ── */}
+            {history.length >= 2 && (
+              <div className="px-5 mt-4">
+                <div className="flex items-center gap-4 p-4 bg-white rounded-[18px] border" style={{ borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 3px 12px rgba(60,30,20,0.06)" }}>
+                  <div className="w-11 h-11 rounded-[13px] flex items-center justify-center flex-shrink-0 text-xl"
+                    style={{ backgroundColor: history[0].score > history[1].score ? "#EDF7EE" : "rgba(240,136,106,0.10)" }}>
+                    {history[0].score > history[1].score ? "📈" : "📉"}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[14px] font-bold text-[#2C1F1A]">
+                      {history[0].score > history[1].score ? "Skin improving!" : "Skin needs attention"}
+                    </p>
+                    <p className="text-[11px]" style={{ color:"rgba(44,31,26,0.56)" }}>
+                      Score {history[0].score > history[1].score ? "up" : "down"} {Math.abs(history[0].score - history[1].score)}% since last scan
+                    </p>
+                  </div>
+                  <span className="text-[13px] font-bold" style={{ color: history[0].score > history[1].score ? "#7FB389" : "#E0685C" }}>
+                    {history[0].score > history[1].score ? "+" : "-"}{Math.abs(history[0].score - history[1].score)}%
+                  </span>
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
 
