@@ -1,146 +1,71 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { T, SANS, Icon, Placeholder } from "@/glow/ui";
 
-const SUGGESTIONS = [
-  "Why am I breaking out more this week?",
-  "Can I use retinol and niacinamide together?",
-  "Explain my latest scan results",
-  "What's a good routine for beginners?",
-];
-
-interface Msg { id:number; role:"ai"|"user"; text:string; card?:{name:string;brand:string} }
+const CHIPS = ["Why am I breaking out more this week?", "Can I use retinol and niacinamide together?", "Explain my latest scan results"];
 
 export default function CoachPage() {
-  const [msgs,   setMsgs]   = useState<Msg[]>([{
-    id:0, role:"ai",
-    text:"Hi! I've loaded your skin profile. Ask me anything about your routine, ingredients, or results."
-  }]);
-  const [input,  setInput]  = useState("");
-  const [typing, setTyping] = useState(false);
-  const scroll = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [msgs, setMsgs] = useState<any[]>([{ who: "ai", text: "Hi — I've loaded your skin profile and latest scan. Ask me anything about your routine, ingredients, or results." }]);
+  const [text, setText] = useState("");
+  const scroller = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    scroll.current?.scrollTo({ top: scroll.current.scrollHeight, behavior:"smooth" });
-  }, [msgs, typing]);
+  useEffect(() => { if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight; }, [msgs]);
 
   const send = async (q?: string) => {
-    const text = q || input.trim();
-    if (!text) return;
-    setInput("");
-    const userMsg: Msg = { id: Date.now(), role:"user", text };
-    setMsgs(m => [...m, userMsg]);
-    setTyping(true);
+    const question = q || text.trim();
+    if (!question) return;
+    setMsgs(m => [...m, { who: "me", text: question }]);
+    setText("");
+    setMsgs(m => [...m, { who: "typing" }]);
     try {
-      const scanData  = localStorage.getItem("velmora_analysis");
-      const skinData  = scanData ? JSON.parse(scanData) : null;
-      const res = await fetch("/api/ai/chat", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ message: text, skinData }),
-      });
-      const data = await res.json();
-      setMsgs(m => [...m, { id:Date.now()+1, role:"ai", text: data.reply || "Here's what I found about your skin concern." }]);
+      const scan = localStorage.getItem("velmora_analysis");
+      const r = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: question, skinData: scan ? JSON.parse(scan) : null }) });
+      const d = await r.json();
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: d.reply || "Here's what I found for your skin." }));
     } catch {
-      setMsgs(m => [...m, { id:Date.now()+1, role:"ai", text:"Your chin breakouts line up with this week's humidity spike and lower hydration. Stay consistent with your BHA toner, and don't skip moisturizer — dehydrated skin overproduces oil." }]);
-    } finally {
-      setTyping(false);
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "Your chin breakouts line up with this week's humidity spike and lower hydration. Stay consistent with your BHA toner, and don't skip moisturizer — dehydrated skin overproduces oil." }));
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-[#FAF8F6] flex flex-col max-w-[430px] mx-auto">
-
-      {/* ── NAV ── */}
-      <div className="flex items-center justify-between px-4 pt-14 pb-2 bg-[#FAF8F6] flex-shrink-0">
-        <Link href="/" className="w-[38px] h-[38px] rounded-[11px] bg-white border flex items-center justify-center no-underline text-[20px] text-[#2C1F1A]"
-          style={{borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 4px 12px rgba(60,30,20,0.06)"}}>‹</Link>
-        <span className="text-[16px] font-bold text-[#2C1F1A]">Ask GlowAI</span>
-        <div className="w-[38px]"/>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: T.bg }}>
+      <div style={{ display: "flex", alignItems: "center", padding: "56px 16px 8px" }}>
+        <button onClick={() => router.push("/")} style={{ width: 36, height: 36, borderRadius: 11, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
+        <div style={{ flex: 1, textAlign: "center", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text }}>Ask GlowAI</div>
+        <div style={{ width: 36 }} />
       </div>
 
-      {/* ── MESSAGES ── */}
-      <div ref={scroll} className="flex-1 overflow-y-auto px-[18px] py-3" style={{scrollbarWidth:"none"}}>
-        {msgs.map(msg => (
-          <div key={msg.id} className={`flex mb-3 ${msg.role==="user"?"justify-end":"justify-start"}`}>
-            <div style={{maxWidth:"82%"}}>
-              {msg.role==="ai" && (
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="text-[11px] text-[#F0886A]">✦</span>
-                  <span className="text-[12px] font-bold text-[#C44E28]">GlowAI</span>
-                </div>
-              )}
-              <div className="px-4 py-3 text-[15px] leading-[1.45]"
-                style={{
-                  background: msg.role==="user"?"#F0886A":"#fff",
-                  color:      msg.role==="user"?"#241712":"#2C1F1A",
-                  borderRadius: msg.role==="user"?"20px 6px 20px 20px":"6px 20px 20px 20px",
-                  border:     msg.role==="ai"?"1px solid rgba(60,30,20,0.08)":"none",
-                  boxShadow:  msg.role==="ai"?"0 2px 10px rgba(60,30,20,0.06)":"none",
-                }}>
-                {msg.text}
+      <div ref={scroller} className="glow-scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 18px" }}>
+        {msgs.map((m, i) => {
+          if (m.who === "typing") return (
+            <div key={i} style={{ display: "flex", gap: 5, padding: "12px 16px", borderRadius: 18, background: T.surface, width: "fit-content", marginBottom: 12, border: `1px solid ${T.border}` }}>
+              {[0, 1, 2].map(d => <span key={d} className="animate-blink" style={{ width: 7, height: 7, borderRadius: 99, background: T.textFaint, animationDelay: `${d * 0.2}s` }} />)}
+            </div>
+          );
+          const me = m.who === "me";
+          return (
+            <div key={i} style={{ display: "flex", justifyContent: me ? "flex-end" : "flex-start", marginBottom: 12 }}>
+              <div style={{ maxWidth: "82%" }}>
+                {!me && <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}><Icon name="spark" size={14} color={T.accent} fill /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.accentText }}>GlowAI</span></div>}
+                <div style={{ padding: "12px 16px", borderRadius: 20, fontFamily: SANS, fontSize: 15, lineHeight: 1.45, background: me ? T.accent : T.surface, color: me ? "#241712" : T.text, borderTopRightRadius: me ? 6 : 20, borderTopLeftRadius: me ? 20 : 6, border: me ? "none" : `1px solid ${T.border}` }}>{m.text}</div>
               </div>
-              {msg.card && (
-                <div className="flex items-center gap-3 p-2.5 rounded-[14px] mt-2 bg-white border cursor-pointer"
-                  style={{borderColor:"rgba(60,30,20,0.08)"}}>
-                  <div className="w-12 h-12 rounded-[10px] bg-[#FEF0EB]"/>
-                  <div className="flex-1">
-                    <p className="text-[14px] font-bold text-[#2C1F1A]">{msg.card.name}</p>
-                    <p className="text-[12px] text-[rgba(44,31,26,0.56)]">{msg.card.brand}</p>
-                  </div>
-                  <span className="text-[rgba(44,31,26,0.33)] text-[16px]">›</span>
-                </div>
-              )}
             </div>
-          </div>
-        ))}
-
-        {/* Typing indicator */}
-        {typing && (
-          <div className="flex mb-3">
-            <div className="flex items-center gap-1.5 px-4 py-3 rounded-[6px_20px_20px_20px] bg-white border"
-              style={{borderColor:"rgba(60,30,20,0.08)"}}>
-              {[0,1,2].map(i=>(
-                <span key={i} className="w-1.5 h-1.5 rounded-full bg-[rgba(44,31,26,0.33)]"
-                  style={{animation:`blink 1.2s ${i*0.2}s infinite`}}/>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Suggestion chips */}
-        {msgs.length === 1 && !typing && (
-          <div className="flex flex-col gap-2 mt-2">
-            {SUGGESTIONS.map(s => (
-              <button key={s} onClick={() => send(s)}
-                className="text-left px-4 py-3 rounded-[14px] bg-transparent border text-[14px] text-[#2C1F1A] cursor-pointer"
-                style={{borderColor:"rgba(60,30,20,0.13)"}}>
-                {s}
-              </button>
-            ))}
+          );
+        })}
+        {msgs.length <= 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+            {CHIPS.map(c => <button key={c} onClick={() => send(c)} style={{ textAlign: "left", padding: "12px 16px", borderRadius: 14, background: "transparent", border: `1.5px solid ${T.border}`, cursor: "pointer", fontFamily: SANS, fontSize: 14, color: T.text }}>{c}</button>)}
           </div>
         )}
       </div>
 
-      {/* ── INPUT BAR ── */}
-      <div className="px-4 pb-8 pt-2 bg-[#FAF8F6] flex-shrink-0">
-        <div className="flex items-center gap-2 pl-4 pr-1.5 py-1.5 rounded-full bg-white border"
-          style={{borderColor:"rgba(60,30,20,0.13)"}}>
-          <span className="text-[18px]">📷</span>
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key==="Enter" && send()}
-            placeholder="Ask about your skin…"
-            className="flex-1 border-none outline-none text-[15px] text-[#2C1F1A] bg-transparent py-2"
-            style={{color:"#2C1F1A"}}
-          />
-          <button onClick={() => send()}
-            className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer flex-shrink-0"
-            style={{background:"#F0886A"}}
-            disabled={!input.trim()}>
-            <span className="text-[#241712] font-bold text-[16px]">↑</span>
-          </button>
+      <div style={{ padding: "8px 16px 30px", background: T.bg }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 6px 6px 16px", borderRadius: 26, background: T.surface, border: `1px solid ${T.borderHi}` }}>
+          <Icon name="camera" size={22} color={T.textMute} />
+          <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask about your skin…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text, padding: "8px 0" }} />
+          <button onClick={() => send()} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: "none", cursor: "pointer", background: T.accent, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="send" size={20} color="#241712" /></button>
         </div>
       </div>
     </div>

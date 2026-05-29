@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
-import { BottomNav } from "@/components/BottomNav";
 import AuthProvider from "@/components/AuthProvider";
 
 const dmSans = DM_Sans({
@@ -34,7 +33,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="w-full max-w-[430px] min-h-screen bg-[#FAF8F6] relative"
               style={{ boxShadow: "0 0 80px rgba(240,136,106,0.07)" }}>
               <main>{children}</main>
-              <BottomNav />
             </div>
           </div>
         </AuthProvider>

@@ -181,6 +181,15 @@ html, body {
   50%      { opacity: 1;  transform: translateY(-3px); }
 }
 
+@keyframes floaty {
+  0%,100% { transform: translateY(0); opacity: .9; }
+  50%      { transform: translateY(-14px); opacity: .4; }
+}
+@keyframes pop {
+  0%   { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+
 .animate-float      { animation: float 4s ease-in-out infinite; }
 .animate-fadeup     { animation: fadeUp .7s ease forwards; }
 .scan-line          { animation: scan 2s ease-in-out infinite; }
@@ -189,3 +198,5 @@ html, body {
 .animate-flash      { animation: flash .15s ease-out; }
 .animate-spinpulse  { animation: spinpulse 1.4s ease-in-out infinite; }
 .animate-blink      { animation: blink 1.2s infinite; }
+.glow-scroll, .glow-hscroll { scrollbar-width: none; -ms-overflow-style: none; }
+.glow-scroll::-webkit-scrollbar, .glow-hscroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
