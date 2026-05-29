@@ -1063,33 +1063,56 @@ export default function Home() {
           </motion.div>
         )}
 
-        {/* SCANNER */}
+        {/* SCANNER — PROTOTYPE DESIGN */}
         {view === "scanner" && (
-          <motion.div key="scanner" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} className="px-5 space-y-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-bold text-[#2C1F1A]">{scanMode === "face" ? "Position Your Face" : "Scan Product Label"}</h2>
-              <button onClick={()=>setView("home")} className="text-[rgba(44,31,26,0.38)] text-sm font-bold bg-white px-4 py-2 rounded-xl shadow border border-[rgba(60,30,20,0.08)]">Cancel</button>
-            </div>
-            
-            <CameraScanner onResult={handleResult} mode={scanMode}/>
+          <motion.div key="scanner" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}
+            className="fixed inset-0 bg-[#0c0908] z-50 flex flex-col" style={{maxWidth:430,margin:"0 auto"}}>
 
-            {scanMode === "product" && (
-              <div className="bg-white rounded-[22px] border border-[#EEF0FF] shadow-sm p-5 space-y-4">
-                <div className="flex items-center gap-2 text-purple-600 font-bold text-xs uppercase tracking-[-0.3px]">
-                  <Info size={16} strokeWidth={1.2} /> How to scan properly?
-                </div>
-                <div className="flex gap-4 items-center">
-                  <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-purple-100 shadow-inner flex-shrink-0">
-                    <img src="/product_example.png" alt="Example" className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 space-y-1.5">
-                    <p className="text-[11px] text-slate-600 font-medium leading-tight">• Focus on the <span className="text-purple-600 font-bold uppercase">Ingredients</span> list.</p>
-                    <p className="text-[11px] text-slate-600 font-medium leading-tight">• Ensure bright lighting for clear text.</p>
-                    <p className="text-[11px] text-slate-600 font-medium leading-tight">• Keep the bottle steady while clicking.</p>
-                  </div>
-                </div>
+            {/* Back */}
+            <button onClick={()=>setView("home")}
+              className="absolute top-14 left-3.5 z-10 w-9 h-9 rounded-[11px] flex items-center justify-center cursor-pointer border"
+              style={{background:"rgba(255,255,255,0.18)", backdropFilter:"blur(10px)", borderColor:"rgba(255,255,255,0.25)"}}>
+              <span className="text-white text-[20px]">‹</span>
+            </button>
+
+            {/* Camera bg */}
+            <div className="absolute inset-0" style={{background:"repeating-linear-gradient(135deg,rgba(240,136,106,0.07) 0 14px,rgba(255,255,255,0.015) 14px 28px)"}}/>
+
+            {/* Instructions */}
+            <div className="absolute top-24 left-6 right-6 text-center z-10">
+              <h2 className="text-[26px] text-white mb-2.5 leading-tight" style={{fontFamily:"'Instrument Serif',Georgia,serif"}}>
+                {scanMode==="face" ? "Position your face in the oval" : "Point at product label"}
+              </h2>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full" style={{background:"rgba(127,179,137,0.20)", border:"1px solid rgba(127,179,137,0.40)"}}>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#8FC299]"/>
+                <span className="text-[13px] font-semibold text-[#8FC299]">Lighting: Great</span>
               </div>
-            )}
+            </div>
+
+            {/* Face oval */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[54%] flex items-end justify-center" style={{width:236, height:312, borderRadius:"50%", border:"2.5px dashed rgba(240,136,106,0.80)", boxShadow:"0 0 0 2000px rgba(0,0,0,0.45)"}}>
+              <span className="text-[10px] uppercase tracking-[1px] mb-1" style={{color:"rgba(244,238,233,0.38)"}}>your face here</span>
+            </div>
+
+            {/* Tips */}
+            <div className="absolute left-6 right-6 text-center z-10" style={{bottom:168}}>
+              <p className="text-[13px]" style={{color:"rgba(255,255,255,0.60)"}}>Remove glasses · tie back hair · use natural light</p>
+            </div>
+
+            {/* Controls */}
+            <div className="absolute left-0 right-0 flex items-center justify-center gap-11 z-10" style={{bottom:96}}>
+              <div className="w-[50px] h-[50px] rounded-[13px] bg-white/15 flex items-center justify-center text-[20px]">🕐</div>
+              <button
+                className="w-20 h-20 rounded-full flex items-center justify-center cursor-pointer bg-transparent" style={{border:"4px solid rgba(255,255,255,0.90)"}}>
+                <div className="w-[68px] h-[68px] rounded-full" style={{background:"#F0886A", boxShadow:"0 0 24px rgba(240,136,106,0.70)"}}/>
+              </button>
+              <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center text-[20px] cursor-pointer" style={{background:"rgba(255,255,255,0.12)", border:"1px solid rgba(255,255,255,0.20)"}}>🔄</div>
+            </div>
+
+            {/* Actual camera (visible + functional) */}
+            <div className="flex-1 flex items-center justify-center" style={{paddingTop:96}}>
+              <CameraScanner onResult={handleResult} mode={scanMode}/>
+            </div>
           </motion.div>
         )}
 

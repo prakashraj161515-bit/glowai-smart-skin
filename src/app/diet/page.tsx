@@ -1,458 +1,93 @@
 "use client";
-
 import { useState, useEffect } from "react";
-import { Apple, Droplets, Sparkles, RefreshCcw, Calendar, Bookmark, Trash2, AlertCircle, ChevronLeft, Gem, X, Download } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
-export default function DietPage() {
-  const { status } = useSession();
-  const router = useRouter();
+const MOODS  = ["😣","😕","😐","🙂","😄"];
+const TAGS   = ["Dairy","Sugar","Greasy","Healthy","Alcohol","Stressed","Slept well","Exercised"];
+const TARGET = 3000;
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [status, router]);
+export default function DiaryPage() {
+  const [mood,  setMood]  = useState(2);
+  const [water, setWater] = useState(6);
+  const [tags,  setTags]  = useState<Set<string>>(new Set());
 
-  const [dietPlan, setDietPlan] = useState("");
-  const [userInput, setUserInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [savedPlans, setSavedPlans] = useState<{id: string, text: string, date: string, concern: string}[]>([]);
-  const [showSaved, setShowSaved] = useState(false);
-  const [dailyTip, setDailyTip] = useState("");
-  const [showLimitModal, setShowLimitModal] = useState(false);
-  const [isPremium, setIsPremium] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("velmora_saved_diets");
-    if (saved) setSavedPlans(JSON.parse(saved));
-    setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
-
-    const tips = [
-      "Add Vitamin C rich foods today for natural glow.",
-      "Try green tea instead of coffee for skin hydration.",
-      "Incorporate walnuts for healthy skin barrier oils.",
-      "A cup of papaya helps in natural skin exfoliation.",
-      "Drink warm water with lemon first thing in the morning."
-    ];
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    setDailyTip(tips[dayOfYear % tips.length]);
-  }, []);
-
-  const generateDietPlan = async () => {
-    // Check daily free limit
-    const todayStr = new Date().toDateString();
-    const lastDietDate = localStorage.getItem("velmora_last_diet_date");
-    if (!isPremium && lastDietDate === todayStr) {
-      setShowLimitModal(true);
-      return;
-    }
-
-    setIsLoading(true);
-    setError("");
-    
-    let scanContext = "";
-    const country = localStorage.getItem("velmora_country") || "India";
-    try {
-      const scanData = localStorage.getItem("velmora_analysis");
-      if (scanData) {
-        const parsed = JSON.parse(scanData);
-        scanContext = `My current skin scan metrics: Glow Score ${parsed.score}/100, Acne ${parsed.acne}%, Oiliness ${parsed.oil}%, Pigmentation ${parsed.pigmentation}%, Gender: ${parsed.gender}. My location is ${country}. Please provide a diet plan suitable for ${country} cuisine and food availability.`;
-      } else {
-        scanContext = `My location is ${country}. Please provide a general healthy skin diet plan suitable for ${country} cuisine and food availability.`;
-      }
-    } catch (e) {}
-
-    const fullContext = `${scanContext}${userInput ? `\nUser's specific concerns/disease: ${userInput}` : ""}`;
-
-    try {
-      const isPremium = localStorage.getItem("velmora_is_premium") === "true";
-      const res = await fetch("/api/ai/diet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context: fullContext, isPremium }),
-      });
-      const data = await res.json();
-      if (data.text) {
-        setDietPlan(data.text);
-        // Save today's date as last diet generation date
-        localStorage.setItem("velmora_last_diet_date", new Date().toDateString());
-      } else {
-        setError(data.error || "Failed to generate diet plan");
-      }
-    } catch (e) {
-      setError("Server busy. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+  const toggleTag = (t:string) => {
+    const next = new Set(tags);
+    next.has(t) ? next.delete(t) : next.add(t);
+    setTags(next);
   };
 
-  const saveCurrentPlan = () => {
-    if (!dietPlan) return;
-    const newPlan = {
-      id: Date.now().toString(),
-      text: dietPlan,
-      date: new Date().toLocaleDateString(),
-      concern: userInput || "General Skin Health"
-    };
-    const updated = [newPlan, ...savedPlans];
-    setSavedPlans(updated);
-    localStorage.setItem("velmora_saved_diets", JSON.stringify(updated));
-    alert("Diet Plan Saved! 💾");
+  const save = () => {
+    const entry = { date:new Date().toISOString(), mood, water, tags:[...tags] };
+    const prev  = JSON.parse(localStorage.getItem("velmora_diary")||"[]");
+    localStorage.setItem("velmora_diary", JSON.stringify([entry, ...prev.slice(0,29)]));
+    alert("Entry saved! ✓");
   };
-
-  const deletePlan = (id: string) => {
-    const updated = savedPlans.filter(p => p.id !== id);
-    setSavedPlans(updated);
-    localStorage.setItem("velmora_saved_diets", JSON.stringify(updated));
-  };
-
-  const formatMarkdown = (text: string) => {
-    return text.split("\n").map((line, i) => {
-      // Bold
-      const formattedLine = line.replace(/\*\*(.*?)\*\*/g, '<strong class="text-[#2C1F1A] font-bold">$1</strong>');
-      
-      if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
-        return (
-          <div key={i} className="flex gap-3 mb-2 ml-4">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#F0886A] mt-2 flex-shrink-0 shadow-sm" />
-            <span className="text-[13px] font-medium text-[rgba(44,31,26,0.65)] leading-snug" dangerouslySetInnerHTML={{ __html: formattedLine.replace(/^[*-]\s*/, "") }} />
-          </div>
-        );
-      }
-
-      if (line.trim().startsWith("**") && line.trim().endsWith("**")) {
-        return (
-          <div key={i} className="flex items-center gap-2 mt-8 mb-4">
-            <div className="h-px bg-slate-200 flex-1" />
-            <span className="text-[10px] font-extrabold text-[#F0886A] uppercase tracking-[0.3em] whitespace-nowrap px-2">
-              {line.replace(/\*\*/g, '')}
-            </span>
-            <div className="h-px bg-slate-200 flex-1" />
-          </div>
-        );
-      }
-      
-      if (line.trim() === "") return <div key={i} className="h-2" />;
-      
-      return (
-        <p key={i} className="mb-2 text-[13px] font-medium text-[rgba(44,31,26,0.75)] leading-relaxed" dangerouslySetInnerHTML={{ __html: formattedLine }} />
-      );
-    });
-  };
-
-  if (status === "loading" || status === "unauthenticated") {
-    return (
-      <div className="min-h-screen bg-[#FAF8F6] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F0886A]"></div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F6] pb-32 font-sans">
-      <header className="px-6 pt-12 flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]">
-            <ChevronLeft size={24} />
-          </Link>
-          <div>
-            <h1 className="text-[20px] font-bold text-[#2C1F1A]">Diet Planner</h1>
-            <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-extrabold uppercase tracking-widest">Smart Meal Plans</p>
-          </div>
+    <div className="min-h-screen bg-[#FAF8F6] pb-32 px-5 pt-[96px]">
+
+      {/* Title */}
+      <h1 className="text-[#2C1F1A] mb-0.5" style={{fontFamily:"'Instrument Serif',Georgia,serif", fontSize:30}}>Skin Diary</h1>
+      <p className="text-[14px] text-[rgba(44,31,26,0.56)] mb-4">Today · {new Date().toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"long"})}</p>
+
+      {/* Mood */}
+      <div className="rounded-[22px] bg-white p-[18px] mb-4 border" style={{borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 4px 20px rgba(60,30,20,0.08)"}}>
+        <p className="text-[14px] font-bold text-[#2C1F1A] mb-3">How does your skin feel?</p>
+        <div className="flex justify-between">
+          {MOODS.map((e,i) => (
+            <button key={i} onClick={() => setMood(i)}
+              className="w-12 h-12 rounded-[14px] text-[24px] flex items-center justify-center cursor-pointer border transition-all"
+              style={{
+                borderColor:  mood===i?"#F0886A":"rgba(60,30,20,0.08)",
+                borderWidth:  "1.5px",
+                background:   mood===i?"rgba(240,136,106,0.12)":"transparent",
+              }}>{e}</button>
+          ))}
         </div>
-        <button 
-          onClick={() => setShowSaved(!showSaved)}
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${showSaved ? 'bg-[#F0886A] text-white shadow-lg shadow-[#F0886A]/20' : 'bg-white shadow-sm text-[rgba(44,31,26,0.38)] border border-[rgba(60,30,20,0.08)]'}`}
-        >
-          <Bookmark size={20} />
-        </button>
-      </header>
-
-      <div className="px-6">
-        <div 
-          onClick={() => {
-            const tips = [
-              "Add Vitamin C rich foods today for natural glow.",
-              "Try green tea instead of coffee for skin hydration.",
-              "Incorporate walnuts for healthy skin barrier oils.",
-              "A cup of papaya helps in natural skin exfoliation.",
-              "Drink warm water with lemon first thing in the morning.",
-              "Avoid dairy for a week to see reduced acne flares.",
-              "Zinc-rich seeds (Pumpkin) help in skin healing.",
-              "Eat more berries for powerful anti-oxidants."
-            ];
-            const randomTip = tips[Math.floor(Math.random() * tips.length)];
-            setDailyTip(randomTip);
-          }}
-          className="mb-8 bg-white/60 border border-white rounded-[22px] p-5 flex items-center gap-4 shadow-sm backdrop-blur-md cursor-pointer active:scale-95 transition-transform group"
-        >
-          <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-500 group-hover:rotate-180 transition-transform duration-500">
-            <RefreshCcw size={22} />
-          </div>
-          <div className="flex-1">
-            <p className="text-[9px] font-extrabold text-emerald-500 uppercase tracking-widest">Daily Skin Boost • Tap to Shuffle</p>
-            <p className="text-[13px] font-bold text-[rgba(44,31,26,0.75)] mt-0.5 italic">&quot;{dailyTip}&quot;</p>
-          </div>
-        </div>
-
-        <AnimatePresence>
-          {showSaved && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-8 space-y-4"
-            >
-              <h3 className="text-[11px] font-bold text-[#F0886A] uppercase tracking-widest flex items-center gap-2">
-                <Bookmark size={14} /> My Saved Plans
-              </h3>
-              {savedPlans.length === 0 ? (
-                <div className="card p-6 text-center text-[11px] text-[rgba(44,31,26,0.30)] font-bold uppercase tracking-widest">No saved plans yet</div>
-              ) : (
-                <div className="grid grid-cols-1 gap-3">
-                  {savedPlans.map(plan => (
-                    <div key={plan.id} className="card p-5 flex justify-between items-center group bg-white/50">
-                      <div>
-                        <p className="text-[14px] font-bold text-[#2C1F1A] mb-0.5">{plan.concern}</p>
-                        <p className="text-[10px] text-[rgba(44,31,26,0.38)] font-bold">{plan.date}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => { setDietPlan(plan.text); setShowSaved(false); }} 
-                          className="bg-[rgba(240,136,106,0.10)] text-[#F0886A] px-4 py-2 rounded-2xl text-[11px] font-bold border border-[rgba(60,30,20,0.08)]"
-                        >
-                          View
-                        </button>
-                        <button 
-                          onClick={() => deletePlan(plan.id)} 
-                          className="w-10 h-10 flex items-center justify-center text-red-300 hover:bg-red-50 rounded-full transition-colors"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {!dietPlan && !isLoading && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="card p-8 text-center bg-white/80 backdrop-blur-sm"
-          >
-            <div className="w-20 h-20 bg-[rgba(240,136,106,0.10)] rounded-[22px] flex items-center justify-center mx-auto mb-6 text-[#F0886A] shadow-inner animate-float">
-              <Apple size={40} />
-            </div>
-            <h2 className="text-[22px] font-bold text-[#2C1F1A] mb-2">Ready to Glow?</h2>
-            <p className="text-[11px] text-[rgba(44,31,26,0.38)] font-extrabold uppercase tracking-widest mb-8 italic">
-              Personalized for your skin type
-            </p>
-            
-            <div className="mb-6">
-              <textarea 
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Describe your skin issues (e.g. acne, oily, dry skin)..."
-                className="w-full bg-[#FAF8F6] border-2 border-transparent rounded-[22px] p-6 text-[14px] font-medium text-[rgba(44,31,26,0.75)] focus:outline-none focus:border-[#F5C0A8] transition-all h-40 resize-none placeholder:text-[rgba(44,31,26,0.30)]"
-              />
-            </div>
-
-            <button 
-              onClick={generateDietPlan}
-              className="w-full h-16 bg-primary-gradient text-white font-bold rounded-[24px] transition-all flex items-center justify-center gap-2 shadow-xl shadow-[#F0886A]/20 active:scale-95"
-            >
-              <Sparkles size={22} />
-              Generate Diet Plan
-            </button>
-          </motion.div>
-        )}
-
-        {isLoading && (
-          <div className="flex flex-col items-center justify-center py-24 px-8 text-center">
-            <div className="relative w-32 h-32 mb-12">
-              {/* Outer Pulsing Glow */}
-              <motion.div 
-                animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 bg-[#F0886A] rounded-full blur-2xl"
-              />
-              
-              {/* Main Spinner */}
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border-[4px] border-[rgba(240,136,106,0.10)] border-t-[#F0886A] rounded-full shadow-[0_0_20px_rgba(248,142,125,0.2)]"
-              />
-              
-              {/* Center Icon */}
-              <div className="absolute inset-0 flex items-center justify-center text-[#F0886A]">
-                <motion.div
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <Apple size={48} className="drop-shadow-lg" />
-                </motion.div>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-               <motion.p 
-                 key={Math.floor(Date.now() / 2000)}
-                 initial={{ opacity: 0, y: 5 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 className="text-[#F0886A] text-[13px] font-extrabold uppercase tracking-[0.2em]"
-               >
-                 {(() => {
-                   const stages = ["Analyzing Skin Metrics", "Checking Nutrient Values", "Personalizing Menu", "Finalizing Routine"];
-                   return stages[Math.floor((Date.now() / 2000) % stages.length)];
-                 })()}
-               </motion.p>
-               <p className="text-[rgba(44,31,26,0.38)] text-[11px] font-medium leading-relaxed max-w-[200px] mx-auto">
-                 Our AI Dietitian is crafting your perfect meal plan.
-               </p>
-            </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="card p-8 text-center space-y-6">
-            <div className="flex flex-col items-center gap-3 text-red-400">
-              <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center">
-                <AlertCircle size={40} />
-              </div>
-              <p className="text-[14px] font-bold uppercase tracking-tight">Server is busy. Try again.</p>
-            </div>
-            <button 
-              onClick={generateDietPlan} 
-              className="w-full h-16 bg-[#F0886A] text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#F0886A]/20 active:scale-95"
-            >
-              <RefreshCcw size={20} /> Retry Now
-            </button>
-          </div>
-        )}
-
-        {dietPlan && !isLoading && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-20">
-            <div className="flex justify-between items-center bg-white p-5 rounded-[22px] shadow-sm border border-[rgba(60,30,20,0.08)]">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-[rgba(240,136,106,0.10)] text-[#F0886A] rounded-2xl flex items-center justify-center">
-                  <Calendar size={22} />
-                </div>
-                <div>
-                  <p className="text-[15px] font-bold text-[#2C1F1A]">Your Plan</p>
-                  <p className="text-[9px] font-extrabold text-[rgba(44,31,26,0.38)] uppercase tracking-widest">Personalized AI</p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                {isPremium && (
-                  <button 
-                    onClick={() => window.print()}
-                    className="bg-[#F0886A] px-4 py-2 rounded-2xl text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 active:scale-95 transition-transform"
-                    title="Download Diet PDF"
-                  >
-                    <Download size={14} /> PDF
-                  </button>
-                )}
-                <button onClick={saveCurrentPlan} className="bg-primary-gradient w-12 h-12 rounded-2xl text-white shadow-lg shadow-[#F0886A]/20 flex items-center justify-center"><Bookmark size={20} /></button>
-                <button onClick={generateDietPlan} className="bg-[#FAF8F6] w-12 h-12 rounded-2xl text-[rgba(44,31,26,0.30)] border border-[rgba(60,30,20,0.08)] flex items-center justify-center"><RefreshCcw size={20} /></button>
-              </div>
-            </div>
-
-            <div className="space-y-1 bg-white p-6 rounded-[22px] border border-[rgba(60,30,20,0.08)] shadow-sm">
-              {formatMarkdown(dietPlan)}
-            </div>
-
-            <div className="bg-primary-gradient p-8 rounded-[40px] text-white shadow-[0_4px_16px_rgba(60,30,20,0.07)]">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-                  <Droplets size={24} />
-                </div>
-                <h3 className="text-[16px] font-bold uppercase tracking-tight">Daily Glow Habits</h3>
-              </div>
-              <ul className="space-y-4">
-                {[
-                  "Drink 3L water daily (with lemon)",
-                  "Sleep 8 hours for cell repair",
-                  "Avoid sugar for 7 days straight"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-4 text-[13px] font-medium text-white/90">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        )}
       </div>
 
-      {/* Premium Upgrade Modal */}
-      <AnimatePresence>
-        {showLimitModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-            {/* Backdrop */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowLimitModal(false)}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
-            />
-            
-            {/* Modal Content */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-white rounded-[40px] p-8 text-center shadow-2xl border border-white/50 z-10"
-            >
-              {/* Close Button */}
-              <button 
-                onClick={() => setShowLimitModal(false)}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[#F5F1EE] border border-[rgba(60,30,20,0.08)] flex items-center justify-center text-[rgba(44,31,26,0.38)] active:scale-95 transition-transform"
-              >
-                <X size={18} />
-              </button>
+      {/* Water intake */}
+      <div className="rounded-[22px] bg-white p-[18px] mb-4 border" style={{borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 4px 20px rgba(60,30,20,0.08)"}}>
+        <div className="flex justify-between items-center mb-3">
+          <p className="text-[14px] font-bold text-[#2C1F1A]">Water intake</p>
+          <p className="text-[14px] font-semibold text-[#C44E28]" style={{fontFamily:"'Space Grotesk',monospace"}}>{water} glasses</p>
+        </div>
+        {/* Glass indicators */}
+        <div className="flex gap-1.5 mb-3">
+          {Array.from({length:12}).map((_,i) => (
+            <button key={i} onClick={() => setWater(i+1)}
+              className="flex-1 h-2 rounded-full border-none cursor-pointer transition-all"
+              style={{background:i<water?"#F0886A":"#F5F1EE"}}/>
+          ))}
+        </div>
+        <p className="text-[12px] text-[rgba(44,31,26,0.56)]">{water>=12?"🎉 Daily goal reached!":`${12-water} more to go`}</p>
+      </div>
 
-              <div className="w-20 h-20 bg-amber-50 rounded-[22px] flex items-center justify-center mx-auto mb-6 text-amber-500 shadow-inner">
-                <Gem size={40} className="animate-pulse" />
-              </div>
+      {/* Notes tags */}
+      <div className="rounded-[22px] bg-white p-[18px] mb-5 border" style={{borderColor:"rgba(60,30,20,0.08)", boxShadow:"0 4px 20px rgba(60,30,20,0.08)"}}>
+        <p className="text-[14px] font-bold text-[#2C1F1A] mb-3">Today&apos;s notes</p>
+        <div className="flex flex-wrap gap-2">
+          {TAGS.map(t => (
+            <button key={t} onClick={() => toggleTag(t)}
+              className="px-4 py-2.5 rounded-full text-[13.5px] font-medium border cursor-pointer transition-all"
+              style={{
+                background:  tags.has(t)?"#F0886A":"transparent",
+                borderColor: tags.has(t)?"#F0886A":"rgba(60,30,20,0.08)",
+                color:       tags.has(t)?"#241712":"rgba(44,31,26,0.56)",
+                fontWeight:  tags.has(t)?700:500,
+                borderWidth:"1.5px",
+              }}>{t}</button>
+          ))}
+        </div>
+      </div>
 
-              <h3 className="text-[20px] font-bold text-[#2C1F1A] mb-2">Daily Limit Reached</h3>
-              <p className="text-[11px] text-amber-600 font-extrabold uppercase tracking-widest mb-4">Velmora Premium</p>
-              
-              <p className="text-[13px] font-medium text-[rgba(44,31,26,0.55)] leading-relaxed mb-8">
-                Free plan users can generate 1 diet plan daily. Upgrade to Premium for unlimited scans, routines, and custom meal plans.
-              </p>
-
-              <div className="space-y-3">
-                <Link 
-                  href="/premium"
-                  className="w-full h-14 bg-primary-gradient text-white font-bold rounded-[20px] flex items-center justify-center gap-2 shadow-lg shadow-[#F0886A]/20 active:scale-95 transition-transform"
-                >
-                  <Gem size={18} />
-                  Upgrade to Premium ✨
-                </Link>
-                <button 
-                  onClick={() => setShowLimitModal(false)}
-                  className="w-full h-14 bg-[#F5F1EE] text-[rgba(44,31,26,0.38)] font-bold rounded-[20px] flex items-center justify-center active:scale-95 transition-transform border border-[rgba(60,30,20,0.08)]"
-                >
-                  Maybe Later
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Save */}
+      <button onClick={save}
+        className="w-full h-[54px] rounded-2xl text-[17px] font-bold text-[#241712] border-none cursor-pointer flex items-center justify-center gap-2"
+        style={{background:"#F0886A", boxShadow:"0 8px 22px rgba(240,136,106,0.35)"}}>
+        ✓&nbsp; Save Entry
+      </button>
     </div>
   );
 }
