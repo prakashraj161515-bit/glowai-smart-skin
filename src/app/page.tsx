@@ -282,16 +282,10 @@ export default function Home() {
                 {data ? "View My Score" : "Start Scan"} <Icon name="arrowR" size={15} color="#C44E28" sw={2.2} />
               </div>
             </div>
-            <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 148, zIndex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="90" height="130" viewBox="0 0 90 130" fill="none" style={{ filter: "drop-shadow(0 8px 20px rgba(180,80,40,0.18))" }}>
-                <rect x="18" y="38" width="54" height="80" rx="18" fill="rgba(255,255,255,0.75)" />
-                <rect x="30" y="18" width="30" height="24" rx="8" fill="rgba(255,255,255,0.65)" />
-                <rect x="28" y="8" width="34" height="14" rx="7" fill="rgba(200,100,60,0.55)" />
-                <rect x="24" y="58" width="42" height="40" rx="8" fill="rgba(255,255,255,0.45)" />
-                <rect x="30" y="66" width="30" height="3" rx="2" fill="rgba(180,80,40,0.4)" />
-                <rect x="33" y="74" width="24" height="2" rx="1" fill="rgba(180,80,40,0.25)" />
-                <rect x="56" y="44" width="6" height="28" rx="3" fill="rgba(255,255,255,0.5)" />
-              </svg>
+            {/* real product photo (unbranded) — blended into hero */}
+            <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: "48%", zIndex: 1 }}>
+              <img src="/hero-product.jpg" alt="" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "left center" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(90deg, #F2BFA8 0%, rgba(242,191,168,0.55) 22%, rgba(242,191,168,0) 50%)" }} />
             </div>
           </div>
 

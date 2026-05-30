@@ -109,131 +109,111 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     };
   };
 
+  const accent = mode === "face" ? "#F0886A" : "#4E8ED4";
   return (
-    <div className="relative w-full max-w-sm mx-auto aspect-[3/4] rounded-[40px] overflow-hidden bg-slate-100 border-8 border-white shadow-2xl">
-      <video 
-        ref={videoRef} 
-        autoPlay 
-        playsInline 
-        muted 
-        className="w-full h-full object-cover" 
-      />
+    <div
+      className="relative w-full mx-auto overflow-hidden"
+      style={{
+        maxWidth: 332,
+        aspectRatio: "3 / 4",
+        borderRadius: 36,
+        background: "#0a0706",
+        boxShadow: `0 24px 70px ${mode === "face" ? "rgba(240,136,106,0.40)" : "rgba(78,142,212,0.40)"}, 0 0 0 1px rgba(255,255,255,0.10)`,
+      }}
+    >
+      <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
 
-      {/* Error Message Overlay */}
+      {/* Error overlay */}
       {error && (
-        <div className="absolute inset-0 z-[60] bg-slate-900/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center text-white">
-          <div className="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center text-red-400 mb-4 animate-pulse">
+        <div className="absolute inset-0 z-[60] flex flex-col items-center justify-center p-8 text-center text-white" style={{ background: "rgba(10,7,6,0.92)", backdropFilter: "blur(8px)" }}>
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 animate-pulse" style={{ background: "rgba(224,104,92,0.2)", color: "#E0685C" }}>
             <Camera size={32} />
           </div>
-          <p className="text-sm font-bold mb-6 text-red-200">{error}</p>
-          <button 
-            onClick={() => mode === "face" ? window.location.reload() : fileInputRef.current?.click()}
-            className="bg-white text-[#2C1F1A] px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
-          >
+          <p className="text-sm font-bold mb-6" style={{ color: "#F5C0B5" }}>{error}</p>
+          <button onClick={() => mode === "face" ? window.location.reload() : fileInputRef.current?.click()}
+            className="px-6 py-3 rounded-2xl text-xs font-bold uppercase tracking-widest active:scale-95 transition-all"
+            style={{ background: "#fff", color: "#2C1F1A", boxShadow: "0 8px 22px rgba(0,0,0,0.3)" }}>
             {mode === "face" ? "Refresh App" : "Upload Photo Instead"}
           </button>
         </div>
       )}
 
-      {/* Flash Effect Overlay */}
-      {showFlash && (
-        <div className="absolute inset-0 bg-white z-50 animate-flash" />
-      )}
-      
-      {/* Face Guide Overlay */}
+      {/* Flash */}
+      {showFlash && <div className="absolute inset-0 z-50 animate-flash" style={{ background: "#fff" }} />}
+
+      {/* Vignette — darkens edges, focuses center */}
+      <div className="absolute inset-0 pointer-events-none z-10" style={{ background: "radial-gradient(ellipse 62% 64% at 50% 44%, transparent 56%, rgba(0,0,0,0.62) 100%)" }} />
+
+      {/* Face oval guide */}
       {mode === "face" && (
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-          <div className="relative w-[75%] h-[75%]">
-            {/* The actual face oval outline */}
-            <svg viewBox="0 0 100 100" className="w-full h-full text-[#F0886A]/40 drop-shadow-lg">
-              <path 
-                d="M50 10 C 30 10, 18 30, 18 55 C 18 80, 30 90, 50 90 C 70 90, 82 80, 82 55 C 82 30, 70 10, 50 10 Z" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="1"
-                strokeDasharray="4 4"
-              />
-            </svg>
-            
-            {/* Subtle glow effect */}
-            <div className="absolute inset-0 rounded-[45%] border-2 border-[#F0886A]/10 blur-[1px]" />
-            
-            {/* Scanning Line Animation */}
-            <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-[#F0886A] to-transparent animate-scan" />
+        <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
+          <div style={{ position: "relative", width: "66%", height: "74%", marginTop: "-4%" }}>
+            {/* glowing dashed oval */}
+            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `2.5px dashed ${accent}`, boxShadow: `0 0 28px ${accent}66, inset 0 0 40px ${accent}22` }} />
+            {/* corner brackets around oval bounding box */}
+            {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],i)=>(
+              <div key={i} style={{ position:"absolute", [v]:-6, [h]:-2, width:20, height:20,
+                borderTop: v==="top"?`3px solid ${accent}`:"none", borderBottom: v==="bottom"?`3px solid ${accent}`:"none",
+                borderLeft: h==="left"?`3px solid ${accent}`:"none", borderRight: h==="right"?`3px solid ${accent}`:"none",
+                borderTopLeftRadius: v==="top"&&h==="left"?6:0, borderTopRightRadius: v==="top"&&h==="right"?6:0,
+                borderBottomLeftRadius: v==="bottom"&&h==="left"?6:0, borderBottomRightRadius: v==="bottom"&&h==="right"?6:0 } as any} />
+            ))}
+            {/* scan line */}
+            <div className="animate-scan" style={{ position: "absolute", left: "6%", right: "6%", height: 2.5, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, boxShadow: `0 0 14px 1px ${accent}` }} />
+            <div style={{ position:"absolute", bottom:-2, left:0, right:0, textAlign:"center", fontSize:10, letterSpacing:1, textTransform:"uppercase", color:"rgba(255,255,255,0.45)", fontFamily:"'DM Sans',sans-serif" }}>align your face</div>
           </div>
         </div>
       )}
 
-      {/* Product Guide Overlay */}
+      {/* Product guide */}
       {mode === "product" && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-64 h-48 border-2 border-dashed border-blue-400/50 rounded-2xl relative">
-            <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-blue-500" />
-            <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-blue-500" />
-            <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-blue-500" />
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-blue-500" />
+        <div className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none">
+          <div style={{ position: "relative", width: 256, height: 180, borderRadius: 16, border: `2px dashed ${accent}88` }}>
+            {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],i)=>(
+              <div key={i} style={{ position:"absolute", [v]:-2, [h]:-2, width:18, height:18,
+                borderTop: v==="top"?`3px solid ${accent}`:"none", borderBottom: v==="bottom"?`3px solid ${accent}`:"none",
+                borderLeft: h==="left"?`3px solid ${accent}`:"none", borderRight: h==="right"?`3px solid ${accent}`:"none" } as any} />
+            ))}
+            <div className="animate-scan" style={{ position: "absolute", left: 8, right: 8, height: 2.5, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, boxShadow: `0 0 14px 1px ${accent}` }} />
           </div>
         </div>
       )}
 
-      <div className="absolute bottom-6 inset-x-0 flex flex-col items-center gap-4 px-6">
-        <div className="flex items-center gap-6">
-          {/* Upload Button */}
+      <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
+
+      {/* Controls */}
+      <div className="absolute inset-x-0 z-30 flex flex-col items-center gap-3" style={{ bottom: 22 }}>
+        <div className="flex items-center justify-center gap-9">
+          {/* upload (product) / spacer */}
           {mode === "product" ? (
-            <button 
-              onClick={() => fileInputRef.current?.click()}
-              className="w-12 h-12 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all"
-            >
-              <Upload size={20} />
+            <button onClick={() => fileInputRef.current?.click()} className="flex items-center justify-center active:scale-95 transition-all"
+              style={{ width: 46, height: 46, borderRadius: 14, background: "rgba(255,255,255,0.14)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.22)", color: "#fff" }}>
+              <Upload size={19} />
             </button>
-          ) : (
-            <div className="w-12 h-12" />
-          )}
+          ) : <div style={{ width: 46 }} />}
 
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            className="hidden" 
-            accept="image/*" 
-            onChange={handleFileUpload} 
-          />
-
-          {/* Capture Button */}
-          <button 
-            onClick={scan}
-            disabled={!isReady || isAnalyzing}
-            className="w-20 h-20 rounded-full bg-white/80 backdrop-blur-xl border-4 border-white flex items-center justify-center shadow-xl active:scale-95 transition-all disabled:opacity-50"
-          >
+          {/* capture */}
+          <button onClick={scan} disabled={!isReady || isAnalyzing} className="flex items-center justify-center active:scale-95 transition-all"
+            style={{ width: 78, height: 78, borderRadius: 999, background: "transparent", border: "4px solid rgba(255,255,255,0.92)", opacity: (!isReady || isAnalyzing) ? 0.55 : 1 }}>
             {isAnalyzing ? (
-              <RefreshCcw className="text-purple-600 animate-spin" size={32} />
+              <RefreshCcw className="animate-spin" size={30} style={{ color: accent }} />
             ) : (
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white shadow-lg shadow-purple-500/20 ${mode === 'face' ? 'bg-primary-gradient' : 'bg-blue-500'}`}>
-                <Camera size={28} />
+              <div style={{ width: 64, height: 64, borderRadius: 999, background: mode === "face" ? "linear-gradient(135deg,#F5A98D 0%,#F0886A 100%)" : "linear-gradient(135deg,#6BA8E8,#4E8ED4)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 22px ${accent}aa` }}>
+                <Camera size={26} color="#fff" />
               </div>
             )}
           </button>
 
-          {/* Swap Camera Button */}
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isAnalyzing) return;
-              setFacingMode(prev => prev === "user" ? "environment" : "user");
-            }}
-            className="w-12 h-12 rounded-2xl bg-white/30 backdrop-blur-md border border-white/40 flex items-center justify-center text-white shadow-lg active:scale-95 transition-all"
-            title="Swap Camera"
-          >
-            <RefreshCcw size={20} />
+          {/* flip */}
+          <button onClick={(e) => { e.stopPropagation(); if (isAnalyzing) return; setFacingMode(prev => prev === "user" ? "environment" : "user"); }}
+            title="Swap Camera" className="flex items-center justify-center active:scale-95 transition-all"
+            style={{ width: 46, height: 46, borderRadius: 999, background: "rgba(255,255,255,0.14)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.22)", color: "#fff" }}>
+            <RefreshCcw size={19} />
           </button>
         </div>
-        
-        <button 
-          onClick={scan}
-          disabled={!isReady || isAnalyzing}
-          className="text-[10px] text-white font-black uppercase tracking-[0.2em] bg-black/40 backdrop-blur-md px-10 py-3 rounded-full border border-white/20 active:scale-95 transition-all hover:bg-black/60 disabled:opacity-50"
-        >
-          {isAnalyzing ? "AI Analyzing..." : mode === 'face' ? "Scan My Face" : "Scan Ingredients"}
-        </button>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "rgba(255,255,255,0.7)", fontFamily: "'DM Sans',sans-serif" }}>
+          {isAnalyzing ? "AI Analyzing…" : (mode === "face" ? "Tap to scan" : "Scan ingredients")}
+        </div>
       </div>
     </div>
   );
