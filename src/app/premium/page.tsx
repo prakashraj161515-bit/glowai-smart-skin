@@ -1,13 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Badge, PrimaryBtn } from "@/glow/ui";
+import { pricing, detectCountry } from "@/glow/diet";
 
-const FEATS = ["Unlimited AI skin scans", "Full AI routine builder", "Ask the AI — unlimited", "Trend analysis & diary insights", "PDF skin reports"];
+const FEATS = ["Unlimited AI skin scans", "Full AI routine builder", "Ask Aura — unlimited", "Trend analysis & diary insights", "PDF skin reports"];
 
 export default function PremiumPage() {
   const router = useRouter();
   const [plan, setPlan] = useState<"annual" | "monthly">("annual");
+  const [country, setCountry] = useState("Global");
+  useEffect(() => { setCountry(localStorage.getItem("velmora_country") || detectCountry()); }, []);
+  const price = pricing(country);
   const upgrade = () => { localStorage.setItem("velmora_is_premium", "true"); router.push("/"); };
 
   return (
@@ -27,14 +31,14 @@ export default function PremiumPage() {
         ))}
       </Card>
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
-        {([["annual", "Annual", "$59.99/yr", "Save 50% · $5/mo", true], ["monthly", "Monthly", "$9.99/mo", "Billed monthly", false]] as const).map(([id, ti, price, sub, best]) => (
+        {([["annual", "Annual", price.annual, price.save, true], ["monthly", "Monthly", price.monthly, "Billed monthly", false]] as const).map(([id, ti, pr, sub, best]) => (
           <button key={id} onClick={() => setPlan(id as any)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, borderRadius: 16, cursor: "pointer", textAlign: "left", background: plan === id ? T.accentSoft : T.surface, border: `1.5px solid ${plan === id ? T.accent : T.border}`, position: "relative" }}>
             <div style={{ width: 22, height: 22, borderRadius: 99, border: `2px solid ${plan === id ? T.accent : T.borderHi}`, background: plan === id ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{plan === id && <Icon name="check" size={13} color="#241712" sw={2.8} />}</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text }}>{ti}</span>{best && <Badge tone="accent">Best</Badge>}</div>
               <div style={{ fontFamily: SANS, fontSize: 13, color: T.textMute }}>{sub}</div>
             </div>
-            <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 600, color: T.text }}>{price}</span>
+            <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 600, color: T.text }}>{pr}</span>
           </button>
         ))}
       </div>

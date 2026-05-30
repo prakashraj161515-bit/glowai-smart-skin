@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, MiniRing, PrimaryBtn, WaterTracker, ProductThumb } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
-import { getWeekPlan, detectCountry, planAgeDays, Meal } from "@/glow/diet";
+import { getWeekPlan, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/diet";
 
 const DAY_LETTERS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -25,12 +25,13 @@ const MEAL_BG: any = { Breakfast: "#FEF7EB", Lunch: "#EDF7EE", Dinner: "#EFF0FD"
 export default function RoutinePage() {
   const router = useRouter();
   const today = new Date();
+  // rolling range: 10 days before → 17 days after today (crosses months), today centred
+  const TODAY_OFFSET = 10;
   const week = useMemo(() => {
-    const start = new Date(today);
-    start.setDate(today.getDate() - today.getDay());
-    return Array.from({ length: 7 }).map((_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
+    const start = new Date(today); start.setDate(today.getDate() - TODAY_OFFSET);
+    return Array.from({ length: 28 }).map((_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
   }, []);
-  const [selIdx, setSelIdx] = useState(today.getDay());
+  const [selIdx, setSelIdx] = useState(TODAY_OFFSET);
   const selDate = week[selIdx];
 
   const [checked, setChecked] = useState<boolean[]>([true, true, false, false, false, false, false, false]);
@@ -58,7 +59,7 @@ export default function RoutinePage() {
   const pct = Math.round((doneCount / ITEMS.length) * 100);
   const sections = [...new Set(ITEMS.map(i => i.section))];
   const weekPlan = useMemo(() => getWeekPlan(country, scan), [country, scan]);
-  const dayPlan = weekPlan.days[selIdx];
+  const dayPlan = weekPlan.days[selIdx % 7];
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, display: "flex", flexDirection: "column" }}>
@@ -82,7 +83,7 @@ export default function RoutinePage() {
             const isToday = d.toDateString() === today.toDateString();
             return (
               <button key={i} ref={el => { dayRefs.current[i] = el; }} onClick={() => setSelIdx(i)} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "8px 10px", borderRadius: 16, flexShrink: 0, border: "none", cursor: "pointer", minWidth: 46, position: "relative", background: active ? "#C44E28" : "rgba(255,255,255,0.6)", boxShadow: active ? "0 6px 18px rgba(196,78,40,0.38)" : "0 2px 8px rgba(60,30,20,0.08)" }}>
-                <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: active ? "rgba(255,255,255,0.75)" : "rgba(44,31,26,0.45)" }}>{DAY_LETTERS[d.getDay()]}</span>
+                <span style={{ fontFamily: SANS, fontSize: 9, fontWeight: 700, letterSpacing: 0.5, color: active ? "rgba(255,255,255,0.75)" : "rgba(44,31,26,0.45)" }}>{d.getDate() === 1 ? MONTHS[d.getMonth()].toUpperCase() : DAY_LETTERS[d.getDay()]}</span>
                 <span style={{ fontFamily: MONO, fontSize: 17, fontWeight: 700, color: active ? "#fff" : "#2C1F1A" }}>{d.getDate()}</span>
                 {isToday && !active && <div style={{ width: 4, height: 4, borderRadius: 99, background: "#C44E28", position: "absolute", bottom: 4 }} />}
               </button>
@@ -181,7 +182,10 @@ function DietPlan({ day, avoid, region, focus, dayName, onAsk }: { day: any; avo
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {meal.items.map((f, k) => (
               <div key={f.name + k} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 3px 12px rgba(60,30,20,0.06)" }}>
-                <div style={{ width: 50, height: 50, borderRadius: 14, flexShrink: 0, background: MEAL_BG[meal.meal], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>{f.emoji}</div>
+                <div style={{ width: 50, height: 50, borderRadius: 14, flexShrink: 0, background: MEAL_BG[meal.meal], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, overflow: "hidden", position: "relative" }}>
+                  <span style={{ position: "absolute" }}>{f.emoji}</span>
+                  <img src={foodImg(f.name)} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", position: "relative" }} onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+                </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: T.text }}>{f.name}</div>
                   <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>{f.why}</div>
@@ -209,7 +213,7 @@ function DietPlan({ day, avoid, region, focus, dayName, onAsk }: { day: any; avo
       <div style={{ fontFamily: SANS, fontSize: 12, color: T.textFaint, textAlign: "center", marginBottom: 14 }}>
         🔒 This plan stays for the week · re-scan your face to refresh it
       </div>
-      <PrimaryBtn icon="chat" onClick={onAsk}>Ask GlowAI about my diet</PrimaryBtn>
+      <PrimaryBtn icon="chat" onClick={onAsk}>Ask Aura about my diet</PrimaryBtn>
     </div>
   );
 }

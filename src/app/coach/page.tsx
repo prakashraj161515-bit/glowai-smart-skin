@@ -15,7 +15,7 @@ type Msg = { who: "ai" | "me" | "typing"; text?: string; actions?: boolean };
 
 export default function CoachPage() {
   const router = useRouter();
-  const [msgs, setMsgs] = useState<Msg[]>([{ who: "ai", text: "Hi! I'm GlowAI ✦ I've loaded your latest scan. Ask me anything about your skin, a product, a diet, or even a skin condition — I'll explain what's happening and how to fix it.", actions: true }]);
+  const [msgs, setMsgs] = useState<Msg[]>([{ who: "ai", text: "Hi, I'm Aura ✦ your personal skin coach. I've loaded your latest scan. Ask me anything — about your skin, a product, a diet, or a condition — and I'll keep it short and clear.", actions: true }]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
@@ -67,15 +67,22 @@ export default function CoachPage() {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column", background: T.bg, position: "relative", overflow: "hidden" }}>
-      {/* soft ambient glow for wow */}
-      <div style={{ position: "absolute", top: -90, left: "50%", transform: "translateX(-50%)", width: 320, height: 320, borderRadius: 99, background: "radial-gradient(circle, rgba(240,136,106,0.16) 0%, transparent 70%)", pointerEvents: "none" }} />
+      {/* soft ambient glows for wow (kept behind, very subtle) */}
+      <div style={{ position: "absolute", top: -140, left: -60, width: 280, height: 280, borderRadius: 99, background: "radial-gradient(circle, rgba(240,136,106,0.12) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "absolute", top: 120, right: -80, width: 240, height: 240, borderRadius: 99, background: "radial-gradient(circle, rgba(139,133,224,0.10) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
 
       {/* nav */}
-      <div style={{ display: "flex", alignItems: "center", padding: "56px 16px 8px", position: "relative", zIndex: 2 }}>
+      <div style={{ display: "flex", alignItems: "center", padding: "54px 16px 10px", position: "relative", zIndex: 2 }}>
         <button onClick={() => router.push("/")} style={{ width: 36, height: 36, borderRadius: 11, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
-        <div style={{ flex: 1, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}><Icon name="spark" size={15} color={T.accent} fill /><span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text }}>Ask GlowAI</span></div>
-          <span style={{ fontFamily: SANS, fontSize: 11, color: "#8FC299", fontWeight: 600 }}>● online · knows your scan</span>
+        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+          {/* glowing avatar */}
+          <div style={{ width: 38, height: 38, borderRadius: 13, background: `linear-gradient(135deg, #F5A98D, ${T.accent})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 16px ${rgba(T.accent, 0.45)}` }}>
+            <Icon name="spark" size={20} color="#fff" fill />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontFamily: SERIF, fontSize: 20, color: T.text, lineHeight: 1 }}>Aura</span>
+            <span style={{ fontFamily: SANS, fontSize: 10.5, color: "#8FC299", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}><span className="animate-blink" style={{ width: 6, height: 6, borderRadius: 99, background: "#8FC299" }} />online · knows your scan</span>
+          </div>
         </div>
         <div style={{ width: 36 }} />
       </div>
@@ -93,7 +100,7 @@ export default function CoachPage() {
             <div key={i}>
               <div style={{ display: "flex", justifyContent: me ? "flex-end" : "flex-start", marginBottom: m.actions ? 8 : 12 }}>
                 <div style={{ maxWidth: "84%" }}>
-                  {!me && <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}><Icon name="spark" size={14} color={T.accent} fill /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.accentText }}>GlowAI</span></div>}
+                  {!me && <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}><Icon name="spark" size={14} color={T.accent} fill /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.accentText }}>Aura</span></div>}
                   <div style={{ padding: "12px 16px", borderRadius: 20, fontFamily: SANS, fontSize: 15, lineHeight: 1.5, whiteSpace: "pre-wrap", background: me ? T.accent : T.surface, color: me ? "#241712" : T.text, borderTopRightRadius: me ? 6 : 20, borderTopLeftRadius: me ? 20 : 6, border: me ? "none" : `1px solid ${T.border}`, boxShadow: me ? `0 4px 14px ${rgba(T.accent, 0.3)}` : "0 2px 10px rgba(60,30,20,0.05)" }}>{m.text}</div>
                 </div>
               </div>

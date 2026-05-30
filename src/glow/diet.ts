@@ -144,6 +144,41 @@ export function buildWeekPlan(country: string, scan: Scan) {
   };
 }
 
+// localized subscription pricing by country
+export function pricing(country: string): { symbol: string; monthly: string; annual: string; save: string } {
+  const map: Record<string, { symbol: string; monthly: string; annual: string; save: string }> = {
+    India:      { symbol: "₹", monthly: "₹399/mo",   annual: "₹2,399/yr",  save: "Save 50% · ₹200/mo" },
+    Pakistan:   { symbol: "₨", monthly: "₨1,400/mo", annual: "₨8,400/yr",  save: "Save 50%" },
+    Bangladesh: { symbol: "৳", monthly: "৳550/mo",   annual: "৳3,300/yr",  save: "Save 50%" },
+    "Sri Lanka":{ symbol: "₨", monthly: "₨1,500/mo", annual: "₨9,000/yr",  save: "Save 50%" },
+    Nepal:      { symbol: "₨", monthly: "₨650/mo",   annual: "₨3,900/yr",  save: "Save 50%" },
+    UK:         { symbol: "£", monthly: "£7.99/mo",  annual: "£47.99/yr",  save: "Save 50% · £4/mo" },
+    UAE:        { symbol: "AED", monthly: "AED 36/mo", annual: "AED 219/yr", save: "Save 50%" },
+    Australia:  { symbol: "A$", monthly: "A$14.99/mo", annual: "A$89.99/yr", save: "Save 50%" },
+    Singapore:  { symbol: "S$", monthly: "S$13.99/mo", annual: "S$83.99/yr", save: "Save 50%" },
+  };
+  return map[country] || { symbol: "$", monthly: "$9.99/mo", annual: "$59.99/yr", save: "Save 50% · $5/mo" };
+}
+
+// map a food name to a real (brand-free) food photo in /public/food
+export function foodImg(name: string): string {
+  const n = name.toLowerCase();
+  const has = (...k: string[]) => k.some(x => n.includes(x));
+  if (has("yogurt", "curd")) return "/food/yogurt.jpg";
+  if (has("oat", "porridge", "upma", "poha", "ragi", "chia", "muesli")) return "/food/oats.jpg";
+  if (has("egg", "omelette", "chilla", "bhurji", "idli")) return "/food/eggs.jpg";
+  if (has("smoothie")) return "/food/smoothie.jpg";
+  if (has("avocado", "toast")) return "/food/avocado.jpg";
+  if (has("berries", "berry", "fruit", "kiwi")) return "/food/berries.jpg";
+  if (has("salmon", "fish", "tuna")) return "/food/fish.jpg";
+  if (has("salad", "greens", "veg ", "veggie", "broccoli", "spinach", "palak", "mixed veg", "bhindi", "lauki", "tinda")) return "/food/salad.jpg";
+  if (has("chicken", "turkey", "paneer", "tofu", "tandoori", "rajma", "chana", "chickpea", "dal", "khichdi", "curry", "stew")) return "/food/chicken.jpg";
+  if (has("soup", "miso")) return "/food/soup.jpg";
+  if (has("walnut", "almond", "nut", "seed", "chana", "pumpkin")) return "/food/nuts.jpg";
+  if (has("tea", "water", "coconut", "buttermilk", "chaas", "amla", "citrus", "orange", "watermelon", "cucumber")) return "/food/tea.jpg";
+  return "/food/salad.jpg";
+}
+
 export function detectCountry(): string {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;

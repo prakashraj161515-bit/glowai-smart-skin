@@ -287,7 +287,7 @@ export default function Home() {
           {/* AI chat banner */}
           <div onClick={() => router.push("/coach")} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 18, marginBottom: 20, cursor: "pointer", background: "linear-gradient(120deg, #F9DDD0 0%, #F5C9B5 100%)", border: "1px solid rgba(196,78,40,0.15)", boxShadow: "0 4px 16px rgba(196,78,40,0.10)" }}>
             <div style={{ width: 42, height: 42, borderRadius: 13, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 4px 14px ${rgba(T.accent, 0.4)}` }}><Icon name="spark" size={22} color="#fff" fill /></div>
-            <div style={{ flex: 1 }}><div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A" }}>Ask GlowAI</div><div style={{ fontFamily: SANS, fontSize: 12.5, color: "rgba(44,31,26,0.55)" }}>Expert skin advice, anytime</div></div>
+            <div style={{ flex: 1 }}><div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A" }}>Chat with Aura</div><div style={{ fontFamily: SANS, fontSize: 12.5, color: "rgba(44,31,26,0.55)" }}>Your AI skin coach, anytime</div></div>
             <Icon name="arrowR" size={20} color="rgba(44,31,26,0.35)" sw={2} />
           </div>
 
@@ -305,8 +305,7 @@ export default function Home() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {PRODUCTS.map(([name, brand, pi], i) => (
                 <div key={i} onClick={() => router.push("/store")} style={{ borderRadius: 20, overflow: "hidden", background: T.surface, boxShadow: T.shadow, cursor: "pointer" }}>
-                  <div style={{ height: 130, background: T.pastels[pi % 5], position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Icon name="drop" size={30} color={rgba(T.accent, 0.4)} />
+                  <div style={{ height: 130, position: "relative", overflow: "hidden", backgroundImage: "url(/hero-product.jpg)", backgroundSize: "260%", backgroundPosition: ["8% 28%", "2% 72%", "30% 86%", "6% 50%", "22% 96%", "0% 40%"][i % 6] }}>
                     <button onClick={e => { e.stopPropagation(); setLiked(l => l.includes(i) ? l.filter(x => x !== i) : [...l, i]); }} style={{ position: "absolute", top: 10, right: 10, width: 32, height: 32, borderRadius: 99, background: "rgba(255,255,255,0.85)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Icon name="star" size={16} color={liked.includes(i) ? "#F0886A" : "#ccc"} sw={1.5} fill={liked.includes(i)} />
                     </button>
