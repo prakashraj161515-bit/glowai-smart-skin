@@ -1,6 +1,7 @@
 "use client";
 /* GlowAI design system — exact port of glow-components.jsx (light theme, accent #F0886A) */
 import React from "react";
+import { affiliateUrl } from "./affiliate";
 
 // ── helpers ──────────────────────────────────────────────────────────────
 function hexToRgb(hex: string): [number, number, number] {
@@ -59,7 +60,7 @@ type IconName =
   | "chevDown" | "check" | "plus" | "close" | "spark" | "bell" | "bolt" | "drop"
   | "sun" | "moon" | "camera" | "flip" | "flame" | "arrowUp" | "arrowDown" | "arrowR"
   | "edit" | "lock" | "star" | "info" | "send" | "grid" | "clock" | "warn" | "leaf"
-  | "crown" | "gem" | "bin" | "bellRing";
+  | "crown" | "gem" | "bin" | "bellRing" | "cart";
 
 export function Icon({ name, size = 24, color = "currentColor", sw = 1.7, fill = false }:
   { name: IconName; size?: number; color?: string; sw?: number; fill?: boolean }) {
@@ -102,6 +103,7 @@ export function Icon({ name, size = 24, color = "currentColor", sw = 1.7, fill =
     gem: <g {...p}><path d="M6 3h12l3 6-9 12L3 9z" fill={fill ? color : "none"} /><path d="M3 9h18M9 3l-3 6 6 12 6-12-3-6" /></g>,
     bin: <g {...p}><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" /></g>,
     bellRing: <g {...p}><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z" /><path d="M10 20a2 2 0 004 0" /><path d="M2.5 6.5C3 5 4 4 4 4M21.5 6.5C21 5 20 4 20 4" /></g>,
+    cart: <g {...p}><circle cx="9" cy="20" r="1.4" fill={color} /><circle cx="17" cy="20" r="1.4" fill={color} /><path d="M3 4h2l2.2 11.2a1 1 0 001 .8h8.6a1 1 0 001-.8L21 8H6" /></g>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", flexShrink: 0 }}>{paths[name]}</svg>;
 }
@@ -154,6 +156,31 @@ export function GhostBtn({ children, onClick, style = {} }:
       background: "transparent", color: T.text, border: `1.5px solid ${T.borderHi}`,
       fontFamily: SANS, fontSize: 17, fontWeight: 600, letterSpacing: -0.2, ...style,
     }}>{children}</button>
+  );
+}
+
+// ── BuyBtn — affiliate buy link (opens in new tab, rel=sponsored) ──────────
+export function BuyBtn({ name, variant = "pill", style = {} }:
+  { name: string; variant?: "pill" | "icon" | "wide"; style?: React.CSSProperties }) {
+  const href = affiliateUrl(name);
+  const common: React.CSSProperties = {
+    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6,
+    textDecoration: "none", cursor: "pointer", fontFamily: SANS, fontWeight: 700,
+    background: T.accent, color: "#241712", border: "none", flexShrink: 0,
+    boxShadow: `0 4px 12px ${rgba(T.accent, 0.32)}`,
+  };
+  const sizes: Record<string, React.CSSProperties> = {
+    pill: { height: 32, padding: "0 13px", borderRadius: 99, fontSize: 12.5 },
+    wide: { height: 44, width: "100%", borderRadius: 13, fontSize: 14.5 },
+    icon: { width: 36, height: 36, borderRadius: 11, padding: 0, gap: 0 },
+  };
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer sponsored"
+      onClick={e => e.stopPropagation()}
+      style={{ ...common, ...sizes[variant], ...style }}>
+      <Icon name="cart" size={variant === "wide" ? 18 : 15} color="#241712" sw={1.9} />
+      {variant !== "icon" && "Buy"}
+    </a>
   );
 }
 

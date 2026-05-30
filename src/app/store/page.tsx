@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
-import { T, SERIF, SANS, MONO, rgba, Icon, Card, Chip, Badge, SectionTitle, ProductThumb } from "@/glow/ui";
+import { T, SERIF, SANS, MONO, rgba, Icon, Card, Chip, Badge, SectionTitle, ProductThumb, BuyBtn } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
 
 type Prod = { name: string; brand: string; cat: string; tags: string[]; rating: number; mine: boolean };
@@ -112,7 +112,8 @@ export default function StorePage() {
                 <Card key={i} pad={12}>
                   <div style={{ height: 120, borderRadius: 14, marginBottom: 10, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}><ProductThumb name={p.name} size={84} /></div>
                   <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 650, color: T.text, lineHeight: 1.2 }}>{p.name}</div>
-                  <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, marginTop: 3 }}>{p.brand}</div>
+                  <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, marginTop: 3, marginBottom: 10 }}>{p.brand}</div>
+                  <BuyBtn name={p.name} variant="wide" />
                 </Card>
               ))}
             </div>
@@ -226,7 +227,10 @@ function RecRow({ p, owned }: { p: Prod; owned?: boolean }) {
         <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>{p.brand} · {p.cat}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 6 }}><Icon name="star" size={14} color="#D9B86A" fill /><span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 600, color: T.text }}>{p.rating}</span></div>
       </div>
-      {owned ? <Badge tone="good">Owned</Badge> : <button style={{ width: 36, height: 36, borderRadius: 11, flexShrink: 0, background: T.accentSoft, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="plus" size={20} color={T.accentText} sw={2.2} /></button>}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 }}>
+        {owned && <Badge tone="good">Owned</Badge>}
+        <BuyBtn name={p.name} variant="pill" />
+      </div>
     </Card>
   );
 }

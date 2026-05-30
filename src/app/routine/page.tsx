@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { T, SERIF, MONO, SANS, rgba, Icon, MiniRing, PrimaryBtn, WaterTracker, ProductThumb } from "@/glow/ui";
+import { T, SERIF, MONO, SANS, rgba, Icon, MiniRing, PrimaryBtn, WaterTracker, ProductThumb, BuyBtn } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
 import { getWeekPlan, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/diet";
 
@@ -229,23 +229,24 @@ export default function RoutinePage() {
                     <div style={{ flex: 1, height: 1, background: rgba(SEC_COL[section], 0.20) }} />
                   </div>
                   {items.map(({ idx, time, period, name, brand }) => (
-                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                      <div style={{ width: 52, flexShrink: 0, textAlign: "right" }}>
+                    <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+                      <div style={{ width: 44, flexShrink: 0, textAlign: "right" }}>
                         <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, color: checked[idx] ? T.textFaint : T.accentText, lineHeight: 1 }}>{time}</div>
                         <div style={{ fontFamily: SANS, fontSize: 9, color: T.textFaint, letterSpacing: 0.3 }}>{period}</div>
                       </div>
-                      <div style={{ width: 10, height: 10, borderRadius: 99, flexShrink: 0, transition: "all .25s", background: checked[idx] ? T.accent : rgba(SEC_COL[section], 0.4), boxShadow: checked[idx] ? "0 0 0 3px " + rgba(T.accent, 0.2) : "none" }} />
-                      <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 18, cursor: "pointer", background: checked[idx] ? T.surface2 : T.surface, border: "1px solid " + (checked[idx] ? T.border : rgba(SEC_COL[section], 0.18)), boxShadow: checked[idx] ? "none" : "0 3px 14px rgba(60,30,20,0.07)", opacity: checked[idx] ? 0.6 : 1, transition: "all .25s" }}>
-                        <ProductThumb name={name} size={46} />
+                      <div style={{ width: 8, height: 8, borderRadius: 99, flexShrink: 0, transition: "all .25s", background: checked[idx] ? T.accent : rgba(SEC_COL[section], 0.4), boxShadow: checked[idx] ? "0 0 0 3px " + rgba(T.accent, 0.2) : "none" }} />
+                      <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 7, padding: "10px 9px", borderRadius: 18, cursor: "pointer", background: checked[idx] ? T.surface2 : T.surface, border: "1px solid " + (checked[idx] ? T.border : rgba(SEC_COL[section], 0.18)), boxShadow: checked[idx] ? "none" : "0 3px 14px rgba(60,30,20,0.07)", opacity: checked[idx] ? 0.6 : 1, transition: "all .25s" }}>
+                        <ProductThumb name={name} size={42} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.22 }}>{name}</div>
-                          <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 2 }}>{brand}</div>
+                          <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", overflowWrap: "anywhere", lineHeight: 1.2 }}>{name}</div>
+                          <div style={{ fontFamily: SANS, fontSize: 11, color: T.textMute, marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{brand}</div>
                         </div>
-                        <button onClick={e => { e.stopPropagation(); toggleReminder(idx); }} title="Set reminder" style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, cursor: "pointer", border: "none", background: reminders.includes(idx) ? rgba("#E8A24C", 0.16) : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Icon name={reminders.includes(idx) ? "bellRing" : "bell"} size={17} color={reminders.includes(idx) ? "#E8A24C" : T.textFaint} sw={1.8} fill={reminders.includes(idx)} />
+                        <BuyBtn name={name} variant="icon" style={{ width: 28, height: 28, borderRadius: 9 }} />
+                        <button onClick={e => { e.stopPropagation(); toggleReminder(idx); }} title="Set reminder" style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, cursor: "pointer", border: "none", background: reminders.includes(idx) ? rgba("#E8A24C", 0.16) : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Icon name={reminders.includes(idx) ? "bellRing" : "bell"} size={16} color={reminders.includes(idx) ? "#E8A24C" : T.textFaint} sw={1.8} fill={reminders.includes(idx)} />
                         </button>
-                        <button onClick={e => { e.stopPropagation(); setCheckedSaved(c => c.map((v, x) => x === idx ? !v : v)); }} style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, cursor: "pointer", border: "1.5px solid " + (checked[idx] ? T.accent : T.borderHi), background: checked[idx] ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
-                          {checked[idx] && <Icon name="check" size={15} color="#fff" sw={2.8} />}
+                        <button onClick={e => { e.stopPropagation(); setCheckedSaved(c => c.map((v, x) => x === idx ? !v : v)); }} style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, cursor: "pointer", border: "1.5px solid " + (checked[idx] ? T.accent : T.borderHi), background: checked[idx] ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
+                          {checked[idx] && <Icon name="check" size={14} color="#fff" sw={2.8} />}
                         </button>
                       </div>
                     </div>

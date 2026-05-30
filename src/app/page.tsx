@@ -6,7 +6,7 @@ import CameraScanner from "@/components/CameraScanner";
 import {
   T, SERIF, MONO, SANS, rgba, scoreColor, scoreLabel, Icon, Placeholder, Card,
   PrimaryBtn, GhostBtn, Chip, Badge, ScoreDial, MetricBar, MiniRing, SectionTitle,
-  TabBar,
+  TabBar, BuyBtn,
 } from "@/glow/ui";
 import { tickLoyalty } from "@/glow/loyalty";
 
@@ -322,7 +322,8 @@ export default function Home() {
                   </div>
                   <div style={{ padding: "10px 12px 14px" }}>
                     <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, lineHeight: 1.2 }}>{name}</div>
-                    <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 3 }}>{brand}</div>
+                    <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 3, marginBottom: 10 }}>{brand}</div>
+                    <BuyBtn name={name} variant="wide" />
                   </div>
                 </div>
               ))}
