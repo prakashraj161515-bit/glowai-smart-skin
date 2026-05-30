@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, MiniRing, PrimaryBtn, WaterTracker, ProductThumb } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
-import { getWeekPlan, detectCountry, planAgeDays, foodImg, skinImg, Meal } from "@/glow/diet";
+import { getWeekPlan, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/diet";
 
 const DAY_LETTERS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -94,26 +94,40 @@ export default function RoutinePage() {
     return () => clearInterval(id);
   }, [reminders]);
 
+  // a single loud, piercing "ring" — siren sweep + harmonic, square wave, high gain
+  const ringPulse = (ctx: AudioContext, t0: number) => {
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.0001, t0);
+    master.gain.exponentialRampToValueAtTime(0.9, t0 + 0.02);   // loud attack
+    master.gain.setValueAtTime(0.9, t0 + 0.34);
+    master.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
+    master.connect(ctx.destination);
+    // siren tone that sweeps up — attention-grabbing
+    const o1 = ctx.createOscillator();
+    o1.type = "square"; o1.frequency.setValueAtTime(740, t0);
+    o1.frequency.exponentialRampToValueAtTime(1180, t0 + 0.3);
+    // bright harmonic on top
+    const o2 = ctx.createOscillator();
+    o2.type = "sawtooth"; o2.frequency.setValueAtTime(1480, t0);
+    o2.frequency.exponentialRampToValueAtTime(2360, t0 + 0.3);
+    const g2 = ctx.createGain(); g2.gain.value = 0.35; o2.connect(g2); g2.connect(master);
+    o1.connect(master);
+    o1.start(t0); o2.start(t0); o1.stop(t0 + 0.42); o2.stop(t0 + 0.42);
+  };
+
   const ringAlarm = (idx: number) => {
     setAlarm(idx);
     try {
       const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
       const ctx = new Ctx(); audioRef.current = ctx;
-      const beep = () => {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.type = "sine"; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
-        g.gain.setValueAtTime(0.0001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.05);
-        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
-        o.start(); o.stop(ctx.currentTime + 0.5);
-      };
+      if (ctx.state === "suspended") ctx.resume();
+      const beep = () => ringPulse(ctx, ctx.currentTime);
       beep();
-      const loop = setInterval(beep, 800);
+      const loop = setInterval(beep, 520);   // rapid, urgent cadence
       audioRef.current._loop = loop;
-      // auto-stop after 60s
       audioRef.current._timeout = setTimeout(() => stopAlarm(), 60000);
     } catch {}
-    if (navigator.vibrate) navigator.vibrate([300, 200, 300, 200, 300]);
+    if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 400, 150, 400]);
   };
   const stopAlarm = () => {
     setAlarm(null);
@@ -125,15 +139,11 @@ export default function RoutinePage() {
     try {
       const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
       const ctx = new Ctx();
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = "sine"; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
-      g.gain.setValueAtTime(0.0001, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
-      o.start(); o.stop(ctx.currentTime + 0.45);
+      if (ctx.state === "suspended") ctx.resume();
+      ringPulse(ctx, ctx.currentTime);   // one loud preview ring
       setTimeout(() => { try { ctx.close(); } catch {} }, 700);
     } catch {}
-    if (navigator.vibrate) navigator.vibrate(120);
+    if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
   };
   const toggleReminder = (idx: number) => {
     setReminders(r => {
@@ -226,7 +236,7 @@ export default function RoutinePage() {
                       </div>
                       <div style={{ width: 10, height: 10, borderRadius: 99, flexShrink: 0, transition: "all .25s", background: checked[idx] ? T.accent : rgba(SEC_COL[section], 0.4), boxShadow: checked[idx] ? "0 0 0 3px " + rgba(T.accent, 0.2) : "none" }} />
                       <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 18, cursor: "pointer", background: checked[idx] ? T.surface2 : T.surface, border: "1px solid " + (checked[idx] ? T.border : rgba(SEC_COL[section], 0.18)), boxShadow: checked[idx] ? "none" : "0 3px 14px rgba(60,30,20,0.07)", opacity: checked[idx] ? 0.6 : 1, transition: "all .25s" }}>
-                        <div style={{ width: 46, height: 46, borderRadius: 13, flexShrink: 0, overflow: "hidden", backgroundImage: `url(${skinImg(name).src})`, backgroundSize: "300%", backgroundPosition: skinImg(name).pos }} />
+                        <ProductThumb name={name} size={46} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.2 }}>{name}</div>
                           <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 2 }}>{brand}</div>

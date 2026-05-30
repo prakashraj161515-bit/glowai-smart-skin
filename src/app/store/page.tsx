@@ -60,7 +60,20 @@ export default function StorePage() {
   const ingResult = useMemo(() => {
     const t = ingQ.trim().toLowerCase();
     if (!t) return null;
-    return INGREDIENTS.find(i => i.key.includes(t) || t.includes(i.key) || i.name.toLowerCase().includes(t)) || { key: t, name: ingQ, verdict: "caution" as const, note: "Not in our database yet — patch-test first and introduce it slowly." };
+    // 1 — exact ingredient match
+    const ing = INGREDIENTS.find(i => i.key.includes(t) || t.includes(i.key) || i.name.toLowerCase().includes(t));
+    if (ing) return { name: ing.name, verdict: ing.verdict, note: ing.note };
+    // 2 — a product / cream in our catalog
+    const prod = CATALOG.find(p => p.name.toLowerCase().includes(t) || t.includes(p.name.toLowerCase()) || t.includes(p.brand.toLowerCase()));
+    if (prod) {
+      const hit = INGREDIENTS.find(i => prod.tags.some(tag => i.key.includes(tag) || tag.includes(i.key)));
+      return { name: prod.name, verdict: (hit?.verdict ?? "good") as "good" | "caution" | "avoid", note: `${prod.cat} by ${prod.brand} — formulated for ${prod.tags.slice(0, 3).join(", ")}. ${prod.mine ? "It's already on your shelf, so you're set." : "A good match for those concerns."}` };
+    }
+    // 3 — an unknown / random cream name that contains a known active
+    const kw = INGREDIENTS.find(i => t.includes(i.key) || t.includes(i.name.toLowerCase().split(" ")[0]));
+    if (kw) return { name: ingQ, verdict: kw.verdict, note: `We don't stock this exact product, but it lists ${kw.name.toLowerCase()} — ${kw.note}` };
+    // 4 — truly unrecognised cream → honest verdict
+    return { name: ingQ, verdict: "caution" as const, note: "We couldn't verify this product. Check its label for the main active, patch-test on your jaw for 2 days, and add it slowly. Avoid if it lists fragrance or alcohol high up." };
   }, [ingQ]);
 
   const vCol: any = { good: "#7FB389", caution: "#E8A24C", avoid: "#E0685C" };
@@ -78,14 +91,25 @@ export default function StorePage() {
 
         {tab === "My Shelf" && (
           <>
-            {/* conflict — tappable */}
-            <button onClick={() => setConflict(true)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: 14, borderRadius: 16, marginBottom: 14, background: "rgba(224,104,92,0.12)", border: "1px solid rgba(224,104,92,0.3)", cursor: "pointer", textAlign: "left" }}>
+            {/* conflict — tappable, with its info right beside it */}
+            <button onClick={() => setConflict(true)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: 14, borderRadius: 16, marginBottom: 10, background: "rgba(224,104,92,0.12)", border: "1px solid rgba(224,104,92,0.3)", cursor: "pointer", textAlign: "left" }}>
               <Icon name="warn" size={22} color="#E0685C" />
               <div style={{ flex: 1 }}>
                 <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: "#E0685C" }}>1 conflict detected</div>
-                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>Vitamin C + BHA — tap to review</div>
+                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>Vitamin C + BHA — tap for the fix</div>
               </div>
-              <Icon name="chev" size={16} color="#E0685C" />
+              <span style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, padding: "5px 10px", borderRadius: 99, background: "rgba(224,104,92,0.16)" }}>
+                <Icon name="info" size={14} color="#E0685C" /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: "#E0685C" }}>Info</span>
+              </span>
+            </button>
+            {/* ingredient checker — sits right alongside the conflict */}
+            <button onClick={() => setChecker(true)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: 14, borderRadius: 16, marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accentDim}`, cursor: "pointer", textAlign: "left" }}>
+              <Icon name="info" size={22} color={T.accentText} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: T.accentText }}>Ingredient checker</div>
+                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>Type any ingredient or cream — is it right for you?</div>
+              </div>
+              <Icon name="chev" size={16} color={T.accentText} />
             </button>
             <div className="glow-hscroll" style={{ display: "flex", gap: 8, overflowX: "auto", margin: "0 -20px 16px", padding: "0 20px 4px" }}>
               {CATS.map(c => <Chip key={c} active={cat === c} onClick={() => setCat(c)}>{c}</Chip>)}
@@ -99,9 +123,6 @@ export default function StorePage() {
                 </Card>
               ))}
             </div>
-            <button onClick={() => setChecker(true)} style={{ marginTop: 18, width: "100%", height: 50, borderRadius: 14, border: `1.5px solid ${T.borderHi}`, background: T.surface, cursor: "pointer", fontFamily: SANS, fontSize: 15, fontWeight: 650, color: T.text, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              <Icon name="info" size={19} color={T.accentText} /> Ingredient Checker
-            </button>
           </>
         )}
 
@@ -172,11 +193,11 @@ export default function StorePage() {
       {checker && (
         <Sheet onClose={() => setChecker(false)} title="Ingredient checker">
           <p style={{ fontFamily: SANS, fontSize: 13.5, color: T.textMute, lineHeight: 1.5, margin: "0 0 14px" }}>
-            Type any ingredient from a product label and I&apos;ll tell you if it suits your skin.
+            Type any ingredient <b>or a cream name</b> — even one you&apos;re unsure about — and I&apos;ll tell you if it&apos;s right or wrong for your skin.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", borderRadius: 14, background: T.surface, border: `1.5px solid ${ingQ ? T.accent : T.border}`, marginBottom: 16 }}>
             <Icon name="info" size={18} color={T.textMute} />
-            <input autoFocus value={ingQ} onChange={e => setIngQ(e.target.value)} placeholder="e.g. niacinamide, retinol, fragrance" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
+            <input autoFocus value={ingQ} onChange={e => setIngQ(e.target.value)} placeholder="e.g. niacinamide, retinol, or a cream name" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
           </div>
           {ingResult && (
             <div style={{ padding: 16, borderRadius: 16, background: `${vCol[ingResult.verdict]}1a`, border: `1.5px solid ${vCol[ingResult.verdict]}66` }}>

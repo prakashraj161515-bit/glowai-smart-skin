@@ -6,7 +6,7 @@ import CameraScanner from "@/components/CameraScanner";
 import {
   T, SERIF, MONO, SANS, rgba, scoreColor, scoreLabel, Icon, Placeholder, Card,
   PrimaryBtn, GhostBtn, Chip, Badge, ScoreDial, MetricBar, MiniRing, SectionTitle,
-  ProductChip, TabBar,
+  TabBar,
 } from "@/glow/ui";
 import { tickLoyalty } from "@/glow/loyalty";
 
@@ -389,33 +389,32 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google" | "apple" | "guest") =>
   const go = async (p: "google" | "apple" | "guest") => { setLoading(p); try { await onLogin(p); } finally { setLoading(""); } };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", background: "linear-gradient(175deg, #FCEEE8 0%, #F9D8C8 48%, #F5C0A8 100%)" }}>
+    <div className="glow-scroll" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", overflowY: "auto", overflowX: "hidden", position: "relative", background: "linear-gradient(175deg, #FCEEE8 0%, #F9D8C8 48%, #F5C0A8 100%)" }}>
       {/* ambient glow rings */}
-      {[{ s: 300, t: -80, l: -80, o: 0.20, d: "0s" }, { s: 240, t: 280, r: -70, o: 0.16, d: "1.2s" }, { s: 180, t: 150, l: 110, o: 0.10, d: "2.4s" }].map((b, i) => (
-        <div key={i} className="animate-float" style={{ position: "absolute", width: b.s, height: b.s, borderRadius: 99, top: b.t, left: b.l, right: (b as any).r, background: `radial-gradient(circle, rgba(240,120,80,${b.o}) 0%, transparent 70%)`, animationDelay: b.d, pointerEvents: "none" }} />
+      {[{ s: 300, t: -90, l: -90, o: 0.18, d: "0s" }, { s: 240, t: 220, r: -80, o: 0.14, d: "1.2s" }].map((b, i) => (
+        <div key={i} className="animate-float" style={{ position: "absolute", width: b.s, height: b.s, borderRadius: 99, top: b.t, left: (b as any).l, right: (b as any).r, background: `radial-gradient(circle, rgba(240,120,80,${b.o}) 0%, transparent 70%)`, animationDelay: b.d, pointerEvents: "none" }} />
       ))}
-      {/* floating product chips */}
-      <div className="animate-fadeup" style={{ position: "absolute", top: 130, right: 20 }}><ProductChip label="Vitamin C Serum" sub="Morning step" color="#FEF0EB" /></div>
-      <div className="animate-fadeup" style={{ position: "absolute", top: 206, left: 16 }}><ProductChip label="Daily Shield SPF 50" sub="Don't skip" color="#EFF0FD" /></div>
 
-      {/* live badge */}
-      <div style={{ position: "absolute", top: 64, left: "50%", transform: "translateX(-50%)", padding: "7px 16px", borderRadius: 99, background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.9)", display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap", boxShadow: "0 4px 20px rgba(200,90,50,0.14)" }}>
-        <span className="animate-blink" style={{ width: 7, height: 7, borderRadius: 99, background: "#7FB389" }} />
-        <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: "#2C1F1A" }}>AI skin analysis · live</span>
+      {/* ── top brand area ── */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "72px 28px 8px", textAlign: "center", position: "relative", zIndex: 1 }}>
+        <div className="animate-fadeup" style={{ width: 78, height: 78, borderRadius: 24, background: "linear-gradient(135deg, #F5A98D, #C44E28)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 14px 36px rgba(196,78,40,0.4)", marginBottom: 18 }}>
+          <Icon name="spark" size={38} color="#fff" fill />
+        </div>
+        <div className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>GlowAI</div>
+        <h1 className="animate-fadeup" style={{ fontFamily: SERIF, fontSize: 42, lineHeight: 1.02, color: "#2C1F1A", margin: "0 0 12px", fontWeight: 400, letterSpacing: -1 }}>
+          Skin that <em>actually</em> improves.
+        </h1>
+        <p className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 15, color: "rgba(44,31,26,0.58)", lineHeight: 1.5, margin: "0 auto", maxWidth: 300 }}>
+          Scan your skin, get a routine built for you, and track real progress.
+        </p>
+        <div className="animate-fadeup" style={{ marginTop: 18, padding: "7px 16px", borderRadius: 99, background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.9)", display: "flex", alignItems: "center", gap: 7, boxShadow: "0 4px 20px rgba(200,90,50,0.12)" }}>
+          <span className="animate-blink" style={{ width: 7, height: 7, borderRadius: 99, background: "#7FB389" }} />
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: "#2C1F1A" }}>AI skin analysis · live</span>
+        </div>
       </div>
 
-      {/* copy + buttons */}
-      <div style={{ marginTop: "auto", padding: "0 28px 36px" }}>
-        <div className="animate-fadeup" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-          <Icon name="spark" size={20} color="#C44E28" fill />
-          <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 2, textTransform: "uppercase" }}>GlowAI</span>
-        </div>
-        <h1 className="animate-fadeup" style={{ fontFamily: SERIF, fontSize: 46, lineHeight: 0.96, color: "#2C1F1A", margin: "0 0 12px", fontWeight: 400, letterSpacing: -1 }}>
-          Skin that<br /><em>actually</em><br />improves.
-        </h1>
-        <p className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 15, color: "rgba(44,31,26,0.56)", lineHeight: 1.5, margin: "0 0 24px", maxWidth: 280 }}>
-          Sign in to scan your skin, get a routine, and track real progress.
-        </p>
+      {/* ── buttons ── */}
+      <div style={{ padding: "0 28px 36px", position: "relative", zIndex: 1 }}>
 
         {/* Google */}
         <button className="animate-fadeup" onClick={() => go("google")} disabled={!!loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, height: 54, borderRadius: 16, cursor: "pointer", border: "none", background: "#fff", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A", boxShadow: "0 6px 20px rgba(180,80,40,0.14)", marginBottom: 10, opacity: loading && loading !== "google" ? 0.6 : 1 }}>
