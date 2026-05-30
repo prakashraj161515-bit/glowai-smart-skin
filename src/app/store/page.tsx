@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { T, SERIF, SANS, rgba, Icon, Card, Chip, Badge, Placeholder, SectionTitle } from "@/glow/ui";
+import { T, SERIF, SANS, rgba, Icon, Card, Chip, Badge, Placeholder, SectionTitle, ProductThumb } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
 
 const SHELF: [string, string, string][] = [
@@ -44,7 +44,7 @@ export default function StorePage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {shown.map(([n, b], i) => (
                 <Card key={i} pad={12}>
-                  <Placeholder label="product" h={120} r={14} style={{ marginBottom: 10 }} />
+                  <div style={{ height: 120, borderRadius: 14, marginBottom: 10, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}><ProductThumb name={n} size={84} /></div>
                   <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 650, color: T.text, lineHeight: 1.2 }}>{n}</div>
                   <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, marginTop: 3 }}>{b}</div>
                 </Card>

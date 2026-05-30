@@ -1,67 +1,149 @@
-// Localized diet plans for skin health — auto-selected by country.
-// Each food has an emoji thumbnail (always renders) + name + benefit.
+// Personalised, region-aware diet plan generator.
+// - Driven by the user's real face-scan concerns (acne / oil / pigmentation / hydration)
+// - 7 days of VARIETY (each day different foods)
+// - Cached for a week; only regenerates on a new scan or after 7 days.
 
 export type Food = { name: string; emoji: string; why: string };
 export type Meal = { meal: string; icon: string; time: string; items: Food[] };
+export type DayPlan = { meals: Meal[]; focus: string };
 
-const INDIA: Meal[] = [
-  { meal: "Breakfast", icon: "🌅", time: "8:00 AM", items: [
+type Scan = { acne?: number; oil?: number; pigmentation?: number; hydration?: number; score?: number };
+
+// ── food banks (region + concern aware) ──────────────────────────────────
+const BANK_INDIA = {
+  breakfast: [
     { name: "Poha with peanuts", emoji: "🍚", why: "Light, iron-rich" },
-    { name: "Amla juice", emoji: "🟢", why: "Vitamin C for glow" },
-    { name: "Soaked almonds", emoji: "🌰", why: "Vitamin E, repairs skin" },
-  ]},
-  { meal: "Lunch", icon: "☀️", time: "1:00 PM", items: [
+    { name: "Vegetable upma", emoji: "🥣", why: "Fibre + steady energy" },
+    { name: "Moong dal chilla", emoji: "🥞", why: "Plant protein" },
+    { name: "Idli with sambar", emoji: "🍚", why: "Fermented, gut-friendly" },
+    { name: "Besan chilla", emoji: "🥞", why: "Protein, controls oil" },
+    { name: "Fruit + curd bowl", emoji: "🥣", why: "Probiotics + vitamins" },
+    { name: "Ragi porridge", emoji: "🥣", why: "Calcium, calms skin" },
+  ],
+  lunch: [
     { name: "Dal + brown rice", emoji: "🍛", why: "Protein + clean carbs" },
-    { name: "Palak (spinach)", emoji: "🥬", why: "Iron, fights dullness" },
-    { name: "Curd / buttermilk", emoji: "🥛", why: "Probiotics, calms acne" },
-  ]},
-  { meal: "Dinner", icon: "🌙", time: "8:00 PM", items: [
-    { name: "Grilled paneer/fish", emoji: "🐟", why: "Collagen support" },
-    { name: "Mixed veg sabzi", emoji: "🥗", why: "Antioxidants" },
-    { name: "Turmeric milk (haldi)", emoji: "🥛", why: "Anti-inflammatory" },
-  ]},
-  { meal: "Snacks", icon: "🍵", time: "Anytime", items: [
+    { name: "Rajma + roti", emoji: "🍛", why: "Fibre + protein" },
+    { name: "Palak paneer + roti", emoji: "🥬", why: "Iron, fights dullness" },
+    { name: "Chana masala bowl", emoji: "🫘", why: "Zinc for healing" },
+    { name: "Veg khichdi + curd", emoji: "🍲", why: "Easy-digest, calming" },
+    { name: "Fish curry + rice", emoji: "🐟", why: "Omega-3, plumps skin" },
+    { name: "Mixed veg + roti", emoji: "🥗", why: "Antioxidants" },
+  ],
+  dinner: [
+    { name: "Grilled paneer + salad", emoji: "🥗", why: "Collagen support" },
+    { name: "Lauki sabzi + roti", emoji: "🥒", why: "Hydrating, light" },
+    { name: "Tinda/veg + dal", emoji: "🍲", why: "Gentle on digestion" },
+    { name: "Tandoori chicken + salad", emoji: "🍗", why: "Lean protein" },
+    { name: "Tofu bhurji + roti", emoji: "🍳", why: "Plant protein" },
+    { name: "Veg soup + multigrain toast", emoji: "🍵", why: "Warm, low-oil" },
+    { name: "Bhindi + dal + rice", emoji: "🍛", why: "Fibre + minerals" },
+  ],
+  snack: [
     { name: "Coconut water", emoji: "🥥", why: "Hydration + minerals" },
+    { name: "Amla juice", emoji: "🟢", why: "Vitamin C, brightening" },
+    { name: "Soaked almonds", emoji: "🌰", why: "Vitamin E, repair" },
     { name: "Seasonal fruit", emoji: "🍊", why: "Vitamin C" },
+    { name: "Roasted chana", emoji: "🫘", why: "Protein, low-GI" },
+    { name: "Buttermilk (chaas)", emoji: "🥛", why: "Probiotic, cooling" },
     { name: "Green tea", emoji: "🍵", why: "Flushes toxins" },
-  ]},
-];
-
-const GLOBAL: Meal[] = [
-  { meal: "Breakfast", icon: "🌅", time: "8:00 AM", items: [
-    { name: "Greek yogurt + berries", emoji: "🫐", why: "Probiotics + antioxidants" },
-    { name: "Oatmeal", emoji: "🥣", why: "Steady energy, low GI" },
-    { name: "Green smoothie", emoji: "🥬", why: "Vitamins for glow" },
-  ]},
-  { meal: "Lunch", icon: "☀️", time: "1:00 PM", items: [
-    { name: "Grilled salmon", emoji: "🐟", why: "Omega-3, plumps skin" },
-    { name: "Quinoa salad", emoji: "🥗", why: "Protein + fiber" },
-    { name: "Avocado", emoji: "🥑", why: "Healthy fats, hydration" },
-  ]},
-  { meal: "Dinner", icon: "🌙", time: "8:00 PM", items: [
-    { name: "Lean chicken / tofu", emoji: "🍗", why: "Collagen building" },
-    { name: "Roasted veggies", emoji: "🥦", why: "Antioxidants" },
-    { name: "Sweet potato", emoji: "🍠", why: "Vitamin A, repairs skin" },
-  ]},
-  { meal: "Snacks", icon: "🍵", time: "Anytime", items: [
-    { name: "Walnuts", emoji: "🌰", why: "Omega-3 + vitamin E" },
-    { name: "Citrus fruit", emoji: "🍊", why: "Vitamin C, brightening" },
-    { name: "Green tea", emoji: "🍵", why: "Detox + calm" },
-  ]},
-];
-
-const AVOID = ["Fried / oily snacks", "Excess sugar & sweets", "Too much dairy (if acne-prone)", "Sugary sodas"];
-
-const PLANS: Record<string, Meal[]> = {
-  India: INDIA, Pakistan: INDIA, Bangladesh: INDIA, "Sri Lanka": INDIA, Nepal: INDIA,
+  ],
 };
 
-export function dietForCountry(country: string): { plan: Meal[]; avoid: string[]; region: string } {
-  const plan = PLANS[country] || GLOBAL;
-  return { plan, avoid: AVOID, region: PLANS[country] ? country : "Global" };
+const BANK_GLOBAL = {
+  breakfast: [
+    { name: "Greek yogurt + berries", emoji: "🫐", why: "Probiotics + antioxidants" },
+    { name: "Oatmeal + banana", emoji: "🥣", why: "Steady energy, low GI" },
+    { name: "Veggie omelette", emoji: "🍳", why: "Protein + biotin" },
+    { name: "Green smoothie", emoji: "🥬", why: "Vitamins for glow" },
+    { name: "Avocado toast", emoji: "🥑", why: "Healthy fats" },
+    { name: "Chia pudding", emoji: "🥣", why: "Omega-3, hydrating" },
+    { name: "Fruit + nut bowl", emoji: "🍓", why: "Vitamin C + E" },
+  ],
+  lunch: [
+    { name: "Grilled salmon + greens", emoji: "🐟", why: "Omega-3, plumps skin" },
+    { name: "Quinoa salad", emoji: "🥗", why: "Protein + fibre" },
+    { name: "Chicken + veg bowl", emoji: "🍗", why: "Collagen building" },
+    { name: "Lentil soup + bread", emoji: "🍲", why: "Iron + fibre" },
+    { name: "Tofu stir-fry", emoji: "🍱", why: "Plant protein" },
+    { name: "Tuna + spinach wrap", emoji: "🌯", why: "Omega-3 + iron" },
+    { name: "Chickpea bowl", emoji: "🫘", why: "Zinc for healing" },
+  ],
+  dinner: [
+    { name: "Baked fish + veggies", emoji: "🐟", why: "Lean omega-3" },
+    { name: "Roasted veg + sweet potato", emoji: "🍠", why: "Vitamin A, repair" },
+    { name: "Grilled chicken salad", emoji: "🥗", why: "Lean protein" },
+    { name: "Veg & bean stew", emoji: "🍲", why: "Fibre + antioxidants" },
+    { name: "Tofu + broccoli", emoji: "🥦", why: "Vitamin C, firming" },
+    { name: "Turkey + greens", emoji: "🍗", why: "Zinc + protein" },
+    { name: "Miso soup + rice", emoji: "🍵", why: "Probiotic, light" },
+  ],
+  snack: [
+    { name: "Walnuts", emoji: "🌰", why: "Omega-3 + vitamin E" },
+    { name: "Citrus fruit", emoji: "🍊", why: "Vitamin C, brightening" },
+    { name: "Carrot sticks", emoji: "🥕", why: "Beta-carotene" },
+    { name: "Pumpkin seeds", emoji: "🎃", why: "Zinc for acne" },
+    { name: "Green tea", emoji: "🍵", why: "Detox + calm" },
+    { name: "Blueberries", emoji: "🫐", why: "Antioxidants" },
+    { name: "Cucumber + hummus", emoji: "🥒", why: "Hydrating snack" },
+  ],
+};
+
+const INDIA_COUNTRIES = ["India", "Pakistan", "Bangladesh", "Sri Lanka", "Nepal"];
+
+// concern-driven extra foods injected by what the scan found
+function concernBoosts(scan: Scan, region: "india" | "global"): Food[] {
+  const out: Food[] = [];
+  const acne = scan.acne ?? 0, oil = scan.oil ?? 0, pig = scan.pigmentation ?? 0, hyd = scan.hydration ?? 60;
+  if (acne >= 35) out.push(region === "india"
+    ? { name: "Turmeric (haldi) milk", emoji: "🥛", why: "Anti-inflammatory for acne" }
+    : { name: "Pumpkin seeds", emoji: "🎃", why: "Zinc fights acne" });
+  if (oil >= 50) out.push(region === "india"
+    ? { name: "Green tea (sugar-free)", emoji: "🍵", why: "Balances excess oil" }
+    : { name: "Green tea", emoji: "🍵", why: "Balances excess oil" });
+  if (pig >= 35) out.push(region === "india"
+    ? { name: "Amla / citrus", emoji: "🟢", why: "Vitamin C fades dark spots" }
+    : { name: "Oranges / kiwi", emoji: "🍊", why: "Vitamin C fades dark spots" });
+  if (hyd < 45) out.push(region === "india"
+    ? { name: "Cucumber + coconut water", emoji: "🥒", why: "Deeply hydrating" }
+    : { name: "Watermelon / cucumber", emoji: "🍉", why: "Deeply hydrating" });
+  return out;
 }
 
-// Detect country from timezone (no extra permissions)
+function topFocus(scan: Scan): string {
+  const acne = scan.acne ?? 0, oil = scan.oil ?? 0, pig = scan.pigmentation ?? 0, hyd = scan.hydration ?? 60;
+  const ranked: [string, number][] = [["clear breakouts", acne], ["control oil", oil], ["fade dark spots", pig], ["boost hydration", 100 - hyd]];
+  ranked.sort((a, b) => b[1] - a[1]);
+  return ranked[0][1] > 30 ? ranked[0][0] : "maintain your glow";
+}
+
+function pick(bank: Food[], dayIdx: number, n: number): Food[] {
+  const out: Food[] = [];
+  for (let i = 0; i < n; i++) out.push(bank[(dayIdx * 2 + i) % bank.length]);
+  return out;
+}
+
+// Build a 7-day plan personalised to the scan + region
+export function buildWeekPlan(country: string, scan: Scan) {
+  const region = INDIA_COUNTRIES.includes(country) ? "india" : "global";
+  const bank = region === "india" ? BANK_INDIA : BANK_GLOBAL;
+  const boosts = concernBoosts(scan, region);
+  const days: DayPlan[] = Array.from({ length: 7 }).map((_, d) => {
+    const meals: Meal[] = [
+      { meal: "Breakfast", icon: "🌅", time: "8:00 AM", items: pick(bank.breakfast, d, 2) },
+      { meal: "Lunch", icon: "☀️", time: "1:00 PM", items: pick(bank.lunch, d, 2) },
+      { meal: "Dinner", icon: "🌙", time: "8:00 PM", items: pick(bank.dinner, d, 2) },
+      { meal: "Snacks", icon: "🍵", time: "Anytime", items: [...pick(bank.snack, d, 1), ...(boosts.length ? [boosts[d % boosts.length]] : [])] },
+    ];
+    return { meals, focus: topFocus(scan) };
+  });
+  return {
+    days,
+    avoid: ["Fried / oily snacks", "Excess sugar & sweets", "Too much dairy (if acne-prone)", "Sugary sodas"],
+    region: region === "india" ? country : "Global",
+    focus: topFocus(scan),
+  };
+}
+
 export function detectCountry(): string {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -76,15 +158,36 @@ export function detectCountry(): string {
   } catch { return "Global"; }
 }
 
-// ── Skincare product thumbnails (emoji by category, always renders) ──
-export function productEmoji(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("cleanser") || n.includes("wash")) return "🧼";
-  if (n.includes("vitamin c") || n.includes("serum")) return "🧪";
-  if (n.includes("niacinamide")) return "💧";
-  if (n.includes("spf") || n.includes("shield") || n.includes("sun")) return "☀️";
-  if (n.includes("moistur") || n.includes("cream")) return "🫙";
-  if (n.includes("night") || n.includes("repair")) return "🌙";
-  if (n.includes("toner")) return "🌸";
-  return "🧴";
+// ── weekly cache ──────────────────────────────────────────────────────────
+const WEEK = 7 * 24 * 60 * 60 * 1000;
+function scanSig(scan: Scan): string {
+  return [scan.acne, scan.oil, scan.pigmentation, scan.hydration, scan.score].join("-");
+}
+
+// Returns a cached plan; regenerates only if (a) older than a week, or
+// (b) the underlying scan changed (a new scan was done).
+export function getWeekPlan(country: string, scan: Scan) {
+  try {
+    const raw = localStorage.getItem("velmora_diet_plan");
+    if (raw) {
+      const c = JSON.parse(raw);
+      const fresh = Date.now() - (c.createdAt || 0) < WEEK;
+      const sameScan = c.sig === scanSig(scan);
+      const sameRegion = c.country === country;
+      if (fresh && sameScan && sameRegion && c.plan) return c.plan;
+    }
+  } catch {}
+  const plan = buildWeekPlan(country, scan);
+  try {
+    localStorage.setItem("velmora_diet_plan", JSON.stringify({ plan, createdAt: Date.now(), sig: scanSig(scan), country }));
+  } catch {}
+  return plan;
+}
+
+export function planAgeDays(): number {
+  try {
+    const raw = localStorage.getItem("velmora_diet_plan");
+    if (raw) { const c = JSON.parse(raw); return Math.floor((Date.now() - (c.createdAt || 0)) / (24 * 60 * 60 * 1000)); }
+  } catch {}
+  return 0;
 }

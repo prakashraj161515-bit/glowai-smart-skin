@@ -268,6 +268,73 @@ export function Screen({ children, pad = 20, top = 56, bottom = 110, style = {} 
   );
 }
 
+// ── ProductThumb — realistic product render by type ──────────────────────
+export function productType(name: string): "cleanser" | "serum" | "niacinamide" | "moisturizer" | "spf" | "night" | "toner" {
+  const n = name.toLowerCase();
+  if (n.includes("cleanser") || n.includes("wash") || n.includes("foam")) return "cleanser";
+  if (n.includes("niacinamide")) return "niacinamide";
+  if (n.includes("vitamin c") || n.includes("serum") || n.includes("essence")) return "serum";
+  if (n.includes("spf") || n.includes("shield") || n.includes("sun")) return "spf";
+  if (n.includes("night") || n.includes("repair") || n.includes("barrier")) return "night";
+  if (n.includes("toner")) return "toner";
+  return "moisturizer";
+}
+
+export function ProductThumb({ name, size = 46 }: { name: string; size?: number }) {
+  const type = productType(name);
+  // [bg tile, body color, cap color]
+  const palette: Record<string, [string, string, string]> = {
+    cleanser:    ["#FEF0EB", "#F2A98D", "#C9633F"],
+    serum:       ["#FEF7EB", "#E8B45C", "#B5792C"],
+    niacinamide: ["#EBF3FE", "#7FB0E0", "#4E78B0"],
+    moisturizer: ["#EDF7EE", "#8FD0A0", "#4E9466"],
+    spf:         ["#FEF7EB", "#F2C94C", "#C99A2C"],
+    night:       ["#EFF0FD", "#9B92E0", "#6A60B0"],
+    toner:       ["#FDEDF0", "#E89BB0", "#C05878"],
+  };
+  const [bg, body, cap] = palette[type];
+  const s = size; const cx = s / 2;
+  const dropper = (
+    <g>
+      <rect x={cx - 6} y={s * 0.34} width="12" height={s * 0.46} rx="4" fill={body} />
+      <rect x={cx - 6} y={s * 0.34} width="6" height={s * 0.46} rx="4" fill="rgba(255,255,255,0.30)" />
+      <rect x={cx - 5} y={s * 0.22} width="10" height={s * 0.14} rx="3" fill={cap} />
+      <rect x={cx - 2.5} y={s * 0.10} width="5" height={s * 0.16} rx="2.5" fill={cap} opacity="0.85" />
+    </g>
+  );
+  const tube = (
+    <g>
+      <rect x={cx - 7} y={s * 0.26} width="14" height={s * 0.54} rx="6" fill={body} />
+      <rect x={cx - 7} y={s * 0.26} width="6" height={s * 0.54} rx="6" fill="rgba(255,255,255,0.28)" />
+      <rect x={cx - 4} y={s * 0.80} width="8" height={s * 0.08} rx="2" fill={cap} />
+      <rect x={cx - 5} y={s * 0.40} width="10" height="3" rx="1.5" fill="rgba(255,255,255,0.6)" />
+    </g>
+  );
+  const jar = (
+    <g>
+      <rect x={cx - 9} y={s * 0.44} width="18" height={s * 0.34} rx="5" fill={body} />
+      <rect x={cx - 9} y={s * 0.44} width="7" height={s * 0.34} rx="5" fill="rgba(255,255,255,0.28)" />
+      <rect x={cx - 10} y={s * 0.32} width="20" height={s * 0.14} rx="4" fill={cap} />
+    </g>
+  );
+  const bottle = (
+    <g>
+      <rect x={cx - 7} y={s * 0.34} width="14" height={s * 0.46} rx="5" fill={body} />
+      <rect x={cx - 7} y={s * 0.34} width="6" height={s * 0.46} rx="5" fill="rgba(255,255,255,0.28)" />
+      <rect x={cx - 4} y={s * 0.18} width="8" height={s * 0.18} rx="3" fill={cap} />
+      <rect x={cx - 5.5} y={s * 0.12} width="11" height={s * 0.08} rx="3" fill={cap} opacity="0.8" />
+    </g>
+  );
+  const shape = type === "moisturizer" || type === "night" ? jar
+    : type === "serum" || type === "niacinamide" ? dropper
+    : type === "toner" ? bottle : tube;
+  return (
+    <div style={{ width: s, height: s, borderRadius: 13, background: bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+      <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`} style={{ filter: "drop-shadow(0 3px 5px rgba(80,40,20,0.18))" }}>{shape}</svg>
+    </div>
+  );
+}
+
 // ── ProductChip (welcome floating chips) ─────────────────────────────────
 export function ProductChip({ label, sub, color }: { label: string; sub: string; color: string }) {
   return (
@@ -331,7 +398,7 @@ export function WaterTracker({ ml, setMl, target = 3000 }:
 export function TabBar({ active, onChange }:
   { active: string; onChange: (id: string) => void }) {
   const tabs: [string, string][] = [
-    ["home", "Home"], ["scan", "Scan"], ["routine", "Routine"], ["products", "Shelf"], ["profile", "You"],
+    ["home", "Home"], ["scan", "Scan"], ["routine", "Ritual"], ["products", "Shelf"], ["profile", "You"],
   ];
   return (
     <div style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", maxWidth: 430, width: "100%", bottom: 0, zIndex: 40, paddingBottom: 20, paddingTop: 8, background: `linear-gradient(to top, ${T.bg} 62%, transparent)` }}>

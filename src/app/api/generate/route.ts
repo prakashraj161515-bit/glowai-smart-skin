@@ -80,10 +80,16 @@ Carefully examine:
 
 Return ONLY a valid JSON object, no extra text, in this exact format:
 {
-  "score": <integer 0-100, overall glow/health score>,
+  "score": <integer 0-100, overall glow/health score from real visual analysis>,
   "acne": <integer 0-100, acne severity>,
   "oil": <integer 0-100, oiliness level>,
   "pigmentation": <integer 0-100, dark spots level>,
+  "hydration": <integer 0-100, how hydrated/plump the skin looks>,
+  "texture": <integer 0-100, smoothness of skin texture, higher = smoother>,
+  "redness": <integer 0-100, visible redness/irritation>,
+  "poreSize": <integer 0-100, visible pore size, higher = larger pores>,
+  "radiance": <integer 0-100, natural glow/radiance, higher = more radiant>,
+  "topConcern": "<the single biggest skin concern in 1-3 words, e.g. 'Excess oil' or 'Dark spots'>",
   "summary": "<ONE warm, encouraging sentence (max 18 words) for ${userName} summarising their skin today in plain simple language a beginner understands. No jargon.>",
   "report": "<a SHORT, easy-to-read markdown report for ${userName} (${gender}). Use EXACTLY these 3 sections with simple words a non-expert understands: **WHAT WE SEE** (2-3 short bullets), **WHY** (2 short bullets on likely causes), **YOUR PLAN** (3 short actionable bullets — what to do + 1 food to eat available in ${country}). Keep every bullet under 14 words. Be friendly and motivating. No medical jargon.>"
 }`;
@@ -121,6 +127,12 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
           acne: parsed.acne,
           oil: parsed.oil,
           pigmentation: parsed.pigmentation,
+          hydration: parsed.hydration,
+          texture: parsed.texture,
+          redness: parsed.redness,
+          poreSize: parsed.poreSize,
+          radiance: parsed.radiance,
+          topConcern: parsed.topConcern || "",
           summary: parsed.summary || "",
           report: parsed.report,
           text: parsed.report

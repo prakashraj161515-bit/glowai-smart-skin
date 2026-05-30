@@ -175,7 +175,18 @@ export default function Home() {
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "face_scan", image: res.image, gender, userName, country, prevScan: prev || null }) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
-      const analysisData = { image: res.image, score: d.score || 0, acne: d.acne || 0, oil: d.oil || 0, pigmentation: d.pigmentation || 0, summary: d.summary || "", gender, date: new Date().toLocaleDateString() };
+      const num = (v: any, fb: number) => typeof v === "number" ? v : fb;
+      const analysisData = {
+        image: res.image,
+        score: num(d.score, 0), acne: num(d.acne, 0), oil: num(d.oil, 0), pigmentation: num(d.pigmentation, 0),
+        hydration: num(d.hydration, Math.max(0, 100 - num(d.oil, 50))),
+        texture: num(d.texture, Math.min(100, num(d.score, 60) + 4)),
+        redness: num(d.redness, num(d.acne, 0)),
+        poreSize: num(d.poreSize, Math.round(num(d.oil, 0) * 0.9)),
+        radiance: num(d.radiance, num(d.score, 60)),
+        topConcern: d.topConcern || "",
+        summary: d.summary || "", gender, date: new Date().toLocaleDateString(), ts: Date.now(),
+      };
       setData(analysisData); setAi(d.report || d.text || "Analysis complete."); setSummary(d.summary || "");
       const nh = [analysisData, ...history].slice(0, 30);
       setHistory(nh); localStorage.setItem("velmora_history", JSON.stringify(nh)); localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
@@ -523,34 +534,41 @@ function ResultsView({ data, ai, summary, history, formatMarkdown, openReport, s
   const score = data.score || 0;
   const prev = history[1];
   const delta = prev ? score - prev.score : 0;
-  const concerns = [
-    { name: "Acne & Breakouts", val: data.acne || 0, dir: "down", tone: "good", pos: { x: 38, y: 44 }, icon: "warn" as const },
-    { name: "Oiliness", val: data.oil || 0, dir: "flat", tone: "warn", pos: { x: 64, y: 52 }, icon: "sun" as const },
-    { name: "Pigmentation", val: data.pigmentation || 0, dir: "flat", tone: "mute", pos: { x: 30, y: 64 }, icon: "drop" as const },
-    { name: "Hydration", val: Math.max(0, 100 - (data.oil || 50)), dir: "up", tone: "good", pos: { x: 70, y: 38 }, icon: "drop" as const },
-  ];
+  // severity from REAL value
+  const sevTone = (v: number) => v >= 60 ? "bad" : v >= 35 ? "warn" : "good";
   const sev = (v: number) => v >= 60 ? "Severe" : v >= 35 ? "Moderate" : "Mild";
-  const metrics: [string, number, any, string][] = [
-    ["Hydration", Math.max(0, 100 - (data.oil || 50)), "drop", "#5AA9D6"],
-    ["Oiliness", data.oil || 0, "sun", "#E8A24C"],
-    ["Texture", Math.min(100, score + 4), "grid", "#7FB389"],
-    ["Redness", data.acne || 0, "warn", "#E0685C"],
-    ["Pore Size", Math.round((data.oil || 0) * 0.9), "scan", "#B58BD6"],
-    ["Radiance", score, "spark", "#D9B86A"],
+  // trend from REAL previous scan (no fabrication)
+  const trend = (cur: number, key: string): "up" | "down" | "none" => {
+    if (!prev || typeof prev[key] !== "number") return "none";
+    if (cur < prev[key] - 2) return "down"; // less concern = good
+    if (cur > prev[key] + 2) return "up";
+    return "none";
+  };
+  const concerns = [
+    { name: "Acne & Breakouts", val: data.acne || 0, key: "acne", icon: "warn" as const },
+    { name: "Oiliness", val: data.oil || 0, key: "oil", icon: "sun" as const },
+    { name: "Pigmentation", val: data.pigmentation || 0, key: "pigmentation", icon: "drop" as const },
+    { name: "Redness", val: data.redness ?? data.acne ?? 0, key: "redness", icon: "warn" as const },
   ];
-  const arrow: Record<string, [any, string]> = { down: ["arrowDown", "#8FC299"], up: ["arrowUp", "#E0685C"], flat: ["arrowR", "#9a8a80"] };
+  const metrics: [string, number, any, string][] = [
+    ["Hydration", data.hydration ?? Math.max(0, 100 - (data.oil || 50)), "drop", "#5AA9D6"],
+    ["Oiliness", data.oil || 0, "sun", "#E8A24C"],
+    ["Texture", data.texture ?? Math.min(100, score + 4), "grid", "#7FB389"],
+    ["Redness", data.redness ?? data.acne ?? 0, "warn", "#E0685C"],
+    ["Pore Size", data.poreSize ?? Math.round((data.oil || 0) * 0.9), "scan", "#B58BD6"],
+    ["Radiance", data.radiance ?? score, "spark", "#D9B86A"],
+  ];
   return (
     <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "56px 20px 130px" }}>
       <button onClick={onBack} style={{ position: "fixed", top: 56, left: 14, zIndex: 70, width: 36, height: 36, borderRadius: 11, cursor: "pointer", background: "rgba(255,255,255,0.82)", backdropFilter: "blur(10px)", border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
-      {/* photo + dots */}
+      {/* clean scanned photo (no dots) */}
       <div style={{ position: "relative", marginBottom: 18, marginTop: 8 }}>
-        {data.image ? <div style={{ height: 240, borderRadius: 24, backgroundImage: `url(${data.image})`, backgroundSize: "cover", backgroundPosition: "center" }} /> : <Placeholder label="scanned selfie" h={240} r={24} />}
-        {concerns.map((c, i) => (
-          <button key={i} onClick={() => setActiveDot(activeDot === i ? null : i)} style={{ position: "absolute", left: `${c.pos.x}%`, top: `${c.pos.y}%`, transform: "translate(-50%,-50%)", cursor: "pointer", width: 22, height: 22, borderRadius: 99, border: "2px solid #fff", background: rgba(c.tone === "good" ? "#8FC299" : c.tone === "warn" ? "#E8A24C" : c.tone === "bad" ? "#E0685C" : "#9a8a80", 0.9), padding: 0 }}>
-            {activeDot === i && <span style={{ position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)", whiteSpace: "nowrap", background: "#1a1310", color: "#fff", padding: "5px 10px", borderRadius: 8, fontFamily: SANS, fontSize: 12, fontWeight: 600 }}>{c.name} · {sev(c.val)}</span>}
-          </button>
-        ))}
-        <div style={{ position: "absolute", top: 12, left: 12 }}><Badge tone="mute" style={{ background: "rgba(0,0,0,0.5)", color: "#fff" }}>Tap dots to inspect</Badge></div>
+        {data.image ? <div style={{ height: 240, borderRadius: 24, backgroundImage: `url(${data.image})`, backgroundSize: "cover", backgroundPosition: "center", boxShadow: "0 10px 30px rgba(60,30,20,0.12)" }} /> : <Placeholder label="scanned selfie" h={240} r={24} />}
+        <div style={{ position: "absolute", inset: 0, borderRadius: 24, background: "linear-gradient(to top, rgba(0,0,0,0.28), transparent 45%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: 12, left: 14, display: "flex", alignItems: "center", gap: 7 }}>
+          <span style={{ width: 7, height: 7, borderRadius: 99, background: "#8FC299", boxShadow: "0 0 8px #8FC299" }} />
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: "#fff" }}>AI analysis complete</span>
+        </div>
       </div>
       {/* score */}
       <Card glow style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
@@ -575,17 +593,22 @@ function ResultsView({ data, ai, summary, history, formatMarkdown, openReport, s
         </div>
       </div>
 
-      {/* concerns */}
+      {/* concerns — from real values + real trend vs last scan */}
       <SectionTitle>Concern Breakdown</SectionTitle>
       <Card pad={6} style={{ marginBottom: 20 }}>
-        {concerns.map((c, i) => { const [ai2, ac] = arrow[c.dir]; return (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 12px", borderTop: i ? `1px solid ${T.border}` : "none" }}>
-            <div style={{ width: 38, height: 38, borderRadius: 11, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name={c.icon} size={19} color={T.textMute} /></div>
-            <span style={{ flex: 1, fontFamily: SANS, fontSize: 15, fontWeight: 600, color: T.text }}>{c.name}</span>
-            <Badge tone={c.tone as any}>{sev(c.val)}</Badge>
-            <Icon name={ai2} size={18} color={ac} sw={2.2} />
-          </div>
-        ); })}
+        {concerns.map((c, i) => {
+          const tr = trend(c.val, c.key);
+          return (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 12px", borderTop: i ? `1px solid ${T.border}` : "none" }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name={c.icon} size={19} color={T.textMute} /></div>
+              <span style={{ flex: 1, fontFamily: SANS, fontSize: 15, fontWeight: 600, color: T.text }}>{c.name}</span>
+              <Badge tone={sevTone(c.val) as any}>{sev(c.val)}</Badge>
+              {tr === "down" && <Icon name="arrowDown" size={18} color="#8FC299" sw={2.2} />}
+              {tr === "up" && <Icon name="arrowUp" size={18} color="#E0685C" sw={2.2} />}
+              {tr === "none" && <span style={{ width: 18, textAlign: "center", fontFamily: SANS, fontSize: 11, fontWeight: 700, color: T.textFaint }}>{prev ? "–" : "new"}</span>}
+            </div>
+          );
+        })}
       </Card>
 
       {/* metrics */}
