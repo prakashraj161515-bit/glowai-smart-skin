@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { T, SANS, MONO, Icon, rgba } from "./ui";
+import { T, SANS, MONO, Icon } from "./ui";
 
 // ── format review counts: 12840 -> 12.8k ──────────────────────────
 export function fmtCount(n: number): string {
@@ -8,7 +8,7 @@ export function fmtCount(n: number): string {
   return String(n);
 }
 
-// ── localStorage user ratings (per ASIN) ──────────────────────────
+// ── per-device user ratings (localStorage) ────────────────────────
 const RKEY = "velmora_user_ratings";
 function readRatings(): Record<string, number> {
   try { return JSON.parse(localStorage.getItem(RKEY) || "{}"); } catch { return {}; }
@@ -22,11 +22,30 @@ export function saveUserRating(asin: string, val: number) {
   localStorage.setItem(RKEY, JSON.stringify(r));
 }
 
-// blends the user's rating into the base average (so it "counts")
-export function blendedRating(base: number, reviews: number, userRating: number): { rating: number; reviews: number } {
-  if (!userRating) return { rating: base, reviews };
-  const total = base * reviews + userRating;
-  return { rating: Math.round((total / (reviews + 1)) * 10) / 10, reviews: reviews + 1 };
+// ── GLOBAL ratings (shared via /api/ratings + Vercel KV) ───────────
+export type GAgg = Record<string, { sum: number; count: number }>;
+export async function fetchGlobalRatings(): Promise<GAgg> {
+  try {
+    const r = await fetch("/api/ratings");
+    const d = await r.json();
+    return d.ratings || {};
+  } catch { return {}; }
+}
+export async function submitRating(asin: string, rating: number, prev: number) {
+  try {
+    await fetch("/api/ratings", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ asin, rating, prev }),
+    });
+  } catch {}
+}
+
+// combine the seed (Amazon-like) rating with the app's community ratings
+export function blendedRating(base: number, baseReviews: number, agg?: { sum: number; count: number }): { rating: number; reviews: number } {
+  if (!agg || agg.count === 0) return { rating: base, reviews: baseReviews };
+  const sum = base * baseReviews + agg.sum;
+  const count = baseReviews + agg.count;
+  return { rating: Math.round((sum / count) * 10) / 10, reviews: count };
 }
 
 // ── Star display (read-only) ──────────────────────────────────────
@@ -41,26 +60,44 @@ export function Stars({ value, size = 12, color = "#F0A52C" }: { value: number; 
   );
 }
 
-// ── Live price (lazy-fetched + cached, IntersectionObserver) ───────
-const priceCache = new Map<string, string | null>();
+// ── price cache (string + numeric for sorting) ────────────────────
+const priceStr = new Map<string, string | null>();
+export const priceNum = new Map<string, number | null>();
 
+function parsePrice(s: string | null): number | null {
+  if (!s) return null;
+  const n = parseInt(s.replace(/[^\d]/g, ""), 10);
+  return isNaN(n) ? null : n;
+}
+
+export async function ensurePrice(asin: string): Promise<number | null> {
+  if (priceNum.has(asin)) return priceNum.get(asin)!;
+  try {
+    const r = await fetch(`/api/price?asin=${asin}`);
+    const d = await r.json();
+    priceStr.set(asin, d.price || null);
+    const num = parsePrice(d.price || null);
+    priceNum.set(asin, num);
+    return num;
+  } catch {
+    priceStr.set(asin, null); priceNum.set(asin, null); return null;
+  }
+}
+
+// ── Live price (lazy-fetched + cached, IntersectionObserver) ───────
 export function LivePrice({ asin, big = false }: { asin: string; big?: boolean }) {
-  const [price, setPrice] = useState<string | null | undefined>(priceCache.get(asin));
+  const [price, setPrice] = useState<string | null | undefined>(priceStr.get(asin));
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (priceCache.has(asin)) { setPrice(priceCache.get(asin)); return; }
+    if (priceStr.has(asin)) { setPrice(priceStr.get(asin)); return; }
     const el = ref.current; if (!el) return;
     let done = false;
     const obs = new IntersectionObserver(async (entries) => {
       if (entries[0].isIntersecting && !done) {
         done = true; obs.disconnect();
-        try {
-          const r = await fetch(`/api/price?asin=${asin}`);
-          const d = await r.json();
-          priceCache.set(asin, d.price || null);
-          setPrice(d.price || null);
-        } catch { priceCache.set(asin, null); setPrice(null); }
+        await ensurePrice(asin);
+        setPrice(priceStr.get(asin) ?? null);
       }
     }, { rootMargin: "300px" });
     obs.observe(el);
@@ -78,12 +115,18 @@ export function LivePrice({ asin, big = false }: { asin: string; big?: boolean }
 }
 
 // ── Interactive "rate this" stars ─────────────────────────────────
-export function RateStars({ asin, onRated }: { asin: string; onRated?: (v: number) => void }) {
+export function RateStars({ asin, onRated }: { asin: string; onRated?: (v: number, prev: number) => void }) {
   const [val, setVal] = useState(0);
   const [hover, setHover] = useState(0);
   useEffect(() => { setVal(getUserRating(asin)); }, [asin]);
 
-  const pick = (v: number) => { setVal(v); saveUserRating(asin, v); onRated?.(v); };
+  const pick = (v: number) => {
+    const prev = getUserRating(asin);
+    setVal(v);
+    saveUserRating(asin, v);
+    submitRating(asin, v, prev);     // share with everyone
+    onRated?.(v, prev);
+  };
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>

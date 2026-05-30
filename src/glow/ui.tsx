@@ -323,11 +323,12 @@ const THUMB_POS: Record<string, string> = {
   night:       "0% 42%",
   toner:       "12% 64%",
 };
-export function ProductThumb({ name, size = 46, img }: { name: string; size?: number; img?: string }) {
+export function ProductThumb({ name, size = 46, img, contain = true }: { name: string; size?: number; img?: string; contain?: boolean }) {
   if (img) {
+    // show the FULL product (objectFit:contain) on a clean white tile so nothing is cut off
     return (
-      <div style={{ width: size, height: size, borderRadius: size * 0.28, flexShrink: 0, overflow: "hidden", backgroundColor: "#F3E7E0", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.06)" }}>
-        <img src={img} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+      <div style={{ width: size, height: size, borderRadius: size * 0.28, flexShrink: 0, overflow: "hidden", backgroundColor: "#FFFFFF", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.06)", display: "flex", alignItems: "center", justifyContent: "center", padding: size * 0.06, boxSizing: "border-box" }}>
+        <img src={img} alt={name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: contain ? "contain" : "cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
       </div>
     );
   }

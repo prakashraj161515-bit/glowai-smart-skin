@@ -321,8 +321,8 @@ export default function Home() {
                   const img = productImg(p.name);
                   return (
                   <div key={p.asin} onClick={() => router.push("/store")} style={{ borderRadius: 20, overflow: "hidden", background: T.surface, boxShadow: T.shadow, cursor: "pointer", display: "flex", flexDirection: "column" }}>
-                    <div style={{ height: 130, position: "relative", overflow: "hidden", background: "#F3E7E0" }}>
-                      {img && <img src={img} alt={p.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+                    <div style={{ height: 130, position: "relative", overflow: "hidden", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 10, boxSizing: "border-box" }}>
+                      {img && <img src={img} alt={p.name} loading="lazy" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />}
                       <div style={{ position: "absolute", top: 9, left: 0, display: "flex", alignItems: "center", gap: 3, padding: "3px 9px 3px 7px", background: "linear-gradient(135deg,#F5A623,#E8821C)", color: "#fff", fontFamily: SANS, fontSize: 9.5, fontWeight: 800, borderRadius: "0 99px 99px 0", textTransform: "uppercase", letterSpacing: 0.3 }}>
                         <Icon name="flame" size={10} color="#fff" fill />Bestseller
                       </div>

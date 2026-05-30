@@ -1,16 +1,27 @@
 "use client";
-import { useState, useMemo, useCallback } from "react";
-import { T, SERIF, SANS, MONO, rgba, Icon, Card, Badge, ProductThumb, BuyBtn } from "@/glow/ui";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { T, SERIF, SANS, MONO, rgba, Icon, Badge, ProductThumb, BuyBtn } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
 import { ALL_PRODUCTS, AffProduct, productImg } from "@/glow/affiliate";
-import { Stars, LivePrice, RateStars, fmtCount, blendedRating, getUserRating } from "@/glow/store-ui";
+import { Stars, LivePrice, RateStars, fmtCount, blendedRating, getUserRating, fetchGlobalRatings, ensurePrice, priceNum, GAgg } from "@/glow/store-ui";
+import { searchProducts } from "@/glow/search";
+
+// internal category value -> friendly label
+const CAT_LABEL: Record<string, string> = { Cleanser: "Facewash" };
+const catLabel = (c: string) => CAT_LABEL[c] || c;
 
 const CATS = ["All", "Cleanser", "Serum", "Moisturizer", "SPF", "Toner", "Night Cream", "Treatment"] as const;
 const CAT_EMOJI: Record<string, string> = {
   All: "✨", Cleanser: "🧼", Serum: "💧", Moisturizer: "🧴", SPF: "☀️", Toner: "🌸", "Night Cream": "🌙", Treatment: "💊",
 };
+type Sort = "popular" | "rated" | "priceLow" | "priceHigh";
+const SORTS: { id: Sort; label: string }[] = [
+  { id: "popular", label: "Popular" },
+  { id: "rated", label: "Top Rated" },
+  { id: "priceLow", label: "Price ↑" },
+  { id: "priceHigh", label: "Price ↓" },
+];
 
-// ── ingredient knowledge base (for the checker) ──
 const INGREDIENTS: { key: string; name: string; verdict: "good" | "caution" | "avoid"; note: string }[] = [
   { key: "niacinamide", name: "Niacinamide", verdict: "good", note: "Calms redness, controls oil, fades marks. Suits almost everyone." },
   { key: "vitamin c", name: "Vitamin C", verdict: "good", note: "Brightens & fades dark spots. Use in the morning under SPF." },
@@ -21,28 +32,56 @@ const INGREDIENTS: { key: string; name: string; verdict: "good" | "caution" | "a
   { key: "retinol", name: "Retinol", verdict: "caution", note: "Smooths texture & fine lines. Night only, build up slowly, always SPF next day." },
   { key: "fragrance", name: "Fragrance / Parfum", verdict: "avoid", note: "A common irritant — best avoided for sensitive or acne-prone skin." },
   { key: "alcohol", name: "Denatured Alcohol", verdict: "avoid", note: "Can strip and dry the skin barrier. Avoid high up in the list." },
-  { key: "spf", name: "SPF / Sunscreen", verdict: "good", note: "Daily SPF is the #1 anti-ageing and anti-pigmentation step." },
 ];
 
 export default function StorePage() {
   const [cat, setCat] = useState<string>("All");
   const [q, setQ] = useState("");
+  const [sort, setSort] = useState<Sort>("popular");
   const [conflict, setConflict] = useState(false);
   const [checker, setChecker] = useState(false);
   const [ingQ, setIngQ] = useState("");
-  const [, forceRefresh] = useState(0);
-  const refresh = useCallback(() => forceRefresh(x => x + 1), []);
+  const [global, setGlobal] = useState<GAgg>({});
+  const [tick, setTick] = useState(0);
+  const bump = useCallback(() => setTick(x => x + 1), []);
+
+  // load global community ratings
+  useEffect(() => { fetchGlobalRatings().then(setGlobal); }, []);
+
+  // base filter (category + fuzzy search)
+  const filtered = useMemo(() => {
+    let list = cat === "All" ? ALL_PRODUCTS : ALL_PRODUCTS.filter(p => p.cat === cat);
+    if (q.trim()) {
+      const scored = searchProducts(list, q);
+      return scored.map(x => x.p); // already relevance-sorted
+    }
+    return list;
+  }, [cat, q]);
+
+  // when sorting by price, make sure prices are fetched
+  useEffect(() => {
+    if (sort === "priceLow" || sort === "priceHigh") {
+      let cancelled = false;
+      Promise.all(filtered.slice(0, 60).map(p => ensurePrice(p.asin))).then(() => { if (!cancelled) bump(); });
+      return () => { cancelled = true; };
+    }
+  }, [sort, filtered, bump]);
 
   const shown = useMemo(() => {
-    const t = q.trim().toLowerCase();
-    let list = ALL_PRODUCTS;
-    if (cat !== "All") list = list.filter(p => p.cat === cat);
-    if (t) list = list.filter(p =>
-      p.name.toLowerCase().includes(t) || p.brand.toLowerCase().includes(t) ||
-      p.cat.toLowerCase().includes(t) || p.tags.some(tag => tag.includes(t) || t.includes(tag)));
-    // bestsellers first, then by rating
-    return [...list].sort((a, b) => (b.bestseller ? 1 : 0) - (a.bestseller ? 1 : 0) || b.rating - a.rating);
-  }, [cat, q]);
+    const list = [...filtered];
+    const searching = q.trim().length > 0;
+    if (sort === "rated") {
+      list.sort((a, b) => b.rating - a.rating || b.reviews - a.reviews);
+    } else if (sort === "priceLow" || sort === "priceHigh") {
+      const pn = (a: AffProduct) => { const v = priceNum.get(a.asin); return v == null ? (sort === "priceLow" ? Infinity : -Infinity) : v; };
+      list.sort((a, b) => sort === "priceLow" ? pn(a) - pn(b) : pn(b) - pn(a));
+    } else if (!searching) {
+      // popular: bestsellers first, then rating
+      list.sort((a, b) => (b.bestseller ? 1 : 0) - (a.bestseller ? 1 : 0) || b.rating - a.rating);
+    }
+    return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtered, sort, q, tick]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { All: ALL_PRODUCTS.length };
@@ -58,7 +97,7 @@ export default function StorePage() {
     const prod = ALL_PRODUCTS.find(p => p.name.toLowerCase().includes(t) || t.includes(p.brand.toLowerCase()));
     if (prod) {
       const hit = INGREDIENTS.find(i => prod.tags.some(tag => i.key.includes(tag) || tag.includes(i.key)));
-      return { name: prod.name, verdict: (hit?.verdict ?? "good") as "good" | "caution" | "avoid", note: `${prod.cat} by ${prod.brand} — for ${prod.tags.slice(0, 3).join(", ")}. A good match for those concerns.` };
+      return { name: prod.name, verdict: (hit?.verdict ?? "good") as "good" | "caution" | "avoid", note: `${catLabel(prod.cat)} by ${prod.brand} — for ${prod.tags.slice(0, 3).join(", ")}. A good match for those concerns.` };
     }
     const kw = INGREDIENTS.find(i => t.includes(i.key) || t.includes(i.name.toLowerCase().split(" ")[0]));
     if (kw) return { name: ingQ, verdict: kw.verdict, note: `We don't stock this exact product, but it lists ${kw.name.toLowerCase()} — ${kw.note}` };
@@ -68,10 +107,18 @@ export default function StorePage() {
   const vCol: any = { good: "#7FB389", caution: "#E8A24C", avoid: "#E0685C" };
   const vLbl: any = { good: "Good for you", caution: "Use with care", avoid: "Best avoided" };
 
+  // on rate: optimistic update of the shared aggregate
+  const onRated = useCallback((asin: string, val: number, prev: number) => {
+    setGlobal(g => {
+      const cur = g[asin] || { sum: 0, count: 0 };
+      const next = prev ? { sum: cur.sum + val - prev, count: cur.count } : { sum: cur.sum + val, count: cur.count + 1 };
+      return { ...g, [asin]: next };
+    });
+  }, []);
+
   return (
     <div style={{ minHeight: "100vh", background: T.bg }}>
       <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "60px 0 130px" }}>
-        {/* header */}
         <div style={{ padding: "0 20px" }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 4 }}>
             <h1 style={{ fontFamily: SERIF, fontSize: 34, color: T.text, margin: 0 }}>Shop Skincare</h1>
@@ -82,7 +129,7 @@ export default function StorePage() {
           {/* search */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 15px", borderRadius: 15, background: T.surface, border: `1.5px solid ${q ? T.accent : T.border}`, marginBottom: 14, boxShadow: T.shadow }}>
             <Icon name="scan" size={19} color={T.textMute} />
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search product, brand or concern…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search — facewash, vitamin c, oily…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
             {q && <button onClick={() => setQ("")} style={{ background: "none", border: "none", cursor: "pointer" }}><Icon name="close" size={16} color={T.textFaint} /></button>}
           </div>
 
@@ -100,21 +147,32 @@ export default function StorePage() {
         </div>
 
         {/* category pills */}
-        <div className="glow-hscroll" style={{ display: "flex", gap: 9, overflowX: "auto", padding: "0 20px 4px", marginBottom: 16 }}>
+        <div className="glow-hscroll" style={{ display: "flex", gap: 9, overflowX: "auto", padding: "0 20px 4px", marginBottom: 12 }}>
           {CATS.map(c => {
             const active = cat === c;
             return (
               <button key={c} onClick={() => setCat(c)} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "9px 15px", borderRadius: 99, cursor: "pointer", border: `1.5px solid ${active ? T.accent : T.border}`, background: active ? T.accent : T.surface, color: active ? "#241712" : T.textMute, fontFamily: SANS, fontSize: 13.5, fontWeight: 650, whiteSpace: "nowrap", boxShadow: active ? `0 4px 12px ${rgba(T.accent, 0.3)}` : "none", transition: "all .2s" }}>
-                <span>{CAT_EMOJI[c]}</span>{c}
+                <span>{CAT_EMOJI[c]}</span>{catLabel(c)}
                 <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, opacity: 0.7 }}>{counts[c] || 0}</span>
               </button>
             );
           })}
         </div>
 
+        {/* sort pills */}
+        <div className="glow-hscroll" style={{ display: "flex", alignItems: "center", gap: 8, overflowX: "auto", padding: "0 20px 4px", marginBottom: 14 }}>
+          <Icon name="grid" size={15} color={T.textFaint} />
+          {SORTS.map(s => {
+            const active = sort === s.id;
+            return (
+              <button key={s.id} onClick={() => setSort(s.id)} style={{ flexShrink: 0, padding: "6px 13px", borderRadius: 99, cursor: "pointer", border: "none", background: active ? T.text : T.surface2, color: active ? "#fff" : T.textMute, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", transition: "all .2s" }}>{s.label}</button>
+            );
+          })}
+        </div>
+
         {/* product grid */}
         <div style={{ padding: "0 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13 }}>
-          {shown.map((p, i) => <ProductCard key={p.asin} p={p} idx={i} onRated={refresh} />)}
+          {shown.map((p, i) => <ProductCard key={p.asin} p={p} idx={i} agg={global[p.asin]} onRated={onRated} />)}
         </div>
         {shown.length === 0 && (
           <div style={{ textAlign: "center", padding: "50px 20px", color: T.textMute }}>
@@ -179,47 +237,50 @@ export default function StorePage() {
   );
 }
 
-// ── Product card ──────────────────────────────────────────────────
-function ProductCard({ p, idx, onRated }: { p: AffProduct; idx: number; onRated: () => void }) {
-  const ur = getUserRating(p.asin);
-  const { rating, reviews } = blendedRating(p.rating, p.reviews, ur);
+// ── Product card with gradient outline ────────────────────────────
+function ProductCard({ p, idx, agg, onRated }: { p: AffProduct; idx: number; agg?: { sum: number; count: number }; onRated: (asin: string, v: number, prev: number) => void }) {
+  const [ur, setUr] = useState(0);
+  useEffect(() => { setUr(getUserRating(p.asin)); }, [p.asin]);
+  const { rating, reviews } = blendedRating(p.rating, p.reviews, agg);
+  // gradient outline — gold for bestsellers, warm accent otherwise
+  const ring = p.bestseller
+    ? "linear-gradient(160deg, #F5C76B, rgba(245,166,35,0.25) 45%, rgba(60,30,20,0.06))"
+    : "linear-gradient(160deg, rgba(240,136,106,0.4), rgba(240,136,106,0.06) 45%, rgba(60,30,20,0.05))";
   return (
-    <div className="card-in" style={{ animationDelay: `${Math.min(idx, 12) * 30}ms`, borderRadius: 20, overflow: "hidden", background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 4px 16px rgba(60,30,20,0.06)", display: "flex", flexDirection: "column" }}>
-      {/* image */}
-      <div style={{ position: "relative", height: 150, background: "#F3E7E0" }}>
-        <ProductThumb name={p.name} size={150} img={productImg(p.name)} />
-        {p.bestseller && (
-          <div style={{ position: "absolute", top: 9, left: 0, display: "flex", alignItems: "center", gap: 4, padding: "4px 10px 4px 8px", background: "linear-gradient(135deg,#F5A623,#E8821C)", color: "#fff", fontFamily: SANS, fontSize: 10, fontWeight: 800, letterSpacing: 0.4, borderRadius: "0 99px 99px 0", boxShadow: "0 3px 8px rgba(232,130,28,0.4)", textTransform: "uppercase" }}>
-            <Icon name="flame" size={11} color="#fff" fill />Bestseller
+    <div className="card-in" style={{ animationDelay: `${Math.min(idx, 12) * 30}ms`, borderRadius: 21, padding: 1.5, background: ring, boxShadow: "0 5px 18px rgba(60,30,20,0.07)" }}>
+      <div style={{ borderRadius: 19.5, overflow: "hidden", background: T.surface, display: "flex", flexDirection: "column", height: "100%" }}>
+        {/* full product photo (not cropped) */}
+        <div style={{ position: "relative", height: 152, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 12, boxSizing: "border-box" }}>
+          <img src={productImg(p.name)} alt={p.name} loading="lazy" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+          {p.bestseller && (
+            <div style={{ position: "absolute", top: 9, left: 0, display: "flex", alignItems: "center", gap: 4, padding: "4px 10px 4px 8px", background: "linear-gradient(135deg,#F5A623,#E8821C)", color: "#fff", fontFamily: SANS, fontSize: 10, fontWeight: 800, letterSpacing: 0.4, borderRadius: "0 99px 99px 0", boxShadow: "0 3px 8px rgba(232,130,28,0.4)", textTransform: "uppercase" }}>
+              <Icon name="flame" size={11} color="#fff" fill />Bestseller
+            </div>
+          )}
+        </div>
+        {/* body */}
+        <div style={{ padding: "10px 11px 12px", display: "flex", flexDirection: "column", flex: 1, borderTop: `1px solid ${T.border}` }}>
+          <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 700, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 2 }}>{p.brand}</div>
+          <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: T.text, lineHeight: 1.2, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: 32 }}>{p.name}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6 }}>
+            <Stars value={rating} size={12} />
+            <span style={{ fontFamily: MONO, fontSize: 11.5, fontWeight: 700, color: T.text }}>{rating}</span>
+            <span style={{ fontFamily: SANS, fontSize: 10.5, color: T.textFaint }}>({fmtCount(reviews)})</span>
           </div>
-        )}
-      </div>
-      {/* body */}
-      <div style={{ padding: "10px 11px 12px", display: "flex", flexDirection: "column", flex: 1 }}>
-        <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 700, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.4, marginBottom: 2 }}>{p.brand}</div>
-        <div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 700, color: T.text, lineHeight: 1.2, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: 32 }}>{p.name}</div>
-        {/* rating */}
-        <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 6 }}>
-          <Stars value={rating} size={12} />
-          <span style={{ fontFamily: MONO, fontSize: 11.5, fontWeight: 700, color: T.text }}>{rating}</span>
-          <span style={{ fontFamily: SANS, fontSize: 10.5, color: T.textFaint }}>({fmtCount(reviews)})</span>
-        </div>
-        {/* price + buy */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 9, marginBottom: 9 }}>
-          <LivePrice asin={p.asin} />
-          <BuyBtn name={p.name} variant="pill" />
-        </div>
-        {/* user rating */}
-        <div style={{ marginTop: "auto", paddingTop: 8, borderTop: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontFamily: SANS, fontSize: 10.5, color: ur ? "#5FA572" : T.textMute, fontWeight: 700, flexShrink: 0, whiteSpace: "nowrap" }}>{ur ? "You rated ✓" : "Rate it"}</span>
-          <RateStars asin={p.asin} onRated={onRated} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 9, marginBottom: 9 }}>
+            <LivePrice asin={p.asin} />
+            <BuyBtn name={p.name} variant="pill" />
+          </div>
+          <div style={{ marginTop: "auto", paddingTop: 8, borderTop: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <span style={{ fontFamily: SANS, fontSize: 10.5, color: ur ? "#5FA572" : T.textMute, fontWeight: 700, flexShrink: 0, whiteSpace: "nowrap" }}>{ur ? "You rated ✓" : "Rate it"}</span>
+            <RateStars asin={p.asin} onRated={(v, prev) => { setUr(v); onRated(p.asin, v, prev); }} />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-// ── bottom sheet ──
 function Sheet({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
