@@ -12,8 +12,11 @@
 //  karega. Koi aur file chhune ki zaroorat nahi.
 // ═══════════════════════════════════════════════════════════════════════════
 
-// Fallback search links isi store + tag se banenge (jab kisi product ka apna
-// link na ho). Apna Amazon associate tag yaha daalo (optional).
+// DEFAULT affiliate link — jab kisi product ka apna alag link na ho, har "Buy"
+// button isi pe jaayega. Yaha apna main affiliate link daalo.
+export const DEFAULT_LINK = "https://amzn.to/4dDZDau";
+
+// Fallback search links isi store + tag se banenge (jab DEFAULT_LINK bhi khaali ho).
 export const AMAZON_DOMAIN = "www.amazon.in"; // e.g. www.amazon.com, www.amazon.co.uk
 export const AMAZON_TAG = "";                 // e.g. "glowai-21"  (khaali chhod sakte ho)
 
@@ -41,8 +44,9 @@ export const AFFILIATE_LINKS: Record<string, string> = {
 // Returns the buy link for a product. Custom link if set, else an Amazon search.
 export function affiliateUrl(name: string): string {
   const direct = AFFILIATE_LINKS[name];
-  if (direct && direct.trim()) return direct.trim();
-  const q = encodeURIComponent(`${name} skincare`);
+  if (direct && direct.trim()) return direct.trim();      // 1) product ka apna link
+  if (DEFAULT_LINK && DEFAULT_LINK.trim()) return DEFAULT_LINK.trim(); // 2) default link
+  const q = encodeURIComponent(`${name} skincare`);       // 3) Amazon search fallback
   const tag = AMAZON_TAG ? `&tag=${encodeURIComponent(AMAZON_TAG)}` : "";
   return `https://${AMAZON_DOMAIN}/s?k=${q}${tag}`;
 }
