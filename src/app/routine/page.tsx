@@ -238,7 +238,7 @@ export default function RoutinePage() {
                       <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 18, cursor: "pointer", background: checked[idx] ? T.surface2 : T.surface, border: "1px solid " + (checked[idx] ? T.border : rgba(SEC_COL[section], 0.18)), boxShadow: checked[idx] ? "none" : "0 3px 14px rgba(60,30,20,0.07)", opacity: checked[idx] ? 0.6 : 1, transition: "all .25s" }}>
                         <ProductThumb name={name} size={46} />
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.2 }}>{name}</div>
+                          <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.22 }}>{name}</div>
                           <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 2 }}>{brand}</div>
                         </div>
                         <button onClick={e => { e.stopPropagation(); toggleReminder(idx); }} title="Set reminder" style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, cursor: "pointer", border: "none", background: reminders.includes(idx) ? rgba("#E8A24C", 0.16) : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
