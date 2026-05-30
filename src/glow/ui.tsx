@@ -280,7 +280,25 @@ export function productType(name: string): "cleanser" | "serum" | "niacinamide" 
   return "moisturizer";
 }
 
+// Real product photo by name — crops a different bottle out of the verified
+// brand-free flatlay (public/hero-product.jpg) for each product type.
 export function ProductThumb({ name, size = 46 }: { name: string; size?: number }) {
+  const type = productType(name);
+  const crop: Record<string, string> = {
+    cleanser:    "32% 88%",  // white tube
+    serum:       "6% 46%",   // amber dropper
+    niacinamide: "2% 70%",   // amber bottle
+    moisturizer: "30% 40%",  // compact / jar
+    spf:         "22% 96%",  // white tube 2
+    night:       "0% 60%",   // amber bottle
+    toner:       "12% 52%",  // dropper
+  };
+  return (
+    <div style={{ width: size, height: size, borderRadius: 13, flexShrink: 0, overflow: "hidden", backgroundImage: "url(/hero-product.jpg)", backgroundSize: "300%", backgroundPosition: crop[type] || "10% 60%", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.05)" }} />
+  );
+}
+
+function ProductThumbSVG({ name, size = 46 }: { name: string; size?: number }) {
   const type = productType(name);
   // [bg tile, body color, cap color]
   const palette: Record<string, [string, string, string]> = {
