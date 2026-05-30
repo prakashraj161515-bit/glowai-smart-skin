@@ -284,6 +284,14 @@ export default function RoutinePage() {
 function DietPlan({ day, avoid, region, focus, dayName, onAsk }: { day: any; avoid: string[]; region: string; focus: string; dayName: string; onAsk: () => void }) {
   return (
     <div>
+      {/* healthy plan intro */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 15px", borderRadius: 16, marginBottom: 18, background: "linear-gradient(135deg, rgba(127,179,137,0.16), rgba(127,179,137,0.06))", border: "1px solid rgba(127,179,137,0.3)" }}>
+        <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: "rgba(127,179,137,0.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🥗</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#3F7A52" }}>Clean, skin-healthy meals</div>
+          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 1 }}>Wholesome, balanced food to help {focus}.</div>
+        </div>
+      </div>
       {day?.meals.map((meal: Meal) => (
         <div key={meal.meal} style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
@@ -309,6 +317,24 @@ function DietPlan({ day, avoid, region, focus, dayName, onAsk }: { day: any; avo
           </div>
         </div>
       ))}
+
+      {/* Eat more — healthy skin-friendly staples */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(127,179,137,0.18)", fontSize: 15 }}>✅</div>
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: "#5FA572", textTransform: "uppercase", letterSpacing: 1 }}>Eat more of these</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(127,179,137,0.25)" }} />
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {[
+            { l: "Leafy greens", e: "🥬" }, { l: "Fresh fruit", e: "🍓" }, { l: "Nuts & seeds", e: "🌰" },
+            { l: "Lean protein", e: "🍗" }, { l: "8+ glasses water", e: "💧" }, { l: "Curd / yogurt", e: "🥛" },
+            { l: "Green tea", e: "🍵" }, { l: "Omega-3 (fish/flax)", e: "🐟" },
+          ].map((h) => (
+            <span key={h.l} style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: "#3F7A52", background: "rgba(127,179,137,0.12)", padding: "7px 12px", borderRadius: 99, border: "1px solid rgba(127,179,137,0.28)" }}>{h.e} {h.l}</span>
+          ))}
+        </div>
+      </div>
 
       <div style={{ marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
