@@ -236,9 +236,9 @@ export default function Home() {
 
   // ════════════════════════ MAIN APP ════════════════════════
   const firstName = (userName || "there").split(" ")[0];
-  // Real products only — fake brands hataye. Naye products jab link milega tab add honge.
-  const PRODUCTS: [string, string, number][] = [
-    ["Garnier Bright Complete Vitamin C Face Wash", "Garnier", 0],
+  // Real products only — [name, brand, photoIndex, img?]
+  const PRODUCTS: [string, string, number, string?][] = [
+    ["Garnier Bright Complete Vitamin C Face Wash", "Garnier", 0, "/products/garnier-vitc-facewash.jpg"],
   ];
 
   return (
@@ -312,9 +312,10 @@ export default function Home() {
             <div style={{ padding: "40px 0", textAlign: "center", color: T.textFaint, fontFamily: SANS, fontSize: 14 }}>No makeup products yet</div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {PRODUCTS.map(([name, brand, pi], i) => (
+              {PRODUCTS.map(([name, brand, pi, img], i) => (
                 <div key={i} onClick={() => router.push("/store")} style={{ borderRadius: 20, overflow: "hidden", background: T.surface, boxShadow: T.shadow, cursor: "pointer" }}>
-                  <div style={{ height: 130, position: "relative", overflow: "hidden", backgroundImage: "url(/hero-product.jpg)", backgroundSize: "260%", backgroundPosition: ["8% 28%", "2% 72%", "30% 86%", "6% 50%", "22% 96%", "0% 40%"][i % 6] }}>
+                  <div style={{ height: 130, position: "relative", overflow: "hidden", background: "#F3E7E0", ...(img ? {} : { backgroundImage: "url(/hero-product.jpg)", backgroundSize: "260%", backgroundPosition: ["8% 28%", "2% 72%", "30% 86%", "6% 50%", "22% 96%", "0% 40%"][i % 6] }) }}>
+                    {img && <img src={img} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
                     <button onClick={e => { e.stopPropagation(); setLiked(l => l.includes(i) ? l.filter(x => x !== i) : [...l, i]); }} style={{ position: "absolute", top: 10, right: 10, width: 32, height: 32, borderRadius: 99, background: "rgba(255,255,255,0.85)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Icon name="star" size={16} color={liked.includes(i) ? "#F0886A" : "#ccc"} sw={1.5} fill={liked.includes(i)} />
                     </button>

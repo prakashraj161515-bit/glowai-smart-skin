@@ -323,7 +323,14 @@ const THUMB_POS: Record<string, string> = {
   night:       "0% 42%",
   toner:       "12% 64%",
 };
-export function ProductThumb({ name, size = 46 }: { name: string; size?: number }) {
+export function ProductThumb({ name, size = 46, img }: { name: string; size?: number; img?: string }) {
+  if (img) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: size * 0.28, flexShrink: 0, overflow: "hidden", backgroundColor: "#F3E7E0", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.06)" }}>
+        <img src={img} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = "none"; }} />
+      </div>
+    );
+  }
   return (
     <div style={{ width: size, height: size, borderRadius: size * 0.28, flexShrink: 0, overflow: "hidden", backgroundColor: "#F3E7E0", backgroundImage: "url(/hero-product.jpg)", backgroundSize: "240%", backgroundPosition: THUMB_POS[productType(name)] || "20% 60%", backgroundRepeat: "no-repeat", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.06)" }} />
   );

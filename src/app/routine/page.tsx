@@ -11,7 +11,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 // ── Real products only — fake brands hataye ──
 // Naye products jab aap link doge tab add honge
 const ITEMS = [
-  { time: "8:00", period: "AM", section: "Morning", name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier" },
+  { time: "8:00", period: "AM", section: "Morning", name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier", img: "/products/garnier-vitc-facewash.jpg" },
   // aur products aane wale hain...
 ];
 const SEC_COL: any = { Morning: "#E8A24C", Afternoon: "#5FAD72", Evening: "#8B85E0" };
@@ -224,7 +224,7 @@ export default function RoutinePage() {
                     <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: SEC_COL[section], textTransform: "uppercase", letterSpacing: 1 }}>{section}</span>
                     <div style={{ flex: 1, height: 1, background: rgba(SEC_COL[section], 0.20) }} />
                   </div>
-                  {items.map(({ idx, time, period, name, brand }) => (
+                  {items.map(({ idx, time, period, name, brand, img }: any) => (
                     <div key={idx} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
                       <div style={{ width: 44, flexShrink: 0, textAlign: "right" }}>
                         <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, color: checked[idx] ? T.textFaint : T.accentText, lineHeight: 1 }}>{time}</div>
@@ -232,7 +232,7 @@ export default function RoutinePage() {
                       </div>
                       <div style={{ width: 8, height: 8, borderRadius: 99, flexShrink: 0, transition: "all .25s", background: checked[idx] ? T.accent : rgba(SEC_COL[section], 0.4), boxShadow: checked[idx] ? "0 0 0 3px " + rgba(T.accent, 0.2) : "none" }} />
                       <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", gap: 7, padding: "10px 9px", borderRadius: 18, cursor: "pointer", background: checked[idx] ? T.surface2 : T.surface, border: "1px solid " + (checked[idx] ? T.border : rgba(SEC_COL[section], 0.18)), boxShadow: checked[idx] ? "none" : "0 3px 14px rgba(60,30,20,0.07)", opacity: checked[idx] ? 0.6 : 1, transition: "all .25s" }}>
-                        <ProductThumb name={name} size={42} />
+                        <ProductThumb name={name} size={42} img={img} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", overflowWrap: "anywhere", lineHeight: 1.2 }}>{name}</div>
                           <div style={{ fontFamily: SANS, fontSize: 11, color: T.textMute, marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{brand}</div>
