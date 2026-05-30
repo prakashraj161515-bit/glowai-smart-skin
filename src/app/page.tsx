@@ -197,49 +197,8 @@ export default function Home() {
     );
   }
 
-  // ════════════════════════ WELCOME ════════════════════════
-  if (showLanding && authView === "welcome") {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", background: "linear-gradient(175deg, #FCEEE8 0%, #F9D8C8 45%, #F5C0A8 100%)" }}>
-        {[{ size: 300, top: -80, left: -80, opacity: 0.22, delay: "0s" }, { size: 240, top: 300, right: -70, opacity: 0.18, delay: "1.2s" }, { size: 180, top: 160, left: 100, opacity: 0.10, delay: "2.4s" }].map((b, i) => (
-          <div key={i} className="animate-float" style={{ position: "absolute", width: b.size, height: b.size, borderRadius: 99, top: b.top, left: b.left, right: (b as any).right, background: `radial-gradient(circle, rgba(240,120,80,${b.opacity}) 0%, transparent 70%)`, animationDelay: b.delay, pointerEvents: "none" }} />
-        ))}
-        <div className="animate-fadeup" style={{ position: "absolute", top: 140, right: 22 }}><ProductChip label="Vitamin C Serum" sub="Morning step" color="#FEF0EB" /></div>
-        <div className="animate-fadeup" style={{ position: "absolute", top: 218, left: 18 }}><ProductChip label="Daily Shield SPF 50" sub="Don't skip" color="#EFF0FD" /></div>
-        <div className="animate-fadeup" style={{ position: "absolute", top: 300, right: 30 }}><ProductChip label="Niacinamide 10%" sub="PM routine" color="#EDF7EE" /></div>
-
-        <div style={{ position: "absolute", top: 68, left: "50%", transform: "translateX(-50%)", padding: "7px 16px", borderRadius: 99, background: "rgba(255,255,255,0.70)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.9)", display: "flex", alignItems: "center", gap: 7, whiteSpace: "nowrap", boxShadow: "0 4px 20px rgba(200,90,50,0.14)" }}>
-          <span className="animate-blink" style={{ width: 7, height: 7, borderRadius: 99, background: "#7FB389", boxShadow: "0 0 8px #7FB389" }} />
-          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: "#2C1F1A", letterSpacing: 0.3 }}>AI skin analysis · live</span>
-        </div>
-        <div style={{ position: "absolute", top: 108, left: "50%", transform: "translateX(-50%)", pointerEvents: "none", opacity: 0.22 }}><ScoreDial score={74} size={240} /></div>
-
-        <div style={{ marginTop: "auto", padding: "0 28px" }}>
-          <div className="animate-fadeup" style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <Icon name="spark" size={20} color="#C44E28" fill />
-            <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 2, textTransform: "uppercase" }}>GlowAI</span>
-          </div>
-          <h1 className="animate-fadeup" style={{ fontFamily: SERIF, fontSize: 52, lineHeight: 0.94, color: "#2C1F1A", margin: "0 0 14px", fontWeight: 400, letterSpacing: -1 }}>
-            Skin that<br /><em>actually</em><br />improves.
-          </h1>
-          <p className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 15, color: "rgba(44,31,26,0.56)", lineHeight: 1.55, margin: "0 0 26px", maxWidth: 280 }}>
-            AI scans your skin, builds a routine for you, and tracks real progress week by week.
-          </p>
-          <div className="animate-fadeup" style={{ marginBottom: 14 }}>
-            <PrimaryBtn onClick={() => setAuthView("auth")}>Get Started</PrimaryBtn>
-          </div>
-          <div className="animate-fadeup" style={{ textAlign: "center", paddingBottom: 32 }}>
-            <button onClick={() => setAuthView("auth")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 14, color: "rgba(44,31,26,0.48)", fontWeight: 500 }}>
-              Have an account? <span style={{ color: "#C44E28", fontWeight: 700 }}>Sign In</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ════════════════════════ AUTH ════════════════════════
-  if (showLanding && authView === "auth") {
+  // ════════════════════════ AUTH (landing) ════════════════════════
+  if (showLanding) {
     return <AuthScreen onContinue={handleLogin} />;
   }
 

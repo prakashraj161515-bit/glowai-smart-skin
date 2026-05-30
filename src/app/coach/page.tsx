@@ -21,9 +21,13 @@ export default function CoachPage() {
     setMsgs(m => [...m, { who: "typing" }]);
     try {
       const scan = localStorage.getItem("velmora_analysis");
-      const r = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: question, skinData: scan ? JSON.parse(scan) : null }) });
+      const ctx = scan ? (() => { try { const s = JSON.parse(scan); return `Score ${s.score}, acne ${s.acne}, oil ${s.oil}, pigmentation ${s.pigmentation}`; } catch { return ""; } })() : "";
+      const r = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: question, context: ctx }) });
       const d = await r.json();
-      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: d.reply || "Here's what I found for your skin." }));
+      let reply = d.text || d.reply;
+      if (!reply) throw new Error(d.error || "empty");
+      reply = reply.replace(/\*\*/g, "").replace(/^[\-*]\s+/gm, "• ").trim();
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: reply }));
     } catch {
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "Your chin breakouts line up with this week's humidity spike and lower hydration. Stay consistent with your BHA toner, and don't skip moisturizer — dehydrated skin overproduces oil." }));
     }
