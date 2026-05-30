@@ -58,7 +58,8 @@ type IconName =
   | "home" | "scan" | "routine" | "products" | "profile" | "chat" | "chev" | "chevL"
   | "chevDown" | "check" | "plus" | "close" | "spark" | "bell" | "bolt" | "drop"
   | "sun" | "moon" | "camera" | "flip" | "flame" | "arrowUp" | "arrowDown" | "arrowR"
-  | "edit" | "lock" | "star" | "info" | "send" | "grid" | "clock" | "warn" | "leaf";
+  | "edit" | "lock" | "star" | "info" | "send" | "grid" | "clock" | "warn" | "leaf"
+  | "crown" | "gem" | "bin" | "bellRing";
 
 export function Icon({ name, size = 24, color = "currentColor", sw = 1.7, fill = false }:
   { name: IconName; size?: number; color?: string; sw?: number; fill?: boolean }) {
@@ -97,6 +98,10 @@ export function Icon({ name, size = 24, color = "currentColor", sw = 1.7, fill =
     clock: <g {...p}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></g>,
     warn: <g {...p}><path d="M12 3l9 16H3z" /><path d="M12 9v5M12 17h.01" /></g>,
     leaf: <path d="M5 19C5 9 13 5 20 5c0 9-6 14-13 14a5 5 0 01-2-9" {...p} />,
+    crown: <g {...p}><path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z" fill={fill ? color : "none"} /><path d="M5 19h14" /></g>,
+    gem: <g {...p}><path d="M6 3h12l3 6-9 12L3 9z" fill={fill ? color : "none"} /><path d="M3 9h18M9 3l-3 6 6 12 6-12-3-6" /></g>,
+    bin: <g {...p}><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" /></g>,
+    bellRing: <g {...p}><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z" /><path d="M10 20a2 2 0 004 0" /><path d="M2.5 6.5C3 5 4 4 4 4M21.5 6.5C21 5 20 4 20 4" /></g>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "block", flexShrink: 0 }}>{paths[name]}</svg>;
 }
@@ -374,7 +379,7 @@ export function WaterTracker({ ml, setMl, target = 3000 }:
   const totalGlasses = Math.round(target / 250);
   const done = ml >= target;
   return (
-    <div style={{ borderRadius: 24, marginBottom: 16, overflow: "hidden", position: "relative", background: "linear-gradient(145deg, #2A6FDB 0%, #4E8ED4 50%, #6BA8E8 100%)", padding: "20px 20px 18px", boxShadow: "0 12px 32px rgba(42,111,219,0.30)" }}>
+    <div style={{ borderRadius: 22, marginBottom: 14, overflow: "hidden", position: "relative", background: "linear-gradient(145deg, #2A6FDB 0%, #4E8ED4 50%, #6BA8E8 100%)", padding: "15px 18px 13px", boxShadow: "0 12px 32px rgba(42,111,219,0.30)" }}>
       <div style={{ position: "absolute", top: -30, right: -30, width: 130, height: 130, borderRadius: 99, background: "rgba(255,255,255,0.08)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: -20, left: 40, width: 90, height: 90, borderRadius: 99, background: "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
       <div style={{ display: "flex", alignItems: "center", gap: 16, position: "relative" }}>
@@ -399,7 +404,7 @@ export function WaterTracker({ ml, setMl, target = 3000 }:
           </div>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 5, margin: "14px 0 14px", position: "relative" }}>
+      <div style={{ display: "flex", gap: 5, margin: "11px 0 11px", position: "relative" }}>
         {Array.from({ length: totalGlasses }).map((_, i) => (
           <div key={i} onClick={() => setMl((i + 1) * 250)} style={{ flex: 1, height: 8, borderRadius: 99, cursor: "pointer", transition: "background .25s, transform .15s", background: i < glasses ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.22)", transform: i === glasses - 1 ? "scaleY(1.3)" : "scaleY(1)" }} />
         ))}

@@ -34,26 +34,103 @@ export default function RoutinePage() {
   const [selIdx, setSelIdx] = useState(TODAY_OFFSET);
   const selDate = week[selIdx];
 
-  const [checked, setChecked] = useState<boolean[]>([true, true, false, false, false, false, false, false]);
+  const [checked, setChecked] = useState<boolean[]>([false, false, false, false, false, false, false, false]);
   const [tab, setTab] = useState<"Skincare" | "Diet Plan">("Skincare");
-  const [water, setWater] = useState(500);
+  const [water, setWater] = useState(0);
   const [country, setCountry] = useState("India");
   const [scan, setScan] = useState<any>({ acne: 30, oil: 45, pigmentation: 25, hydration: 55, score: 74 });
+  const [reminders, setReminders] = useState<number[]>([]);
+  const [alarm, setAlarm] = useState<number | null>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   const dayRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const audioRef = useRef<any>(null);
 
+  // ── daily refresh: water + checks reset every new day ──
   useEffect(() => {
-    const w = localStorage.getItem("velmora_water_intake"); if (w) setWater(parseInt(w));
+    const today = new Date().toDateString();
+    const lastDay = localStorage.getItem("velmora_routine_day");
     const c = localStorage.getItem("velmora_country") || detectCountry(); setCountry(c);
     const a = localStorage.getItem("velmora_analysis"); if (a) { try { setScan(JSON.parse(a)); } catch {} }
+    try { const r = JSON.parse(localStorage.getItem("velmora_reminders") || "[]"); setReminders(r); } catch {}
+
+    if (lastDay !== today) {
+      // new day → reset water + all checks
+      setWater(0); localStorage.setItem("velmora_water_intake", "0");
+      setChecked(ITEMS.map(() => false));
+      localStorage.setItem("velmora_routine_checks", JSON.stringify(ITEMS.map(() => false)));
+      localStorage.setItem("velmora_routine_day", today);
+      localStorage.removeItem("velmora_alarm_fired");
+    } else {
+      const w = localStorage.getItem("velmora_water_intake"); if (w) setWater(parseInt(w));
+      try { const ch = JSON.parse(localStorage.getItem("velmora_routine_checks") || "null"); if (ch) setChecked(ch); } catch {}
+    }
   }, []);
-  // auto-center selected day in the strip
+
+  // auto-center selected day
   useEffect(() => {
     const el = dayRefs.current[selIdx];
     if (el) el.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }, [selIdx]);
 
+  // ── alarm clock: ring when a reminder time arrives ──
+  useEffect(() => {
+    const id = setInterval(() => {
+      const now = new Date();
+      const hhmm = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+      let fired: string[] = [];
+      try { fired = JSON.parse(localStorage.getItem("velmora_alarm_fired") || "[]"); } catch {}
+      reminders.forEach(idx => {
+        const it = ITEMS[idx]; if (!it) return;
+        let [h, m] = it.time.split(":").map(Number);
+        if (it.period === "PM" && h !== 12) h += 12;
+        if (it.period === "AM" && h === 12) h = 0;
+        const key = `${idx}-${h}:${String(m).padStart(2, "0")}`;
+        if (`${h}:${String(m).padStart(2, "0")}` === hhmm && !fired.includes(key)) {
+          fired.push(key); localStorage.setItem("velmora_alarm_fired", JSON.stringify(fired));
+          ringAlarm(idx);
+        }
+      });
+    }, 15000);
+    return () => clearInterval(id);
+  }, [reminders]);
+
+  const ringAlarm = (idx: number) => {
+    setAlarm(idx);
+    try {
+      const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const ctx = new Ctx(); audioRef.current = ctx;
+      const beep = () => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine"; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+        g.gain.setValueAtTime(0.0001, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+        o.start(); o.stop(ctx.currentTime + 0.5);
+      };
+      beep();
+      const loop = setInterval(beep, 800);
+      audioRef.current._loop = loop;
+      // auto-stop after 60s
+      audioRef.current._timeout = setTimeout(() => stopAlarm(), 60000);
+    } catch {}
+    if (navigator.vibrate) navigator.vibrate([300, 200, 300, 200, 300]);
+  };
+  const stopAlarm = () => {
+    setAlarm(null);
+    const ctx = audioRef.current;
+    if (ctx) { clearInterval(ctx._loop); clearTimeout(ctx._timeout); try { ctx.close(); } catch {} audioRef.current = null; }
+  };
+
+  const toggleReminder = (idx: number) => {
+    setReminders(r => {
+      const next = r.includes(idx) ? r.filter(x => x !== idx) : [...r, idx];
+      localStorage.setItem("velmora_reminders", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const setW = (v: number) => { setWater(v); localStorage.setItem("velmora_water_intake", String(v)); };
+  const setCheckedSaved = (fn: (c: boolean[]) => boolean[]) => setChecked(c => { const n = fn(c); localStorage.setItem("velmora_routine_checks", JSON.stringify(n)); return n; });
 
   const doneCount = checked.filter(Boolean).length;
   const pct = Math.round((doneCount / ITEMS.length) * 100);
@@ -138,7 +215,10 @@ export default function RoutinePage() {
                           <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.2 }}>{name}</div>
                           <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 2 }}>{brand}</div>
                         </div>
-                        <button onClick={e => { e.stopPropagation(); setChecked(c => c.map((v, x) => x === idx ? !v : v)); }} style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, cursor: "pointer", border: "1.5px solid " + (checked[idx] ? T.accent : T.borderHi), background: checked[idx] ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
+                        <button onClick={e => { e.stopPropagation(); toggleReminder(idx); }} title="Set reminder" style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, cursor: "pointer", border: "none", background: reminders.includes(idx) ? rgba("#E8A24C", 0.16) : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Icon name={reminders.includes(idx) ? "bellRing" : "bell"} size={17} color={reminders.includes(idx) ? "#E8A24C" : T.textFaint} sw={1.8} fill={reminders.includes(idx)} />
+                        </button>
+                        <button onClick={e => { e.stopPropagation(); setCheckedSaved(c => c.map((v, x) => x === idx ? !v : v)); }} style={{ width: 28, height: 28, borderRadius: 9, flexShrink: 0, cursor: "pointer", border: "1.5px solid " + (checked[idx] ? T.accent : T.borderHi), background: checked[idx] ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
                           {checked[idx] && <Icon name="check" size={15} color="#fff" sw={2.8} />}
                         </button>
                       </div>
@@ -153,6 +233,22 @@ export default function RoutinePage() {
           <DietPlan day={dayPlan} avoid={weekPlan.avoid} region={weekPlan.region} focus={weekPlan.focus} dayName={DAY_NAMES[selDate.getDay()]} onAsk={() => router.push("/coach?q=" + encodeURIComponent("What should I eat for my skin?"))} />
         )}
       </div>
+
+      {/* ── ALARM overlay ── */}
+      {alarm !== null && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, maxWidth: 430, margin: "0 auto", background: "linear-gradient(160deg, #2C1F1A, #1a1310)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, padding: 30 }}>
+          <div className="animate-spinpulse" style={{ width: 110, height: 110, borderRadius: 99, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 40px ${T.accent}` }}>
+            <Icon name="bellRing" size={52} color="#fff" sw={2} fill />
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontFamily: MONO, fontSize: 38, fontWeight: 700, color: "#fff" }}>{ITEMS[alarm].time} {ITEMS[alarm].period}</div>
+            <div style={{ fontFamily: SERIF, fontSize: 26, color: "#fff", marginTop: 6 }}>{ITEMS[alarm].name}</div>
+            <div style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.6)", marginTop: 4 }}>Time for your skincare step ✦</div>
+          </div>
+          <button onClick={() => { setCheckedSaved(c => c.map((v, x) => x === alarm ? true : v)); stopAlarm(); }} style={{ width: "100%", maxWidth: 300, height: 56, borderRadius: 16, border: "none", cursor: "pointer", background: T.accent, color: "#241712", fontFamily: SANS, fontSize: 17, fontWeight: 700 }}>Done · Stop alarm</button>
+          <button onClick={stopAlarm} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.55)", fontFamily: SANS, fontSize: 14, fontWeight: 600 }}>Snooze / dismiss</button>
+        </div>
+      )}
 
       <AppTabBar active="routine" />
     </div>

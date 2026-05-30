@@ -72,19 +72,15 @@ export default function CoachPage() {
       <div style={{ position: "absolute", top: 120, right: -80, width: 240, height: 240, borderRadius: 99, background: "radial-gradient(circle, rgba(139,133,224,0.10) 0%, transparent 70%)", pointerEvents: "none", zIndex: 0 }} />
 
       {/* nav */}
-      <div style={{ display: "flex", alignItems: "center", padding: "54px 16px 10px", position: "relative", zIndex: 2 }}>
-        <button onClick={() => router.push("/")} style={{ width: 36, height: 36, borderRadius: 11, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-          {/* glowing avatar */}
-          <div style={{ width: 38, height: 38, borderRadius: 13, background: `linear-gradient(135deg, #F5A98D, ${T.accent})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 16px ${rgba(T.accent, 0.45)}` }}>
-            <Icon name="spark" size={20} color="#fff" fill />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontFamily: SERIF, fontSize: 20, color: T.text, lineHeight: 1 }}>Aura</span>
-            <span style={{ fontFamily: SANS, fontSize: 10.5, color: "#8FC299", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}><span className="animate-blink" style={{ width: 6, height: 6, borderRadius: 99, background: "#8FC299" }} />online · knows your scan</span>
-          </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "56px 16px 12px", position: "relative", zIndex: 2 }}>
+        <button onClick={() => router.push("/")} style={{ width: 38, height: 38, borderRadius: 12, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, boxShadow: T.shadow }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
+        <div style={{ width: 42, height: 42, borderRadius: 14, background: `linear-gradient(135deg, #F5A98D, ${T.accent})`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 6px 16px ${rgba(T.accent, 0.45)}`, flexShrink: 0 }}>
+          <Icon name="spark" size={22} color="#fff" fill />
         </div>
-        <div style={{ width: 36 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: SERIF, fontSize: 22, color: T.text, lineHeight: 1.05 }}>Aura</div>
+          <div style={{ fontFamily: SANS, fontSize: 11, color: "#8FC299", fontWeight: 600, display: "flex", alignItems: "center", gap: 5, marginTop: 1 }}><span className="animate-blink" style={{ width: 6, height: 6, borderRadius: 99, background: "#8FC299" }} />online · knows your scan</div>
+        </div>
       </div>
 
       {/* messages */}
@@ -120,8 +116,8 @@ export default function CoachPage() {
       {/* input */}
       <div style={{ padding: "8px 16px 30px", background: T.bg, position: "relative", zIndex: 2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 6px 6px 16px", borderRadius: 26, background: T.surface, border: `1px solid ${T.borderHi}`, boxShadow: "0 4px 16px rgba(60,30,20,0.06)" }}>
-          <Icon name="camera" size={22} color={T.textMute} />
-          <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask about your skin, a cream, a diet…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text, padding: "8px 0" }} />
+          <button onClick={() => router.push("/?scan=product")} title="Scan a product / read a label" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex" }}><Icon name="camera" size={22} color={T.accentText} /></button>
+          <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask, or 📷 scan a product…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text, padding: "8px 0" }} />
           <button onClick={() => send()} disabled={busy} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: "none", cursor: "pointer", background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", opacity: busy ? 0.6 : 1 }}><Icon name="send" size={20} color="#241712" /></button>
         </div>
       </div>

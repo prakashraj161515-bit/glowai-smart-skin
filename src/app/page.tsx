@@ -62,9 +62,10 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("scan") === "1") {
-      setScanMode("face"); setView("scanner"); window.history.replaceState({}, "", "/");
-    }
+    if (typeof window === "undefined") return;
+    const s = new URLSearchParams(window.location.search).get("scan");
+    if (s === "1") { setScanMode("face"); setView("scanner"); window.history.replaceState({}, "", "/"); }
+    else if (s === "product") { setScanMode("product"); setView("scanner"); window.history.replaceState({}, "", "/"); }
   }, []);
 
   const saveToCloud = async (payload: object) => {
@@ -246,7 +247,7 @@ export default function Home() {
 
       {/* ─────────── HOME DASHBOARD ─────────── */}
       {view === "home" && (
-        <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "108px 20px 130px" }}>
+        <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "64px 20px 130px" }}>
           {/* greeting */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
             <div>
@@ -255,8 +256,9 @@ export default function Home() {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {/* premium / subscribe icon */}
-              <button onClick={() => router.push("/premium")} title="Go Pro" style={{ width: 42, height: 42, borderRadius: 13, border: "none", cursor: "pointer", background: "linear-gradient(135deg, #F5C76B, #E8A24C)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 16px rgba(232,162,76,0.4)", flexShrink: 0 }}>
-                <Icon name="spark" size={20} color="#3a2a10" fill />
+              <button onClick={() => router.push("/premium")} title="Premium" style={{ height: 42, padding: "0 14px 0 12px", borderRadius: 13, border: "none", cursor: "pointer", background: "linear-gradient(135deg, #F5C76B, #E8A24C)", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 6px 16px rgba(232,162,76,0.4)", flexShrink: 0 }}>
+                <Icon name="crown" size={19} color="#3a2a10" fill />
+                <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#3a2a10" }}>Premium</span>
               </button>
               <div onClick={() => router.push("/profile")} style={{ width: 46, height: 46, borderRadius: 99, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer" }}>
                 {userPic ? <img src={userPic} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" /> : <span style={{ fontFamily: SERIF, fontSize: 20, color: "#fff" }}>{firstName[0]?.toUpperCase()}</span>}

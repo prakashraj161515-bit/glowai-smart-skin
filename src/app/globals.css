@@ -189,6 +189,15 @@ html, body {
   0%   { transform: scale(0); }
   100% { transform: scale(1); }
 }
+@keyframes moodbounce {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35) rotate(-6deg); }
+  60%  { transform: scale(0.92) rotate(4deg); }
+  100% { transform: scale(1.12) rotate(0deg); }
+}
+.mood-pop { animation: moodbounce .45s cubic-bezier(.3,1.5,.5,1); }
+@keyframes dashdraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: dashdraw 1.3s ease forwards; }
 
 .animate-float      { animation: float 4s ease-in-out infinite; }
 .animate-fadeup     { animation: fadeUp .7s ease forwards; }

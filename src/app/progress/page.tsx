@@ -7,14 +7,27 @@ import AppTabBar from "@/glow/AppTabBar";
 const RANGES: Record<string, number> = { "1W": 7, "1M": 10, "3M": 16, "All": 999 };
 const LABELS: Record<string, string> = { "1W": "last 7 days", "1M": "last 30 days", "3M": "last 90 days", "All": "all time" };
 
+type Milestone = { ic: any; label: string; earned: boolean; desc: string };
+
 export default function ProgressPage() {
   const router = useRouter();
   const [all, setAll] = useState<number[]>([58, 61, 60, 64, 68, 66, 70, 72, 71, 74]);
   const [range, setRange] = useState("1M");
+  const [scans, setScans] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [selM, setSelM] = useState<Milestone | null>(null);
   useEffect(() => {
     const h = localStorage.getItem("velmora_history");
-    if (h) { try { const arr = JSON.parse(h).map((x: any) => x.score).reverse(); if (arr.length >= 2) setAll(arr); } catch {} }
+    if (h) { try { const arr = JSON.parse(h); setScans(arr.length); const s = arr.map((x: any) => x.score).reverse(); if (s.length >= 2) setAll(s); } catch {} }
+    setStreak(parseInt(localStorage.getItem("velmora_streak") || "0") || 0);
   }, []);
+
+  const MILESTONES: Milestone[] = [
+    { ic: "spark", label: "First Scan", earned: scans >= 1, desc: "Complete your very first AI skin scan." },
+    { ic: "flame", label: "7-Day Streak", earned: streak >= 7, desc: "Open GlowAI 7 days in a row." },
+    { ic: "check", label: "Clear 2 Weeks", earned: scans >= 4, desc: "Keep your skin score steady for two weeks." },
+    { ic: "star", label: "30-Day Streak", earned: streak >= 30, desc: "Log in 30 days straight to unlock a loyalty discount!" },
+  ];
   const n = Math.min(all.length, RANGES[range]);
   const pts = all.slice(-Math.max(2, n));
   const W = 320, H = 120;
@@ -43,20 +56,34 @@ export default function ProgressPage() {
           <svg width="100%" viewBox={`0 0 ${W} ${H + 4}`} style={{ display: "block" }}>
             <defs><linearGradient id="fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={T.accent} stopOpacity="0.35" /><stop offset="100%" stopColor={T.accent} stopOpacity="0" /></linearGradient></defs>
             <polygon points={`0,${H} ${path} ${W},${H}`} fill="url(#fill)" />
-            <polyline points={path} fill="none" stroke={T.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <circle cx={W} cy={H - ((pts[pts.length - 1] - min) / (max - min)) * H} r="4" fill={T.accent} />
+            <polyline className="draw-line" pathLength={1} points={path} fill="none" stroke={T.accent} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx={W} cy={H - ((pts[pts.length - 1] - min) / (max - min)) * H} r="4" fill={T.accent} className="animate-spinpulse" />
           </svg>
         </Card>
         <SectionTitle>Milestones</SectionTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {([["spark", "First Scan", true], ["flame", "7-Day Streak", true], ["check", "Clear 2 Weeks", true], ["star", "30-Day Streak", false]] as [any, string, boolean][]).map(([ic, l, earned], i) => (
-            <Card key={i} pad={16} style={{ textAlign: "center", opacity: earned ? 1 : 0.45 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 99, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", background: earned ? T.accentSoft : T.surface2 }}><Icon name={ic} size={24} color={earned ? T.accentText : T.textFaint} fill={ic === "star"} /></div>
-              <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 650, color: T.text }}>{l}</div>
+          {MILESTONES.map((m, i) => (
+            <Card key={i} pad={16} onClick={() => setSelM(m)} style={{ textAlign: "center", opacity: m.earned ? 1 : 0.5, cursor: "pointer" }}>
+              <div style={{ width: 48, height: 48, borderRadius: 99, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", background: m.earned ? T.accentSoft : T.surface2 }}><Icon name={m.ic} size={24} color={m.earned ? T.accentText : T.textFaint} fill={m.ic === "star"} /></div>
+              <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 650, color: T.text }}>{m.label}</div>
+              <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 700, color: m.earned ? "#7FB389" : T.textFaint, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{m.earned ? "Earned" : "Locked"}</div>
             </Card>
           ))}
         </div>
       </div>
+
+      {/* milestone detail */}
+      {selM && (
+        <div onClick={() => setSelM(null)} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(20,12,8,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 28, maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderRadius: 24, padding: 24, textAlign: "center", animation: "fadeUp .25s ease" }}>
+            <div style={{ width: 64, height: 64, borderRadius: 99, margin: "0 auto 14px", display: "flex", alignItems: "center", justifyContent: "center", background: selM.earned ? T.accentSoft : T.surface2 }}><Icon name={selM.ic} size={30} color={selM.earned ? T.accentText : T.textFaint} fill={selM.ic === "star"} /></div>
+            <h3 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 6px" }}>{selM.label}</h3>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 18px", lineHeight: 1.5 }}>{selM.desc} {selM.earned ? "✓ Earned!" : "Keep going to unlock it."}</p>
+            <button onClick={() => setSelM(null)} style={{ width: "100%", height: 50, borderRadius: 14, border: "none", cursor: "pointer", background: T.accent, color: "#241712", fontFamily: SANS, fontSize: 15, fontWeight: 700 }}>Got it</button>
+          </div>
+        </div>
+      )}
+
       <AppTabBar active="profile" />
     </div>
   );

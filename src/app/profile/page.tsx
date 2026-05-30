@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
 
+// anime-style avatars (DiceBear) — male & female, switchable
+const AV = (style: string, seed: string) => `https://api.dicebear.com/9.x/${style}/svg?seed=${seed}&backgroundColor=ffd9c0,ffe4d6,e8f0fe,edf7ee`;
+const AVATARS = [
+  AV("adventurer", "Kai"), AV("adventurer", "Leo"), AV("adventurer", "Max"), AV("micah", "Aron"),
+  AV("lorelei", "Maya"), AV("lorelei", "Aria"), AV("lorelei", "Luna"), AV("adventurer", "Zoe"),
+];
+
 const FAQS = [
   ["How does the AI scan work?", "GlowAI analyses your selfie with on-device + cloud AI to score acne, oil, pigmentation, hydration and more — then builds advice from it."],
   ["Is my photo stored?", "Your scan stays on your device. We only sync your scores so your progress follows you across devices."],
@@ -26,6 +33,7 @@ export default function ProfilePage() {
   const [notif, setNotif] = useState(true);
   const [help, setHelp] = useState(false);
   const [confirmOut, setConfirmOut] = useState(false);
+  const [showAv, setShowAv] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -37,7 +45,13 @@ export default function ProfilePage() {
     const a = localStorage.getItem("velmora_analysis"); if (a) { try { setScore(JSON.parse(a).score || 74); } catch {} }
     const s = localStorage.getItem("velmora_streak"); if (s) setStreak(parseInt(s) || 12);
     if (status === "authenticated" && session?.user) { setUserName(session.user.name || "Maya"); if (session.user.image) setUserPic(session.user.image); }
+    // guest with no picture → give a default anime avatar
+    if (!localStorage.getItem("velmora_user_pic") && !session?.user?.image) {
+      setUserPic(AVATARS[0]); localStorage.setItem("velmora_user_pic", AVATARS[0]);
+    }
   }, [status, session]);
+
+  const pickAvatar = (url: string) => { setUserPic(url); localStorage.setItem("velmora_user_pic", url); setShowAv(false); };
 
   const saveName = () => { setEditing(false); localStorage.setItem("velmora_user_name", userName.trim() || "Maya"); };
   const toggleNotif = () => { const v = !notif; setNotif(v); localStorage.setItem("velmora_notif", v ? "on" : "off"); };
@@ -60,7 +74,7 @@ export default function ProfilePage() {
       <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "108px 20px 130px" }}>
         {/* header */}
         <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-          <div onClick={() => fileRef.current?.click()} style={{ width: 72, height: 72, borderRadius: 99, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", position: "relative" }}>
+          <div onClick={() => setShowAv(true)} style={{ width: 72, height: 72, borderRadius: 99, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", position: "relative" }}>
             {userPic ? <img src={userPic} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" /> : <span style={{ fontFamily: SERIF, fontSize: 30, color: "#241712" }}>{initial}</span>}
             <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,0,0,0.35)", textAlign: "center", fontSize: 9, color: "#fff", padding: "2px 0", fontFamily: SANS, fontWeight: 600 }}>edit</div>
           </div>
@@ -141,6 +155,27 @@ export default function ProfilePage() {
       )}
 
       {/* Help & FAQ sheet */}
+      {/* avatar picker */}
+      {showAv && (
+        <div onClick={() => setShowAv(false)} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: "20px 20px 36px", animation: "fadeUp .3s ease" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 99, background: T.borderHi, margin: "0 auto 16px" }} />
+            <h2 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 4px" }}>Choose your avatar</h2>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: T.textMute, margin: "0 0 16px" }}>Pick a character — or upload your own photo.</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 16 }}>
+              {AVATARS.map((a, i) => (
+                <button key={i} onClick={() => pickAvatar(a)} style={{ aspectRatio: "1", borderRadius: 16, overflow: "hidden", cursor: "pointer", padding: 0, background: T.surface2, border: `2px solid ${userPic === a ? T.accent : "transparent"}` }}>
+                  <img src={a} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </button>
+              ))}
+            </div>
+            <button onClick={() => { setShowAv(false); fileRef.current?.click(); }} style={{ width: "100%", height: 50, borderRadius: 14, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.borderHi}`, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, fontFamily: SANS, fontSize: 15, fontWeight: 650, color: T.text }}>
+              <Icon name="camera" size={18} color={T.text} /> Upload my photo
+            </button>
+          </div>
+        </div>
+      )}
+
       {help && (
         <div onClick={() => setHelp(false)} style={{ position: "fixed", inset: 0, zIndex: 90, background: "rgba(20,12,8,0.4)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
           <div onClick={e => e.stopPropagation()} className="glow-scroll" style={{ width: "100%", maxHeight: "78vh", overflowY: "auto", background: T.bg, borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: "20px 20px 36px", animation: "fadeUp .3s ease" }}>
