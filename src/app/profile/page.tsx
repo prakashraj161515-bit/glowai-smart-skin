@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [notif, setNotif] = useState(true);
   const [help, setHelp] = useState(false);
+  const [confirmOut, setConfirmOut] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -118,11 +119,26 @@ export default function ProfilePage() {
           ))}
         </Card>
 
-        <button onClick={() => { signOut({ callbackUrl: "/" }); localStorage.removeItem("velmora_onboarding_complete"); }} style={{ width: "100%", marginTop: 14, height: 52, borderRadius: 16, cursor: "pointer", background: "rgba(224,104,92,0.08)", border: "1.5px solid rgba(224,104,92,0.25)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+        <button onClick={() => setConfirmOut(true)} style={{ width: "100%", marginTop: 14, height: 52, borderRadius: 16, cursor: "pointer", background: "rgba(224,104,92,0.08)", border: "1.5px solid rgba(224,104,92,0.25)", display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
           <Icon name="arrowR" size={18} color="#E0685C" sw={2} />
           <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#E0685C" }}>Sign Out</span>
         </button>
       </div>
+
+      {/* sign-out confirmation */}
+      {confirmOut && (
+        <div onClick={() => setConfirmOut(false)} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 28, maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderRadius: 24, padding: 24, textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", animation: "fadeUp .25s ease" }}>
+            <div style={{ width: 56, height: 56, borderRadius: 99, background: "rgba(224,104,92,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}><Icon name="arrowR" size={26} color="#E0685C" sw={2} /></div>
+            <h3 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 6px" }}>Sign out?</h3>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 20px" }}>You&apos;ll need to sign in again to use GlowAI.</p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setConfirmOut(false)} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.borderHi}`, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }}>Cancel</button>
+              <button onClick={() => { localStorage.removeItem("velmora_onboarding_complete"); signOut({ callbackUrl: "/" }); }} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: "#E0685C", border: "none", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff" }}>Sign Out</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Help & FAQ sheet */}
       {help && (

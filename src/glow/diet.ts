@@ -144,20 +144,41 @@ export function buildWeekPlan(country: string, scan: Scan) {
   };
 }
 
-// localized subscription pricing by country
-export function pricing(country: string): { symbol: string; monthly: string; annual: string; save: string } {
-  const map: Record<string, { symbol: string; monthly: string; annual: string; save: string }> = {
-    India:      { symbol: "₹", monthly: "₹399/mo",   annual: "₹2,399/yr",  save: "Save 50% · ₹200/mo" },
-    Pakistan:   { symbol: "₨", monthly: "₨1,400/mo", annual: "₨8,400/yr",  save: "Save 50%" },
-    Bangladesh: { symbol: "৳", monthly: "৳550/mo",   annual: "৳3,300/yr",  save: "Save 50%" },
-    "Sri Lanka":{ symbol: "₨", monthly: "₨1,500/mo", annual: "₨9,000/yr",  save: "Save 50%" },
-    Nepal:      { symbol: "₨", monthly: "₨650/mo",   annual: "₨3,900/yr",  save: "Save 50%" },
-    UK:         { symbol: "£", monthly: "£7.99/mo",  annual: "£47.99/yr",  save: "Save 50% · £4/mo" },
-    UAE:        { symbol: "AED", monthly: "AED 36/mo", annual: "AED 219/yr", save: "Save 50%" },
-    Australia:  { symbol: "A$", monthly: "A$14.99/mo", annual: "A$89.99/yr", save: "Save 50%" },
-    Singapore:  { symbol: "S$", monthly: "S$13.99/mo", annual: "S$83.99/yr", save: "Save 50%" },
-  };
-  return map[country] || { symbol: "$", monthly: "$9.99/mo", annual: "$59.99/yr", save: "Save 50% · $5/mo" };
+// localized subscription pricing by country — 3 tiers (monthly / 6-month / yearly)
+export type Plan = { id: "monthly" | "sixmo" | "yearly"; label: string; period: string; amount: number; sub: string; best?: boolean };
+export type Pricing = { symbol: string; fmt: (n: number) => string; plans: Plan[] };
+
+export function pricing(country: string): Pricing {
+  const inr = (n: number): string => "₹" + n.toLocaleString("en-IN");
+  const sym = (s: string) => (n: number) => `${s}${n.toLocaleString()}`;
+
+  if (["India", "Nepal", "Sri Lanka"].includes(country)) {
+    return {
+      symbol: "₹", fmt: inr,
+      plans: [
+        { id: "monthly", label: "Monthly", period: "/mo", amount: 249, sub: "Billed monthly" },
+        { id: "sixmo",   label: "6 Months", period: "/6mo", amount: 1200, sub: "≈ ₹200/mo · save 20%" },
+        { id: "yearly",  label: "Yearly",  period: "/yr", amount: 2000, sub: "≈ ₹167/mo · best value", best: true },
+      ],
+    };
+  }
+  if (country === "Pakistan") return { symbol: "₨", fmt: sym("₨"), plans: [
+    { id: "monthly", label: "Monthly", period: "/mo", amount: 900, sub: "Billed monthly" },
+    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 4500, sub: "save 20%" },
+    { id: "yearly", label: "Yearly", period: "/yr", amount: 7500, sub: "best value", best: true } ] };
+  if (country === "UK") return { symbol: "£", fmt: sym("£"), plans: [
+    { id: "monthly", label: "Monthly", period: "/mo", amount: 4.99, sub: "Billed monthly" },
+    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 24, sub: "save 20%" },
+    { id: "yearly", label: "Yearly", period: "/yr", amount: 39.99, sub: "best value", best: true } ] };
+  if (country === "UAE") return { symbol: "AED", fmt: sym("AED "), plans: [
+    { id: "monthly", label: "Monthly", period: "/mo", amount: 22, sub: "Billed monthly" },
+    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 109, sub: "save 20%" },
+    { id: "yearly", label: "Yearly", period: "/yr", amount: 179, sub: "best value", best: true } ] };
+  // default USD
+  return { symbol: "$", fmt: sym("$"), plans: [
+    { id: "monthly", label: "Monthly", period: "/mo", amount: 5.99, sub: "Billed monthly" },
+    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 29, sub: "save 20%" },
+    { id: "yearly", label: "Yearly", period: "/yr", amount: 49.99, sub: "best value", best: true } ] };
 }
 
 // map a food name to a real (brand-free) food photo in /public/food
@@ -177,6 +198,21 @@ export function foodImg(name: string): string {
   if (has("walnut", "almond", "nut", "seed", "chana", "pumpkin")) return "/food/nuts.jpg";
   if (has("tea", "water", "coconut", "buttermilk", "chaas", "amla", "citrus", "orange", "watermelon", "cucumber")) return "/food/tea.jpg";
   return "/food/salad.jpg";
+}
+
+// real (brand-free) skincare product photo by name — crops of the verified
+// unbranded flatlay, positioned to a different product per type
+export function skinImg(name: string): { src: string; pos: string } {
+  const n = name.toLowerCase();
+  const src = "/hero-product.jpg";
+  if (n.includes("cleanser") || n.includes("wash")) return { src, pos: "92% 60%" };   // white tube
+  if (n.includes("vitamin c") || n.includes("serum")) return { src, pos: "10% 38%" };  // amber dropper
+  if (n.includes("niacinamide")) return { src, pos: "4% 60%" };                          // amber bottle
+  if (n.includes("spf") || n.includes("shield") || n.includes("sun")) return { src, pos: "78% 92%" }; // tube
+  if (n.includes("moistur") || n.includes("cream")) return { src, pos: "44% 50%" };      // compact/jar
+  if (n.includes("night") || n.includes("repair") || n.includes("barrier")) return { src, pos: "30% 86%" };
+  if (n.includes("toner")) return { src, pos: "16% 70%" };
+  return { src, pos: "20% 60%" };
 }
 
 export function detectCountry(): string {

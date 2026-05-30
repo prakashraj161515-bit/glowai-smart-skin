@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, MiniRing, PrimaryBtn, WaterTracker, ProductThumb } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
-import { getWeekPlan, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/diet";
+import { getWeekPlan, detectCountry, planAgeDays, foodImg, skinImg, Meal } from "@/glow/diet";
 
 const DAY_LETTERS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -133,7 +133,7 @@ export default function RoutinePage() {
                       </div>
                       <div style={{ width: 10, height: 10, borderRadius: 99, flexShrink: 0, transition: "all .25s", background: checked[idx] ? T.accent : rgba(SEC_COL[section], 0.4), boxShadow: checked[idx] ? "0 0 0 3px " + rgba(T.accent, 0.2) : "none" }} />
                       <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 12, padding: "11px 13px", borderRadius: 18, cursor: "pointer", background: checked[idx] ? T.surface2 : T.surface, border: "1px solid " + (checked[idx] ? T.border : rgba(SEC_COL[section], 0.18)), boxShadow: checked[idx] ? "none" : "0 3px 14px rgba(60,30,20,0.07)", opacity: checked[idx] ? 0.6 : 1, transition: "all .25s" }}>
-                        <ProductThumb name={name} size={46} />
+                        <div style={{ width: 46, height: 46, borderRadius: 13, flexShrink: 0, overflow: "hidden", backgroundImage: `url(${skinImg(name).src})`, backgroundSize: "300%", backgroundPosition: skinImg(name).pos }} />
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, textDecoration: checked[idx] ? "line-through" : "none", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", lineHeight: 1.2 }}>{name}</div>
                           <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 2 }}>{brand}</div>
