@@ -27,10 +27,15 @@ export const AMAZON_TAG = "";                 // e.g. "glowai-21"  (khaali chhod
 // link: aapka affiliate link
 // Photo automatically /api/img?asin=XXXX se aayegi — koi aur kaam nahi!
 // ─────────────────────────────────────────────────────────────────────────────
-export const PRODUCTS_DATA: Record<string, { link: string; asin?: string }> = {
+// ── Product data — name → { link, img } ──────────────────────────────────
+// img: Amazon CDN image URL (m.media-amazon.com/...)
+//      Main isko ek baar extract karta hoon jab product add hota hai.
+//      Proxy (/api/img?url=) isse serve karta hai — koi ASIN scraping nahi.
+// ─────────────────────────────────────────────────────────────────────────
+export const PRODUCTS_DATA: Record<string, { link: string; img?: string }> = {
   "Garnier Bright Complete Vitamin C Face Wash": {
-    asin: "B0G4WQX1WR",
     link: "https://amzn.to/4dDZDau",
+    img:  "https://m.media-amazon.com/images/I/51O4CZnsiZL._AC_SL1500_.jpg",
   },
   // aur products aane wale hain...
 };
@@ -44,7 +49,7 @@ export const AFFILIATE_LINKS: Record<string, string> = Object.fromEntries(
 // Falls back to undefined if no ASIN set.
 export function productImg(name: string): string | undefined {
   const d = PRODUCTS_DATA[name];
-  if (d?.asin) return `/api/img?asin=${d.asin}`;
+  if (d?.img) return `/api/img?url=${encodeURIComponent(d.img)}`;
   return undefined;
 }
 
