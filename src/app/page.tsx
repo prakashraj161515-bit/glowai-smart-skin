@@ -8,7 +8,8 @@ import {
   PrimaryBtn, GhostBtn, Chip, Badge, ScoreDial, MetricBar, MiniRing, SectionTitle,
   TabBar, BuyBtn,
 } from "@/glow/ui";
-import { productImg } from "@/glow/affiliate";
+import { productImg, ALL_PRODUCTS } from "@/glow/affiliate";
+import { LivePrice, fmtCount } from "@/glow/store-ui";
 import { tickLoyalty } from "@/glow/loyalty";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; image?: string };
@@ -237,9 +238,8 @@ export default function Home() {
 
   // ════════════════════════ MAIN APP ════════════════════════
   const firstName = (userName || "there").split(" ")[0];
-  const PRODUCTS: [string, string][] = [
-    ["Garnier Bright Complete Vitamin C Face Wash", "Garnier"],
-  ];
+  // Top bestsellers for the home grid (real products)
+  const PRODUCTS = ALL_PRODUCTS.filter(p => p.bestseller).slice(0, 8);
 
   return (
     <div style={{ minHeight: "100vh", background: T.bg, position: "relative" }}>
@@ -307,29 +307,43 @@ export default function Home() {
             ))}
           </div>
 
-          {/* product grid */}
+          {/* product grid — top bestsellers */}
           {cat === "Makeup" ? (
             <div style={{ padding: "40px 0", textAlign: "center", color: T.textFaint, fontFamily: SANS, fontSize: 14 }}>No makeup products yet</div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {PRODUCTS.map(([name, brand], i) => {
-                const img = productImg(name);
-                return (
-                <div key={i} onClick={() => router.push("/store")} style={{ borderRadius: 20, overflow: "hidden", background: T.surface, boxShadow: T.shadow, cursor: "pointer" }}>
-                  <div style={{ height: 130, position: "relative", overflow: "hidden", background: "#F3E7E0", ...(img ? {} : { backgroundImage: "url(/hero-product.jpg)", backgroundSize: "260%", backgroundPosition: ["8% 28%", "2% 72%", "30% 86%", "6% 50%", "22% 96%", "0% 40%"][i % 6] }) }}>
-                    {img && <img src={img} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
-                    <button onClick={e => { e.stopPropagation(); setLiked(l => l.includes(i) ? l.filter(x => x !== i) : [...l, i]); }} style={{ position: "absolute", top: 10, right: 10, width: 32, height: 32, borderRadius: 99, background: "rgba(255,255,255,0.85)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Icon name="star" size={16} color={liked.includes(i) ? "#F0886A" : "#ccc"} sw={1.5} fill={liked.includes(i)} />
-                    </button>
+            <>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 0.8 }}>🔥 Bestsellers</span>
+                <button onClick={() => router.push("/store")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.accentText }}>See all {ALL_PRODUCTS.length} →</button>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {PRODUCTS.map((p, i) => {
+                  const img = productImg(p.name);
+                  return (
+                  <div key={p.asin} onClick={() => router.push("/store")} style={{ borderRadius: 20, overflow: "hidden", background: T.surface, boxShadow: T.shadow, cursor: "pointer", display: "flex", flexDirection: "column" }}>
+                    <div style={{ height: 130, position: "relative", overflow: "hidden", background: "#F3E7E0" }}>
+                      {img && <img src={img} alt={p.name} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+                      <div style={{ position: "absolute", top: 9, left: 0, display: "flex", alignItems: "center", gap: 3, padding: "3px 9px 3px 7px", background: "linear-gradient(135deg,#F5A623,#E8821C)", color: "#fff", fontFamily: SANS, fontSize: 9.5, fontWeight: 800, borderRadius: "0 99px 99px 0", textTransform: "uppercase", letterSpacing: 0.3 }}>
+                        <Icon name="flame" size={10} color="#fff" fill />Bestseller
+                      </div>
+                    </div>
+                    <div style={{ padding: "9px 11px 12px", display: "flex", flexDirection: "column", flex: 1 }}>
+                      <div style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.3 }}>{p.brand}</div>
+                      <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.text, lineHeight: 1.2, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", minHeight: 30, marginTop: 1 }}>{p.name}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 5 }}>
+                        <Icon name="star" size={12} color="#F0A52C" fill />
+                        <span style={{ fontFamily: MONO, fontSize: 11.5, fontWeight: 700, color: T.text }}>{p.rating}</span>
+                        <span style={{ fontFamily: SANS, fontSize: 10.5, color: T.textFaint }}>({fmtCount(p.reviews)})</span>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+                        <LivePrice asin={p.asin} />
+                        <BuyBtn name={p.name} variant="pill" />
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ padding: "10px 12px 14px" }}>
-                    <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, lineHeight: 1.2 }}>{name}</div>
-                    <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, marginTop: 3, marginBottom: 10 }}>{brand}</div>
-                    <BuyBtn name={name} variant="wide" />
-                  </div>
-                </div>
-              )})}
-            </div>
+                )})}
+              </div>
+            </>
           )}
         </div>
       )}

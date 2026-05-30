@@ -9,11 +9,15 @@ import { productImg } from "@/glow/affiliate";
 const DAY_LETTERS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-// ── Real products only — fake brands hataye ──
-// Naye products jab aap link doge tab add honge
+// Default routine from real products (image + buy auto from affiliate.ts)
 const ITEMS = [
   { time: "8:00", period: "AM", section: "Morning", name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier" },
-  // aur products aane wale hain...
+  { time: "8:10", period: "AM", section: "Morning", name: "Garnier Vitamin C+ Face Serum for Skin Brightening", brand: "Garnier" },
+  { time: "8:20", period: "AM", section: "Morning", name: "Minimalist Vitamin B5 10% Oil-Free Moisturizer", brand: "Minimalist" },
+  { time: "12:00", period: "PM", section: "Afternoon", name: "Minimalist Sunscreen SPF 50 PA+++ with Niacinamide", brand: "Minimalist" },
+  { time: "9:00", period: "PM", section: "Evening", name: "Cetaphil Gentle Skin Hydrating Face Wash", brand: "Cetaphil" },
+  { time: "9:10", period: "PM", section: "Evening", name: "The Derma Co 2% Salicylic Acid Face Serum", brand: "The Derma Co" },
+  { time: "9:30", period: "PM", section: "Evening", name: "Dot & Key Night Reset Retinol + Ceramide Night Cream", brand: "Dot & Key" },
 ];
 const SEC_COL: any = { Morning: "#E8A24C", Afternoon: "#5FAD72", Evening: "#8B85E0" };
 const SEC_ICON: any = { Morning: "sun", Afternoon: "bolt", Evening: "moon" };
