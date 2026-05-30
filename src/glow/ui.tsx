@@ -285,57 +285,20 @@ export function productType(name: string): "cleanser" | "serum" | "niacinamide" 
   return "moisturizer";
 }
 
-// Brand-free product render by type — clean SVG that always fits any size.
-type ThumbShape = "tube" | "dropper" | "jar" | "pump";
-const TYPE_STYLE: Record<string, { c1: string; c2: string; cap: string; shape: ThumbShape }> = {
-  cleanser:    { c1: "#CFEBDD", c2: "#9AD7BC", cap: "#6FBFA0", shape: "tube" },
-  serum:       { c1: "#F8DCAE", c2: "#ECBE7E", cap: "#CE9A52", shape: "dropper" },
-  niacinamide: { c1: "#F4CEA8", c2: "#E2A571", cap: "#C0824F", shape: "dropper" },
-  moisturizer: { c1: "#ECDAF3", c2: "#CDAEE3", cap: "#A983CC", shape: "jar" },
-  spf:         { c1: "#FCEAAC", c2: "#F3D26F", cap: "#D9B449", shape: "pump" },
-  night:       { c1: "#C9C6EC", c2: "#9F9ADB", cap: "#7A75C2", shape: "dropper" },
-  toner:       { c1: "#D2E8F2", c2: "#A4CFE3", cap: "#79B0CC", shape: "pump" },
+// Real product photo by type — crops the brand-free flatlay (public/hero-product.jpg).
+// overflow:hidden + borderRadius keep it perfectly inside the box (never overflows).
+const THUMB_POS: Record<string, string> = {
+  cleanser:    "30% 86%",
+  serum:       "8% 30%",
+  niacinamide: "2% 66%",
+  moisturizer: "44% 48%",
+  spf:         "22% 96%",
+  night:       "0% 42%",
+  toner:       "12% 64%",
 };
-
-function ThumbGlyph({ shape, cap }: { shape: ThumbShape; cap: string }) {
-  const W = "#FFFFFF", g = "rgba(255,255,255,0.62)"; // body + glass highlight
-  switch (shape) {
-    case "tube": return (<g>
-      <rect x="14.5" y="6" width="11" height="3.4" rx="1.2" fill={cap} />
-      <path d="M14 10h12l-1 21a2 2 0 0 1-2 1.8h-6A2 2 0 0 1 15 31z" fill={W} />
-      <rect x="17.2" y="14" width="2.4" height="13" rx="1.2" fill={g} />
-    </g>);
-    case "dropper": return (<g>
-      <rect x="16.5" y="4.5" width="7" height="4" rx="1.2" fill={cap} />
-      <rect x="18.4" y="8" width="3.2" height="3.5" fill={cap} opacity="0.8" />
-      <rect x="13.5" y="11.5" width="13" height="23" rx="3.2" fill={W} />
-      <rect x="16.4" y="15" width="2.6" height="15" rx="1.3" fill={g} />
-    </g>);
-    case "jar": return (<g>
-      <rect x="11" y="9.5" width="18" height="5" rx="2.2" fill={cap} />
-      <rect x="10" y="14" width="20" height="18" rx="4" fill={W} />
-      <rect x="13.5" y="18" width="2.6" height="10" rx="1.3" fill={g} />
-    </g>);
-    case "pump": default: return (<g>
-      <rect x="17.5" y="3.5" width="5" height="5.5" rx="1.4" fill={cap} />
-      <rect x="22" y="6" width="4.5" height="2.6" rx="1.3" fill={cap} />
-      <rect x="16" y="9" width="8" height="3" rx="1.2" fill={cap} opacity="0.85" />
-      <rect x="13" y="12" width="14" height="22" rx="3.4" fill={W} />
-      <rect x="16" y="16" width="2.6" height="13" rx="1.3" fill={g} />
-    </g>);
-  }
-}
-
 export function ProductThumb({ name, size = 46 }: { name: string; size?: number }) {
-  const s = TYPE_STYLE[productType(name)];
   return (
-    <div style={{ width: size, height: size, borderRadius: size * 0.28, flexShrink: 0, overflow: "hidden", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.05)" }}>
-      <svg width={size} height={size} viewBox="0 0 40 40" style={{ display: "block" }}>
-        <defs><linearGradient id={`tg-${s.cap.slice(1)}`} x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor={s.c1} /><stop offset="100%" stopColor={s.c2} /></linearGradient></defs>
-        <rect width="40" height="40" fill={`url(#tg-${s.cap.slice(1)})`} />
-        <ThumbGlyph shape={s.shape} cap={s.cap} />
-      </svg>
-    </div>
+    <div style={{ width: size, height: size, borderRadius: size * 0.28, flexShrink: 0, overflow: "hidden", backgroundColor: "#F3E7E0", backgroundImage: "url(/hero-product.jpg)", backgroundSize: "240%", backgroundPosition: THUMB_POS[productType(name)] || "20% 60%", backgroundRepeat: "no-repeat", boxShadow: "inset 0 0 0 1px rgba(60,30,20,0.06)" }} />
   );
 }
 

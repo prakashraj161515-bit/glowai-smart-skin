@@ -91,26 +91,19 @@ export default function StorePage() {
 
         {tab === "My Shelf" && (
           <>
-            {/* conflict — tappable, with its info right beside it */}
-            <button onClick={() => setConflict(true)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: 14, borderRadius: 16, marginBottom: 10, background: "rgba(224,104,92,0.12)", border: "1px solid rgba(224,104,92,0.3)", cursor: "pointer", textAlign: "left" }}>
-              <Icon name="warn" size={22} color="#E0685C" />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: "#E0685C" }}>1 conflict detected</div>
-                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>Vitamin C + BHA — tap for the fix</div>
-              </div>
-              <span style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0, padding: "5px 10px", borderRadius: 99, background: "rgba(224,104,92,0.16)" }}>
-                <Icon name="info" size={14} color="#E0685C" /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: "#E0685C" }}>Info</span>
-              </span>
-            </button>
-            {/* ingredient checker — sits right alongside the conflict */}
-            <button onClick={() => setChecker(true)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: 14, borderRadius: 16, marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accentDim}`, cursor: "pointer", textAlign: "left" }}>
-              <Icon name="info" size={22} color={T.accentText} />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: T.accentText }}>Ingredient checker</div>
-                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>Type any ingredient or cream — is it right for you?</div>
-              </div>
-              <Icon name="chev" size={16} color={T.accentText} />
-            </button>
+            {/* conflict + ingredient checker — side by side in a row */}
+            <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+              <button onClick={() => setConflict(true)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, padding: 14, borderRadius: 16, background: "rgba(224,104,92,0.12)", border: "1px solid rgba(224,104,92,0.3)", cursor: "pointer", textAlign: "left" }}>
+                <Icon name="warn" size={22} color="#E0685C" />
+                <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: "#E0685C", lineHeight: 1.2 }}>1 conflict detected</div>
+                <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, lineHeight: 1.25 }}>Vitamin C + BHA · tap for info & fix</div>
+              </button>
+              <button onClick={() => setChecker(true)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6, padding: 14, borderRadius: 16, background: T.accentSoft, border: `1px solid ${T.accentDim}`, cursor: "pointer", textAlign: "left" }}>
+                <Icon name="info" size={22} color={T.accentText} />
+                <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.accentText, lineHeight: 1.2 }}>Ingredient checker</div>
+                <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textMute, lineHeight: 1.25 }}>Ingredient or cream · right for you?</div>
+              </button>
+            </div>
             <div className="glow-hscroll" style={{ display: "flex", gap: 8, overflowX: "auto", margin: "0 -20px 16px", padding: "0 20px 4px" }}>
               {CATS.map(c => <Chip key={c} active={cat === c} onClick={() => setCat(c)}>{c}</Chip>)}
             </div>
