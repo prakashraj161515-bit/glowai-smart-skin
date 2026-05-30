@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Chip, PrimaryBtn } from "@/glow/ui";
 
 const MOODS = ["😣", "😕", "😐", "🙂", "😄"];
+const MOOD_BG = ["rgba(224,104,92,0.18)", "rgba(232,162,76,0.18)", "rgba(180,160,140,0.18)", "rgba(127,179,137,0.18)", "rgba(95,173,114,0.24)"];
 const TAGS = ["Dairy", "Sugar", "Greasy", "Healthy", "Alcohol", "Stressed", "Slept well"];
 
 type Entry = { date: string; mood: number; water: number; tags: string[] };
@@ -67,7 +68,7 @@ export default function DiaryPage() {
           {MOODS.map((e, i) => (
             <button key={i} onClick={() => { setMood(i); setPopKey(k => k + 1); }}
               className={mood === i ? "mood-pop" : ""}
-              style={{ width: 48, height: 48, borderRadius: 14, cursor: "pointer", border: `1.5px solid ${mood === i ? T.accent : T.border}`, background: mood === i ? T.accentSoft : "transparent", fontSize: 24, lineHeight: 1, transition: "border .15s, background .15s" }}>
+              style={{ width: 48, height: 48, borderRadius: 14, cursor: "pointer", border: `1.5px solid ${mood === i ? T.accent : T.border}`, background: mood === i ? MOOD_BG[i] : "transparent", fontSize: 24, lineHeight: 1, transition: "border .15s, background .15s", transform: mood === i ? "scale(1.08)" : "scale(1)" }}>
               <span key={mood === i ? popKey : 0} className={mood === i ? "mood-pop" : ""} style={{ display: "inline-block" }}>{e}</span>
             </button>
           ))}
@@ -110,7 +111,7 @@ export default function DiaryPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {entries.slice(0, 10).map((en, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 2px 10px rgba(60,30,20,0.05)" }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{MOODS[en.mood]}</div>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: MOOD_BG[en.mood], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{MOODS[en.mood]}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text }}>{new Date(en.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</div>
                   <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{en.water} glasses{en.tags.length ? " · " + en.tags.join(", ") : ""}</div>

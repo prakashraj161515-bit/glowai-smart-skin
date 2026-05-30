@@ -23,10 +23,10 @@ export default function ProgressPage() {
   }, []);
 
   const MILESTONES: Milestone[] = [
-    { ic: "spark", label: "First Scan", earned: scans >= 1, desc: "Complete your very first AI skin scan." },
     { ic: "flame", label: "7-Day Streak", earned: streak >= 7, desc: "Open GlowAI 7 days in a row." },
-    { ic: "check", label: "Clear 2 Weeks", earned: scans >= 4, desc: "Keep your skin score steady for two weeks." },
-    { ic: "star", label: "30-Day Streak", earned: streak >= 30, desc: "Log in 30 days straight to unlock a loyalty discount!" },
+    { ic: "crown", label: "30-Day Streak", earned: streak >= 30, desc: "Log in 30 days straight to unlock a 10% loyalty discount!" },
+    { ic: "gem", label: "100-Day Streak", earned: streak >= 100, desc: "100 days of glow — your loyalty discount grows to ~11-12%." },
+    { ic: "star", label: "200-Day Streak", earned: streak >= 200, desc: "A 200-day streak earns the top 13% loyalty discount." },
   ];
   const n = Math.min(all.length, RANGES[range]);
   const pts = all.slice(-Math.max(2, n));

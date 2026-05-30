@@ -121,10 +121,26 @@ export default function RoutinePage() {
     if (ctx) { clearInterval(ctx._loop); clearTimeout(ctx._timeout); try { ctx.close(); } catch {} audioRef.current = null; }
   };
 
+  const previewBeep = () => {
+    try {
+      const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
+      const ctx = new Ctx();
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+      o.start(); o.stop(ctx.currentTime + 0.45);
+      setTimeout(() => { try { ctx.close(); } catch {} }, 700);
+    } catch {}
+    if (navigator.vibrate) navigator.vibrate(120);
+  };
   const toggleReminder = (idx: number) => {
     setReminders(r => {
-      const next = r.includes(idx) ? r.filter(x => x !== idx) : [...r, idx];
+      const has = r.includes(idx);
+      const next = has ? r.filter(x => x !== idx) : [...r, idx];
       localStorage.setItem("velmora_reminders", JSON.stringify(next));
+      if (!has) previewBeep(); // ring once when turning ON
       return next;
     });
   };
@@ -141,7 +157,7 @@ export default function RoutinePage() {
   return (
     <div style={{ minHeight: "100vh", background: T.bg, display: "flex", flexDirection: "column" }}>
       {/* hero header */}
-      <div style={{ background: "linear-gradient(160deg, #F9DDD0 0%, #F5C9B5 55%, #FAF8F6 100%)", padding: "70px 20px 20px", flexShrink: 0 }}>
+      <div style={{ background: "linear-gradient(160deg, #F9DDD0 0%, #F5C9B5 55%, #FAF8F6 100%)", padding: "56px 20px 16px", flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
           <div>
             <div style={{ fontFamily: SANS, fontSize: 26, fontWeight: 800, color: "#2C1F1A", lineHeight: 1 }}>Daily Ritual</div>
@@ -170,7 +186,7 @@ export default function RoutinePage() {
       </div>
 
       {/* live date label */}
-      <div style={{ padding: "14px 20px 0", flexShrink: 0, display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ padding: "12px 20px 0", flexShrink: 0, display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }}>
           {DAY_NAMES[selDate.getDay()]}, {selDate.getDate()} {MONTHS[selDate.getMonth()]} {selDate.getFullYear()}
         </span>
@@ -178,7 +194,7 @@ export default function RoutinePage() {
       </div>
 
       {/* WATER INTAKE — above the tabs (shared by both) */}
-      <div style={{ padding: "12px 20px 0", flexShrink: 0 }}>
+      <div style={{ padding: "10px 20px 0", flexShrink: 0 }}>
         <WaterTracker ml={water} setMl={setW} />
       </div>
 
@@ -258,15 +274,6 @@ export default function RoutinePage() {
 function DietPlan({ day, avoid, region, focus, dayName, onAsk }: { day: any; avoid: string[]; region: string; focus: string; dayName: string; onAsk: () => void }) {
   return (
     <div>
-      {/* focus banner — personalised to scan */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 14, borderRadius: 18, marginBottom: 18, background: "linear-gradient(120deg, rgba(95,173,114,0.14), rgba(95,173,114,0.05))", border: "1px solid rgba(95,173,114,0.25)" }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#EDF7EE", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>📍</div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: T.text }}>{region} plan · focus: {focus}</div>
-          <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute }}>{dayName}&apos;s meals · built from your last scan</div>
-        </div>
-      </div>
-
       {day?.meals.map((meal: Meal) => (
         <div key={meal.meal} style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>

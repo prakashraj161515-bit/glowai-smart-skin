@@ -19,6 +19,7 @@ export default function CoachPage() {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const scroller = useRef<HTMLDivElement>(null);
+  const camRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight; }, [msgs]);
 
@@ -62,6 +63,24 @@ export default function CoachPage() {
       let s: any = {}; try { s = JSON.parse(localStorage.getItem("velmora_analysis") || "{}"); } catch {}
       const top = s.topConcern || (s.oil > 50 ? "excess oil" : s.acne > 35 ? "breakouts" : s.pigmentation > 35 ? "dark spots" : "mild dehydration");
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: `Based on your scan, your main concern looks like ${top}. Keep a simple routine — gentle cleanser, a targeted serum, moisturizer and daily SPF — stay hydrated, and avoid fried/sugary foods. Want a product or diet tip for it?`, actions: true }));
+    } finally { setBusy(false); }
+  };
+
+  // ── scan a product photo right inside the chat ──
+  const scanProduct = async (file: File) => {
+    if (busy) return;
+    setBusy(true);
+    setMsgs(m => [...m, { who: "me", text: "📷 Scanned a product label" }, { who: "typing" }]);
+    try {
+      const b64: string = await new Promise((res, rej) => { const r = new FileReader(); r.onloadend = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(file); });
+      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: b64, mode: "product_scan", context: scanContext() }) });
+      const d = await r.json();
+      let reply = d.text || d.report;
+      if (!reply) throw new Error(d.error || "empty");
+      reply = reply.replace(/\*\*/g, "").replace(/^[\-*]\s+/gm, "• ").trim();
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: reply, actions: true }));
+    } catch {
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "I couldn't read that label clearly. Try a brighter, closer photo of the ingredients list — then I'll tell you if it suits your skin.", actions: true }));
     } finally { setBusy(false); }
   };
 
@@ -116,7 +135,8 @@ export default function CoachPage() {
       {/* input */}
       <div style={{ padding: "8px 16px 30px", background: T.bg, position: "relative", zIndex: 2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 6px 6px 16px", borderRadius: 26, background: T.surface, border: `1px solid ${T.borderHi}`, boxShadow: "0 4px 16px rgba(60,30,20,0.06)" }}>
-          <button onClick={() => router.push("/?scan=product")} title="Scan a product / read a label" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex" }}><Icon name="camera" size={22} color={T.accentText} /></button>
+          <button onClick={() => camRef.current?.click()} title="Scan a product / read a label" style={{ background: "none", border: "none", cursor: "pointer", padding: 2, display: "flex" }}><Icon name="camera" size={22} color={T.accentText} /></button>
+          <input ref={camRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) scanProduct(f); e.currentTarget.value = ""; }} />
           <input value={text} onChange={e => setText(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask, or 📷 scan a product…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text, padding: "8px 0" }} />
           <button onClick={() => send()} disabled={busy} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: "none", cursor: "pointer", background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", opacity: busy ? 0.6 : 1 }}><Icon name="send" size={20} color="#241712" /></button>
         </div>

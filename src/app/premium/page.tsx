@@ -99,8 +99,20 @@ export default function PremiumPage() {
           <div style={{ height: 8, borderRadius: 99, background: T.surface2, overflow: "hidden", marginBottom: 8 }}>
             <div style={{ height: "100%", width: `${(loy.progress / 30) * 100}%`, background: T.accent, borderRadius: 99, transition: "width .5s" }} />
           </div>
-          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, lineHeight: 1.5 }}>
-            🔥 Log in daily! A <b>30-day streak</b> unlocks <b>10% off</b> any plan — and the longer your streak, the bigger the discount (≈13% at 200 days). It stays saved until you use it.
+          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, lineHeight: 1.5, marginBottom: 12 }}>
+            🔥 Log in daily! Your <b>login streak</b> earns a bigger discount the longer it grows. It stays saved until you use it.
+          </div>
+          {/* tier table — when each % unlocks */}
+          <div style={{ display: "flex", gap: 6 }}>
+            {([["30d", "10%"], ["87d", "11%"], ["144d", "12%"], ["200d", "13%"]] as const).map(([d, p], i) => {
+              const reached = loy.streak >= [30, 87, 144, 200][i];
+              return (
+                <div key={d} style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderRadius: 12, background: reached ? "rgba(127,179,137,0.16)" : T.surface2, border: `1px solid ${reached ? "rgba(127,179,137,0.4)" : T.border}` }}>
+                  <div style={{ fontFamily: MONO, fontSize: 15, fontWeight: 800, color: reached ? "#4E9466" : T.text }}>{p}</div>
+                  <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: T.textMute, marginTop: 1 }}>{d}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -117,7 +129,7 @@ export default function PremiumPage() {
       </Card>
 
       <PrimaryBtn onClick={buy} style={done ? { background: "#7FB389" } : undefined}>
-        {done ? "Welcome to Pro ✓" : disc > 0 ? `Subscribe — ${disc}% off` : "Start 7-Day Free Trial"}
+        {done ? "Welcome to Pro ✓" : disc > 0 ? `Subscribe — ${disc}% off` : "Get Premium"}
       </PrimaryBtn>
       <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}>Restore Purchases · Terms · Privacy</div>
 
