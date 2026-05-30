@@ -104,7 +104,24 @@ export default function Home() {
     return true;
   })();
 
-  const handleLogin = () => { if (status === "authenticated") return; signIn("google"); };
+  // Smart login: try Google first, fall back to credentials demo login
+  const handleLogin = async (nameInput?: string) => {
+    if (status === "authenticated") return;
+    const googleConfigured = !!(process.env.NEXT_PUBLIC_GOOGLE_CONFIGURED);
+    if (googleConfigured) {
+      signIn("google");
+    } else {
+      // Demo mode — use credentials provider with provided name or default
+      const name = nameInput || userName || "Maya";
+      const result = await signIn("credentials", { redirect: false, name });
+      if (result?.ok) {
+        localStorage.removeItem("velmora_onboarding_complete");
+        setUserName(name);
+        setShowOnboarding(true);
+      }
+    }
+  };
+
   const completeOnboarding = () => {
     setShowOnboarding(false);
     localStorage.setItem("velmora_onboarding_complete", "true");
@@ -372,61 +389,74 @@ export default function Home() {
         </div>
       )}
 
-      {/* TAB BAR + floating chat (only on home/results) */}
+      {/* TAB BAR (only on home/results) */}
       {(view === "home" || view === "results" || view === "product_results") && (
-        <>
-          <TabBar active={view === "home" ? "home" : ""} onChange={handleTab} />
-          {view === "home" && (
-            <button onClick={() => router.push("/coach")} style={{ position: "fixed", bottom: 100, right: 16, zIndex: 50, width: 52, height: 52, borderRadius: 99, border: "none", cursor: "pointer", background: `linear-gradient(135deg, ${T.accent} 0%, #D45A3A 100%)`, boxShadow: `0 8px 24px ${rgba(T.accent, 0.5)}`, display: "flex", alignItems: "center", justifyContent: "center", maxWidth: 430, marginLeft: "auto" }}>
-              <Icon name="spark" size={24} color="#fff" fill />
-            </button>
-          )}
-        </>
+        <TabBar active={view === "home" ? "home" : ""} onChange={handleTab} />
       )}
     </div>
   );
 }
 
 // ════════════════════════ AUTH SCREEN ════════════════════════
-function AuthScreen({ onContinue }: { onContinue: () => void }) {
+function AuthScreen({ onContinue }: { onContinue: (name?: string) => void }) {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
+  const [name, setName]   = useState("Maya Chen");
+  const [email, setEmail] = useState("hello@example.com");
+  const [pass, setPass]   = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading]   = useState(false);
+
+  const doLogin = async () => {
+    setLoading(true);
+    try { await onContinue(name || "Maya"); } finally { setLoading(false); }
+  };
+
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: T.bg, overflow: "hidden", position: "relative" }}>
+      {/* top glow blob */}
       <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 340, height: 340, borderRadius: 99, background: "radial-gradient(circle, rgba(240,136,106,0.22) 0%, transparent 68%)", pointerEvents: "none" }} />
+
       <div className="glow-scroll" style={{ flex: 1, overflowY: "auto", padding: "0 26px 32px" }}>
+        {/* logo */}
         <div className="animate-fadeup" style={{ display: "flex", alignItems: "center", gap: 8, paddingTop: 72, marginBottom: 32 }}>
           <Icon name="spark" size={22} color={T.accentText} fill />
           <span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 800, color: T.accentText, letterSpacing: 2, textTransform: "uppercase" }}>GlowAI</span>
         </div>
+
+        {/* headline */}
         <div className="animate-fadeup" style={{ marginBottom: 28 }}>
           <h1 style={{ fontFamily: SERIF, fontSize: 38, lineHeight: 1.02, color: T.text, margin: "0 0 8px", fontWeight: 400, letterSpacing: -0.4 }}>
             {mode === "signin" ? <>Welcome<br /><em>back.</em></> : <>Create your<br /><em>account.</em></>}
           </h1>
-          <p style={{ fontFamily: SANS, fontSize: 14.5, color: T.textMute, margin: 0 }}>{mode === "signin" ? "Sign in to your GlowAI account." : "Start your skin journey today."}</p>
+          <p style={{ fontFamily: SANS, fontSize: 14.5, color: T.textMute, margin: 0 }}>
+            {mode === "signin" ? "Sign in to your GlowAI account." : "Start your skin journey today."}
+          </p>
         </div>
+
+        {/* social buttons */}
         <div className="animate-fadeup" style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 22 }}>
-          <button onClick={onContinue} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, height: 52, borderRadius: 16, cursor: "pointer", border: `1.5px solid ${T.border}`, background: T.surface, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text, boxShadow: T.shadow }}>
-            <svg width="20" height="20" viewBox="0 0 20 20"><path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.4a4.61 4.61 0 01-2 3.02v2.5h3.24c1.9-1.75 3-4.33 3-7.31z" fill="#4285F4" /><path d="M10 20c2.7 0 4.97-.9 6.63-2.43l-3.24-2.5c-.9.6-2.06.96-3.39.96-2.6 0-4.8-1.76-5.6-4.12H1.06v2.58A9.99 9.99 0 0010 20z" fill="#34A853" /><path d="M4.4 11.91A6 6 0 014.1 10c0-.66.11-1.3.3-1.91V5.51H1.06A9.99 9.99 0 000 10c0 1.61.38 3.14 1.06 4.49l3.34-2.58z" fill="#FBBC05" /><path d="M10 3.97c1.47 0 2.79.51 3.82 1.5L16.7 2.6C14.97.99 12.7 0 10 0A9.99 9.99 0 001.06 5.51l3.34 2.58C5.2 5.73 7.4 3.97 10 3.97z" fill="#EA4335" /></svg>
-            Continue with Google
+          <button onClick={doLogin} disabled={loading} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, height: 52, borderRadius: 16, cursor: "pointer", border: `1.5px solid ${T.border}`, background: T.surface, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text, boxShadow: T.shadow, opacity: loading ? 0.7 : 1 }}>
+            <svg width="20" height="20" viewBox="0 0 20 20"><path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.4a4.61 4.61 0 01-2 3.02v2.5h3.24c1.9-1.75 3-4.33 3-7.31z" fill="#4285F4"/><path d="M10 20c2.7 0 4.97-.9 6.63-2.43l-3.24-2.5c-.9.6-2.06.96-3.39.96-2.6 0-4.8-1.76-5.6-4.12H1.06v2.58A9.99 9.99 0 0010 20z" fill="#34A853"/><path d="M4.4 11.91A6 6 0 014.1 10c0-.66.11-1.3.3-1.91V5.51H1.06A9.99 9.99 0 000 10c0 1.61.38 3.14 1.06 4.49l3.34-2.58z" fill="#FBBC05"/><path d="M10 3.97c1.47 0 2.79.51 3.82 1.5L16.7 2.6C14.97.99 12.7 0 10 0A9.99 9.99 0 001.06 5.51l3.34 2.58C5.2 5.73 7.4 3.97 10 3.97z" fill="#EA4335"/></svg>
+            {loading ? "Signing in…" : "Continue with Google"}
           </button>
-          <button onClick={onContinue} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, height: 52, borderRadius: 16, cursor: "pointer", border: "none", background: "#1A1A1A", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff", boxShadow: "0 4px 16px rgba(0,0,0,0.18)" }}>
-            <svg width="18" height="22" viewBox="0 0 18 22" fill="#fff"><path d="M14.96 11.6c-.02-2.37 1.94-3.52 2.03-3.58-1.11-1.62-2.83-1.84-3.44-1.86-1.46-.15-2.86.87-3.6.87-.75 0-1.9-.85-3.12-.83-1.6.02-3.08.93-3.9 2.36-1.67 2.89-.43 7.17 1.2 9.52.8 1.15 1.75 2.44 3 2.39 1.2-.05 1.66-.78 3.11-.78 1.46 0 1.88.78 3.15.75 1.3-.02 2.12-1.17 2.91-2.33.93-1.33 1.3-2.63 1.32-2.7-.03-.01-2.63-1.01-2.66-4.01zM12.41 4.02C13.07 3.22 13.5 2.1 13.38 1c-.95.04-2.12.64-2.8 1.43-.61.7-1.15 1.85-1.01 2.94 1.06.08 2.14-.54 2.84-1.35z" /></svg>
+          <button onClick={doLogin} disabled={loading} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, height: 52, borderRadius: 16, cursor: "pointer", border: "none", background: "#1A1A1A", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff", boxShadow: "0 4px 16px rgba(0,0,0,0.18)", opacity: loading ? 0.7 : 1 }}>
+            <svg width="18" height="22" viewBox="0 0 18 22" fill="#fff"><path d="M14.96 11.6c-.02-2.37 1.94-3.52 2.03-3.58-1.11-1.62-2.83-1.84-3.44-1.86-1.46-.15-2.86.87-3.6.87-.75 0-1.9-.85-3.12-.83-1.6.02-3.08.93-3.9 2.36-1.67 2.89-.43 7.17 1.2 9.52.8 1.15 1.75 2.44 3 2.39 1.2-.05 1.66-.78 3.11-.78 1.46 0 1.88.78 3.15.75 1.3-.02 2.12-1.17 2.91-2.33.93-1.33 1.3-2.63 1.32-2.7-.03-.01-2.63-1.01-2.66-4.01zM12.41 4.02C13.07 3.22 13.5 2.1 13.38 1c-.95.04-2.12.64-2.8 1.43-.61.7-1.15 1.85-1.01 2.94 1.06.08 2.14-.54 2.84-1.35z"/></svg>
             Continue with Apple
           </button>
         </div>
+
+        {/* divider */}
         <div className="animate-fadeup" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 22 }}>
           <div style={{ flex: 1, height: 1, background: T.border }} /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 600, color: T.textFaint }}>or</span><div style={{ flex: 1, height: 1, background: T.border }} />
         </div>
+
+        {/* fields */}
         <div className="animate-fadeup" style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 18 }}>
-          {mode === "signup" && (
-            <div style={{ padding: "14px 16px", borderRadius: 14, background: T.surface, border: `1.5px solid ${T.border}` }}>
-              <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Full name</div>
-              <input placeholder="Maya Chen" style={{ width: "100%", border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
-            </div>
-          )}
+          {/* name field — always shown for personalization */}
+          <div style={{ padding: "14px 16px", borderRadius: 14, background: T.surface, border: `1.5px solid ${name ? T.accent : T.border}` }}>
+            <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Your name</div>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="Maya Chen" style={{ width: "100%", border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
+          </div>
           <div style={{ padding: "14px 16px", borderRadius: 14, background: T.surface, border: `1.5px solid ${email ? T.accent : T.border}` }}>
             <div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: T.textFaint, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 4 }}>Email</div>
             <input value={email} onChange={e => setEmail(e.target.value)} placeholder="hello@example.com" style={{ width: "100%", border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
@@ -437,8 +467,17 @@ function AuthScreen({ onContinue }: { onContinue: () => void }) {
             <button onClick={() => setShowPass(s => !s)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: T.textFaint, fontFamily: SANS, fontSize: 12, fontWeight: 600 }}>{showPass ? "Hide" : "Show"}</button>
           </div>
         </div>
-        {mode === "signin" && <div className="animate-fadeup" style={{ textAlign: "right", marginBottom: 20 }}><span style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 600, color: T.accentText, cursor: "pointer" }}>Forgot password?</span></div>}
-        <div className="animate-fadeup"><PrimaryBtn onClick={onContinue}>{mode === "signin" ? "Sign In" : "Create Account"}</PrimaryBtn></div>
+
+        {mode === "signin" && (
+          <div className="animate-fadeup" style={{ textAlign: "right", marginBottom: 20 }}>
+            <span style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 600, color: T.accentText, cursor: "pointer" }}>Forgot password?</span>
+          </div>
+        )}
+
+        <div className="animate-fadeup">
+          <PrimaryBtn onClick={doLogin}>{loading ? "Signing in…" : (mode === "signin" ? "Sign In" : "Create Account")}</PrimaryBtn>
+        </div>
+
         <div className="animate-fadeup" style={{ textAlign: "center", marginTop: 20 }}>
           <span style={{ fontFamily: SANS, fontSize: 14, color: T.textMute }}>{mode === "signin" ? "Don't have an account? " : "Already have an account? "}</span>
           <span onClick={() => setMode(m => m === "signin" ? "signup" : "signin")} style={{ fontFamily: SANS, fontSize: 14, fontWeight: 700, color: T.accentText, cursor: "pointer" }}>{mode === "signin" ? "Sign Up" : "Sign In"}</span>
