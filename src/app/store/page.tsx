@@ -5,23 +5,17 @@ import AppTabBar from "@/glow/AppTabBar";
 
 type Prod = { name: string; brand: string; cat: string; tags: string[]; rating: number; mine: boolean };
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  REAL PRODUCTS — har product ka apna affiliate link affiliate.ts mein hai
+//  Naya product add karna ho: yaha entry daalo, affiliate.ts mein link daalo.
+// ─────────────────────────────────────────────────────────────────────────────
 const CATALOG: Prod[] = [
-  // ── my shelf ──
-  { name: "Gentle Gel Cleanser", brand: "Beam Labs", cat: "Cleanser", tags: ["acne", "oil", "daily"], rating: 4.5, mine: true },
-  { name: "15% Vitamin C", brand: "Beam Labs", cat: "Serum", tags: ["pigmentation", "dark spots", "brightening", "vitamin c", "glow"], rating: 4.8, mine: true },
-  { name: "Quiet Hero 10%", brand: "Lumen", cat: "Serum", tags: ["niacinamide", "oil", "pores", "redness"], rating: 4.7, mine: true },
-  { name: "Cloud Cream", brand: "Lumen", cat: "Moisturizer", tags: ["dry", "hydration", "barrier"], rating: 4.6, mine: true },
-  { name: "Daily Shield SPF 50", brand: "Solé", cat: "SPF", tags: ["spf", "sun", "pigmentation", "daily"], rating: 4.9, mine: true },
-  { name: "Spot Gel", brand: "Beam Labs", cat: "Treatment", tags: ["acne", "spot", "breakout"], rating: 4.3, mine: true },
-  // ── discover (not owned) ──
-  { name: "Clarifying BHA Toner", brand: "Beam Labs", cat: "Toner", tags: ["acne", "oil", "pores", "bha", "exfoliate"], rating: 4.6, mine: false },
-  { name: "Barrier Repair Cream", brand: "Lumen", cat: "Moisturizer", tags: ["dry", "sensitive", "barrier", "redness"], rating: 4.8, mine: false },
-  { name: "Brightening Essence", brand: "Solé", cat: "Essence", tags: ["pigmentation", "dark spots", "glow", "brightening"], rating: 4.4, mine: false },
-  { name: "Retinol 0.3 Night", brand: "Lumen", cat: "Serum", tags: ["retinol", "ageing", "texture", "fine lines", "night"], rating: 4.7, mine: false },
-  { name: "Hydra Plump HA", brand: "Solé", cat: "Serum", tags: ["hyaluronic", "hydration", "dry", "plump"], rating: 4.5, mine: false },
+  // ── Cleanser ──
+  { name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier", cat: "Cleanser", tags: ["cleanser", "vitamin c", "brightening", "glow", "daily", "all skin types"], rating: 4.4, mine: true },
+  // ── aur products yahan aayenge jab aap link doge ──
 ];
 
-const CATS = ["All", "Cleanser", "Serum", "Moisturizer", "SPF", "Treatment"];
+const CATS = ["All", "Cleanser", "Serum", "Moisturizer", "SPF", "Toner", "Treatment", "Night Cream"];
 
 // small ingredient knowledge base
 const INGREDIENTS: { key: string; name: string; verdict: "good" | "caution" | "avoid"; note: string }[] = [

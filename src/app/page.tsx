@@ -236,10 +236,9 @@ export default function Home() {
 
   // ════════════════════════ MAIN APP ════════════════════════
   const firstName = (userName || "there").split(" ")[0];
+  // Real products only — fake brands hataye. Naye products jab link milega tab add honge.
   const PRODUCTS: [string, string, number][] = [
-    ["Gentle Gel Cleanser", "Beam Labs", 0], ["Quiet Hero 10%", "Lumen", 1],
-    ["Cloud Cream", "Lumen", 2], ["Daily Shield SPF 50", "Solé", 3],
-    ["Brightening Essence", "Solé", 4], ["Spot Gel", "Beam Labs", 0],
+    ["Garnier Bright Complete Vitamin C Face Wash", "Garnier", 0],
   ];
 
   return (

@@ -14,31 +14,18 @@
 
 // DEFAULT affiliate link — jab kisi product ka apna alag link na ho, har "Buy"
 // button isi pe jaayega. Yaha apna main affiliate link daalo.
-export const DEFAULT_LINK = "https://amzn.to/4dDZDau";
+export const DEFAULT_LINK = ""; // khaali — naye products ke links aayenge
 
 // Fallback search links isi store + tag se banenge (jab DEFAULT_LINK bhi khaali ho).
 export const AMAZON_DOMAIN = "www.amazon.in"; // e.g. www.amazon.com, www.amazon.co.uk
 export const AMAZON_TAG = "";                 // e.g. "glowai-21"  (khaali chhod sakte ho)
 
 // Per-product affiliate links — apne real links yaha paste karo.
+// ── Real products — har product ka apna affiliate link ──
+// Naya product: CATALOG mein entry daalo + yahan link daalo
 export const AFFILIATE_LINKS: Record<string, string> = {
-  "Gentle Gel Cleanser": "",
-  "Gentle Cleanser (PM)": "",
-  "Vitamin C Serum": "",
-  "15% Vitamin C": "",
-  "Quiet Hero 10%": "",
-  "Niacinamide 10%": "",
-  "Cloud Cream": "",
-  "Cloud Cream Moisturizer": "",
-  "Daily Shield SPF 50": "",
-  "SPF Reapplication": "",
-  "Spot Gel": "",
-  "Barrier Repair Night Cream": "",
-  "Barrier Repair Cream": "",
-  "Clarifying BHA Toner": "",
-  "Brightening Essence": "",
-  "Retinol 0.3 Night": "",
-  "Hydra Plump HA": "",
+  "Garnier Bright Complete Vitamin C Face Wash": "https://amzn.to/4dDZDau",
+  // aur products aane wale hain...
 };
 
 // Returns the buy link for a product. Custom link if set, else an Amazon search.

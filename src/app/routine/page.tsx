@@ -8,15 +8,11 @@ import { getWeekPlan, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/d
 const DAY_LETTERS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+// ── Real products only — fake brands hataye ──
+// Naye products jab aap link doge tab add honge
 const ITEMS = [
-  { time: "8:00", period: "AM", section: "Morning", name: "Gentle Gel Cleanser", brand: "Beam Labs" },
-  { time: "8:15", period: "AM", section: "Morning", name: "Vitamin C Serum", brand: "Beam Labs" },
-  { time: "9:00", period: "AM", section: "Morning", name: "Niacinamide 10%", brand: "Lumen" },
-  { time: "9:30", period: "AM", section: "Morning", name: "Cloud Cream Moisturizer", brand: "Lumen" },
-  { time: "12:00", period: "PM", section: "Afternoon", name: "Daily Shield SPF 50", brand: "Solé" },
-  { time: "3:00", period: "PM", section: "Afternoon", name: "SPF Reapplication", brand: "Solé" },
-  { time: "9:00", period: "PM", section: "Evening", name: "Gentle Cleanser (PM)", brand: "Beam Labs" },
-  { time: "9:30", period: "PM", section: "Evening", name: "Barrier Repair Night Cream", brand: "Lumen" },
+  { time: "8:00", period: "AM", section: "Morning", name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier" },
+  // aur products aane wale hain...
 ];
 const SEC_COL: any = { Morning: "#E8A24C", Afternoon: "#5FAD72", Evening: "#8B85E0" };
 const SEC_ICON: any = { Morning: "sun", Afternoon: "bolt", Evening: "moon" };
@@ -34,7 +30,7 @@ export default function RoutinePage() {
   const [selIdx, setSelIdx] = useState(TODAY_OFFSET);
   const selDate = week[selIdx];
 
-  const [checked, setChecked] = useState<boolean[]>([false, false, false, false, false, false, false, false]);
+  const [checked, setChecked] = useState<boolean[]>(ITEMS.map(() => false));
   const [tab, setTab] = useState<"Skincare" | "Diet Plan">("Skincare");
   const [water, setWater] = useState(0);
   const [country, setCountry] = useState("India");
