@@ -8,6 +8,7 @@ import {
   PrimaryBtn, GhostBtn, Chip, Badge, ScoreDial, MetricBar, MiniRing, SectionTitle,
   TabBar, BuyBtn,
 } from "@/glow/ui";
+import { productImg } from "@/glow/affiliate";
 import { tickLoyalty } from "@/glow/loyalty";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; image?: string };
@@ -236,9 +237,8 @@ export default function Home() {
 
   // ════════════════════════ MAIN APP ════════════════════════
   const firstName = (userName || "there").split(" ")[0];
-  // Real products only — [name, brand, photoIndex, img?]
-  const PRODUCTS: [string, string, number, string?][] = [
-    ["Garnier Bright Complete Vitamin C Face Wash", "Garnier", 0, "/products/garnier-vitc-facewash.jpg"],
+  const PRODUCTS: [string, string][] = [
+    ["Garnier Bright Complete Vitamin C Face Wash", "Garnier"],
   ];
 
   return (
@@ -312,7 +312,9 @@ export default function Home() {
             <div style={{ padding: "40px 0", textAlign: "center", color: T.textFaint, fontFamily: SANS, fontSize: 14 }}>No makeup products yet</div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {PRODUCTS.map(([name, brand, pi, img], i) => (
+              {PRODUCTS.map(([name, brand], i) => {
+                const img = productImg(name);
+                return (
                 <div key={i} onClick={() => router.push("/store")} style={{ borderRadius: 20, overflow: "hidden", background: T.surface, boxShadow: T.shadow, cursor: "pointer" }}>
                   <div style={{ height: 130, position: "relative", overflow: "hidden", background: "#F3E7E0", ...(img ? {} : { backgroundImage: "url(/hero-product.jpg)", backgroundSize: "260%", backgroundPosition: ["8% 28%", "2% 72%", "30% 86%", "6% 50%", "22% 96%", "0% 40%"][i % 6] }) }}>
                     {img && <img src={img} alt={name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
@@ -326,7 +328,7 @@ export default function Home() {
                     <BuyBtn name={name} variant="wide" />
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </div>

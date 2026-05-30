@@ -21,12 +21,32 @@ export const AMAZON_DOMAIN = "www.amazon.in"; // e.g. www.amazon.com, www.amazon
 export const AMAZON_TAG = "";                 // e.g. "glowai-21"  (khaali chhod sakte ho)
 
 // Per-product affiliate links — apne real links yaha paste karo.
-// ── Real products — har product ka apna affiliate link ──
-// Naya product: CATALOG mein entry daalo + yahan link daalo
-export const AFFILIATE_LINKS: Record<string, string> = {
-  "Garnier Bright Complete Vitamin C Face Wash": "https://amzn.to/4dDZDau",
+// ── Real products — name → { link, asin } ──────────────────────────────────
+// Naya product add karna: yahan entry daalo.
+// asin: Amazon product ID (URL mein /dp/XXXXXXXXXX wala)
+// link: aapka affiliate link
+// Photo automatically /api/img?asin=XXXX se aayegi — koi aur kaam nahi!
+// ─────────────────────────────────────────────────────────────────────────────
+export const PRODUCTS_DATA: Record<string, { link: string; asin?: string }> = {
+  "Garnier Bright Complete Vitamin C Face Wash": {
+    asin: "B0G4WQX1WR",
+    link: "https://amzn.to/4dDZDau",
+  },
   // aur products aane wale hain...
 };
+
+// backward-compat helper for BuyBtn
+export const AFFILIATE_LINKS: Record<string, string> = Object.fromEntries(
+  Object.entries(PRODUCTS_DATA).map(([k, v]) => [k, v.link])
+);
+
+// Returns the auto-proxied image URL for a product (via /api/img?asin=)
+// Falls back to undefined if no ASIN set.
+export function productImg(name: string): string | undefined {
+  const d = PRODUCTS_DATA[name];
+  if (d?.asin) return `/api/img?asin=${d.asin}`;
+  return undefined;
+}
 
 // Returns the buy link for a product. Custom link if set, else an Amazon search.
 export function affiliateUrl(name: string): string {

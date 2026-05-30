@@ -1,9 +1,10 @@
 "use client";
 import { useState, useMemo } from "react";
 import { T, SERIF, SANS, MONO, rgba, Icon, Card, Chip, Badge, SectionTitle, ProductThumb, BuyBtn } from "@/glow/ui";
+import { productImg } from "@/glow/affiliate";
 import AppTabBar from "@/glow/AppTabBar";
 
-type Prod = { name: string; brand: string; cat: string; tags: string[]; rating: number; mine: boolean; img?: string };
+type Prod = { name: string; brand: string; cat: string; tags: string[]; rating: number; mine: boolean };
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  REAL PRODUCTS — har product ka apna affiliate link affiliate.ts mein hai
@@ -11,7 +12,7 @@ type Prod = { name: string; brand: string; cat: string; tags: string[]; rating: 
 // ─────────────────────────────────────────────────────────────────────────────
 const CATALOG: Prod[] = [
   // ── Cleanser ──
-  { name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier", cat: "Cleanser", tags: ["cleanser", "vitamin c", "brightening", "glow", "daily", "all skin types"], rating: 4.4, mine: true, img: "/products/garnier-vitc-facewash.jpg" },
+  { name: "Garnier Bright Complete Vitamin C Face Wash", brand: "Garnier", cat: "Cleanser", tags: ["cleanser", "vitamin c", "brightening", "glow", "daily", "all skin types"], rating: 4.4, mine: true },
   // ── aur products yahan aayenge jab aap link doge ──
 ];
 
@@ -104,7 +105,7 @@ export default function StorePage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
               {shown.map((p, i) => (
                 <Card key={i} pad={12}>
-                  <div style={{ height: 120, borderRadius: 14, marginBottom: 10, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><ProductThumb name={p.name} size={84} img={p.img} /></div>
+                  <div style={{ height: 120, borderRadius: 14, marginBottom: 10, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><ProductThumb name={p.name} size={84} img={productImg(p.name)} /></div>
                   <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 650, color: T.text, lineHeight: 1.2 }}>{p.name}</div>
                   <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, marginTop: 3, marginBottom: 10 }}>{p.brand}</div>
                   <BuyBtn name={p.name} variant="wide" />
@@ -215,7 +216,7 @@ export default function StorePage() {
 function RecRow({ p, owned }: { p: Prod; owned?: boolean }) {
   return (
     <Card pad={12} style={{ display: "flex", gap: 14, alignItems: "center" }}>
-      <div style={{ width: 64, height: 64, borderRadius: 14, flexShrink: 0, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><ProductThumb name={p.name} size={56} img={p.img} /></div>
+      <div style={{ width: 64, height: 64, borderRadius: 14, flexShrink: 0, background: T.surface2, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}><ProductThumb name={p.name} size={56} img={productImg(p.name)} /></div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 650, color: T.text }}>{p.name}</div>
         <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>{p.brand} · {p.cat}</div>
