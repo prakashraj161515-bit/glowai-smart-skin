@@ -19,6 +19,7 @@ export default function Home() {
   const [scanMode, setScanMode] = useState<"face" | "product">("face");
   const [data, setData] = useState<any>(null);
   const [ai, setAi] = useState("");
+  const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState<"male" | "female">("female");
   const [history, setHistory] = useState<HistoryEntry[]>([]);
@@ -37,7 +38,7 @@ export default function Home() {
   const [streak, setStreak] = useState(1);
   const [cat, setCat] = useState("All");
   const [liked, setLiked] = useState<number[]>([]);
-  const [openReport, setOpenReport] = useState(false);
+  const [openReport, setOpenReport] = useState(true);
   const [openPlan, setOpenPlan] = useState(true);
   const [activeDot, setActiveDot] = useState<number | null>(null);
 
@@ -79,7 +80,9 @@ export default function Home() {
       const h = localStorage.getItem("velmora_history");
       if (h) { try { setHistory(JSON.parse(h)); } catch {} }
       const a = localStorage.getItem("velmora_analysis");
-      if (a) { try { setData(JSON.parse(a)); } catch {} }
+      if (a) { try { const ad = JSON.parse(a); setData(ad); if (ad.summary) setSummary(ad.summary); } catch {} }
+      const savedAi = localStorage.getItem("velmora_ai_report");
+      if (savedAi) setAi(savedAi);
       const st = parseInt(localStorage.getItem("velmora_streak") || "1");
       setStreak(st || 1);
       fetch("/api/user/load").then(r => r.json()).then(({ data }) => {
@@ -132,13 +135,22 @@ export default function Home() {
   const resetScanner = (m: "face" | "product") => { setAi(""); setData((d: any) => d); setScanMode(m); setView("scanner"); };
 
   const formatMarkdown = (text: string) => text.split("\n").map((line, i) => {
+    const trimmed = line.trim();
+    // full-line bold => section header chip
+    const headerMatch = trimmed.match(/^\*\*(.+?)\*\*:?\.?$/);
+    if (headerMatch) {
+      return <div key={i} style={{ display: "flex", alignItems: "center", gap: 7, margin: i ? "16px 0 10px" : "0 0 10px" }}>
+        <span style={{ width: 5, height: 16, borderRadius: 99, background: T.accent }} />
+        <span style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.8 }}>{headerMatch[1]}</span>
+      </div>;
+    }
     const f = line.replace(/\*\*(.*?)\*\*/g, '<strong style="color:#2C1F1A;font-weight:700">$1</strong>');
-    if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
+    if (trimmed.startsWith("- ") || trimmed.startsWith("* ") || trimmed.startsWith("• ")) {
       return <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
         <span style={{ width: 7, height: 7, borderRadius: 99, background: T.accent, flexShrink: 0, marginTop: 7 }} />
-        <span style={{ fontFamily: SANS, fontSize: 13.5, color: T.textMute, lineHeight: 1.55 }} dangerouslySetInnerHTML={{ __html: f.replace(/^[*-]\s*/, "") }} /></div>;
+        <span style={{ fontFamily: SANS, fontSize: 14, color: T.text, lineHeight: 1.5 }} dangerouslySetInnerHTML={{ __html: f.replace(/^[*\-•]\s*/, "") }} /></div>;
     }
-    if (line.trim() === "") return <div key={i} style={{ height: 8 }} />;
+    if (trimmed === "") return <div key={i} style={{ height: 6 }} />;
     return <p key={i} style={{ fontFamily: SANS, fontSize: 13.5, color: T.textMute, lineHeight: 1.55, margin: "0 0 8px" }} dangerouslySetInnerHTML={{ __html: f }} />;
   });
 
@@ -163,10 +175,11 @@ export default function Home() {
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "face_scan", image: res.image, gender, userName, country, prevScan: prev || null }) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
-      const analysisData = { image: res.image, score: d.score || 0, acne: d.acne || 0, oil: d.oil || 0, pigmentation: d.pigmentation || 0, gender, date: new Date().toLocaleDateString() };
-      setData(analysisData); setAi(d.report || d.text || "Analysis complete.");
+      const analysisData = { image: res.image, score: d.score || 0, acne: d.acne || 0, oil: d.oil || 0, pigmentation: d.pigmentation || 0, summary: d.summary || "", gender, date: new Date().toLocaleDateString() };
+      setData(analysisData); setAi(d.report || d.text || "Analysis complete."); setSummary(d.summary || "");
       const nh = [analysisData, ...history].slice(0, 30);
       setHistory(nh); localStorage.setItem("velmora_history", JSON.stringify(nh)); localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
+      localStorage.setItem("velmora_ai_report", d.report || d.text || "");
       let dt = "Combination"; if (analysisData.oil > 60) dt = "Oily"; else if (analysisData.oil < 25) dt = "Dry"; else if (analysisData.acne > 40) dt = "Acne-Prone";
       setSkinType(dt);
       saveToCloud({ history: nh, gender, country, skinType: dt, onboardingComplete: true, isPremium });
@@ -322,7 +335,7 @@ export default function Home() {
       {view === "results" && data && (loading ? (
         <ProcessingScreen image={data.image} />
       ) : (
-        <ResultsView data={data} ai={ai} history={history} formatMarkdown={formatMarkdown} openReport={openReport} setOpenReport={setOpenReport} openPlan={openPlan} setOpenPlan={setOpenPlan} activeDot={activeDot} setActiveDot={setActiveDot} onRoutine={() => router.push("/routine")} onProducts={() => router.push("/store")} onBack={() => setView("home")} />
+        <ResultsView data={data} ai={ai} summary={summary} history={history} formatMarkdown={formatMarkdown} openReport={openReport} setOpenReport={setOpenReport} openPlan={openPlan} setOpenPlan={setOpenPlan} activeDot={activeDot} setActiveDot={setActiveDot} onRoutine={() => router.push("/routine")} onProducts={() => router.push("/store")} onBack={() => setView("home")} />
       ))}
 
       {/* ─────────── PRODUCT RESULTS ─────────── */}
@@ -506,7 +519,7 @@ function ProcessingScreen({ image }: { image?: string }) {
 }
 
 // ════════════════════════ RESULTS ════════════════════════
-function ResultsView({ data, ai, history, formatMarkdown, openReport, setOpenReport, openPlan, setOpenPlan, activeDot, setActiveDot, onRoutine, onProducts, onBack }: any) {
+function ResultsView({ data, ai, summary, history, formatMarkdown, openReport, setOpenReport, openPlan, setOpenPlan, activeDot, setActiveDot, onRoutine, onProducts, onBack }: any) {
   const score = data.score || 0;
   const prev = history[1];
   const delta = prev ? score - prev.score : 0;
@@ -540,7 +553,7 @@ function ResultsView({ data, ai, history, formatMarkdown, openReport, setOpenRep
         <div style={{ position: "absolute", top: 12, left: 12 }}><Badge tone="mute" style={{ background: "rgba(0,0,0,0.5)", color: "#fff" }}>Tap dots to inspect</Badge></div>
       </div>
       {/* score */}
-      <Card glow style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
+      <Card glow style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
         <ScoreDial score={score} size={120} delta={delta} />
         <div style={{ flex: 1 }}>
           <div style={{ fontFamily: SERIF, fontSize: 28, color: T.text, lineHeight: 1.05 }}>Overall<br />Skin Score</div>
@@ -550,6 +563,18 @@ function ResultsView({ data, ai, history, formatMarkdown, openReport, setOpenRep
           </div>
         </div>
       </Card>
+
+      {/* AI one-line summary — friendly + wow */}
+      <div style={{ display: "flex", gap: 12, padding: 16, borderRadius: 18, marginBottom: 20, background: "linear-gradient(120deg, rgba(240,136,106,0.14), rgba(240,136,106,0.06))", border: `1px solid ${T.accentDim}` }}>
+        <div style={{ width: 38, height: 38, borderRadius: 12, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 4px 14px ${rgba(T.accent, 0.4)}` }}>
+          <Icon name="spark" size={20} color="#fff" fill />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>In short</div>
+          <div style={{ fontFamily: SANS, fontSize: 15, color: T.text, lineHeight: 1.5, fontWeight: 500 }}>{summary || `Your skin scored ${score}/100 — ${scoreLabel(score).toLowerCase()}. Keep your routine consistent and you'll see steady improvement.`}</div>
+        </div>
+      </div>
+
       {/* concerns */}
       <SectionTitle>Concern Breakdown</SectionTitle>
       <Card pad={6} style={{ marginBottom: 20 }}>
@@ -562,6 +587,7 @@ function ResultsView({ data, ai, history, formatMarkdown, openReport, setOpenRep
           </div>
         ); })}
       </Card>
+
       {/* metrics */}
       <SectionTitle>Skin Metrics</SectionTitle>
       <Card style={{ marginBottom: 20 }}>
@@ -569,22 +595,27 @@ function ResultsView({ data, ai, history, formatMarkdown, openReport, setOpenRep
           {metrics.map(([l, v, ic, col]) => <MetricBar key={l} label={l} value={v} icon={ic} color={col} />)}
         </div>
       </Card>
-      {/* actions */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-        <PrimaryBtn icon="routine" onClick={onRoutine}>Update My Routine</PrimaryBtn>
-        <div style={{ display: "flex", gap: 10 }}><GhostBtn onClick={onProducts}>Product Recs</GhostBtn><GhostBtn onClick={onBack}>Done</GhostBtn></div>
-      </div>
-      {/* AI report */}
+
+      {/* AI report — moved up, open by default */}
       {ai && (
-        <div style={{ borderRadius: 18, background: T.surface, border: `1px solid ${T.border}`, overflow: "hidden", marginBottom: 12, boxShadow: T.shadow }}>
+        <div style={{ borderRadius: 18, background: T.surface, border: `1px solid ${T.border}`, overflow: "hidden", marginBottom: 20, boxShadow: T.shadow }}>
           <button onClick={() => setOpenReport((o: boolean) => !o)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "none", border: "none", cursor: "pointer" }}>
             <Icon name="spark" size={16} color={T.accentText} fill />
             <span style={{ flex: 1, fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 1, textAlign: "left" }}>Complete AI Skin Report</span>
             <div style={{ transform: openReport ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .25s" }}><Icon name="chevDown" size={18} color={T.textFaint} /></div>
           </button>
-          {openReport && <div style={{ padding: "0 16px 16px" }}>{formatMarkdown(ai)}</div>}
+          {openReport && <div style={{ padding: "4px 16px 16px" }}>{formatMarkdown(ai)}</div>}
         </div>
       )}
+
+      {/* product recs */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
+        <GhostBtn onClick={onProducts}>Product Recs</GhostBtn>
+        <GhostBtn onClick={onBack}>Done</GhostBtn>
+      </div>
+
+      {/* Update My Routine — final CTA at the very bottom */}
+      <PrimaryBtn icon="routine" onClick={onRoutine}>Update My Routine</PrimaryBtn>
     </div>
   );
 }

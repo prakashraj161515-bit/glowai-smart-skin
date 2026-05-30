@@ -84,7 +84,8 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
   "acne": <integer 0-100, acne severity>,
   "oil": <integer 0-100, oiliness level>,
   "pigmentation": <integer 0-100, dark spots level>,
-  "report": "<a detailed multiline markdown report for ${userName} (${gender}) with sections: **SKIN IMPROVEMENT ANALYSIS**, **CAUSES**, **WHAT TO EAT & DRINK** (foods available in ${country}), **RECOMMENDED PRODUCTS & TIMING**. Use bullet points. Tailor specifically for ${gender} skin physiology.>"
+  "summary": "<ONE warm, encouraging sentence (max 18 words) for ${userName} summarising their skin today in plain simple language a beginner understands. No jargon.>",
+  "report": "<a SHORT, easy-to-read markdown report for ${userName} (${gender}). Use EXACTLY these 3 sections with simple words a non-expert understands: **WHAT WE SEE** (2-3 short bullets), **WHY** (2 short bullets on likely causes), **YOUR PLAN** (3 short actionable bullets — what to do + 1 food to eat available in ${country}). Keep every bullet under 14 words. Be friendly and motivating. No medical jargon.>"
 }`;
     } else {
       prompt = `You are GlowAI, a world-class dermatological assistant. Provide professional skincare advice.`;
@@ -115,11 +116,12 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
     if (isFaceScan) {
       try {
         const parsed = JSON.parse(text);
-        return NextResponse.json({ 
+        return NextResponse.json({
           score: parsed.score,
           acne: parsed.acne,
           oil: parsed.oil,
           pigmentation: parsed.pigmentation,
+          summary: parsed.summary || "",
           report: parsed.report,
           text: parsed.report
         });
