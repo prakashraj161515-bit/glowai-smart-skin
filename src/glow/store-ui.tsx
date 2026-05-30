@@ -114,34 +114,57 @@ export function LivePrice({ asin, big = false }: { asin: string; big?: boolean }
   return <span ref={ref} style={{ fontFamily: MONO, fontSize: fs, fontWeight: 700, color: T.text }}>{price}</span>;
 }
 
-// ── Interactive "rate this" stars ─────────────────────────────────
+// ── Interactive "rate this" — pick stars, then SUBMIT once ────────
 export function RateStars({ asin, onRated }: { asin: string; onRated?: (v: number, prev: number) => void }) {
-  const [val, setVal] = useState(0);
+  const [submitted, setSubmitted] = useState(0); // confirmed rating
+  const [pending, setPending] = useState(0);     // selected but not yet submitted
   const [hover, setHover] = useState(0);
-  useEffect(() => { setVal(getUserRating(asin)); }, [asin]);
+  const [busy, setBusy] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
+  useEffect(() => { setSubmitted(getUserRating(asin)); }, [asin]);
 
-  const pick = (v: number) => {
+  const sel = hover || pending || submitted;
+  const dirty = pending > 0 && pending !== submitted;
+
+  const submit = async () => {
+    if (!pending || busy) return;
     const prev = getUserRating(asin);
-    setVal(v);
-    saveUserRating(asin, v);
-    submitRating(asin, v, prev);     // share with everyone
-    onRated?.(v, prev);
+    setBusy(true);
+    saveUserRating(asin, pending);
+    await submitRating(asin, pending, prev);     // share with everyone
+    setSubmitted(pending); setPending(0); setBusy(false);
+    setJustSaved(true); setTimeout(() => setJustSaved(false), 1600);
+    onRated?.(pending, prev);
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
-      {[1, 2, 3, 4, 5].map(i => {
-        const active = (hover || val) >= i;
-        return (
-          <button key={i}
-            onClick={e => { e.stopPropagation(); pick(i); }}
-            onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)}
-            title={`Rate ${i} star${i > 1 ? "s" : ""}`}
-            style={{ background: "none", border: "none", padding: 1, cursor: "pointer", lineHeight: 0, transition: "transform .1s", transform: active ? "scale(1.08)" : "scale(1)" }}>
-            <Icon name="star" size={15} color={active ? "#F0A52C" : "#D8CCC4"} fill={active} sw={1.4} />
-          </button>
-        );
-      })}
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 6 }}>
+      {/* left: label OR submit button */}
+      {dirty ? (
+        <button onClick={e => { e.stopPropagation(); submit(); }} disabled={busy}
+          style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 11px", borderRadius: 99, border: "none", cursor: "pointer", background: T.accent, color: "#241712", fontFamily: SANS, fontSize: 11, fontWeight: 800, boxShadow: `0 3px 9px ${T.accent}55` }}>
+          {busy ? "Saving…" : "Submit"}
+        </button>
+      ) : (
+        <span style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 700, color: submitted ? "#5FA572" : T.textMute, flexShrink: 0, whiteSpace: "nowrap" }}>
+          {justSaved ? "Thanks ✓" : submitted ? "You rated ✓" : "Rate it"}
+        </span>
+      )}
+      {/* right: the stars */}
+      <div style={{ display: "flex", alignItems: "center", gap: 1, flexShrink: 0 }}>
+        {[1, 2, 3, 4, 5].map(i => {
+          const active = sel >= i;
+          return (
+            <button key={i}
+              onClick={e => { e.stopPropagation(); setPending(i); }}
+              onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)}
+              title={`${i} star${i > 1 ? "s" : ""}`}
+              style={{ background: "none", border: "none", padding: 1, cursor: "pointer", lineHeight: 0, transition: "transform .1s", transform: active ? "scale(1.08)" : "scale(1)" }}>
+              <Icon name="star" size={16} color={active ? "#F0A52C" : "#D8CCC4"} fill={active} sw={1.4} />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

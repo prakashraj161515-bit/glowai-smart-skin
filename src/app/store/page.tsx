@@ -3,7 +3,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { T, SERIF, SANS, MONO, rgba, Icon, Badge, ProductThumb, BuyBtn } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
 import { ALL_PRODUCTS, AffProduct, productImg } from "@/glow/affiliate";
-import { Stars, LivePrice, RateStars, fmtCount, blendedRating, getUserRating, fetchGlobalRatings, ensurePrice, priceNum, GAgg } from "@/glow/store-ui";
+import { Stars, LivePrice, RateStars, fmtCount, blendedRating, fetchGlobalRatings, ensurePrice, priceNum, GAgg } from "@/glow/store-ui";
 import { searchProducts } from "@/glow/search";
 
 // internal category value -> friendly label
@@ -239,8 +239,6 @@ export default function StorePage() {
 
 // ── Product card with gradient outline ────────────────────────────
 function ProductCard({ p, idx, agg, onRated }: { p: AffProduct; idx: number; agg?: { sum: number; count: number }; onRated: (asin: string, v: number, prev: number) => void }) {
-  const [ur, setUr] = useState(0);
-  useEffect(() => { setUr(getUserRating(p.asin)); }, [p.asin]);
   const { rating, reviews } = blendedRating(p.rating, p.reviews, agg);
   // gradient outline — gold for bestsellers, warm accent otherwise
   const ring = p.bestseller
@@ -271,9 +269,8 @@ function ProductCard({ p, idx, agg, onRated }: { p: AffProduct; idx: number; agg
             <LivePrice asin={p.asin} />
             <BuyBtn name={p.name} variant="pill" />
           </div>
-          <div style={{ marginTop: "auto", paddingTop: 8, borderTop: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontFamily: SANS, fontSize: 10.5, color: ur ? "#5FA572" : T.textMute, fontWeight: 700, flexShrink: 0, whiteSpace: "nowrap" }}>{ur ? "You rated ✓" : "Rate it"}</span>
-            <RateStars asin={p.asin} onRated={(v, prev) => { setUr(v); onRated(p.asin, v, prev); }} />
+          <div style={{ marginTop: "auto", paddingTop: 8, borderTop: `1px solid ${T.border}` }}>
+            <RateStars asin={p.asin} onRated={(v, prev) => onRated(p.asin, v, prev)} />
           </div>
         </div>
       </div>
