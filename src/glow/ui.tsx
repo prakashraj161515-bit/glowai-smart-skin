@@ -464,11 +464,11 @@ export function TabBar({ active, onChange }:
           const on = active === id;
           if (id === "scan") {
             return (
-              <button key={id} onClick={() => onChange(id)} style={{ border: "none", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: 4 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 15, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", marginTop: -20, boxShadow: `0 6px 16px ${rgba(T.accent, 0.45)}`, border: "2.5px solid #fff" }}>
-                  <Icon name="scan" size={22} color="#fff" sw={2} />
+              <button key={id} onClick={() => onChange(id)} style={{ border: "none", background: "transparent", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "0 4px", flex: 1 }}>
+                <div style={{ width: 50, height: 50, borderRadius: 17, background: "linear-gradient(140deg, #F5A98D 0%, #F0886A 55%, #E0685C 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginTop: -12, boxShadow: `0 0 0 4px #fff, 0 8px 20px ${rgba(T.accent, 0.5)}` }}>
+                  <Icon name="scan" size={24} color="#fff" sw={2.2} />
                 </div>
-                <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 600, color: on ? T.accent : T.textFaint }}>{lbl}</span>
+                <span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, color: on ? T.accent : T.textFaint }}>{lbl}</span>
               </button>
             );
           }

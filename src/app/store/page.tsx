@@ -15,11 +15,11 @@ const CAT_EMOJI: Record<string, string> = {
   All: "✨", Cleanser: "🧼", Serum: "💧", Moisturizer: "🧴", SPF: "☀️", Toner: "🌸", "Night Cream": "🌙", Treatment: "💊",
 };
 type Sort = "popular" | "rated" | "priceLow" | "priceHigh";
-const SORTS: { id: Sort; label: string }[] = [
-  { id: "popular", label: "Popular" },
-  { id: "rated", label: "Top Rated" },
-  { id: "priceLow", label: "Price ↑" },
-  { id: "priceHigh", label: "Price ↓" },
+const SORTS: { id: Sort; label: string; icon: any }[] = [
+  { id: "popular", label: "Popular", icon: "flame" },
+  { id: "rated", label: "Top Rated", icon: "star" },
+  { id: "priceLow", label: "Lowest", icon: "arrowDown" },
+  { id: "priceHigh", label: "Highest", icon: "arrowUp" },
 ];
 
 const INGREDIENTS: { key: string; name: string; verdict: "good" | "caution" | "avoid"; note: string }[] = [
@@ -123,11 +123,7 @@ export default function StorePage() {
         <div style={{ background: "linear-gradient(165deg, #F9DDD0 0%, #F5C7B4 52%, #FAF8F6 100%)", padding: "56px 20px 20px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: -36, right: -26, width: 140, height: 140, borderRadius: 99, background: "rgba(255,255,255,0.22)" }} />
           <div style={{ position: "absolute", top: 40, right: 60, width: 60, height: 60, borderRadius: 99, background: "rgba(255,255,255,0.14)" }} />
-          <div style={{ position: "relative" }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 99, background: "rgba(255,255,255,0.65)", backdropFilter: "blur(8px)", marginBottom: 10 }}>
-              <Icon name="spark" size={13} color="#C44E28" fill />
-              <span style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: "#C44E28", letterSpacing: 0.4 }}>{ALL_PRODUCTS.length} REAL PRODUCTS</span>
-            </div>
+          <div style={{ position: "relative", paddingTop: 6 }}>
             <h1 style={{ fontFamily: SERIF, fontSize: 38, color: "#2C1F1A", margin: 0, lineHeight: 1 }}>Shop Skincare</h1>
             <p style={{ fontFamily: SANS, fontSize: 13.5, color: "rgba(44,31,26,0.62)", fontWeight: 600, margin: "8px 0 16px" }}>Live prices · star ratings · rated by users like you</p>
             {/* search inside hero */}
@@ -140,15 +136,15 @@ export default function StorePage() {
         </div>
 
         <div style={{ padding: "16px 20px 0" }}>
-          {/* conflict + ingredient checker */}
-          <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-            <button onClick={() => setConflict(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 9, padding: "11px 12px", borderRadius: 14, background: "rgba(224,104,92,0.1)", border: "1px solid rgba(224,104,92,0.28)", cursor: "pointer", textAlign: "left" }}>
-              <Icon name="warn" size={19} color="#E0685C" />
-              <div><div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: "#E0685C", lineHeight: 1.1 }}>Conflict check</div><div style={{ fontFamily: SANS, fontSize: 10.5, color: T.textMute }}>What not to mix</div></div>
+          {/* smart tools — clean feature cards (not warnings) */}
+          <div style={{ display: "flex", gap: 11, marginBottom: 16 }}>
+            <button onClick={() => setConflict(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "12px 13px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 4px 14px rgba(60,30,20,0.06)", cursor: "pointer", textAlign: "left" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 11, flexShrink: 0, background: "linear-gradient(135deg,#EAE4FB,#D9CFF4)", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="bolt" size={18} color="#7C6CE0" fill /></div>
+              <div><div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 750, color: T.text, lineHeight: 1.1 }}>Conflict check</div><div style={{ fontFamily: SANS, fontSize: 10.5, color: T.textMute, marginTop: 1 }}>What not to mix</div></div>
             </button>
-            <button onClick={() => setChecker(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 9, padding: "11px 12px", borderRadius: 14, background: T.accentSoft, border: `1px solid ${T.accentDim}`, cursor: "pointer", textAlign: "left" }}>
-              <Icon name="info" size={19} color={T.accentText} />
-              <div><div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.accentText, lineHeight: 1.1 }}>Ingredient check</div><div style={{ fontFamily: SANS, fontSize: 10.5, color: T.textMute }}>Right for you?</div></div>
+            <button onClick={() => setChecker(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "12px 13px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 4px 14px rgba(60,30,20,0.06)", cursor: "pointer", textAlign: "left" }}>
+              <div style={{ width: 36, height: 36, borderRadius: 11, flexShrink: 0, background: "linear-gradient(135deg,#D8F0E0,#BEE6CC)", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="leaf" size={18} color="#5FA572" /></div>
+              <div><div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 750, color: T.text, lineHeight: 1.1 }}>Ingredient check</div><div style={{ fontFamily: SANS, fontSize: 10.5, color: T.textMute, marginTop: 1 }}>Right for you?</div></div>
             </button>
           </div>
         </div>
@@ -172,7 +168,9 @@ export default function StorePage() {
           {SORTS.map(s => {
             const active = sort === s.id;
             return (
-              <button key={s.id} onClick={() => setSort(s.id)} style={{ flexShrink: 0, padding: "6px 13px", borderRadius: 99, cursor: "pointer", border: "none", background: active ? T.text : T.surface2, color: active ? "#fff" : T.textMute, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", transition: "all .2s" }}>{s.label}</button>
+              <button key={s.id} onClick={() => setSort(s.id)} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 99, cursor: "pointer", border: "none", background: active ? T.text : T.surface2, color: active ? "#fff" : T.textMute, fontFamily: SANS, fontSize: 12.5, fontWeight: 700, whiteSpace: "nowrap", transition: "all .2s" }}>
+                <Icon name={s.icon} size={13} color={active ? "#fff" : T.textMute} fill={s.icon === "flame" || s.icon === "star"} />{s.label}
+              </button>
             );
           })}
         </div>
