@@ -22,7 +22,7 @@ function img(id: string) {
 }
 
 export const ALL_PRODUCTS: AffProduct[] = [
-  // ── CLEANSERS (50) ──────────────────────────────────────────
+  // ── CLEANSERS (51) ──────────────────────────────────────────
   { name:"Garnier Bright Complete Vitamin C Face Wash", brand:"Garnier", cat:"Cleanser", asin:"B0G4WQX1WR", imgId:"51O4CZnsiZL", link:"https://amzn.to/4dDZDau", rating:4.3, reviews:12840, bestseller:true, tags:["vitamin c","brightening","glow","daily","all skin"] },
   { name:"Garnier Men Acno Fight Gentle Cleanser", brand:"Garnier", cat:"Cleanser", asin:"B0FJ74F5DB", imgId:"711-v3qfhmL", link:"https://amzn.to/4vhBrkb", rating:4.2, reviews:3210, tags:["acne","men","gentle","oil control"] },
   { name:"Garnier Men TurboBright Double Action Face Wash", brand:"Garnier", cat:"Cleanser", asin:"B00V4L6JC2", imgId:"615gCt+GzCL", link:"https://amzn.to/4uJT1gS", rating:4.1, reviews:5670, tags:["brightening","men","anti-pollution"] },
