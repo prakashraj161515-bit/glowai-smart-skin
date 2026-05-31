@@ -56,13 +56,22 @@ export default function DiaryPage() {
   };
 
   return (
-    <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", background: T.bg, padding: "56px 20px 40px" }}>
-      <button onClick={() => router.back()} style={{ width: 36, height: 36, borderRadius: 11, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 16 }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
-      <h1 style={{ fontFamily: SERIF, fontSize: 30, color: T.text, margin: "0 0 4px" }}>Skin Diary</h1>
-      <div style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, marginBottom: 16 }}>Today · {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</div>
+    <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", background: T.bg, paddingBottom: 40 }}>
+      {/* gradient hero */}
+      <div style={{ background: "linear-gradient(165deg, #E8DFF6 0%, #F3D9E4 55%, #FAF8F6 100%)", padding: "56px 20px 46px", position: "relative" }}>
+        <button onClick={() => router.back()} style={{ width: 36, height: 36, borderRadius: 11, background: "rgba(255,255,255,0.7)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.8)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", marginBottom: 14 }}><Icon name="chevL" size={18} color="#2C1F1A" sw={2.2} /></button>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 30 }}>{MOODS[mood]}</span>
+          <div>
+            <h1 style={{ fontFamily: SERIF, fontSize: 32, color: "#2C1F1A", margin: 0, lineHeight: 1 }}>Skin Diary</h1>
+            <div style={{ fontFamily: SANS, fontSize: 13.5, color: "rgba(44,31,26,0.6)", fontWeight: 600, marginTop: 3 }}>Today · {new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</div>
+          </div>
+        </div>
+      </div>
 
+      <div style={{ padding: "0 20px", marginTop: -20, position: "relative", zIndex: 2 }}>
       {/* mood — auto-follows water, animates */}
-      <Card style={{ marginBottom: 16 }}>
+      <Card style={{ marginBottom: 16, boxShadow: "0 12px 30px rgba(60,30,20,0.1)" }}>
         <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 650, color: T.text, marginBottom: 12 }}>How does your skin feel?</div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {MOODS.map((e, i) => (
@@ -76,23 +85,24 @@ export default function DiaryPage() {
         <div style={{ fontFamily: SANS, fontSize: 12, color: T.textFaint, marginTop: 8 }}>Auto-set from your water intake — tap to override.</div>
       </Card>
 
-      {/* water — synced with Daily Ritual */}
-      <Card style={{ marginBottom: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 650, color: T.text }}>Water intake</span>
-          <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 600, color: T.accentText }}>{water} glasses</span>
+      {/* water — synced with Daily Ritual (blue gradient hero card) */}
+      <div style={{ marginBottom: 16, borderRadius: 22, padding: 18, background: "linear-gradient(150deg, #5B9BD5 0%, #4E8ED4 60%, #3F7CC4 100%)", boxShadow: "0 10px 28px rgba(78,142,212,0.35)", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -30, right: -20, width: 120, height: 120, borderRadius: 99, background: "rgba(255,255,255,0.12)" }} />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, position: "relative" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff" }}><Icon name="drop" size={18} color="#fff" fill />Water intake</span>
+          <span style={{ fontFamily: MONO, fontSize: 16, fontWeight: 800, color: "#fff" }}>{water} <span style={{ fontSize: 12, opacity: 0.85 }}>glasses</span></span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => changeWater(water - 1)} style={{ width: 40, height: 40, borderRadius: 12, border: `1.5px solid ${T.borderHi}`, background: T.surface, cursor: "pointer", fontFamily: SANS, fontSize: 20, fontWeight: 700, color: T.text }}>−</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, position: "relative" }}>
+          <button onClick={() => changeWater(water - 1)} style={{ width: 40, height: 40, borderRadius: 12, border: "1.5px solid rgba(255,255,255,0.5)", background: "rgba(255,255,255,0.15)", cursor: "pointer", fontFamily: SANS, fontSize: 20, fontWeight: 700, color: "#fff" }}>−</button>
           <div style={{ flex: 1, display: "flex", gap: 4 }}>
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} onClick={() => changeWater(i + 1)} style={{ flex: 1, height: 26, borderRadius: 7, cursor: "pointer", background: i < water ? "#4E8ED4" : T.surface2, transition: "background .2s" }} />
+              <div key={i} onClick={() => changeWater(i + 1)} style={{ flex: 1, height: 28, borderRadius: 7, cursor: "pointer", background: i < water ? "#fff" : "rgba(255,255,255,0.22)", transition: "background .2s", boxShadow: i < water ? "0 2px 6px rgba(0,0,0,0.12)" : "none" }} />
             ))}
           </div>
-          <button onClick={() => changeWater(water + 1)} style={{ width: 40, height: 40, borderRadius: 12, border: "none", background: "#4E8ED4", cursor: "pointer", fontFamily: SANS, fontSize: 20, fontWeight: 700, color: "#fff" }}>+</button>
+          <button onClick={() => changeWater(water + 1)} style={{ width: 40, height: 40, borderRadius: 12, border: "none", background: "#fff", cursor: "pointer", fontFamily: SANS, fontSize: 20, fontWeight: 700, color: "#4E8ED4" }}>+</button>
         </div>
-        <div style={{ fontFamily: SANS, fontSize: 12, color: T.textFaint, marginTop: 8 }}>🔗 Linked with Daily Ritual — changes sync both ways.</div>
-      </Card>
+        <div style={{ fontFamily: SANS, fontSize: 12, color: "rgba(255,255,255,0.85)", marginTop: 10, position: "relative" }}>🔗 Linked with Daily Ritual — changes sync both ways.</div>
+      </div>
 
       {/* notes */}
       <Card style={{ marginBottom: 16 }}>
@@ -124,6 +134,7 @@ export default function DiaryPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

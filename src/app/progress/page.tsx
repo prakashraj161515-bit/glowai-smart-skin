@@ -63,10 +63,11 @@ export default function ProgressPage() {
         <SectionTitle>Milestones</SectionTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {MILESTONES.map((m, i) => (
-            <Card key={i} pad={16} onClick={() => setSelM(m)} style={{ textAlign: "center", opacity: m.earned ? 1 : 0.5, cursor: "pointer" }}>
-              <div style={{ width: 48, height: 48, borderRadius: 99, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", background: m.earned ? T.accentSoft : T.surface2 }}><Icon name={m.ic} size={24} color={m.earned ? T.accentText : T.textFaint} fill={m.ic === "star"} /></div>
-              <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 650, color: T.text }}>{m.label}</div>
-              <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 700, color: m.earned ? "#7FB389" : T.textFaint, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>{m.earned ? "Earned" : "Locked"}</div>
+            <Card key={i} pad={16} onClick={() => setSelM(m)} style={{ textAlign: "center", cursor: "pointer", opacity: m.earned ? 1 : 0.55, background: m.earned ? "linear-gradient(160deg, #FEF0EB, #FFF8F4)" : T.surface, border: m.earned ? "1px solid " + rgba(T.accent, 0.25) : `1px solid ${T.border}`, boxShadow: m.earned ? `0 8px 22px ${rgba(T.accent, 0.16)}` : T.shadow, position: "relative", overflow: "hidden" }}>
+              {m.earned && <div style={{ position: "absolute", top: -20, right: -20, width: 70, height: 70, borderRadius: 99, background: rgba(T.accent, 0.1) }} />}
+              <div style={{ width: 50, height: 50, borderRadius: 99, margin: "0 auto 10px", display: "flex", alignItems: "center", justifyContent: "center", background: m.earned ? "linear-gradient(135deg,#F5A98D,#F0886A)" : T.surface2, boxShadow: m.earned ? `0 5px 14px ${rgba(T.accent, 0.4)}` : "none", position: "relative" }}><Icon name={m.ic} size={24} color={m.earned ? "#fff" : T.textFaint} fill={m.ic === "star" || m.earned} /></div>
+              <div style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 700, color: T.text, position: "relative" }}>{m.label}</div>
+              <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 800, color: m.earned ? "#5FA572" : T.textFaint, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5, position: "relative" }}>{m.earned ? "✓ Earned" : "Locked"}</div>
             </Card>
           ))}
         </div>
