@@ -27,11 +27,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={`${dmSans.variable} bg-[#FAF8F6]`} style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+      <body className={`${dmSans.variable}`} style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}>
         <AuthProvider>
-          <div className="flex flex-col min-h-screen items-center overflow-x-hidden">
-            <div className="w-full max-w-[430px] min-h-screen bg-[#FAF8F6] relative"
-              style={{ boxShadow: "0 0 80px rgba(240,136,106,0.07)" }}>
+          <div className="app-bg">
+            <div className="app-frame">
               <main>{children}</main>
             </div>
           </div>

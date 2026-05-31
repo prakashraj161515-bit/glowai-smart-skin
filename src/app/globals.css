@@ -199,6 +199,41 @@ html, body {
 @keyframes dashdraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: dashdraw 1.3s ease forwards; }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── Desktop / wide-screen backdrop (mobile stays edge-to-edge) ── */
+.app-bg {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  overflow-x: hidden;
+}
+.app-frame {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100vh;
+  background: #FAF8F6;
+  position: relative;
+}
+@media (min-width: 500px) {
+  .app-bg {
+    background:
+      radial-gradient(circle at 16% 14%, rgba(245,169,141,0.34), transparent 38%),
+      radial-gradient(circle at 86% 20%, rgba(139,133,224,0.22), transparent 40%),
+      radial-gradient(circle at 80% 84%, rgba(127,179,137,0.18), transparent 38%),
+      radial-gradient(circle at 22% 88%, rgba(232,162,76,0.18), transparent 40%),
+      linear-gradient(155deg, #FBEEE8 0%, #F3E0D7 55%, #ECE4F0 100%);
+    background-attachment: fixed;
+  }
+  /* app panel floats on the gradient with a soft device-like shadow */
+  .app-frame {
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.5),
+      -1px 0 0 rgba(60,30,20,0.04),
+      0 0 60px rgba(60,30,20,0.10),
+      0 0 120px rgba(240,136,106,0.10);
+  }
+}
 @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .card-in { animation: cardIn .4s ease both; }
 
