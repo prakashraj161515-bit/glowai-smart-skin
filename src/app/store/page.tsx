@@ -11,8 +11,16 @@ const CAT_LABEL: Record<string, string> = { Cleanser: "Facewash" };
 const catLabel = (c: string) => CAT_LABEL[c] || c;
 
 const CATS = ["All", "Cleanser", "Serum", "Moisturizer", "SPF", "Toner", "Night Cream", "Treatment"] as const;
-const CAT_EMOJI: Record<string, string> = {
-  All: "✨", Cleanser: "🧼", Serum: "💧", Moisturizer: "🧴", SPF: "☀️", Toner: "🌸", "Night Cream": "🌙", Treatment: "💊",
+// SVG icon per category (crisp, consistent with the rest of the app)
+const CAT_ICON: Record<string, { name: any; fill?: boolean }> = {
+  All: { name: "grid" },
+  Cleanser: { name: "drop", fill: true },
+  Serum: { name: "products" },
+  Moisturizer: { name: "leaf" },
+  SPF: { name: "sun", fill: true },
+  Toner: { name: "spark", fill: true },
+  "Night Cream": { name: "moon", fill: true },
+  Treatment: { name: "gem", fill: true },
 };
 type Sort = "popular" | "rated" | "priceLow" | "priceHigh";
 const SORTS: { id: Sort; label: string; icon: any }[] = [
@@ -155,7 +163,7 @@ export default function StorePage() {
             const active = cat === c;
             return (
               <button key={c} onClick={() => setCat(c)} style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 6, padding: "9px 15px", borderRadius: 99, cursor: "pointer", border: `1.5px solid ${active ? T.accent : T.border}`, background: active ? T.accent : T.surface, color: active ? "#241712" : T.textMute, fontFamily: SANS, fontSize: 13.5, fontWeight: 650, whiteSpace: "nowrap", boxShadow: active ? `0 4px 12px ${rgba(T.accent, 0.3)}` : "none", transition: "all .2s" }}>
-                <span>{CAT_EMOJI[c]}</span>{catLabel(c)}
+                <Icon name={CAT_ICON[c].name} size={14} color={active ? "#241712" : T.accentText} fill={CAT_ICON[c].fill} sw={1.9} />{catLabel(c)}
                 <span style={{ fontFamily: MONO, fontSize: 11, fontWeight: 700, opacity: 0.7 }}>{counts[c] || 0}</span>
               </button>
             );
