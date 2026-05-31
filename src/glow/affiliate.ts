@@ -22,7 +22,7 @@ function img(id: string) {
 }
 
 export const ALL_PRODUCTS: AffProduct[] = [
-  // ── CLEANSERS (52) ──────────────────────────────────────────
+  // ── CLEANSERS (50) ──────────────────────────────────────────
   { name:"Garnier Bright Complete Vitamin C Face Wash", brand:"Garnier", cat:"Cleanser", asin:"B0G4WQX1WR", imgId:"51O4CZnsiZL", link:"https://amzn.to/4dDZDau", rating:4.3, reviews:12840, bestseller:true, tags:["vitamin c","brightening","glow","daily","all skin"] },
   { name:"Garnier Men Acno Fight Gentle Cleanser", brand:"Garnier", cat:"Cleanser", asin:"B0FJ74F5DB", imgId:"711-v3qfhmL", link:"https://amzn.to/4vhBrkb", rating:4.2, reviews:3210, tags:["acne","men","gentle","oil control"] },
   { name:"Garnier Men TurboBright Double Action Face Wash", brand:"Garnier", cat:"Cleanser", asin:"B00V4L6JC2", imgId:"615gCt+GzCL", link:"https://amzn.to/4uJT1gS", rating:4.1, reviews:5670, tags:["brightening","men","anti-pollution"] },
@@ -45,7 +45,6 @@ export const ALL_PRODUCTS: AffProduct[] = [
   { name:"Brillare Professional Natural Face Wash", brand:"Brillare", cat:"Cleanser", asin:"B0132H7D66", imgId:"51rEn6EZMcL", link:"https://amzn.to/4ebtOWG", rating:4.1, reviews:670, tags:["natural","professional","gentle"] },
   { name:"Glutafine Facewash with Glutathione & Vitamin C", brand:"Glutafine", cat:"Cleanser", asin:"B07PG8PKMX", imgId:"61NMYJwJUiL", link:"https://amzn.to/4vmFKuH", rating:4.2, reviews:2340, tags:["glutathione","kojic acid","vitamin c","brightening","even tone"] },
   { name:"RAS Luxury Oils Infinity Anti Ageing Crème Face Cleanser", brand:"RAS Luxury", cat:"Cleanser", asin:"B0B9Y7XGS6", imgId:"51J9mOwYc-L", link:"https://amzn.to/4dSh2Lj", rating:4.4, reviews:560, tags:["anti-ageing","calendula","shea butter","luxury"] },
-  { name:"Kimirica Brightening Hydrating Face Wash", brand:"Kimirica", cat:"Cleanser", asin:"B0B8H8QBKS", imgId:"61b8RIfzGTL", link:"https://amzn.to/4uZcjz7", rating:4.1, reviews:780, tags:["brightening","hydrating","plant based","gentle"] },
   { name:"Biluma Advance Skin Brightening Face Wash", brand:"Biluma", cat:"Cleanser", asin:"B09VT7VFSB", imgId:"61nMxKRX+nL", link:"https://amzn.to/3Py2ust", rating:4.0, reviews:1120, tags:["brightening","vitamin e","aloe vera","pH 5.5","soap free"] },
   { name:"Glow & Lovely Bright Glow Facewash", brand:"Glow & Lovely", cat:"Cleanser", asin:"B00CQ423Q2", imgId:"41hAa+GflqL", link:"https://amzn.to/4nYf2pq", rating:4.0, reviews:9870, tags:["brightening","glow","daily","fairness"] },
   { name:"POND'S Pure Detox Face Wash", brand:"POND'S", cat:"Cleanser", asin:"B08PQ6VWPT", imgId:"51AmjNNFiyL", link:"https://amzn.to/4ehLnn5", rating:4.1, reviews:6780, tags:["detox","brightening","activated charcoal","oily skin"] },
@@ -76,7 +75,7 @@ export const ALL_PRODUCTS: AffProduct[] = [
   { name:"POND'S Pure Detox Anti-Pollution Face Wash", brand:"POND'S", cat:"Cleanser", asin:"B07T8NWDJP", imgId:"51gNeZyT97L", link:"https://amzn.to/4x0EKxE", rating:4.2, reviews:8760, tags:["charcoal","anti-pollution","detox","brightening"] },
   { name:"Ghar Soaps Magic De-Tan Face Wash with Saffron & Glutathione", brand:"Ghar Soaps", cat:"Cleanser", asin:"B0GYCT961V", imgId:"71x-JgwRslL", link:"https://amzn.to/4vjcbKb", rating:4.1, reviews:340, tags:["saffron","glutathione","de-tan","brightening","tan removal"] },
 
-  // ── SPF (19) ────────────────────────────────────────────────
+  // ── SPF (18) ────────────────────────────────────────────────
   { name:"Dot & Key Vitamin C + E Super Bright Sunscreen SPF 50+ PA++++", brand:"Dot & Key", cat:"SPF", asin:"B0BLK4YRSN", imgId:"61ckTgN44WL", link:"https://amzn.to/4nVADPo", rating:4.4, reviews:8920, bestseller:true, tags:["vitamin c","spf 50","brightening","uv filter","lightweight"] },
   { name:"Lakme SPF 50 PA++++ Sunscreen Lotion", brand:"Lakme", cat:"SPF", asin:"B00CS1KT96", imgId:"51+gSgH2c4L", link:"https://amzn.to/4dODB3z", rating:4.2, reviews:18540, bestseller:true, tags:["spf 50","uva uvb","blue light","waterlight","no white cast"] },
   { name:"Dot & Key Watermelon Cooling Sunscreen SPF 50+ PA++++", brand:"Dot & Key", cat:"SPF", asin:"B0BQN2YWN5", imgId:"61laZHTxyOL", link:"https://amzn.to/43CQUPQ", rating:4.4, reviews:12300, bestseller:true, tags:["watermelon","cooling","spf 50","dewy","new age uv"] },
@@ -94,7 +93,6 @@ export const ALL_PRODUCTS: AffProduct[] = [
   { name:"Deconstruct Fluid Brightening Sunscreen SPF 50+ PA++++", brand:"Deconstruct", cat:"SPF", asin:"B0D3HWWMY7", imgId:"41y92R6p1qL", link:"https://amzn.to/49vK8is", rating:4.4, reviews:7890, tags:["niacinamide","brightening","dewy","spf 50"] },
   { name:"Beauty of Joseon Relief Sun Rice + Probiotics SPF 50+ PA++++", brand:"Beauty of Joseon", cat:"SPF", asin:"B09JVNZVH3", imgId:"61DA-VH24GL", link:"https://amzn.to/3RGX6Um", rating:4.5, reviews:14560, bestseller:true, tags:["korean","rice","probiotics","oily skin","lightweight"] },
   { name:"Sunscreen SPF 50+ PA+++ for Acne-Prone & Oily Skin", brand:"Generic", cat:"SPF", asin:"B0GPD3L34Z", imgId:"61TXQHIVbnL", link:"https://amzn.to/4vpfEat", rating:4.1, reviews:560, tags:["spf 50","acne","oily skin","lightweight"] },
-  { name:"Coola Organic Liplux Lip Oil Sunscreen SPF 30", brand:"Coola", cat:"SPF", asin:"B08TVWZQHF", imgId:"61Rn3Wlx+eL", link:"https://amzn.to/4uaIgTN", rating:4.4, reviews:1230, tags:["lip sunscreen","organic","spf 30","lip oil"] },
   { name:"Dolce Aura Sun Protection & Pore Care Combo", brand:"Dolce Aura", cat:"SPF", asin:"B0FCXW8YPX", imgId:"713wsKeYsYL", link:"https://amzn.to/434Q8eu", rating:4.2, reviews:450, tags:["sunscreen","charcoal","centella","pore","combo"] },
 
   // ── SERUMS (15) ─────────────────────────────────────────────
