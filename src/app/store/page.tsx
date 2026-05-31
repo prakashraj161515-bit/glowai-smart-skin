@@ -118,21 +118,28 @@ export default function StorePage() {
 
   return (
     <div className="store-wide" style={{ minHeight: "100vh", background: T.bg }}>
-      <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "60px 0 130px" }}>
-        <div style={{ padding: "0 20px" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 4 }}>
-            <h1 style={{ fontFamily: SERIF, fontSize: 34, color: T.text, margin: 0 }}>Shop Skincare</h1>
-            <span style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 700, color: T.accentText, paddingBottom: 6 }}>{ALL_PRODUCTS.length} products</span>
+      <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "0 0 130px" }}>
+        {/* gradient hero */}
+        <div style={{ background: "linear-gradient(165deg, #F9DDD0 0%, #F5C7B4 52%, #FAF8F6 100%)", padding: "56px 20px 20px", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: -36, right: -26, width: 140, height: 140, borderRadius: 99, background: "rgba(255,255,255,0.22)" }} />
+          <div style={{ position: "absolute", top: 40, right: 60, width: 60, height: 60, borderRadius: 99, background: "rgba(255,255,255,0.14)" }} />
+          <div style={{ position: "relative" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 99, background: "rgba(255,255,255,0.65)", backdropFilter: "blur(8px)", marginBottom: 10 }}>
+              <Icon name="spark" size={13} color="#C44E28" fill />
+              <span style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: "#C44E28", letterSpacing: 0.4 }}>{ALL_PRODUCTS.length} REAL PRODUCTS</span>
+            </div>
+            <h1 style={{ fontFamily: SERIF, fontSize: 38, color: "#2C1F1A", margin: 0, lineHeight: 1 }}>Shop Skincare</h1>
+            <p style={{ fontFamily: SANS, fontSize: 13.5, color: "rgba(44,31,26,0.62)", fontWeight: 600, margin: "8px 0 16px" }}>Live prices · star ratings · rated by users like you</p>
+            {/* search inside hero */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 16px", borderRadius: 16, background: "#fff", border: `1.5px solid ${q ? T.accent : "transparent"}`, boxShadow: "0 8px 22px rgba(196,78,40,0.16)" }}>
+              <Icon name="scan" size={19} color={T.textMute} />
+              <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search — facewash, vitamin c, oily…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
+              {q && <button onClick={() => setQ("")} style={{ background: "none", border: "none", cursor: "pointer" }}><Icon name="close" size={16} color={T.textFaint} /></button>}
+            </div>
           </div>
-          <p style={{ fontFamily: SANS, fontSize: 13.5, color: T.textMute, margin: "0 0 14px" }}>Real products · live prices · rated by users</p>
+        </div>
 
-          {/* search */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 15px", borderRadius: 15, background: T.surface, border: `1.5px solid ${q ? T.accent : T.border}`, marginBottom: 14, boxShadow: T.shadow }}>
-            <Icon name="scan" size={19} color={T.textMute} />
-            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search — facewash, vitamin c, oily…" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
-            {q && <button onClick={() => setQ("")} style={{ background: "none", border: "none", cursor: "pointer" }}><Icon name="close" size={16} color={T.textFaint} /></button>}
-          </div>
-
+        <div style={{ padding: "16px 20px 0" }}>
           {/* conflict + ingredient checker */}
           <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
             <button onClick={() => setConflict(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 9, padding: "11px 12px", borderRadius: 14, background: "rgba(224,104,92,0.1)", border: "1px solid rgba(224,104,92,0.28)", cursor: "pointer", textAlign: "left" }}>
