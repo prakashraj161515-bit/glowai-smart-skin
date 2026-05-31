@@ -117,7 +117,7 @@ export default function StorePage() {
   }, []);
 
   return (
-    <div style={{ minHeight: "100vh", background: T.bg }}>
+    <div className="store-wide" style={{ minHeight: "100vh", background: T.bg }}>
       <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "60px 0 130px" }}>
         <div style={{ padding: "0 20px" }}>
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 4 }}>
@@ -171,7 +171,7 @@ export default function StorePage() {
         </div>
 
         {/* product grid */}
-        <div style={{ padding: "0 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13 }}>
+        <div className="store-grid" style={{ padding: "0 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13 }}>
           {shown.map((p, i) => <ProductCard key={p.asin} p={p} idx={i} agg={global[p.asin]} onRated={onRated} />)}
         </div>
         {shown.length === 0 && (

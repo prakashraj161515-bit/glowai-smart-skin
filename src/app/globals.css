@@ -223,7 +223,6 @@ html, body {
       radial-gradient(circle at 80% 84%, rgba(127,179,137,0.18), transparent 38%),
       radial-gradient(circle at 22% 88%, rgba(232,162,76,0.18), transparent 40%),
       linear-gradient(155deg, #FBEEE8 0%, #F3E0D7 55%, #ECE4F0 100%);
-    background-attachment: fixed;
   }
   /* app panel floats on the gradient with a soft device-like shadow */
   .app-frame {
@@ -232,6 +231,17 @@ html, body {
       -1px 0 0 rgba(60,30,20,0.04),
       0 0 60px rgba(60,30,20,0.10),
       0 0 120px rgba(240,136,106,0.10);
+  }
+}
+
+/* ── Wide-screen: the Shop page expands to a full multi-column store ── */
+@media (min-width: 900px) {
+  .app-frame:has(.store-wide) { max-width: 1180px; }
+  /* multi-column responsive product grid */
+  .store-grid {
+    grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)) !important;
+    padding: 0 24px !important;
+    gap: 18px !important;
   }
 }
 @keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
