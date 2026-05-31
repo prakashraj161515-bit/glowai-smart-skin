@@ -455,7 +455,7 @@ export function WaterTracker({ ml, setMl, target = 3000 }:
 export function TabBar({ active, onChange }:
   { active: string; onChange: (id: string) => void }) {
   const tabs: [string, string][] = [
-    ["home", "Home"], ["scan", "Scan"], ["routine", "Ritual"], ["products", "Shelf"], ["profile", "You"],
+    ["home", "Home"], ["routine", "Ritual"], ["scan", "Scan"], ["products", "Shelf"], ["profile", "You"],
   ];
   return (
     <div style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", maxWidth: 430, width: "100%", bottom: 0, zIndex: 40, paddingBottom: 20, paddingTop: 8, background: `linear-gradient(to top, ${T.bg} 62%, transparent)` }}>
