@@ -97,20 +97,40 @@ export default function StorePage() {
     return c;
   }, []);
 
-  const ingResult = useMemo(() => {
+  // instant local match (fast path)
+  const ingLocal = useMemo(() => {
     const t = ingQ.trim().toLowerCase();
     if (!t) return null;
     const ing = INGREDIENTS.find(i => i.key.includes(t) || t.includes(i.key) || i.name.toLowerCase().includes(t));
-    if (ing) return { name: ing.name, verdict: ing.verdict, note: ing.note };
+    if (ing) return { name: ing.name, verdict: ing.verdict, note: ing.note, keyActives: [] as string[], bestFor: "" };
     const prod = ALL_PRODUCTS.find(p => p.name.toLowerCase().includes(t) || t.includes(p.brand.toLowerCase()));
     if (prod) {
       const hit = INGREDIENTS.find(i => prod.tags.some(tag => i.key.includes(tag) || tag.includes(i.key)));
-      return { name: prod.name, verdict: (hit?.verdict ?? "good") as "good" | "caution" | "avoid", note: `${catLabel(prod.cat)} by ${prod.brand} — for ${prod.tags.slice(0, 3).join(", ")}. A good match for those concerns.` };
+      return { name: prod.name, verdict: (hit?.verdict ?? "good") as "good" | "caution" | "avoid", note: `${catLabel(prod.cat)} by ${prod.brand} — for ${prod.tags.slice(0, 3).join(", ")}. A good match for those concerns.`, keyActives: prod.tags.slice(0, 4), bestFor: "" };
     }
-    const kw = INGREDIENTS.find(i => t.includes(i.key) || t.includes(i.name.toLowerCase().split(" ")[0]));
-    if (kw) return { name: ingQ, verdict: kw.verdict, note: `We don't stock this exact product, but it lists ${kw.name.toLowerCase()} — ${kw.note}` };
-    return { name: ingQ, verdict: "caution" as const, note: "We couldn't verify this product. Check its label for the main active, patch-test for 2 days, and add it slowly." };
+    return null;
   }, [ingQ]);
+
+  // AI lookup for anything not in our DB (any cream / product / ingredient)
+  const [ingAI, setIngAI] = useState<any>(null);
+  const [ingBusy, setIngBusy] = useState(false);
+  useEffect(() => {
+    const t = ingQ.trim();
+    setIngAI(null);
+    if (!t || ingLocal) { setIngBusy(false); return; }
+    setIngBusy(true);
+    const ctrl = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const r = await fetch("/api/ingredient", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: t }), signal: ctrl.signal });
+        const d = await r.json();
+        if (d.result) setIngAI(d.result);
+      } catch {} finally { setIngBusy(false); }
+    }, 650); // debounce while typing
+    return () => { clearTimeout(timer); ctrl.abort(); };
+  }, [ingQ, ingLocal]);
+
+  const ingResult = ingLocal || (ingAI ? { name: ingAI.name, verdict: ingAI.verdict, note: ingAI.note, keyActives: ingAI.keyActives || [], bestFor: ingAI.bestFor || "" } : null);
 
   const vCol: any = { good: "#7FB389", caution: "#E8A24C", avoid: "#E0685C" };
   const vLbl: any = { good: "Good for you", caution: "Use with care", avoid: "Best avoided" };
@@ -225,14 +245,29 @@ export default function StorePage() {
             <Icon name="info" size={18} color={T.textMute} />
             <input autoFocus value={ingQ} onChange={e => setIngQ(e.target.value)} placeholder="e.g. niacinamide, retinol, or a cream name" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
           </div>
+          {/* AI searching state */}
+          {!ingResult && ingBusy && ingQ.trim() && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 16, background: T.surface2 }}>
+              <span className="animate-spinpulse" style={{ width: 22, height: 22, borderRadius: 99, background: T.accentSoft, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon name="spark" size={12} color={T.accent} fill /></span>
+              <span style={{ fontFamily: SANS, fontSize: 13.5, color: T.textMute }}>Searching <b style={{ color: T.text }}>{ingQ}</b>…</span>
+            </div>
+          )}
           {ingResult && (
             <div style={{ padding: 16, borderRadius: 16, background: `${vCol[ingResult.verdict]}1a`, border: `1.5px solid ${vCol[ingResult.verdict]}66` }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ width: 10, height: 10, borderRadius: 99, background: vCol[ingResult.verdict] }} />
+                <span style={{ width: 10, height: 10, borderRadius: 99, background: vCol[ingResult.verdict], flexShrink: 0 }} />
                 <span style={{ fontFamily: SANS, fontSize: 15.5, fontWeight: 700, color: T.text, flex: 1 }}>{ingResult.name}</span>
                 <Badge tone={ingResult.verdict === "good" ? "good" : ingResult.verdict === "caution" ? "warn" : "bad"}>{vLbl[ingResult.verdict]}</Badge>
               </div>
               <div style={{ fontFamily: SANS, fontSize: 13.5, color: T.textMute, lineHeight: 1.5 }}>{ingResult.note}</div>
+              {ingResult.bestFor && <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.text, marginTop: 8 }}>👍 <b>Best for:</b> {ingResult.bestFor}</div>}
+              {ingResult.keyActives?.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10 }}>
+                  {ingResult.keyActives.map((a: string, i: number) => (
+                    <span key={i} style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 600, color: T.text, background: "rgba(255,255,255,0.7)", padding: "4px 10px", borderRadius: 99, border: `1px solid ${T.border}` }}>{a}</span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
           {!ingQ && (

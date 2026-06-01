@@ -13,6 +13,22 @@ const ACTIONS = [
 
 type Msg = { who: "ai" | "me" | "typing"; text?: string; actions?: boolean };
 
+// Render Aura's reply with **bold** parts shown as soft highlighted text,
+// so key words / product names / actions pop out (the "highlight" feel).
+function renderRich(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((p, i) => {
+    if (p.startsWith("**") && p.endsWith("**")) {
+      return (
+        <span key={i} style={{ fontWeight: 800, color: T.accentText, background: T.accentSoft, padding: "1px 5px", borderRadius: 6, margin: "0 1px", boxDecorationBreak: "clone", WebkitBoxDecorationBreak: "clone" }}>
+          {p.slice(2, -2)}
+        </span>
+      );
+    }
+    return <span key={i}>{p}</span>;
+  });
+}
+
 export default function CoachPage() {
   const router = useRouter();
   const [msgs, setMsgs] = useState<Msg[]>([{ who: "ai", text: "Hi, I'm Aura ✦ your personal skin coach. I've loaded your latest scan. Ask me anything — about your skin, a product, a diet, or a condition — and I'll keep it short and clear.", actions: true }]);
@@ -56,7 +72,7 @@ export default function CoachPage() {
       const d = await r.json();
       let reply = d.text || d.reply;
       if (!reply) throw new Error(d.error || "empty");
-      reply = reply.replace(/\*\*/g, "").replace(/^[\-*]\s+/gm, "• ").trim();
+      reply = reply.replace(/^[\-*]\s+/gm, "• ").trim(); // keep **bold** markers for highlighting
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: reply, actions: true }));
     } catch {
       // graceful, still-helpful fallback that uses scan data locally
@@ -77,7 +93,7 @@ export default function CoachPage() {
       const d = await r.json();
       let reply = d.text || d.report;
       if (!reply) throw new Error(d.error || "empty");
-      reply = reply.replace(/\*\*/g, "").replace(/^[\-*]\s+/gm, "• ").trim();
+      reply = reply.replace(/^[\-*]\s+/gm, "• ").trim();
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: reply, actions: true }));
     } catch {
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "I couldn't read that label clearly. Try a brighter, closer photo of the ingredients list — then I'll tell you if it suits your skin.", actions: true }));
@@ -116,7 +132,7 @@ export default function CoachPage() {
               <div style={{ display: "flex", justifyContent: me ? "flex-end" : "flex-start", marginBottom: m.actions ? 8 : 12 }}>
                 <div style={{ maxWidth: "84%" }}>
                   {!me && <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}><Icon name="spark" size={14} color={T.accent} fill /><span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.accentText }}>Aura</span></div>}
-                  <div style={{ padding: "12px 16px", borderRadius: 20, fontFamily: SANS, fontSize: 15, lineHeight: 1.5, whiteSpace: "pre-wrap", background: me ? T.accent : T.surface, color: me ? "#241712" : T.text, borderTopRightRadius: me ? 6 : 20, borderTopLeftRadius: me ? 20 : 6, border: me ? "none" : `1px solid ${T.border}`, boxShadow: me ? `0 4px 14px ${rgba(T.accent, 0.3)}` : "0 2px 10px rgba(60,30,20,0.05)" }}>{m.text}</div>
+                  <div style={{ padding: "12px 16px", borderRadius: 20, fontFamily: SANS, fontSize: 15, lineHeight: 1.55, whiteSpace: "pre-wrap", background: me ? T.accent : T.surface, color: me ? "#241712" : T.text, borderTopRightRadius: me ? 6 : 20, borderTopLeftRadius: me ? 20 : 6, border: me ? "none" : `1px solid ${T.border}`, boxShadow: me ? `0 4px 14px ${rgba(T.accent, 0.3)}` : "0 2px 10px rgba(60,30,20,0.05)" }}>{me ? m.text : renderRich(m.text || "")}</div>
                 </div>
               </div>
               {/* quick-action chips under the latest AI message */}
