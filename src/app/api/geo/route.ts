@@ -16,14 +16,37 @@ export async function GET(req: NextRequest) {
   };
   const SOUTH_ASIA = new Set(["IN", "PK", "BD", "NP", "LK"]);
 
+  // Map the visitor's country to the right Amazon marketplace + currency,
+  // so prices/links shown are local to them.
+  const AMZ: Record<string, { domain: string; currency: string; symbol: string }> = {
+    IN: { domain: "www.amazon.in", currency: "INR", symbol: "₹" },
+    US: { domain: "www.amazon.com", currency: "USD", symbol: "$" },
+    GB: { domain: "www.amazon.co.uk", currency: "GBP", symbol: "£" },
+    CA: { domain: "www.amazon.ca", currency: "CAD", symbol: "$" },
+    AU: { domain: "www.amazon.com.au", currency: "AUD", symbol: "$" },
+    AE: { domain: "www.amazon.ae", currency: "AED", symbol: "AED " },
+    SG: { domain: "www.amazon.sg", currency: "SGD", symbol: "$" },
+    DE: { domain: "www.amazon.de", currency: "EUR", symbol: "€" },
+    FR: { domain: "www.amazon.fr", currency: "EUR", symbol: "€" },
+    IT: { domain: "www.amazon.it", currency: "EUR", symbol: "€" },
+    ES: { domain: "www.amazon.es", currency: "EUR", symbol: "€" },
+    JP: { domain: "www.amazon.co.jp", currency: "JPY", symbol: "¥" },
+  };
+  // South-Asian neighbours don't have their own Amazon → use amazon.in (closest)
+  const amz = AMZ[country] || (SOUTH_ASIA.has(country) ? AMZ.IN : AMZ.IN);
+
   const countryName = COUNTRY_NAME[country] || (country || "");
   const isSouthAsia = SOUTH_ASIA.has(country);
 
   return NextResponse.json({
     country: countryName,
+    countryCode: country,
     city,
     region,
     foodRegion: isSouthAsia ? "india" : (country ? "global" : ""),
     area: city ? `${city}${countryName ? ", " + countryName : ""}` : countryName,
+    amazonDomain: amz.domain,
+    currency: amz.currency,
+    currencySymbol: amz.symbol,
   }, { headers: { "Cache-Control": "private, max-age=86400" } });
 }

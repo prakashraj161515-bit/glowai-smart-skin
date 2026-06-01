@@ -19,6 +19,13 @@ const ITEMS = [
   { time: "9:10", period: "PM", section: "Evening", name: "The Derma Co 2% Salicylic Acid Face Serum", brand: "The Derma Co" },
   { time: "9:30", period: "PM", section: "Evening", name: "Dot & Key Night Reset Retinol + Ceramide Night Cream", brand: "Dot & Key" },
 ];
+// Indian state codes (ISO 3166-2:IN) → name, so the diet can localise dishes
+const STATE_NAMES: Record<string, string> = {
+  "IN-MH": "Maharashtra", "IN-GJ": "Gujarat", "IN-PB": "Punjab", "IN-DL": "Delhi",
+  "IN-UP": "Uttar Pradesh", "IN-TN": "Tamil Nadu", "IN-KA": "Karnataka",
+  "IN-WB": "West Bengal", "IN-KL": "Kerala", "IN-RJ": "Rajasthan", "IN-HR": "Haryana",
+  "IN-MP": "Madhya Pradesh", "IN-BR": "Bihar", "IN-TG": "Telangana", "IN-AP": "Andhra Pradesh",
+};
 const SEC_COL: any = { Morning: "#E8A24C", Afternoon: "#5FAD72", Evening: "#8B85E0" };
 const SEC_ICON: any = { Morning: "sun", Afternoon: "bolt", Evening: "moon" };
 const MEAL_BG: any = { Breakfast: "#FEF7EB", Lunch: "#EDF7EE", Dinner: "#EFF0FD", Snacks: "#FEF0EB" };
@@ -55,7 +62,10 @@ export default function RoutinePage() {
     setArea(localStorage.getItem("velmora_area") || "");
     // detect real area (city, country) from IP via our edge geo endpoint
     fetch("/api/geo").then(r => r.json()).then((g) => {
-      if (g.area) { setArea(g.area); localStorage.setItem("velmora_area", g.area); }
+      // build a rich area string incl. state so the diet can localise dishes
+      const full = [g.city, STATE_NAMES[`${g.countryCode}-${g.region}`] || "", g.country].filter(Boolean).join(", ");
+      const areaStr = full || g.area || "";
+      if (areaStr) { setArea(areaStr); localStorage.setItem("velmora_area", areaStr); }
       if (g.country) { setCountry(g.country); localStorage.setItem("velmora_country", g.country); }
     }).catch(() => {});
     const a = localStorage.getItem("velmora_analysis"); if (a) { try { setScan(JSON.parse(a)); } catch {} }
@@ -169,7 +179,7 @@ export default function RoutinePage() {
   const doneCount = checked.filter(Boolean).length;
   const pct = Math.round((doneCount / ITEMS.length) * 100);
   const sections = [...new Set(ITEMS.map(i => i.section))];
-  const weekPlan = useMemo(() => getWeekPlan(country, scan), [country, scan]);
+  const weekPlan = useMemo(() => getWeekPlan(country, scan, area), [country, scan, area]);
   const dayPlan = weekPlan.days[selIdx % 7];
 
   return (
@@ -297,9 +307,12 @@ function DietPlan({ day, avoid, region, focus, area, dayName, onAsk }: { day: an
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 15px", borderRadius: 16, marginBottom: 18, background: "linear-gradient(135deg, rgba(127,179,137,0.16), rgba(127,179,137,0.06))", border: "1px solid rgba(127,179,137,0.3)" }}>
         <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: "rgba(127,179,137,0.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🥗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#3F7A52" }}>Healthy, skin-friendly meals</div>
-          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 1 }}>
-            {area ? <>📍 {area} · </> : null}foods to help {focus}.
+          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+            <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#3F7A52" }}>Veg, skin-friendly meals</div>
+            <span style={{ fontFamily: SANS, fontSize: 9.5, fontWeight: 800, color: "#fff", background: "#5FA572", padding: "2px 7px", borderRadius: 99, letterSpacing: 0.3 }}>🌱 100% VEG</span>
+          </div>
+          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>
+            {area ? <>📍 {area} · </> : null}local foods to help {focus}.
           </div>
         </div>
       </div>
@@ -339,8 +352,8 @@ function DietPlan({ day, avoid, region, focus, area, dayName, onAsk }: { day: an
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {[
             { l: "Leafy greens", e: "🥬" }, { l: "Fresh fruit", e: "🍓" }, { l: "Nuts & seeds", e: "🌰" },
-            { l: "Lean protein", e: "🍗" }, { l: "8+ glasses water", e: "💧" }, { l: "Curd / yogurt", e: "🥛" },
-            { l: "Green tea", e: "🍵" }, { l: "Omega-3 (fish/flax)", e: "🐟" },
+            { l: "Dal & beans", e: "🫘" }, { l: "8+ glasses water", e: "💧" }, { l: "Curd / yogurt", e: "🥛" },
+            { l: "Green tea", e: "🍵" }, { l: "Flax & walnuts", e: "🌰" },
           ].map((h) => (
             <span key={h.l} style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: "#3F7A52", background: "rgba(127,179,137,0.12)", padding: "7px 12px", borderRadius: 99, border: "1px solid rgba(127,179,137,0.28)" }}>{h.e} {h.l}</span>
           ))}

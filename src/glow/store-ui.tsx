@@ -70,10 +70,29 @@ function parsePrice(s: string | null): number | null {
   return isNaN(n) ? null : n;
 }
 
+// ── visitor's local Amazon marketplace (detected once, cached) ─────
+let marketPromise: Promise<{ domain: string; symbol: string }> | null = null;
+function getMarket(): Promise<{ domain: string; symbol: string }> {
+  if (marketPromise) return marketPromise;
+  marketPromise = (async () => {
+    try {
+      const cached = sessionStorage.getItem("velmora_market");
+      if (cached) return JSON.parse(cached);
+      const r = await fetch("/api/geo");
+      const g = await r.json();
+      const m = { domain: g.amazonDomain || "www.amazon.in", symbol: g.currencySymbol || "₹" };
+      sessionStorage.setItem("velmora_market", JSON.stringify(m));
+      return m;
+    } catch { return { domain: "www.amazon.in", symbol: "₹" }; }
+  })();
+  return marketPromise;
+}
+
 export async function ensurePrice(asin: string): Promise<number | null> {
   if (priceNum.has(asin)) return priceNum.get(asin)!;
   try {
-    const r = await fetch(`/api/price?asin=${asin}`);
+    const mkt = await getMarket();
+    const r = await fetch(`/api/price?asin=${asin}&domain=${encodeURIComponent(mkt.domain)}&symbol=${encodeURIComponent(mkt.symbol)}`);
     const d = await r.json();
     priceStr.set(asin, d.price || null);
     const num = parsePrice(d.price || null);

@@ -9,7 +9,8 @@ export type DayPlan = { meals: Meal[]; focus: string };
 
 type Scan = { acne?: number; oil?: number; pigmentation?: number; hydration?: number; score?: number };
 
-// ── food banks (region + concern aware) ──────────────────────────────────
+// ── food banks — 100% VEGETARIAN, fruit & veg led, skin-improving ─────────
+// (no fish / chicken / meat anywhere — only plant foods + fruits + dairy)
 const BANK_INDIA = {
   breakfast: [
     { name: "Poha with peanuts", emoji: "🍚", why: "Light, iron-rich" },
@@ -17,7 +18,7 @@ const BANK_INDIA = {
     { name: "Moong dal chilla", emoji: "🥞", why: "Plant protein" },
     { name: "Idli with sambar", emoji: "🍚", why: "Fermented, gut-friendly" },
     { name: "Besan chilla", emoji: "🥞", why: "Protein, controls oil" },
-    { name: "Fruit + curd bowl", emoji: "🥣", why: "Probiotics + vitamins" },
+    { name: "Papaya + curd bowl", emoji: "🥣", why: "Enzymes brighten skin" },
     { name: "Ragi porridge", emoji: "🥣", why: "Calcium, calms skin" },
   ],
   lunch: [
@@ -26,26 +27,26 @@ const BANK_INDIA = {
     { name: "Palak paneer + roti", emoji: "🥬", why: "Iron, fights dullness" },
     { name: "Chana masala bowl", emoji: "🫘", why: "Zinc for healing" },
     { name: "Veg khichdi + curd", emoji: "🍲", why: "Easy-digest, calming" },
-    { name: "Fish curry + rice", emoji: "🐟", why: "Omega-3, plumps skin" },
+    { name: "Sprouts salad bowl", emoji: "🥗", why: "Protein + vitamin E" },
     { name: "Mixed veg + roti", emoji: "🥗", why: "Antioxidants" },
   ],
   dinner: [
     { name: "Grilled paneer + salad", emoji: "🥗", why: "Collagen support" },
     { name: "Lauki sabzi + roti", emoji: "🥒", why: "Hydrating, light" },
     { name: "Tinda/veg + dal", emoji: "🍲", why: "Gentle on digestion" },
-    { name: "Tandoori chicken + salad", emoji: "🍗", why: "Lean protein" },
     { name: "Tofu bhurji + roti", emoji: "🍳", why: "Plant protein" },
     { name: "Veg soup + multigrain toast", emoji: "🍵", why: "Warm, low-oil" },
     { name: "Bhindi + dal + rice", emoji: "🍛", why: "Fibre + minerals" },
+    { name: "Spinach dal + rice", emoji: "🥬", why: "Iron for a healthy glow" },
   ],
   snack: [
     { name: "Coconut water", emoji: "🥥", why: "Hydration + minerals" },
-    { name: "Amla juice", emoji: "🟢", why: "Vitamin C, brightening" },
+    { name: "Amla / orange", emoji: "🍊", why: "Vitamin C, brightening" },
     { name: "Soaked almonds", emoji: "🌰", why: "Vitamin E, repair" },
-    { name: "Seasonal fruit", emoji: "🍊", why: "Vitamin C" },
-    { name: "Roasted chana", emoji: "🫘", why: "Protein, low-GI" },
+    { name: "Papaya slices", emoji: "🧡", why: "Fades dull skin" },
+    { name: "Pomegranate bowl", emoji: "🔴", why: "Antioxidants for glow" },
     { name: "Buttermilk (chaas)", emoji: "🥛", why: "Probiotic, cooling" },
-    { name: "Green tea", emoji: "🍵", why: "Flushes toxins" },
+    { name: "Guava", emoji: "🟢", why: "4x Vitamin C of orange" },
   ],
 };
 
@@ -53,29 +54,29 @@ const BANK_GLOBAL = {
   breakfast: [
     { name: "Greek yogurt + berries", emoji: "🫐", why: "Probiotics + antioxidants" },
     { name: "Oatmeal + banana", emoji: "🥣", why: "Steady energy, low GI" },
-    { name: "Veggie omelette", emoji: "🍳", why: "Protein + biotin" },
+    { name: "Tofu scramble", emoji: "🍳", why: "Plant protein + biotin" },
     { name: "Green smoothie", emoji: "🥬", why: "Vitamins for glow" },
     { name: "Avocado toast", emoji: "🥑", why: "Healthy fats" },
     { name: "Chia pudding", emoji: "🥣", why: "Omega-3, hydrating" },
     { name: "Fruit + nut bowl", emoji: "🍓", why: "Vitamin C + E" },
   ],
   lunch: [
-    { name: "Grilled salmon + greens", emoji: "🐟", why: "Omega-3, plumps skin" },
-    { name: "Quinoa salad", emoji: "🥗", why: "Protein + fibre" },
-    { name: "Chicken + veg bowl", emoji: "🍗", why: "Collagen building" },
+    { name: "Quinoa + veggie salad", emoji: "🥗", why: "Protein + fibre" },
     { name: "Lentil soup + bread", emoji: "🍲", why: "Iron + fibre" },
     { name: "Tofu stir-fry", emoji: "🍱", why: "Plant protein" },
-    { name: "Tuna + spinach wrap", emoji: "🌯", why: "Omega-3 + iron" },
     { name: "Chickpea bowl", emoji: "🫘", why: "Zinc for healing" },
+    { name: "Spinach + bean wrap", emoji: "🌯", why: "Iron + folate" },
+    { name: "Hummus + veg platter", emoji: "🥙", why: "Protein + healthy fat" },
+    { name: "Buddha bowl", emoji: "🥗", why: "Rainbow antioxidants" },
   ],
   dinner: [
-    { name: "Baked fish + veggies", emoji: "🐟", why: "Lean omega-3" },
     { name: "Roasted veg + sweet potato", emoji: "🍠", why: "Vitamin A, repair" },
-    { name: "Grilled chicken salad", emoji: "🥗", why: "Lean protein" },
     { name: "Veg & bean stew", emoji: "🍲", why: "Fibre + antioxidants" },
     { name: "Tofu + broccoli", emoji: "🥦", why: "Vitamin C, firming" },
-    { name: "Turkey + greens", emoji: "🍗", why: "Zinc + protein" },
     { name: "Miso soup + rice", emoji: "🍵", why: "Probiotic, light" },
+    { name: "Stuffed bell peppers", emoji: "🫑", why: "Vitamin C boost" },
+    { name: "Veg lentil curry + rice", emoji: "🍛", why: "Protein + minerals" },
+    { name: "Grilled veg + quinoa", emoji: "🥗", why: "Light, skin-friendly" },
   ],
   snack: [
     { name: "Walnuts", emoji: "🌰", why: "Omega-3 + vitamin E" },
@@ -122,16 +123,47 @@ function pick(bank: Food[], dayIdx: number, n: number): Food[] {
   return out;
 }
 
-// Build a 7-day plan personalised to the scan + region
-export function buildWeekPlan(country: string, scan: Scan) {
+// ── State / region local veg dishes (so all ingredients are easy to find) ──
+// Keyed by a normalised region/state name. All 100% vegetarian.
+const STATE_DISHES: Record<string, Food[]> = {
+  // India — states
+  maharashtra: [{ name: "Veg Thalipeeth", emoji: "🫓", why: "Multigrain, local & filling" }, { name: "Sprouts Misal (less oil)", emoji: "🫘", why: "Protein, gut-friendly" }],
+  gujarat:     [{ name: "Veg Handvo", emoji: "🟡", why: "Fermented, gut-friendly" }, { name: "Dhokla", emoji: "🟨", why: "Steamed, low-oil protein" }],
+  punjab:      [{ name: "Sarson ka saag + roti", emoji: "🥬", why: "Iron for glow" }, { name: "Rajma chawal", emoji: "🍛", why: "Protein + fibre" }],
+  delhi:       [{ name: "Chana + roti", emoji: "🫘", why: "Zinc for healing" }, { name: "Veg dalia", emoji: "🥣", why: "Light, fibre-rich" }],
+  "uttar pradesh": [{ name: "Veg tehri", emoji: "🍚", why: "Spiced rice + veggies" }, { name: "Arhar dal + rice", emoji: "🍛", why: "Clean protein" }],
+  "tamil nadu": [{ name: "Idli + sambar", emoji: "🍚", why: "Fermented, gut-friendly" }, { name: "Veg pongal", emoji: "🍲", why: "Light, easy-digest" }],
+  karnataka:   [{ name: "Ragi mudde + saaru", emoji: "🟤", why: "Calcium, calms skin" }, { name: "Bisi bele bath", emoji: "🍛", why: "Lentils + veggies" }],
+  "west bengal": [{ name: "Veg ghugni", emoji: "🫘", why: "Protein, low-oil" }, { name: "Shukto (veg)", emoji: "🥬", why: "Mixed veg, light" }],
+  kerala:      [{ name: "Veg avial", emoji: "🥥", why: "Coconut + veggies" }, { name: "Kerala red rice + sambar", emoji: "🍚", why: "Fibre + minerals" }],
+  rajasthan:   [{ name: "Gatte ki sabzi + roti", emoji: "🟡", why: "Besan protein" }, { name: "Bajra roti + veg", emoji: "🫓", why: "Iron, warming" }],
+};
+
+// Build a 7-day plan personalised to the scan + region (+ optional state/area)
+export function buildWeekPlan(country: string, scan: Scan, area?: string) {
   const region = INDIA_COUNTRIES.includes(country) ? "india" : "global";
   const bank = region === "india" ? BANK_INDIA : BANK_GLOBAL;
   const boosts = concernBoosts(scan, region);
+
+  // find local state dishes from the detected area string (e.g. "Pune, India")
+  const areaKey = (area || "").toLowerCase();
+  let localDishes: Food[] = [];
+  for (const key in STATE_DISHES) {
+    if (areaKey.includes(key)) { localDishes = STATE_DISHES[key]; break; }
+  }
+
   const days: DayPlan[] = Array.from({ length: 7 }).map((_, d) => {
+    // mix a local regional dish into lunch/dinner so ingredients are easy to find
+    const lunchItems = pick(bank.lunch, d, 2);
+    const dinnerItems = pick(bank.dinner, d, 2);
+    if (localDishes.length) {
+      if (d % 2 === 0) lunchItems[1] = localDishes[d % localDishes.length];
+      else dinnerItems[1] = localDishes[d % localDishes.length];
+    }
     const meals: Meal[] = [
       { meal: "Breakfast", icon: "🌅", time: "8:00 AM", items: pick(bank.breakfast, d, 2) },
-      { meal: "Lunch", icon: "☀️", time: "1:00 PM", items: pick(bank.lunch, d, 2) },
-      { meal: "Dinner", icon: "🌙", time: "8:00 PM", items: pick(bank.dinner, d, 2) },
+      { meal: "Lunch", icon: "☀️", time: "1:00 PM", items: lunchItems },
+      { meal: "Dinner", icon: "🌙", time: "8:00 PM", items: dinnerItems },
       { meal: "Snacks", icon: "🍵", time: "Anytime", items: [...pick(bank.snack, d, 1), ...(boosts.length ? [boosts[d % boosts.length]] : [])] },
     ];
     return { meals, focus: topFocus(scan) };
@@ -139,7 +171,8 @@ export function buildWeekPlan(country: string, scan: Scan) {
   return {
     days,
     avoid: ["Fried / oily snacks", "Excess sugar & sweets", "Too much dairy (if acne-prone)", "Sugary sodas"],
-    region: region === "india" ? country : "Global",
+    region: area || (region === "india" ? country : "Global"),
+    veg: true,
     focus: topFocus(scan),
   };
 }
@@ -255,20 +288,22 @@ function scanSig(scan: Scan): string {
 
 // Returns a cached plan; regenerates only if (a) older than a week, or
 // (b) the underlying scan changed (a new scan was done).
-export function getWeekPlan(country: string, scan: Scan) {
+export function getWeekPlan(country: string, scan: Scan, area?: string) {
+  const tag = `${country}|${area || ""}`;
   try {
     const raw = localStorage.getItem("velmora_diet_plan");
     if (raw) {
       const c = JSON.parse(raw);
       const fresh = Date.now() - (c.createdAt || 0) < WEEK;
       const sameScan = c.sig === scanSig(scan);
-      const sameRegion = c.country === country;
-      if (fresh && sameScan && sameRegion && c.plan) return c.plan;
+      const sameRegion = c.tag === tag;
+      // v2 marker forces a one-time refresh now that the plan is veg + state-aware
+      if (fresh && sameScan && sameRegion && c.v === 2 && c.plan) return c.plan;
     }
   } catch {}
-  const plan = buildWeekPlan(country, scan);
+  const plan = buildWeekPlan(country, scan, area);
   try {
-    localStorage.setItem("velmora_diet_plan", JSON.stringify({ plan, createdAt: Date.now(), sig: scanSig(scan), country }));
+    localStorage.setItem("velmora_diet_plan", JSON.stringify({ plan, createdAt: Date.now(), sig: scanSig(scan), tag, v: 2 }));
   } catch {}
   return plan;
 }
