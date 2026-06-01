@@ -39,6 +39,7 @@ export default function RoutinePage() {
   const [tab, setTab] = useState<"Skincare" | "Diet Plan">("Skincare");
   const [water, setWater] = useState(0);
   const [country, setCountry] = useState("India");
+  const [area, setArea] = useState("");
   const [scan, setScan] = useState<any>({ acne: 30, oil: 45, pigmentation: 25, hydration: 55, score: 74 });
   const [reminders, setReminders] = useState<number[]>([]);
   const [alarm, setAlarm] = useState<number | null>(null);
@@ -51,6 +52,12 @@ export default function RoutinePage() {
     const today = new Date().toDateString();
     const lastDay = localStorage.getItem("velmora_routine_day");
     const c = localStorage.getItem("velmora_country") || detectCountry(); setCountry(c);
+    setArea(localStorage.getItem("velmora_area") || "");
+    // detect real area (city, country) from IP via our edge geo endpoint
+    fetch("/api/geo").then(r => r.json()).then((g) => {
+      if (g.area) { setArea(g.area); localStorage.setItem("velmora_area", g.area); }
+      if (g.country) { setCountry(g.country); localStorage.setItem("velmora_country", g.country); }
+    }).catch(() => {});
     const a = localStorage.getItem("velmora_analysis"); if (a) { try { setScan(JSON.parse(a)); } catch {} }
     try { const r = JSON.parse(localStorage.getItem("velmora_reminders") || "[]"); setReminders(r); } catch {}
 
@@ -258,7 +265,7 @@ export default function RoutinePage() {
             <PrimaryBtn icon="spark" onClick={() => router.push("/coach")}>Regenerate with AI</PrimaryBtn>
           </>
         ) : (
-          <DietPlan day={dayPlan} avoid={weekPlan.avoid} region={weekPlan.region} focus={weekPlan.focus} dayName={DAY_NAMES[selDate.getDay()]} onAsk={() => router.push("/coach?q=" + encodeURIComponent("What should I eat for my skin?"))} />
+          <DietPlan day={dayPlan} avoid={weekPlan.avoid} region={weekPlan.region} focus={weekPlan.focus} area={area || country} dayName={DAY_NAMES[selDate.getDay()]} onAsk={() => router.push("/coach?q=" + encodeURIComponent("What should I eat for my skin?"))} />
         )}
       </div>
 
@@ -283,15 +290,17 @@ export default function RoutinePage() {
   );
 }
 
-function DietPlan({ day, avoid, region, focus, dayName, onAsk }: { day: any; avoid: string[]; region: string; focus: string; dayName: string; onAsk: () => void }) {
+function DietPlan({ day, avoid, region, focus, area, dayName, onAsk }: { day: any; avoid: string[]; region: string; focus: string; area: string; dayName: string; onAsk: () => void }) {
   return (
     <div>
-      {/* healthy plan intro */}
+      {/* healthy plan intro — now shows the detected area */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 15px", borderRadius: 16, marginBottom: 18, background: "linear-gradient(135deg, rgba(127,179,137,0.16), rgba(127,179,137,0.06))", border: "1px solid rgba(127,179,137,0.3)" }}>
         <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: "rgba(127,179,137,0.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🥗</div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#3F7A52" }}>Clean, skin-healthy meals</div>
-          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 1 }}>Wholesome, balanced food to help {focus}.</div>
+          <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#3F7A52" }}>Healthy, skin-friendly meals</div>
+          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 1 }}>
+            {area ? <>📍 {area} · </> : null}foods to help {focus}.
+          </div>
         </div>
       </div>
       {day?.meals.map((meal: Meal) => (

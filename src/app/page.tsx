@@ -22,6 +22,7 @@ export default function Home() {
   const [scanMode, setScanMode] = useState<"face" | "product">("face");
   const [data, setData] = useState<any>(null);
   const [ai, setAi] = useState("");
+  const [product, setProduct] = useState<any>(null);
   const [summary, setSummary] = useState("");
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState<"male" | "female">("female");
@@ -160,12 +161,13 @@ export default function Home() {
   });
 
   async function handleProductResult(res: any) {
-    setData(res); setView("product_results"); setLoading(true); setAi("");
+    setData(res); setView("product_results"); setLoading(true); setAi(""); setProduct(null);
     try {
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ image: res.image, mode: "product_scan", gender, userName }) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
-      setAi(d.text || "Scanning complete.");
+      if (d.product) setProduct(d.product);
+      else setAi(d.text || "Scanning complete.");
     } catch (e: any) { setAi(`⚠️ Analysis failed: ${e.message}`); } finally { setLoading(false); }
   }
 
@@ -377,25 +379,112 @@ export default function Home() {
 
       {/* ─────────── PRODUCT RESULTS ─────────── */}
       {view === "product_results" && data && (
-        <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "100px 20px 130px" }}>
-          <button onClick={() => setView("home")} style={{ position: "fixed", top: 56, left: 14, zIndex: 70, width: 36, height: 36, borderRadius: 11, cursor: "pointer", background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="chevL" size={18} color={T.text} sw={2.2} /></button>
-          {data.image && <Placeholder label="" h={200} r={22} style={{ marginBottom: 16, backgroundImage: `url(${data.image})`, backgroundSize: "cover", backgroundPosition: "center" } as any} />}
-          <h1 style={{ fontFamily: SERIF, fontSize: 28, color: T.text, margin: "0 0 16px" }}>Ingredient Analysis</h1>
-          {loading ? (
-            <div style={{ padding: "60px 0", textAlign: "center" }}>
-              <div className="animate-spinpulse" style={{ width: 64, height: 64, borderRadius: 99, background: T.accentSoft, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="spark" size={28} color={T.accent} fill /></div>
-              <div style={{ fontFamily: MONO, fontSize: 12, color: T.textFaint, textTransform: "uppercase", letterSpacing: 1 }}>Scanning ingredients…</div>
-            </div>
-          ) : (
-            <Card>{formatMarkdown(ai)}</Card>
-          )}
-        </div>
+        <ProductResultView image={data.image} loading={loading} product={product} ai={ai} formatMarkdown={formatMarkdown} onBack={() => setView("home")} onScanAgain={() => resetScanner("product")} />
       )}
 
       {/* TAB BAR (only on home/results) */}
       {(view === "home" || view === "results" || view === "product_results") && (
         <TabBar active={view === "home" ? "home" : ""} onChange={handleTab} />
       )}
+    </div>
+  );
+}
+
+// ════════════════════════ PRODUCT SCAN RESULT (wow card) ════════════════════════
+function ProductResultView({ image, loading, product, ai, formatMarkdown, onBack, onScanAgain }: any) {
+  const VCOL: any = { good: "#5FA572", caution: "#E8A24C", avoid: "#E0685C" };
+  const VBG: any = { good: "linear-gradient(135deg,#D8F0E0,#BEE6CC)", caution: "linear-gradient(135deg,#FBEFD6,#F6E2B8)", avoid: "linear-gradient(135deg,#FBDDD8,#F6C7BF)" };
+  const VICON: any = { good: "check", caution: "warn", avoid: "close" };
+  const v = product?.verdict || "caution";
+  return (
+    <div style={{ minHeight: "100vh", background: T.bg }}>
+      <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", paddingBottom: 130 }}>
+        {/* hero with scanned photo */}
+        <div style={{ position: "relative", height: 230, overflow: "hidden", background: "#000" }}>
+          {image && <img src={image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.92 }} />}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.25), transparent 30%, rgba(250,248,246,0.0) 60%, #FAF8F6 100%)" }} />
+          <button onClick={onBack} style={{ position: "absolute", top: 52, left: 16, width: 38, height: 38, borderRadius: 12, cursor: "pointer", background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 10px rgba(0,0,0,0.15)" }}><Icon name="chevL" size={18} color="#2C1F1A" sw={2.2} /></button>
+          <div style={{ position: "absolute", top: 52, right: 16, padding: "7px 13px", borderRadius: 99, background: "rgba(255,255,255,0.85)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", gap: 6 }}>
+            <Icon name="spark" size={13} color={T.accent} fill /><span style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: T.accentText }}>AI Scan</span>
+          </div>
+        </div>
+
+        <div style={{ padding: "0 20px", marginTop: -40, position: "relative", zIndex: 2 }}>
+          {loading ? (
+            <div style={{ padding: "70px 0", textAlign: "center" }}>
+              <div className="animate-spinpulse" style={{ width: 64, height: 64, borderRadius: 99, background: T.accentSoft, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="spark" size={28} color={T.accent} fill /></div>
+              <div style={{ fontFamily: MONO, fontSize: 12, color: T.textFaint, textTransform: "uppercase", letterSpacing: 1 }}>Analysing product…</div>
+            </div>
+          ) : product ? (
+            <>
+              {/* verdict card */}
+              <Card style={{ marginBottom: 14, boxShadow: "0 14px 34px rgba(60,30,20,0.12)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
+                  <div style={{ width: 54, height: 54, borderRadius: 16, flexShrink: 0, background: VBG[v], display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Icon name={VICON[v]} size={28} color={VCOL[v]} sw={2.6} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 800, color: VCOL[v], textTransform: "uppercase", letterSpacing: 0.6 }}>{product.verdictLabel || "Verdict"}</div>
+                    <div style={{ fontFamily: SERIF, fontSize: 22, color: T.text, lineHeight: 1.1, marginTop: 2 }}>{product.productName || "Skincare Product"}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5 }}>
+                      <span style={{ display: "inline-flex", gap: 1 }}>{[1,2,3,4,5].map(i => <Icon key={i} name="star" size={13} color={i <= (product.rating||0) ? "#F0A52C" : "#E2D6CE"} fill={i <= (product.rating||0)} />)}</span>
+                      {product.productType && <span style={{ fontFamily: SANS, fontSize: 11, fontWeight: 700, color: T.accentText, background: T.accentSoft, padding: "2px 9px", borderRadius: 99 }}>{product.productType}</span>}
+                    </div>
+                  </div>
+                </div>
+                {product.summary && <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, lineHeight: 1.5, margin: "13px 0 0" }}>{product.summary}</p>}
+              </Card>
+
+              {/* key ingredients */}
+              {product.keyIngredients?.length > 0 && (
+                <Card style={{ marginBottom: 14 }}>
+                  <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 0.6, marginBottom: 11, display: "flex", alignItems: "center", gap: 7 }}><Icon name="leaf" size={15} color="#5FA572" /> Key Ingredients</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {product.keyIngredients.map((ing: string, i: number) => (
+                      <span key={i} style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, color: T.text, background: T.surface2, padding: "7px 13px", borderRadius: 99, border: `1px solid ${T.border}` }}>{ing}</span>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+              {/* good for / watch out */}
+              <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+                {product.goodFor?.length > 0 && (
+                  <Card pad={14} style={{ flex: 1 }}>
+                    <div style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: "#5FA572", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 9, display: "flex", alignItems: "center", gap: 5 }}><Icon name="check" size={14} color="#5FA572" sw={2.4} /> Good for</div>
+                    {product.goodFor.map((g: string, i: number) => (
+                      <div key={i} style={{ display: "flex", gap: 7, marginBottom: 7, alignItems: "flex-start" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: "#5FA572", flexShrink: 0, marginTop: 6 }} /><span style={{ fontFamily: SANS, fontSize: 12.5, color: T.text, lineHeight: 1.4 }}>{g}</span></div>
+                    ))}
+                  </Card>
+                )}
+                {product.watchOut?.length > 0 && (
+                  <Card pad={14} style={{ flex: 1 }}>
+                    <div style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: "#E8A24C", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 9, display: "flex", alignItems: "center", gap: 5 }}><Icon name="warn" size={14} color="#E8A24C" /> Watch out</div>
+                    {product.watchOut.map((w: string, i: number) => (
+                      <div key={i} style={{ display: "flex", gap: 7, marginBottom: 7, alignItems: "flex-start" }}><span style={{ width: 5, height: 5, borderRadius: 99, background: "#E8A24C", flexShrink: 0, marginTop: 6 }} /><span style={{ fontFamily: SANS, fontSize: 12.5, color: T.text, lineHeight: 1.4 }}>{w}</span></div>
+                    ))}
+                  </Card>
+                )}
+              </div>
+
+              {/* how to use */}
+              {product.howToUse && (
+                <Card style={{ marginBottom: 14, background: "linear-gradient(135deg, rgba(240,136,106,0.08), rgba(240,136,106,0.02))", border: `1px solid ${T.accentDim}` }}>
+                  <div style={{ display: "flex", gap: 11, alignItems: "center" }}>
+                    <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: T.accentSoft, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="clock" size={19} color={T.accentText} /></div>
+                    <div><div style={{ fontFamily: SANS, fontSize: 11, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.5 }}>How to use</div><div style={{ fontFamily: SANS, fontSize: 13.5, color: T.text, lineHeight: 1.45, marginTop: 2 }}>{product.howToUse}</div></div>
+                  </div>
+                </Card>
+              )}
+
+              <button onClick={onScanAgain} style={{ width: "100%", height: 52, borderRadius: 16, border: `1.5px solid ${T.borderHi}`, background: T.surface, cursor: "pointer", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><Icon name="camera" size={19} color={T.accentText} /> Scan another product</button>
+            </>
+          ) : (
+            // fallback: AI returned plain text
+            <Card style={{ marginTop: 8 }}><h1 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 12px" }}>Ingredient Analysis</h1>{formatMarkdown(ai)}</Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

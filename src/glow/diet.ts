@@ -229,6 +229,24 @@ export function detectCountry(): string {
   } catch { return "Global"; }
 }
 
+// Detect a finer AREA (e.g. region within India) so the diet feels truly local.
+// Uses the IANA timezone, which the browser already exposes. Returns a short
+// area label and (for India) a region key used to bias the food bank.
+export type AreaInfo = { country: string; area: string; region: string };
+export function detectArea(): AreaInfo {
+  let tz = "";
+  try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch {}
+  const country = detectCountry();
+  // India is a single timezone (Asia/Kolkata), so we can't get the state from TZ
+  // alone — but we can offer a sensible pan-Indian healthy plan and let the user
+  // see their detected country/area. For other countries we surface the city.
+  const city = tz.split("/")[1]?.replace(/_/g, " ") || "";
+  if (country === "India" || country === "Pakistan" || country === "Bangladesh" || country === "Nepal" || country === "Sri Lanka") {
+    return { country, area: country, region: "india" };
+  }
+  return { country, area: city || country, region: "global" };
+}
+
 // ── weekly cache ──────────────────────────────────────────────────────────
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 function scanSig(scan: Scan): string {
