@@ -10,7 +10,7 @@ const FEATS = ["Unlimited AI skin scans", "Full AI routine builder", "Ask Aura â
 export default function PremiumPage() {
   const router = useRouter();
   const [country, setCountry] = useState("Global");
-  const [sel, setSel] = useState<"monthly" | "sixmo" | "yearly">("yearly");
+  const [sel, setSel] = useState<"monthly" | "yearly">("yearly");
   const [loy, setLoy] = useState({ streak: 0, progress: 0, banked: false, daysLeft: 30, pct: 0 });
   const [mounted, setMounted] = useState(false);
   const [done, setDone] = useState(false);

@@ -177,41 +177,19 @@ export function buildWeekPlan(country: string, scan: Scan, area?: string) {
   };
 }
 
-// localized subscription pricing by country — 3 tiers (monthly / 6-month / yearly)
-export type Plan = { id: "monthly" | "sixmo" | "yearly"; label: string; period: string; amount: number; sub: string; best?: boolean };
+// India-only subscription pricing — 2 plans (monthly / yearly)
+export type Plan = { id: "monthly" | "yearly"; label: string; period: string; amount: number; sub: string; best?: boolean };
 export type Pricing = { symbol: string; fmt: (n: number) => string; plans: Plan[] };
 
-export function pricing(country: string): Pricing {
+export function pricing(_country?: string): Pricing {
   const inr = (n: number): string => "₹" + n.toLocaleString("en-IN");
-  const sym = (s: string) => (n: number) => `${s}${n.toLocaleString()}`;
-
-  if (["India", "Nepal", "Sri Lanka"].includes(country)) {
-    return {
-      symbol: "₹", fmt: inr,
-      plans: [
-        { id: "monthly", label: "Monthly", period: "/mo", amount: 249, sub: "Billed monthly" },
-        { id: "sixmo",   label: "6 Months", period: "/6mo", amount: 1200, sub: "≈ ₹200/mo · save 20%" },
-        { id: "yearly",  label: "Yearly",  period: "/yr", amount: 2000, sub: "≈ ₹167/mo · best value", best: true },
-      ],
-    };
-  }
-  if (country === "Pakistan") return { symbol: "₨", fmt: sym("₨"), plans: [
-    { id: "monthly", label: "Monthly", period: "/mo", amount: 900, sub: "Billed monthly" },
-    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 4500, sub: "save 20%" },
-    { id: "yearly", label: "Yearly", period: "/yr", amount: 7500, sub: "best value", best: true } ] };
-  if (country === "UK") return { symbol: "£", fmt: sym("£"), plans: [
-    { id: "monthly", label: "Monthly", period: "/mo", amount: 4.99, sub: "Billed monthly" },
-    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 24, sub: "save 20%" },
-    { id: "yearly", label: "Yearly", period: "/yr", amount: 39.99, sub: "best value", best: true } ] };
-  if (country === "UAE") return { symbol: "AED", fmt: sym("AED "), plans: [
-    { id: "monthly", label: "Monthly", period: "/mo", amount: 22, sub: "Billed monthly" },
-    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 109, sub: "save 20%" },
-    { id: "yearly", label: "Yearly", period: "/yr", amount: 179, sub: "best value", best: true } ] };
-  // default USD
-  return { symbol: "$", fmt: sym("$"), plans: [
-    { id: "monthly", label: "Monthly", period: "/mo", amount: 5.99, sub: "Billed monthly" },
-    { id: "sixmo", label: "6 Months", period: "/6mo", amount: 29, sub: "save 20%" },
-    { id: "yearly", label: "Yearly", period: "/yr", amount: 49.99, sub: "best value", best: true } ] };
+  return {
+    symbol: "₹", fmt: inr,
+    plans: [
+      { id: "monthly", label: "Monthly", period: "/mo", amount: 249, sub: "Billed monthly" },
+      { id: "yearly",  label: "Yearly",  period: "/yr", amount: 1599, sub: "≈ ₹133/mo · best value", best: true },
+    ],
+  };
 }
 
 // map a food name to a real (brand-free) food photo in /public/food
