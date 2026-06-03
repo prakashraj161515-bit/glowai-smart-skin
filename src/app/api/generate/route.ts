@@ -61,17 +61,20 @@ Be honest: if it's a medicine/prescription/non-skincare item, set verdict 'avoid
       // REAL AI FACE SCAN — returns structured JSON
       isFaceScan = true;
       const { userName = "User", country = "India" } = body;
-      prompt = `You are Cream, a world-class AI dermatologist. Analyze the facial skin in the image carefully and provide REAL scores based on actual visual analysis.
+      prompt = `You are Cream, a world-class AI dermatologist. Look VERY carefully at THIS specific face image and score the skin from what you ACTUALLY see. Do NOT give generic or "safe" middle numbers — be honest and precise so two different faces (or the same face on a better/worse day) get clearly different scores.
 
-Carefully examine:
-- Acne, pimples, blemishes, redness (for acne score)
-- Shine, oiliness, sebum on skin surface (for oil score)
-- Dark spots, uneven tone, hyperpigmentation (for pigmentation score)
-- Overall healthy glow based on all factors (for glow score)
+How to score (study the actual pixels):
+- ACNE: count visible pimples, bumps, blemishes, breakouts. Clear skin = low (0-15). A few spots = 25-45. Many/cystic = 60-90.
+- OIL: look for shine, greasy T-zone, visible sebum. Matte/dry = low. Very shiny = high.
+- PIGMENTATION: dark spots, tan, uneven tone, melasma. Even tone = low. Many dark patches = high.
+- REDNESS: irritation, rosacea, red patches.
+- Then derive the OVERALL "score" (0-100, higher = healthier): start near 90 and SUBTRACT for every problem you see (more acne/oil/pigmentation/redness/large pores = lower score). A flawless face ≈ 88-96; clearly problematic skin ≈ 45-65; severe ≈ 25-45. Use the FULL range — avoid clustering everything around 75-80.
+
+Base every number on real visual evidence in this exact photo. If the photo is blurry or no clear face, return score 0 and topConcern "Unclear photo".
 
 Return ONLY a valid JSON object, no extra text, in this exact format:
 {
-  "score": <integer 0-100, overall glow/health score from real visual analysis>,
+  "score": <integer 0-100, overall skin-health score derived as above — vary it honestly>,
   "acne": <integer 0-100, acne severity>,
   "oil": <integer 0-100, oiliness level>,
   "pigmentation": <integer 0-100, dark spots level>,
@@ -101,7 +104,8 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
       model: "gemini-3.5-flash",
       generationConfig: {
         maxOutputTokens: 2000,
-        temperature: 0.4,
+        // face scan: a touch higher so scores reflect real differences (not clustered ~78)
+        temperature: isFaceScan ? 0.6 : 0.4,
         ...((isFaceScan || isProductScan) ? { responseMimeType: "application/json" } : {})
       },
       safetySettings,
