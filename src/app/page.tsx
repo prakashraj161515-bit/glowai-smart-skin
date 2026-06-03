@@ -52,7 +52,17 @@ export default function Home() {
 
   const APP_VERSION = "3.0";
 
-  useEffect(() => { setIsPremium(localStorage.getItem("velmora_is_premium") === "true"); }, []);
+  useEffect(() => {
+    // One-time global reset: revoke any previously-set premium (no real payments
+    // existed yet, so everyone starts fresh on the Free plan). Bump the version
+    // suffix to run this again in the future.
+    if (localStorage.getItem("velmora_premium_reset_v1") !== "done") {
+      localStorage.setItem("velmora_is_premium", "false");
+      localStorage.setItem("velmora_premium_reset_v1", "done");
+      fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: false }) }).catch(() => {});
+    }
+    setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
+  }, []);
 
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
