@@ -13,7 +13,7 @@ const AVATARS = [
 ];
 
 const FAQS = [
-  ["How does the AI scan work?", "GlowAI analyses your selfie with on-device + cloud AI to score acne, oil, pigmentation, hydration and more — then builds advice from it."],
+  ["How does the AI scan work?", "Cream analyses your selfie with on-device + cloud AI to score acne, oil, pigmentation, hydration and more — then builds advice from it."],
   ["Is my photo stored?", "Your scan stays on your device. We only sync your scores so your progress follows you across devices."],
   ["How often should I scan?", "Once a week is ideal — your diet and routine refresh after each new scan."],
   ["What is Aura?", "Aura is your in-app AI skin coach. Ask it anything about your skin, products, or diet."],
@@ -170,7 +170,7 @@ export default function ProfilePage() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderRadius: 24, padding: 24, textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", animation: "fadeUp .25s ease" }}>
             <div style={{ width: 56, height: 56, borderRadius: 99, background: "rgba(224,104,92,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}><Icon name="arrowR" size={26} color="#E0685C" sw={2} /></div>
             <h3 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 6px" }}>Sign out?</h3>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 20px" }}>You&apos;ll need to sign in again to use GlowAI.</p>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 20px" }}>You&apos;ll need to sign in again to use Cream.</p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmOut(false)} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.borderHi}`, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }}>Cancel</button>
               <button onClick={() => { localStorage.removeItem("velmora_onboarding_complete"); signOut({ callbackUrl: "/" }); }} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: "#E0685C", border: "none", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff" }}>Sign Out</button>

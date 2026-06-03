@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       prompt = body.customPrompt;
     } else if (body.mode === "product_scan") {
       isProductScan = true;
-      prompt = `You are GlowAI, a world-class dermatologist. Look at the scanned skincare product image and identify it.
+      prompt = `You are Cream, a world-class dermatologist. Look at the scanned skincare product image and identify it.
 
 Return ONLY a valid JSON object, no extra text, in this EXACT format:
 {
@@ -56,7 +56,7 @@ Return ONLY a valid JSON object, no extra text, in this EXACT format:
 Be honest: if it's a medicine/prescription/non-skincare item, set verdict 'avoid' and explain in summary.`;
     } else if (body.message) {
       prompt = `
-        You are GlowAI, a world-class dermatological assistant. 
+        You are Cream, a world-class dermatological assistant. 
         User (${gender}) Question: "${body.message}"
         Provide professional, gender-specific skincare advice.
       `;
@@ -64,7 +64,7 @@ Be honest: if it's a medicine/prescription/non-skincare item, set verdict 'avoid
       // REAL AI FACE SCAN — returns structured JSON
       isFaceScan = true;
       const { userName = "User", country = "India" } = body;
-      prompt = `You are GlowAI, a world-class AI dermatologist. Analyze the facial skin in the image carefully and provide REAL scores based on actual visual analysis.
+      prompt = `You are Cream, a world-class AI dermatologist. Analyze the facial skin in the image carefully and provide REAL scores based on actual visual analysis.
 
 Carefully examine:
 - Acne, pimples, blemishes, redness (for acne score)
@@ -88,7 +88,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
   "report": "<a SHORT, easy-to-read markdown report for ${userName} (${gender}). Use EXACTLY these 3 sections with simple words a non-expert understands: **WHAT WE SEE** (2-3 short bullets), **WHY** (2 short bullets on likely causes), **YOUR PLAN** (3 short actionable bullets — what to do + 1 food to eat available in ${country}). Keep every bullet under 14 words. Be friendly and motivating. No medical jargon.>"
 }`;
     } else {
-      prompt = `You are GlowAI, a world-class dermatological assistant. Provide professional skincare advice.`;
+      prompt = `You are Cream, a world-class dermatological assistant. Provide professional skincare advice.`;
     }
 
     const content = imagePart ? [prompt, imagePart] : [prompt];

@@ -10,8 +10,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "GlowAI – Smart Skin Analysis",
-  description: "AI-powered personalized skin analysis and coaching app.",
+  title: "Cream : AI Skin Care & Scanner",
+  description: "AI-powered personalized skin analysis, routine & product scanner.",
   themeColor: "#FAF8F6",
   icons: {
     icon: "/logo.png?v=6",

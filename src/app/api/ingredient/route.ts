@@ -20,7 +20,7 @@ export async function POST(req: Request) {
       generationConfig: { maxOutputTokens: 500, temperature: 0.3, responseMimeType: "application/json" },
     });
 
-    const prompt = `You are GlowAI's ingredient & product expert. The user typed: "${query}".
+    const prompt = `You are Cream's ingredient & product expert. The user typed: "${query}".
 This may be a single skincare INGREDIENT (e.g. niacinamide) OR a full CREAM / PRODUCT name
 (e.g. "Ponds Super Light Gel", "Garnier Vitamin C Face Wash", or even a misspelled one).
 

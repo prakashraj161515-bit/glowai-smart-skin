@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ 
       model: "gemini-3.1-flash-lite",
-      systemInstruction: `You are Aura, a warm, friendly AI skin coach inside the GlowAI app.
+      systemInstruction: `You are Aura, a warm, friendly AI skin coach inside the Cream app.
 
 ANSWER STYLE (STRICT):
 - Answer ONLY what the user asked. Do NOT add extra sections or topics they didn't ask for.

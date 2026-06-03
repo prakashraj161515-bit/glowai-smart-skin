@@ -2,34 +2,19 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Badge, PrimaryBtn } from "@/glow/ui";
-import { pricing, detectCountry, Plan } from "@/glow/diet";
-import { tickLoyalty, consumeDiscount, getLoyalty } from "@/glow/loyalty";
+import { pricing, Plan } from "@/glow/diet";
 
 const FEATS = ["Unlimited AI skin scans", "Full AI routine builder", "Ask Aura — unlimited", "Trend analysis & diary insights", "PDF skin reports"];
 
 export default function PremiumPage() {
   const router = useRouter();
-  const [country, setCountry] = useState("Global");
   const [sel, setSel] = useState<"monthly" | "yearly">("yearly");
-  const [loy, setLoy] = useState({ streak: 0, progress: 0, banked: false, daysLeft: 30, pct: 0 });
-  const [mounted, setMounted] = useState(false);
   const [done, setDone] = useState(false);
 
-  useEffect(() => {
-    setCountry(localStorage.getItem("velmora_country") || detectCountry());
-    setLoy(tickLoyalty());
-    setMounted(true);
-  }, []);
-
-  const price = pricing(country);
-  const unlocked = loy.banked && loy.pct > 0;
-  const disc = unlocked ? loy.pct : 0;
-  const finalAmt = (amt: number) => Math.round(amt * (1 - disc / 100));
+  const price = pricing();
 
   const buy = () => {
-    consumeDiscount();
     localStorage.setItem("velmora_is_premium", "true");
-    setLoy(getLoyalty());
     setDone(true);
     setTimeout(() => router.push("/"), 1200);
   };
@@ -39,7 +24,6 @@ export default function PremiumPage() {
       {price.plans.map((p: Plan) => {
         const on = sel === p.id;
         const original = price.fmt(p.amount);
-        const discounted = price.fmt(finalAmt(p.amount));
         return (
           <button key={p.id} onClick={() => setSel(p.id)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, borderRadius: 16, cursor: "pointer", textAlign: "left", background: on ? T.accentSoft : T.surface, border: `1.5px solid ${on ? T.accent : T.border}`, position: "relative" }}>
             <div style={{ width: 22, height: 22, borderRadius: 99, border: `2px solid ${on ? T.accent : T.borderHi}`, background: on ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{on && <Icon name="check" size={13} color="#241712" sw={2.8} />}</div>
@@ -48,14 +32,7 @@ export default function PremiumPage() {
               <div style={{ fontFamily: SANS, fontSize: 13, color: T.textMute }}>{p.sub}</div>
             </div>
             <div style={{ textAlign: "right" }}>
-              {disc > 0 ? (
-                <>
-                  <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 700, color: "#4E9466" }}>{discounted}<span style={{ fontSize: 11, color: T.textMute }}>{p.period}</span></div>
-                  <div style={{ fontFamily: MONO, fontSize: 11.5, color: T.textFaint, textDecoration: "line-through" }}>{original}</div>
-                </>
-              ) : (
-                <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 600, color: T.text }}>{original}<span style={{ fontSize: 11, color: T.textMute }}>{p.period}</span></div>
-              )}
+              <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 600, color: T.text }}>{original}<span style={{ fontSize: 11, color: T.textMute }}>{p.period}</span></div>
             </div>
           </button>
         );
@@ -80,44 +57,7 @@ export default function PremiumPage() {
 
       <div style={{ height: 16 }} />
 
-      {/* 2 — LOYALTY OFFER (with explainer so users understand it) */}
-      {unlocked ? (
-        <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, borderRadius: 18, marginBottom: 14, background: "linear-gradient(120deg, rgba(127,179,137,0.18), rgba(127,179,137,0.06))", border: "1.5px solid rgba(127,179,137,0.4)" }}>
-          <div style={{ width: 44, height: 44, borderRadius: 13, background: "#7FB389", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 6px 16px rgba(127,179,137,0.45)" }}><Icon name="flame" size={22} color="#fff" fill /></div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 800, color: "#4E9466" }}>🎉 {loy.pct}% loyalty reward applied!</div>
-            <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>{loy.streak}-day login streak · already in the prices above</div>
-          </div>
-        </div>
-      ) : (
-        <div style={{ padding: 16, borderRadius: 18, marginBottom: 14, background: T.surface, border: `1px solid ${T.border}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <Icon name="flame" size={16} color={T.accentText} fill />
-            <span style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: T.text, flex: 1 }}>Loyalty reward</span>
-            <span style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, color: T.accentText }}>{loy.progress}/30 days</span>
-          </div>
-          <div style={{ height: 8, borderRadius: 99, background: T.surface2, overflow: "hidden", marginBottom: 8 }}>
-            <div style={{ height: "100%", width: `${(loy.progress / 30) * 100}%`, background: T.accent, borderRadius: 99, transition: "width .5s" }} />
-          </div>
-          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, lineHeight: 1.5, marginBottom: 12 }}>
-            🔥 Log in daily! Your <b>login streak</b> earns a bigger discount the longer it grows. It stays saved until you use it.
-          </div>
-          {/* tier table — when each % unlocks */}
-          <div style={{ display: "flex", gap: 6 }}>
-            {([["30d", "10%"], ["87d", "11%"], ["144d", "12%"], ["200d", "13%"]] as const).map(([d, p], i) => {
-              const reached = loy.streak >= [30, 87, 144, 200][i];
-              return (
-                <div key={d} style={{ flex: 1, textAlign: "center", padding: "8px 4px", borderRadius: 12, background: reached ? "rgba(127,179,137,0.16)" : T.surface2, border: `1px solid ${reached ? "rgba(127,179,137,0.4)" : T.border}` }}>
-                  <div style={{ fontFamily: MONO, fontSize: 15, fontWeight: 800, color: reached ? "#4E9466" : T.text }}>{p}</div>
-                  <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 600, color: T.textMute, marginTop: 1 }}>{d}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 3 — PREMIUM FEATURES */}
+      {/* 2 — PREMIUM FEATURES */}
       <Card style={{ marginBottom: 18 }}>
         <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>What you get</div>
         {FEATS.map((f, i) => (
@@ -129,17 +69,9 @@ export default function PremiumPage() {
       </Card>
 
       <PrimaryBtn onClick={buy} style={done ? { background: "#7FB389" } : undefined}>
-        {done ? "Welcome to Pro ✓" : disc > 0 ? `Subscribe — ${disc}% off` : "Get Premium"}
+        {done ? "Welcome to Pro ✓" : "Get Premium"}
       </PrimaryBtn>
       <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}>Restore Purchases · Terms · Privacy</div>
-
-      {!unlocked && (
-        <div style={{ textAlign: "center", marginTop: 18 }}>
-          <button onClick={() => { import("@/glow/loyalty").then(m => { m.simulateStreak(30); setLoy(getLoyalty()); }); }} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 12, color: T.textFaint, textDecoration: "underline" }}>
-            (demo: preview a 30-day-streak reward)
-          </button>
-        </div>
-      )}
     </div>
   );
 }

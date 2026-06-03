@@ -221,8 +221,8 @@ export default function Home() {
           <Icon name="spark" size={36} color={T.accent} fill />
         </div>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 800, color: T.text, letterSpacing: 2 }}>GLOWAI</div>
-          <div style={{ fontFamily: MONO, fontSize: 11, color: T.textFaint, textTransform: "uppercase", letterSpacing: 3, marginTop: 4 }}>Smart Skin AI</div>
+          <div style={{ fontFamily: SANS, fontSize: 22, fontWeight: 800, color: T.text, letterSpacing: 2 }}>CREAM</div>
+          <div style={{ fontFamily: MONO, fontSize: 11, color: T.textFaint, textTransform: "uppercase", letterSpacing: 3, marginTop: 4 }}>AI Skin Care &amp; Scanner</div>
         </div>
       </div>
     );
@@ -506,7 +506,7 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google" | "apple" | "guest") =>
         <div className="animate-fadeup" style={{ width: 78, height: 78, borderRadius: 24, background: "linear-gradient(135deg, #F5A98D, #C44E28)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 14px 36px rgba(196,78,40,0.4)", marginBottom: 18 }}>
           <Icon name="spark" size={38} color="#fff" fill />
         </div>
-        <div className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>GlowAI</div>
+        <div className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>Cream · AI Skin Care &amp; Scanner</div>
         <h1 className="animate-fadeup" style={{ fontFamily: SERIF, fontSize: 42, lineHeight: 1.02, color: "#2C1F1A", margin: "0 0 12px", fontWeight: 400, letterSpacing: -1 }}>
           Skin that <em>actually</em> improves.
         </h1>
@@ -548,7 +548,7 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google" | "apple" | "guest") =>
 
 // ════════════════════════ ONBOARDING ════════════════════════
 const OB_SLIDES = [
-  { icon: "scan" as const, color: "#FEF0EB", accent: "#F0886A", title: "AI Skin Analysis", sub: "Scan your face in seconds. GlowAI detects 6 key metrics and gives you a personalised skin score.", label: "Smart · Accurate · Instant" },
+  { icon: "scan" as const, color: "#FEF0EB", accent: "#F0886A", title: "AI Skin Analysis", sub: "Scan your face in seconds. Cream detects 6 key metrics and gives you a personalised skin score.", label: "Smart · Accurate · Instant" },
   { icon: "routine" as const, color: "#EFF0FD", accent: "#8B85E0", title: "Your Daily Routine", sub: "A step-by-step routine built exactly for your skin — right ingredients, right order, right timing.", label: "Personalised · Simple · Effective" },
   { icon: "arrowUp" as const, color: "#EDF7EE", accent: "#5FAD72", title: "Track Real Progress", sub: "Watch your skin improve week by week. Compare scans, spot trends, and earn milestones.", label: "Visual · Motivating · Honest" },
   { icon: "products" as const, color: "#FEF7EB", accent: "#D9A040", title: "Smart Ingredient Checker", sub: "Scan any product and instantly know if it's right for your skin — with zero guesswork.", label: "Safe · Curated · For You" },

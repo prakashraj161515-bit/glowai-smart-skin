@@ -23,10 +23,10 @@ export default function ProgressPage() {
   }, []);
 
   const MILESTONES: Milestone[] = [
-    { ic: "flame", label: "7-Day Streak", earned: streak >= 7, desc: "Open GlowAI 7 days in a row." },
-    { ic: "crown", label: "30-Day Streak", earned: streak >= 30, desc: "Log in 30 days straight to unlock a 10% loyalty discount!" },
-    { ic: "gem", label: "100-Day Streak", earned: streak >= 100, desc: "100 days of glow — your loyalty discount grows to ~11-12%." },
-    { ic: "star", label: "200-Day Streak", earned: streak >= 200, desc: "A 200-day streak earns the top 13% loyalty discount." },
+    { ic: "flame", label: "7-Day Streak", earned: streak >= 7, desc: "Open Cream 7 days in a row." },
+    { ic: "crown", label: "30-Day Streak", earned: streak >= 30, desc: "Log in 30 days straight — your skin habit is forming!" },
+    { ic: "gem", label: "100-Day Streak", earned: streak >= 100, desc: "100 days of consistent care — glowing results!" },
+    { ic: "star", label: "200-Day Streak", earned: streak >= 200, desc: "A 200-day streak — true skincare devotion." },
   ];
   const n = Math.min(all.length, RANGES[range]);
   const pts = all.slice(-Math.max(2, n));
