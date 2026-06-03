@@ -22,9 +22,13 @@ import { getSecureKey } from "./api-key-manager";
 const DEFAULT_CF_ACCOUNT_ID = "3d1cabaf9d1df38540b6437d7c395cbc";
 const DEFAULT_CF_GATEWAY_ID = "cream-ai-skin-care";
 
+// ⏸️ Cloudflare AI Gateway is PAUSED. AI requests go straight to Google.
+// To RESUME, set this back to false (or set Vercel env AI_GATEWAY_DISABLED=false).
+const GATEWAY_PAUSED = true;
+
 function gatewayBaseUrl(): string | null {
-  // Kill-switch: set Vercel env  AI_GATEWAY_DISABLED=true  to PAUSE Cloudflare
-  // routing (AI then goes straight to Google). Remove it / set false to resume.
+  // Paused either by the code flag above or the Vercel env kill-switch.
+  if (GATEWAY_PAUSED) return null;
   if (process.env.AI_GATEWAY_DISABLED === "true") return null;
   const acct = process.env.CF_ACCOUNT_ID || DEFAULT_CF_ACCOUNT_ID;
   const gw = process.env.CF_GATEWAY_ID || DEFAULT_CF_GATEWAY_ID;
