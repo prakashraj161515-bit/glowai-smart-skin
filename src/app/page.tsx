@@ -116,22 +116,10 @@ export default function Home() {
     return true;
   })();
 
-  // Login gate: Google = real OAuth (always) · Apple & Guest = instant demo
-  const handleLogin = async (provider: "google" | "apple" | "guest") => {
+  // Login: Google is the only sign-in method (real OAuth account-chooser)
+  const handleLogin = async (_provider: "google") => {
     if (status === "authenticated") return;
-    // Real Google OAuth — always opens Google's account-chooser screen.
-    if (provider === "google") {
-      signIn("google", { callbackUrl: "/" });
-      return;
-    }
-    // Apple / Guest → instant credentials sign-in so the app always opens.
-    const name = provider === "apple" ? "Apple User" : "Guest";
-    const result = await signIn("credentials", { redirect: false, name });
-    if (result?.ok) {
-      localStorage.removeItem("velmora_onboarding_complete");
-      setUserName(name);
-      setShowOnboarding(true);
-    }
+    signIn("google", { callbackUrl: "/" });
   };
 
   const completeOnboarding = () => {
@@ -514,9 +502,9 @@ function ProductResultView({ image, loading, product, ai, formatMarkdown, onBack
 }
 
 // ════════════════════════ AUTH SCREEN ════════════════════════
-function AuthScreen({ onLogin }: { onLogin: (p: "google" | "apple" | "guest") => Promise<void> }) {
-  const [loading, setLoading] = useState<"" | "google" | "apple" | "guest">("");
-  const go = async (p: "google" | "apple" | "guest") => { setLoading(p); try { await onLogin(p); } finally { setLoading(""); } };
+function AuthScreen({ onLogin }: { onLogin: (p: "google") => Promise<void> }) {
+  const [loading, setLoading] = useState<"" | "google">("");
+  const go = async (p: "google") => { setLoading(p); try { await onLogin(p); } finally { setLoading(""); } };
 
   return (
     <div className="glow-scroll" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", overflowY: "auto", overflowX: "hidden", position: "relative", background: "linear-gradient(175deg, #FCEEE8 0%, #F9D8C8 48%, #F5C0A8 100%)" }}>
@@ -546,20 +534,10 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google" | "apple" | "guest") =>
       {/* ── buttons ── */}
       <div style={{ padding: "0 28px 36px", position: "relative", zIndex: 1 }}>
 
-        {/* Google */}
-        <button className="animate-fadeup" onClick={() => go("google")} disabled={!!loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, height: 54, borderRadius: 16, cursor: "pointer", border: "none", background: "#fff", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A", boxShadow: "0 6px 20px rgba(180,80,40,0.14)", marginBottom: 10, opacity: loading && loading !== "google" ? 0.6 : 1 }}>
+        {/* Google — only sign-in method */}
+        <button className="animate-fadeup" onClick={() => go("google")} disabled={!!loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, height: 54, borderRadius: 16, cursor: "pointer", border: "none", background: "#fff", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A", boxShadow: "0 6px 20px rgba(180,80,40,0.14)", opacity: loading && loading !== "google" ? 0.6 : 1 }}>
           <svg width="20" height="20" viewBox="0 0 20 20"><path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.4a4.61 4.61 0 01-2 3.02v2.5h3.24c1.9-1.75 3-4.33 3-7.31z" fill="#4285F4"/><path d="M10 20c2.7 0 4.97-.9 6.63-2.43l-3.24-2.5c-.9.6-2.06.96-3.39.96-2.6 0-4.8-1.76-5.6-4.12H1.06v2.58A9.99 9.99 0 0010 20z" fill="#34A853"/><path d="M4.4 11.91A6 6 0 014.1 10c0-.66.11-1.3.3-1.91V5.51H1.06A9.99 9.99 0 000 10c0 1.61.38 3.14 1.06 4.49l3.34-2.58z" fill="#FBBC05"/><path d="M10 3.97c1.47 0 2.79.51 3.82 1.5L16.7 2.6C14.97.99 12.7 0 10 0A9.99 9.99 0 001.06 5.51l3.34 2.58C5.2 5.73 7.4 3.97 10 3.97z" fill="#EA4335"/></svg>
           {loading === "google" ? "Opening Google…" : "Continue with Google"}
-        </button>
-        {/* Apple */}
-        <button className="animate-fadeup" onClick={() => go("apple")} disabled={!!loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, height: 54, borderRadius: 16, cursor: "pointer", border: "none", background: "#1A1A1A", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 10, opacity: loading && loading !== "apple" ? 0.6 : 1 }}>
-          <svg width="18" height="22" viewBox="0 0 18 22" fill="#fff"><path d="M14.96 11.6c-.02-2.37 1.94-3.52 2.03-3.58-1.11-1.62-2.83-1.84-3.44-1.86-1.46-.15-2.86.87-3.6.87-.75 0-1.9-.85-3.12-.83-1.6.02-3.08.93-3.9 2.36-1.67 2.89-.43 7.17 1.2 9.52.8 1.15 1.75 2.44 3 2.39 1.2-.05 1.66-.78 3.11-.78 1.46 0 1.88.78 3.15.75 1.3-.02 2.12-1.17 2.91-2.33.93-1.33 1.3-2.63 1.32-2.7-.03-.01-2.63-1.01-2.66-4.01zM12.41 4.02C13.07 3.22 13.5 2.1 13.38 1c-.95.04-2.12.64-2.8 1.43-.61.7-1.15 1.85-1.01 2.94 1.06.08 2.14-.54 2.84-1.35z"/></svg>
-          {loading === "apple" ? "Signing in…" : "Continue with Apple"}
-        </button>
-        {/* Guest */}
-        <button className="animate-fadeup" onClick={() => go("guest")} disabled={!!loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, height: 54, borderRadius: 16, cursor: "pointer", border: "1.5px solid rgba(60,30,20,0.18)", background: "rgba(255,255,255,0.55)", backdropFilter: "blur(8px)", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A", opacity: loading && loading !== "guest" ? 0.6 : 1 }}>
-          <Icon name="profile" size={19} color="#2C1F1A" sw={1.8} />
-          {loading === "guest" ? "Entering…" : "Continue as Guest"}
         </button>
 
         <p className="animate-fadeup" style={{ textAlign: "center", marginTop: 16, fontFamily: SANS, fontSize: 12, color: "rgba(44,31,26,0.42)" }}>
