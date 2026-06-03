@@ -46,6 +46,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   const detectorRef = useRef<FaceDetector | null>(null);
   const rafRef = useRef<number>(0);
   const okSinceRef = useRef(0);          // timestamp when face became ok+steady+sharp
+  const badFramesRef = useRef(0);        // tolerance: how many recent non-ok frames
   const prevCenterRef = useRef<{ x: number; y: number } | null>(null);
   const sampleCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const analyzingRef = useRef(false);
@@ -182,30 +183,44 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
             prevCenterRef.current = { x: cx, y: cy };
 
             let status: FaceStatus;
-            if (w < 0.32) status = "far";
-            else if (w > 0.72) status = "close";
+            if (w < 0.30) status = "far";
+            else if (w > 0.74) status = "close";
             else if (!centered) status = "offcenter";
             else {
               // well-placed — now require it to be STEADY and SHARP before capturing
               if (!sampleCanvasRef.current) sampleCanvasRef.current = document.createElement("canvas");
               const sharp = frameSharpness(video, sampleCanvasRef.current);
-              const steady = moved < 0.015;
+              const steady = moved < 0.022;            // a little forgiving so tiny motion is ok
               status = (steady && sharp >= SHARP_MIN) ? "ok" : "blurry";
             }
-            setFaceStatus(status);
 
-            // auto-capture only after holding ok+steady+sharp for HOLD_MS (with 3-2-1 countdown)
+            // auto-capture: hold ok+steady+sharp for HOLD_MS, with tolerance so a
+            // single shaky frame doesn't restart the 3-2-1 countdown.
             if (status === "ok") {
+              badFramesRef.current = 0;
               const now = performance.now();
               if (!okSinceRef.current) okSinceRef.current = now;
               const held = now - okSinceRef.current;
-              setCountdown(Math.max(1, Math.ceil((HOLD_MS - held) / 500)));
+              const cd = Math.max(1, Math.ceil((HOLD_MS - held) / 500));
+              setCountdown(prev => (prev === cd ? prev : cd));     // only re-render when the number changes
+              setFaceStatus("ok");
               if (held >= HOLD_MS && !analyzingRef.current) {
-                okSinceRef.current = 0; setCountdown(null);
+                okSinceRef.current = 0; badFramesRef.current = 0; setCountdown(null);
                 scan();
               }
             } else {
-              okSinceRef.current = 0; setCountdown(null);
+              // forgive up to ~8 bad frames (~0.3s) before resetting the timer
+              badFramesRef.current += 1;
+              if (badFramesRef.current > 8) {
+                okSinceRef.current = 0;
+                setCountdown(null);
+                setFaceStatus(status);
+              } else if (okSinceRef.current) {
+                // mid-countdown wobble — keep counting, just nudge the user
+                setFaceStatus("blurry");
+              } else {
+                setFaceStatus(status);
+              }
             }
           }
         } catch {}

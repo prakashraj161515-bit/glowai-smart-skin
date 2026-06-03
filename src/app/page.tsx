@@ -64,6 +64,32 @@ export default function Home() {
     setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
   }, []);
 
+  // ── Android/browser BACK button: close an open in-app view or modal instead of
+  //    exiting the whole app. Pushes one history entry when an overlay opens and
+  //    pops it back on Back. ──
+  const viewRef = useRef(view);
+  const gateRef = useRef(gate);
+  useEffect(() => { viewRef.current = view; }, [view]);
+  useEffect(() => { gateRef.current = gate; }, [gate]);
+  const overlayOpen = view !== "home" || !!gate;
+  const pushedRef = useRef(false);
+  useEffect(() => {
+    if (overlayOpen && !pushedRef.current) {
+      pushedRef.current = true;
+      window.history.pushState({ overlay: true }, "");
+    } else if (!overlayOpen) {
+      pushedRef.current = false;
+    }
+  }, [overlayOpen]);
+  useEffect(() => {
+    const onPop = () => {
+      if (gateRef.current) { setGate(null); pushedRef.current = false; return; }
+      if (viewRef.current !== "home") { setView("home"); pushedRef.current = false; return; }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     const map: Record<string, string> = {
