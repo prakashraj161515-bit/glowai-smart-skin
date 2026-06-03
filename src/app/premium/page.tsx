@@ -19,13 +19,25 @@ export default function PremiumPage() {
   const router = useRouter();
   const [sel, setSel] = useState<"monthly" | "yearly">("yearly");
   const [done, setDone] = useState(false);
+  const [already, setAlready] = useState(false);
 
   const price = pricing();
 
+  useEffect(() => { setAlready(localStorage.getItem("velmora_is_premium") === "true"); }, []);
+
   const buy = () => {
     localStorage.setItem("velmora_is_premium", "true");
+    // best-effort cloud persist (works once KV is connected)
+    fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
     setDone(true);
     setTimeout(() => router.push("/"), 1200);
+  };
+
+  const switchToFree = () => {
+    localStorage.setItem("velmora_is_premium", "false");
+    fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: false }) }).catch(() => {});
+    setAlready(false);
+    router.push("/");
   };
 
   const PlanList = (
@@ -80,9 +92,20 @@ export default function PremiumPage() {
         ))}
       </Card>
 
-      <PrimaryBtn onClick={buy} style={done ? { background: "#7FB389" } : undefined}>
-        {done ? "Welcome to Pro ✓" : "Get Premium"}
-      </PrimaryBtn>
+      {already ? (
+        <>
+          <div style={{ textAlign: "center", padding: "14px 0 4px", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#5FA572" }}>
+            ✓ You're on Premium — everything is unlocked.
+          </div>
+          <button onClick={switchToFree} style={{ width: "100%", height: 52, marginTop: 8, borderRadius: 16, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.border}`, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.textMute }}>
+            Switch to Free plan
+          </button>
+        </>
+      ) : (
+        <PrimaryBtn onClick={buy} style={done ? { background: "#7FB389" } : undefined}>
+          {done ? "Welcome to Pro ✓" : "Get Premium"}
+        </PrimaryBtn>
+      )}
       <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}>Restore Purchases · Terms · Privacy</div>
     </div>
   );
