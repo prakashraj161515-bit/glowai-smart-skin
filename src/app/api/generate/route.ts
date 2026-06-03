@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { generateWithGateway } from "@/lib/ai";
 
+// Face/product image analysis can take ~10s; the default 10s Vercel limit cut it
+// off mid-request (no result). Allow up to 60s so the scan always completes.
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
