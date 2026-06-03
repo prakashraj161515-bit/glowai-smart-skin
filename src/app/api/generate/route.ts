@@ -104,7 +104,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
     ];
 
     const result = await generateWithGateway({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: {
         maxOutputTokens: 2000,
         // face scan: a touch higher so scores reflect real differences (not clustered ~78)

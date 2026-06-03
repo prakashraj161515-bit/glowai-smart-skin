@@ -41,7 +41,7 @@ FORMATTING RULES:
 `;
 
     const result = await generateWithGateway({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
     }, prompt);
     const response = await result.response;

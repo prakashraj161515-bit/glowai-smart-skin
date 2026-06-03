@@ -33,7 +33,7 @@ Return ONLY valid JSON in this EXACT shape:
 Be honest: if it's a medicine/non-skincare/harsh item, use verdict 'avoid'.`;
 
     const result = await generateWithGateway({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: { maxOutputTokens: 500, temperature: 0.3, responseMimeType: "application/json" },
     }, prompt);
     const text = result.response.text();

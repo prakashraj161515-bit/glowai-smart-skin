@@ -29,7 +29,7 @@ Provide Indian food names and culturally relevant tips. Return ONLY valid JSON, 
 `;
 
     const result = await generateWithGateway({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       generationConfig: { responseMimeType: "application/json" }
     }, prompt);
     let text = result.response.text();

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const result = await chatWithGateway({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.1-flash-lite",
       systemInstruction: `You are Aura, a warm, friendly AI skin coach inside the Cream app.
 
 ANSWER STYLE (STRICT):
