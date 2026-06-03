@@ -6,7 +6,33 @@ import { analyzeSkin } from "../lib/analyze";
 import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
 
 // face-position guidance states
-type FaceStatus = "loading" | "none" | "far" | "close" | "offcenter" | "ok";
+type FaceStatus = "loading" | "none" | "far" | "close" | "offcenter" | "blurry" | "ok";
+
+// Measure how sharp the current video frame is (variance of a Laplacian on a
+// small grayscale sample). Higher = sharper. Used to avoid auto-capturing a
+// blurry frame. Reuses one canvas to stay cheap.
+function frameSharpness(video: HTMLVideoElement, c: HTMLCanvasElement): number {
+  const vw = video.videoWidth || 640, vh = video.videoHeight || 480;
+  const W = 160, H = Math.max(1, Math.round((W * vh) / vw));
+  c.width = W; c.height = H;
+  const cx = c.getContext("2d", { willReadFrequently: true });
+  if (!cx) return 999;
+  cx.drawImage(video, 0, 0, W, H);
+  const { data } = cx.getImageData(0, 0, W, H);
+  const gray = (i: number) => 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+  let sum = 0, sum2 = 0, n = 0;
+  for (let y = 1; y < H - 1; y++) {
+    for (let x = 1; x < W - 1; x++) {
+      const i = (y * W + x) * 4;
+      const lap = gray(i - 4) + gray(i + 4) + gray(i - W * 4) + gray(i + W * 4) - 4 * gray(i);
+      sum += lap; sum2 += lap * lap; n++;
+    }
+  }
+  const mean = sum / n;
+  return sum2 / n - mean * mean;
+}
+const SHARP_MIN = 55;     // below this the frame is considered blurry
+const HOLD_MS = 1500;     // must stay ok+steady+sharp this long before capture
 
 export default function CameraScanner({ onResult, mode = "face" }: { onResult: (result: any) => void, mode?: "face" | "product" }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -19,9 +45,12 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   // ── MediaPipe face detection state ──
   const detectorRef = useRef<FaceDetector | null>(null);
   const rafRef = useRef<number>(0);
-  const okFramesRef = useRef(0);
+  const okSinceRef = useRef(0);          // timestamp when face became ok+steady+sharp
+  const prevCenterRef = useRef<{ x: number; y: number } | null>(null);
+  const sampleCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const analyzingRef = useRef(false);
   const [faceStatus, setFaceStatus] = useState<FaceStatus>(mode === "face" ? "loading" : "ok");
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   useEffect(() => {
     let streamRef: MediaStream | null = null;
@@ -49,8 +78,8 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       const success = await tryStream({ 
         video: { 
           facingMode: facingMode === "environment" ? { exact: "environment" } : "user",
-          width: { ideal: 640 },
-          height: { ideal: 480 }
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         } 
       });
 
@@ -138,7 +167,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
           const res = det.detectForVideo(video, performance.now());
           const d = res.detections?.[0];
           if (!d) {
-            setFaceStatus("none"); okFramesRef.current = 0;
+            setFaceStatus("none"); okSinceRef.current = 0; prevCenterRef.current = null; setCountdown(null);
           } else {
             const b = d.boundingBox!;
             const vw = video.videoWidth || 640, vh = video.videoHeight || 480;
@@ -146,22 +175,37 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
             const cx = (b.originX + b.width / 2) / vw;
             const cy = (b.originY + b.height / 2) / vh;
             const centered = Math.abs(cx - 0.5) < 0.18 && Math.abs(cy - 0.46) < 0.2;
+
+            // how much the face moved since last frame (motion-blur guard)
+            const prev = prevCenterRef.current;
+            const moved = prev ? Math.hypot(cx - prev.x, cy - prev.y) : 1;
+            prevCenterRef.current = { x: cx, y: cy };
+
             let status: FaceStatus;
             if (w < 0.32) status = "far";
             else if (w > 0.72) status = "close";
             else if (!centered) status = "offcenter";
-            else status = "ok";
+            else {
+              // well-placed — now require it to be STEADY and SHARP before capturing
+              if (!sampleCanvasRef.current) sampleCanvasRef.current = document.createElement("canvas");
+              const sharp = frameSharpness(video, sampleCanvasRef.current);
+              const steady = moved < 0.015;
+              status = (steady && sharp >= SHARP_MIN) ? "ok" : "blurry";
+            }
             setFaceStatus(status);
 
-            // auto-capture: face held 'ok' for ~10 frames (~0.5s)
+            // auto-capture only after holding ok+steady+sharp for HOLD_MS (with 3-2-1 countdown)
             if (status === "ok") {
-              okFramesRef.current += 1;
-              if (okFramesRef.current >= 10 && !analyzingRef.current) {
-                okFramesRef.current = 0;
+              const now = performance.now();
+              if (!okSinceRef.current) okSinceRef.current = now;
+              const held = now - okSinceRef.current;
+              setCountdown(Math.max(1, Math.ceil((HOLD_MS - held) / 500)));
+              if (held >= HOLD_MS && !analyzingRef.current) {
+                okSinceRef.current = 0; setCountdown(null);
                 scan();
               }
             } else {
-              okFramesRef.current = 0;
+              okSinceRef.current = 0; setCountdown(null);
             }
           }
         } catch {}
@@ -206,7 +250,8 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     far:       { text: "Move a little closer", color: "#E8A24C" },
     close:     { text: "Move back a little", color: "#E8A24C" },
     offcenter: { text: "Center your face", color: "#E8A24C" },
-    ok:        { text: "Hold still — capturing…", color: "#7FB389" },
+    blurry:    { text: "Hold steady — keep still", color: "#E8A24C" },
+    ok:        { text: countdown ? `Hold still… ${countdown}` : "Hold still — capturing…", color: "#7FB389" },
   };
   const guide = GUIDE[faceStatus];
   const ovalColor = mode === "face" ? guide.color : accent;
@@ -261,6 +306,12 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
             ))}
             {/* scan line */}
             <div className="animate-scan" style={{ position: "absolute", left: "6%", right: "6%", height: 2.5, background: `linear-gradient(90deg, transparent, ${ovalColor}, transparent)`, boxShadow: `0 0 14px 1px ${ovalColor}` }} />
+            {/* big hold-still countdown */}
+            {faceStatus === "ok" && countdown && (
+              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span key={countdown} className="animate-ping-once" style={{ fontSize: 72, fontWeight: 800, color: "#fff", textShadow: `0 0 24px ${ovalColor}, 0 2px 12px rgba(0,0,0,0.5)`, fontFamily: "'DM Sans',sans-serif", lineHeight: 1 }}>{countdown}</span>
+              </div>
+            )}
           </div>
 
           {/* live guidance pill */}

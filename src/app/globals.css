@@ -255,5 +255,7 @@ html, body {
 .animate-flash      { animation: flash .15s ease-out; }
 .animate-spinpulse  { animation: spinpulse 1.4s ease-in-out infinite; }
 .animate-blink      { animation: blink 1.2s infinite; }
+@keyframes pingOnce { 0% { transform: scale(1.6); opacity: 0; } 40% { opacity: 1; } 100% { transform: scale(1); opacity: .92; } }
+.animate-ping-once  { animation: pingOnce .45s cubic-bezier(.2,.8,.2,1) both; }
 .glow-scroll, .glow-hscroll { scrollbar-width: none; -ms-overflow-style: none; }
 .glow-scroll::-webkit-scrollbar, .glow-hscroll::-webkit-scrollbar { width: 0; height: 0; display: none; }

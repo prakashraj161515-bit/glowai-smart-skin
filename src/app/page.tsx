@@ -186,6 +186,14 @@ export default function Home() {
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "face_scan", image: res.image, gender, userName, country, prevScan: prev || null }) });
       const d = await r.json();
       if (d.error) throw new Error(d.error);
+      // AI couldn't read the face (blurry / no clear face) → ask for a retry instead of a blank 0 result
+      const unclear = (typeof d.score === "number" && d.score === 0) || /unclear|blurry|no face/i.test(d.topConcern || "");
+      if (unclear) {
+        setLoading(false);
+        alert("Hmm, the photo wasn't clear enough to read your skin. Please hold steady in good light and scan again. 📸");
+        resetScanner("face");
+        return;
+      }
       const num = (v: any, fb: number) => typeof v === "number" ? v : fb;
       const analysisData = {
         image: res.image,
