@@ -506,6 +506,42 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google") => Promise<void> }) {
   const [loading, setLoading] = useState<"" | "google">("");
   const go = async (p: "google") => { setLoading(p); try { await onLogin(p); } finally { setLoading(""); } };
 
+  // ── email-OTP flow ──
+  const [showEmail, setShowEmail] = useState(false);
+  const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState<"email" | "code">("email");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  const sendCode = async () => {
+    setErr("");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr("Enter a valid email"); return; }
+    setBusy(true);
+    try {
+      const r = await fetch("/api/otp/send", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Could not send code");
+      if (d.devCode) setErr(`Dev code: ${d.devCode}`); // shown only if email service not set up yet
+      setStep("code");
+    } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+  };
+
+  const verifyCode = async () => {
+    setErr("");
+    if (code.trim().length < 4) { setErr("Enter the 6-digit code"); return; }
+    setBusy(true);
+    try {
+      const r = await fetch("/api/otp/verify", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, code }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || "Wrong code");
+      // valid → create the NextAuth session (re-verified server-side)
+      const res = await signIn("email-otp", { email, code, redirect: false });
+      if (res?.ok) { localStorage.removeItem("velmora_onboarding_complete"); window.location.href = "/"; }
+      else throw new Error("Sign-in failed, request a new code");
+    } catch (e: any) { setErr(e.message); setBusy(false); }
+  };
+
   return (
     <div className="glow-scroll" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", overflowY: "auto", overflowX: "hidden", position: "relative", background: "linear-gradient(175deg, #FCEEE8 0%, #F9D8C8 48%, #F5C0A8 100%)" }}>
       {/* ambient glow rings */}
@@ -539,6 +575,29 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google") => Promise<void> }) {
           <svg width="20" height="20" viewBox="0 0 20 20"><path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.4a4.61 4.61 0 01-2 3.02v2.5h3.24c1.9-1.75 3-4.33 3-7.31z" fill="#4285F4"/><path d="M10 20c2.7 0 4.97-.9 6.63-2.43l-3.24-2.5c-.9.6-2.06.96-3.39.96-2.6 0-4.8-1.76-5.6-4.12H1.06v2.58A9.99 9.99 0 0010 20z" fill="#34A853"/><path d="M4.4 11.91A6 6 0 014.1 10c0-.66.11-1.3.3-1.91V5.51H1.06A9.99 9.99 0 000 10c0 1.61.38 3.14 1.06 4.49l3.34-2.58z" fill="#FBBC05"/><path d="M10 3.97c1.47 0 2.79.51 3.82 1.5L16.7 2.6C14.97.99 12.7 0 10 0A9.99 9.99 0 001.06 5.51l3.34 2.58C5.2 5.73 7.4 3.97 10 3.97z" fill="#EA4335"/></svg>
           {loading === "google" ? "Opening Google…" : "Continue with Google"}
         </button>
+
+        {!showEmail ? (
+          <button className="animate-fadeup" onClick={() => setShowEmail(true)} style={{ width: "100%", marginTop: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, height: 54, borderRadius: 16, cursor: "pointer", border: "1.5px solid rgba(60,30,20,0.18)", background: "rgba(255,255,255,0.55)", backdropFilter: "blur(8px)", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A" }}>
+            <Icon name="chat" size={19} color="#2C1F1A" sw={1.8} /> Continue with Email
+          </button>
+        ) : (
+          <div className="animate-fadeup" style={{ marginTop: 10, background: "rgba(255,255,255,0.7)", backdropFilter: "blur(10px)", borderRadius: 18, padding: 16, boxShadow: "0 6px 20px rgba(180,80,40,0.12)" }}>
+            {step === "email" ? (
+              <>
+                <input autoFocus type="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && sendCode()} placeholder="you@email.com" style={{ width: "100%", boxSizing: "border-box", height: 50, borderRadius: 13, border: "1.5px solid rgba(60,30,20,0.18)", background: "#fff", padding: "0 16px", fontFamily: SANS, fontSize: 15.5, color: "#2C1F1A", outline: "none", marginBottom: 10 }} />
+                <button onClick={sendCode} disabled={busy} style={{ width: "100%", height: 50, borderRadius: 13, border: "none", cursor: "pointer", background: "#C44E28", color: "#fff", fontFamily: SANS, fontSize: 15.5, fontWeight: 700, opacity: busy ? 0.6 : 1 }}>{busy ? "Sending…" : "Send code"}</button>
+              </>
+            ) : (
+              <>
+                <div style={{ fontFamily: SANS, fontSize: 13, color: "rgba(44,31,26,0.7)", marginBottom: 10, textAlign: "center" }}>We sent a 6-digit code to <b>{email}</b></div>
+                <input autoFocus inputMode="numeric" maxLength={6} value={code} onChange={e => setCode(e.target.value.replace(/\D/g, ""))} onKeyDown={e => e.key === "Enter" && verifyCode()} placeholder="000000" style={{ width: "100%", boxSizing: "border-box", height: 54, borderRadius: 13, border: "1.5px solid rgba(60,30,20,0.18)", background: "#fff", padding: "0 16px", fontFamily: MONO, fontSize: 24, fontWeight: 700, letterSpacing: 8, textAlign: "center", color: "#2C1F1A", outline: "none", marginBottom: 10 }} />
+                <button onClick={verifyCode} disabled={busy} style={{ width: "100%", height: 50, borderRadius: 13, border: "none", cursor: "pointer", background: "#C44E28", color: "#fff", fontFamily: SANS, fontSize: 15.5, fontWeight: 700, opacity: busy ? 0.6 : 1 }}>{busy ? "Verifying…" : "Verify & Sign in"}</button>
+                <button onClick={() => { setStep("email"); setCode(""); setErr(""); }} style={{ width: "100%", marginTop: 8, background: "none", border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 12.5, fontWeight: 600, color: "rgba(44,31,26,0.5)" }}>← Change email</button>
+              </>
+            )}
+            {err && <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 600, color: err.startsWith("Dev code") ? "#5FA572" : "#E0685C", marginTop: 10, textAlign: "center" }}>{err}</div>}
+          </div>
+        )}
 
         <p className="animate-fadeup" style={{ textAlign: "center", marginTop: 16, fontFamily: SANS, fontSize: 12, color: "rgba(44,31,26,0.42)" }}>
           By continuing you agree to our Terms &amp; Privacy.
