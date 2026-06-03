@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
 import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
-import { getGenAI, aiRequestOptions } from "@/lib/ai";
+import { generateWithGateway } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
-    const genAI = getGenAI();
 
     let prompt = "";
     let imagePart: any = null;
@@ -100,7 +98,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
       { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
     ];
 
-    const model = genAI.getGenerativeModel({
+    const result = await generateWithGateway({
       model: "gemini-3.5-flash",
       generationConfig: {
         maxOutputTokens: 2000,
@@ -109,9 +107,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
         ...((isFaceScan || isProductScan) ? { responseMimeType: "application/json" } : {})
       },
       safetySettings,
-    }, aiRequestOptions());
-
-    const result = await model.generateContent(content);
+    }, content);
     const text = result.response.text();
 
     if (isFaceScan) {

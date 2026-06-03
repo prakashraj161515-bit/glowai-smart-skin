@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
-import { getGenAI, aiRequestOptions } from "@/lib/ai";
+import { generateWithGateway } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const { metrics, skinType } = await req.json();
-
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-3.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
-    }, aiRequestOptions());
 
     const prompt = `
 You are the Velmora Smart Skin Coach. Analyze these metrics and provide a comprehensive skin report:
@@ -31,7 +25,10 @@ As a "Fully AI" coach, generate a detailed personalized plan in JSON:
 Provide Indian food names and culturally relevant tips. Return ONLY valid JSON, no markdown.
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateWithGateway({
+      model: "gemini-3.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    }, prompt);
     let text = result.response.text();
 
     // Clean any markdown code blocks

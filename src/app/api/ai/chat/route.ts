@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { getGenAI, aiRequestOptions } from "@/lib/ai";
+import { chatWithGateway } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
+    const result = await chatWithGateway({
       model: "gemini-3.5-flash",
       systemInstruction: `You are Aura, a warm, friendly AI skin coach inside the Cream app.
 
@@ -22,14 +21,8 @@ ANSWER STYLE (STRICT):
 
 ${body.context ? `\nUSER'S LATEST FACE SCAN: ${body.context}` : ""}`,
       generationConfig: { maxOutputTokens: 320, temperature: 0.6 }
-    }, aiRequestOptions());
+    }, body.history || [], body.message);
 
-    const chat = model.startChat({
-      history: body.history || [],
-    });
-
-    const result = await chat.sendMessage(body.message);
-    
     return NextResponse.json({ text: result.response.text() });
   } catch (err: any) {
     console.error("🔥 Chat API Error:", err);

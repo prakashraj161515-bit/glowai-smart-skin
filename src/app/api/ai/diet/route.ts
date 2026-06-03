@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
-import { getGenAI, aiRequestOptions } from "@/lib/ai";
+import { generateWithGateway } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { context, isPremium } = body;
-
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-3.5-flash",
-      generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
-    }, aiRequestOptions());
 
     const premiumInstruction = isPremium 
       ? "Generate a FULL, highly detailed 7-day skincare diet plan including specific timings." 
@@ -43,7 +37,10 @@ FORMATTING RULES:
 - ${premiumInstruction}
 `;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateWithGateway({
+      model: "gemini-3.5-flash",
+      generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
+    }, prompt);
     const response = await result.response;
     const text = response.text();
 

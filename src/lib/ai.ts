@@ -14,12 +14,17 @@
 //   https://gateway.ai.cloudflare.com/v1/<ACCOUNT_ID>/<GATEWAY_ID>/google-ai-studio
 // The SDK appends /v1beta/... itself, so we hand it that prefix as `baseUrl`.
 
-import { GoogleGenerativeAI, RequestOptions } from "@google/generative-ai";
+import { GoogleGenerativeAI, RequestOptions, ModelParams } from "@google/generative-ai";
 import { getSecureKey } from "./api-key-manager";
 
+// Default Cloudflare AI Gateway for this project (the "cream-ai-skin-care" gateway).
+// Env vars still override these if set on Vercel.
+const DEFAULT_CF_ACCOUNT_ID = "3d1cabaf9d1df38540b6437d7c395cbc";
+const DEFAULT_CF_GATEWAY_ID = "cream-ai-skin-care";
+
 function gatewayBaseUrl(): string | null {
-  const acct = process.env.CF_ACCOUNT_ID;
-  const gw = process.env.CF_GATEWAY_ID;
+  const acct = process.env.CF_ACCOUNT_ID || DEFAULT_CF_ACCOUNT_ID;
+  const gw = process.env.CF_GATEWAY_ID || DEFAULT_CF_GATEWAY_ID;
   if (!acct || !gw) return null;
   return `https://gateway.ai.cloudflare.com/v1/${acct}/${gw}/google-ai-studio`;
 }
@@ -48,4 +53,48 @@ export function getGenAI(): GoogleGenerativeAI {
 /** True when requests are being routed through Cloudflare AI Gateway. */
 export function usingGateway(): boolean {
   return !!gatewayBaseUrl();
+}
+
+/**
+ * Run a Gemini request, preferring the Cloudflare AI Gateway.
+ * If the gateway call fails for ANY reason (e.g. the gateway has
+ * "Authenticated Gateway" turned on and no token is set, or a network
+ * hiccup), it automatically retries the SAME request directly against
+ * Google so the app never breaks. Once the gateway is reachable, every
+ * request shows up in the Cloudflare dashboard logs.
+ */
+export async function generateWithGateway(modelParams: ModelParams, content: any) {
+  const genAI = getGenAI();
+  const gwOpts = aiRequestOptions();
+  if (gwOpts.baseUrl) {
+    try {
+      const model = genAI.getGenerativeModel(modelParams, gwOpts);
+      return await model.generateContent(content);
+    } catch (err) {
+      console.warn("[ai] Cloudflare gateway call failed, falling back to direct Google:", (err as any)?.message || err);
+    }
+  }
+  const model = genAI.getGenerativeModel(modelParams, {});
+  return await model.generateContent(content);
+}
+
+/**
+ * Like generateWithGateway but for multi-turn chat (startChat + sendMessage).
+ * Tries the Cloudflare gateway first, falls back to direct Google on any error.
+ */
+export async function chatWithGateway(modelParams: ModelParams, history: any[], message: string) {
+  const genAI = getGenAI();
+  const gwOpts = aiRequestOptions();
+  if (gwOpts.baseUrl) {
+    try {
+      const model = genAI.getGenerativeModel(modelParams, gwOpts);
+      const chat = model.startChat({ history: history || [] });
+      return await chat.sendMessage(message);
+    } catch (err) {
+      console.warn("[ai] Cloudflare gateway chat failed, falling back to direct Google:", (err as any)?.message || err);
+    }
+  }
+  const model = genAI.getGenerativeModel(modelParams, {});
+  const chat = model.startChat({ history: history || [] });
+  return await chat.sendMessage(message);
 }

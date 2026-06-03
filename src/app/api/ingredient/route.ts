@@ -2,7 +2,7 @@
 // Returns a clean verdict so the Ingredient Checker can tell the user whether
 // it's right or wrong for their skin, even for products not in our catalog.
 import { NextResponse } from "next/server";
-import { getGenAI, aiRequestOptions } from "@/lib/ai";
+import { generateWithGateway } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
@@ -10,12 +10,6 @@ export async function POST(req: Request) {
     if (!query || !query.trim()) {
       return NextResponse.json({ error: "empty" }, { status: 400 });
     }
-
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({
-      model: "gemini-3.5-flash",
-      generationConfig: { maxOutputTokens: 500, temperature: 0.3, responseMimeType: "application/json" },
-    }, aiRequestOptions());
 
     const prompt = `You are Cream's ingredient & product expert. The user typed: "${query}".
 This may be a single skincare INGREDIENT (e.g. niacinamide) OR a full CREAM / PRODUCT name
@@ -35,7 +29,10 @@ Return ONLY valid JSON in this EXACT shape:
 }
 Be honest: if it's a medicine/non-skincare/harsh item, use verdict 'avoid'.`;
 
-    const result = await model.generateContent(prompt);
+    const result = await generateWithGateway({
+      model: "gemini-3.5-flash",
+      generationConfig: { maxOutputTokens: 500, temperature: 0.3, responseMimeType: "application/json" },
+    }, prompt);
     const text = result.response.text();
     try {
       return NextResponse.json({ result: JSON.parse(text) });
