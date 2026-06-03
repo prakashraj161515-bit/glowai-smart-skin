@@ -1,8 +1,12 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Camera, RefreshCcw, Upload } from "lucide-react";
 import { analyzeSkin } from "../lib/analyze";
+import { FaceDetector, FilesetResolver } from "@mediapipe/tasks-vision";
+
+// face-position guidance states
+type FaceStatus = "loading" | "none" | "far" | "close" | "offcenter" | "ok";
 
 export default function CameraScanner({ onResult, mode = "face" }: { onResult: (result: any) => void, mode?: "face" | "product" }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -11,6 +15,13 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [facingMode, setFacingMode] = useState<"user" | "environment">(mode === "face" ? "user" : "environment");
+
+  // ── MediaPipe face detection state ──
+  const detectorRef = useRef<FaceDetector | null>(null);
+  const rafRef = useRef<number>(0);
+  const okFramesRef = useRef(0);
+  const analyzingRef = useRef(false);
+  const [faceStatus, setFaceStatus] = useState<FaceStatus>(mode === "face" ? "loading" : "ok");
 
   useEffect(() => {
     let streamRef: MediaStream | null = null;
@@ -66,9 +77,10 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
 
   const [showFlash, setShowFlash] = useState(false);
 
-  async function scan() {
-    if (!videoRef.current || isAnalyzing) return;
-    
+  const scan = useCallback(async () => {
+    if (!videoRef.current || analyzingRef.current) return;
+    analyzingRef.current = true;
+
     // Feedback: Flash & Vibrate
     setShowFlash(true);
     if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -87,7 +99,83 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     const result = await analyzeSkin(canvas, mode === "product");
     onResult(result);
     setIsAnalyzing(false);
-  }
+  }, [mode, onResult]);
+
+  // ── MediaPipe: load model + run detection loop (face mode only) ──
+  useEffect(() => {
+    if (mode !== "face") return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const vision = await FilesetResolver.forVisionTasks(
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
+        );
+        const detector = await FaceDetector.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath:
+              "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
+            delegate: "GPU",
+          },
+          runningMode: "VIDEO",
+        });
+        if (cancelled) { detector.close(); return; }
+        detectorRef.current = detector;
+        setFaceStatus("none");
+        loop();
+      } catch (e) {
+        // if MediaPipe fails to load, fall back to manual capture
+        console.warn("MediaPipe face detector failed, manual capture only:", e);
+        setFaceStatus("ok");
+      }
+    })();
+
+    const loop = () => {
+      const video = videoRef.current;
+      const det = detectorRef.current;
+      if (!cancelled && video && det && video.readyState >= 2) {
+        try {
+          const res = det.detectForVideo(video, performance.now());
+          const d = res.detections?.[0];
+          if (!d) {
+            setFaceStatus("none"); okFramesRef.current = 0;
+          } else {
+            const b = d.boundingBox!;
+            const vw = video.videoWidth || 640, vh = video.videoHeight || 480;
+            const w = b.width / vw;              // face width as % of frame
+            const cx = (b.originX + b.width / 2) / vw;
+            const cy = (b.originY + b.height / 2) / vh;
+            const centered = Math.abs(cx - 0.5) < 0.18 && Math.abs(cy - 0.46) < 0.2;
+            let status: FaceStatus;
+            if (w < 0.32) status = "far";
+            else if (w > 0.72) status = "close";
+            else if (!centered) status = "offcenter";
+            else status = "ok";
+            setFaceStatus(status);
+
+            // auto-capture: face held 'ok' for ~10 frames (~0.5s)
+            if (status === "ok") {
+              okFramesRef.current += 1;
+              if (okFramesRef.current >= 10 && !analyzingRef.current) {
+                okFramesRef.current = 0;
+                scan();
+              }
+            } else {
+              okFramesRef.current = 0;
+            }
+          }
+        } catch {}
+      }
+      if (!cancelled) rafRef.current = requestAnimationFrame(loop);
+    };
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(rafRef.current);
+      detectorRef.current?.close();
+      detectorRef.current = null;
+    };
+  }, [mode, scan]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -110,6 +198,19 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   };
 
   const accent = mode === "face" ? "#F0886A" : "#4E8ED4";
+
+  // live guidance for the face overlay
+  const GUIDE: Record<FaceStatus, { text: string; color: string }> = {
+    loading:   { text: "Loading face detector…", color: "#F0886A" },
+    none:      { text: "Position your face in the oval", color: "#F0886A" },
+    far:       { text: "Move a little closer", color: "#E8A24C" },
+    close:     { text: "Move back a little", color: "#E8A24C" },
+    offcenter: { text: "Center your face", color: "#E8A24C" },
+    ok:        { text: "Hold still — capturing…", color: "#7FB389" },
+  };
+  const guide = GUIDE[faceStatus];
+  const ovalColor = mode === "face" ? guide.color : accent;
+
   return (
     <div
       className="relative w-full mx-auto overflow-hidden"
@@ -144,23 +245,30 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
       {/* Vignette — darkens edges, focuses center */}
       <div className="absolute inset-0 pointer-events-none z-10" style={{ background: "radial-gradient(ellipse 62% 64% at 50% 44%, transparent 56%, rgba(0,0,0,0.62) 100%)" }} />
 
-      {/* Face oval guide */}
+      {/* Face oval guide — color + text driven by MediaPipe detection */}
       {mode === "face" && (
         <div className="absolute inset-0 z-20 pointer-events-none flex items-center justify-center">
-          <div style={{ position: "relative", width: "66%", height: "74%", marginTop: "-4%" }}>
-            {/* glowing dashed oval */}
-            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `2.5px dashed ${accent}`, boxShadow: `0 0 28px ${accent}66, inset 0 0 40px ${accent}22` }} />
+          <div style={{ position: "relative", width: "66%", height: "74%", marginTop: "-4%", transition: "all .25s" }}>
+            {/* glowing dashed oval (turns green when face is well-placed) */}
+            <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `2.5px ${faceStatus === "ok" ? "solid" : "dashed"} ${ovalColor}`, boxShadow: `0 0 28px ${ovalColor}66, inset 0 0 40px ${ovalColor}22`, transition: "border-color .25s, box-shadow .25s" }} />
             {/* corner brackets around oval bounding box */}
             {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],i)=>(
-              <div key={i} style={{ position:"absolute", [v]:-6, [h]:-2, width:20, height:20,
-                borderTop: v==="top"?`3px solid ${accent}`:"none", borderBottom: v==="bottom"?`3px solid ${accent}`:"none",
-                borderLeft: h==="left"?`3px solid ${accent}`:"none", borderRight: h==="right"?`3px solid ${accent}`:"none",
+              <div key={i} style={{ position:"absolute", [v]:-6, [h]:-2, width:20, height:20, transition:"border-color .25s",
+                borderTop: v==="top"?`3px solid ${ovalColor}`:"none", borderBottom: v==="bottom"?`3px solid ${ovalColor}`:"none",
+                borderLeft: h==="left"?`3px solid ${ovalColor}`:"none", borderRight: h==="right"?`3px solid ${ovalColor}`:"none",
                 borderTopLeftRadius: v==="top"&&h==="left"?6:0, borderTopRightRadius: v==="top"&&h==="right"?6:0,
                 borderBottomLeftRadius: v==="bottom"&&h==="left"?6:0, borderBottomRightRadius: v==="bottom"&&h==="right"?6:0 } as any} />
             ))}
             {/* scan line */}
-            <div className="animate-scan" style={{ position: "absolute", left: "6%", right: "6%", height: 2.5, background: `linear-gradient(90deg, transparent, ${accent}, transparent)`, boxShadow: `0 0 14px 1px ${accent}` }} />
-            <div style={{ position:"absolute", bottom:-2, left:0, right:0, textAlign:"center", fontSize:10, letterSpacing:1, textTransform:"uppercase", color:"rgba(255,255,255,0.45)", fontFamily:"'DM Sans',sans-serif" }}>align your face</div>
+            <div className="animate-scan" style={{ position: "absolute", left: "6%", right: "6%", height: 2.5, background: `linear-gradient(90deg, transparent, ${ovalColor}, transparent)`, boxShadow: `0 0 14px 1px ${ovalColor}` }} />
+          </div>
+
+          {/* live guidance pill */}
+          <div style={{ position: "absolute", top: "8%", left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "7px 15px", borderRadius: 99, background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", border: `1px solid ${ovalColor}55` }}>
+              <span style={{ width: 7, height: 7, borderRadius: 99, background: ovalColor, boxShadow: `0 0 8px ${ovalColor}` }} className={faceStatus === "ok" ? "" : "animate-blink"} />
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: "#fff", fontFamily: "'DM Sans',sans-serif" }}>{guide.text}</span>
+            </div>
           </div>
         </div>
       )}
@@ -212,7 +320,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
           </button>
         </div>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "rgba(255,255,255,0.7)", fontFamily: "'DM Sans',sans-serif" }}>
-          {isAnalyzing ? "AI Analyzing…" : (mode === "face" ? "Tap to scan" : "Scan ingredients")}
+          {isAnalyzing ? "AI Analyzing…" : (mode === "face" ? "Auto-captures · or tap" : "Scan ingredients")}
         </div>
       </div>
     </div>
