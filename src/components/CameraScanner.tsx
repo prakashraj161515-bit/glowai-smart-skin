@@ -47,6 +47,7 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   const rafRef = useRef<number>(0);
   const okSinceRef = useRef(0);          // timestamp when face became ok+steady+sharp
   const badFramesRef = useRef(0);        // tolerance: how many recent non-ok frames
+  const capturedRef = useRef(false);     // once a frame is captured, stop the timer for good
   const prevCenterRef = useRef<{ x: number; y: number } | null>(null);
   const sampleCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const analyzingRef = useRef(false);
@@ -110,6 +111,8 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
   const scan = useCallback(async () => {
     if (!videoRef.current || analyzingRef.current) return;
     analyzingRef.current = true;
+    capturedRef.current = true;   // lock — no more auto-capture / countdown after this
+    setCountdown(null);
 
     // Feedback: Flash & Vibrate
     setShowFlash(true);
@@ -161,6 +164,11 @@ export default function CameraScanner({ onResult, mode = "face" }: { onResult: (
     })();
 
     const loop = () => {
+      // once we've captured (or are analyzing), stop all guidance & the countdown
+      if (capturedRef.current || analyzingRef.current) {
+        if (!cancelled) rafRef.current = requestAnimationFrame(loop);
+        return;
+      }
       const video = videoRef.current;
       const det = detectorRef.current;
       if (!cancelled && video && det && video.readyState >= 2) {
