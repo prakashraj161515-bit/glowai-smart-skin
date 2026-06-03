@@ -116,17 +116,16 @@ export default function Home() {
     return true;
   })();
 
-  // Login gate: Google (real OAuth) · Apple & Guest (instant, no setup needed)
+  // Login gate: Google = real OAuth (always) · Apple & Guest = instant demo
   const handleLogin = async (provider: "google" | "apple" | "guest") => {
     if (status === "authenticated") return;
-    // Real Google OAuth opens Google's page when configured on the server.
-    if (provider === "google" && process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "1") {
+    // Real Google OAuth — always opens Google's account-chooser screen.
+    if (provider === "google") {
       signIn("google", { callbackUrl: "/" });
       return;
     }
-    // Otherwise (Apple / Guest, or Google when OAuth isn't configured) →
-    // instant credentials sign-in so the app always opens after login.
-    const name = provider === "apple" ? "Apple User" : provider === "google" ? "Google User" : "Guest";
+    // Apple / Guest → instant credentials sign-in so the app always opens.
+    const name = provider === "apple" ? "Apple User" : "Guest";
     const result = await signIn("credentials", { redirect: false, name });
     if (result?.ok) {
       localStorage.removeItem("velmora_onboarding_complete");
