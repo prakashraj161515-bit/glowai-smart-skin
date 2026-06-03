@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Chip, PrimaryBtn } from "@/glow/ui";
+import { isPremium } from "@/glow/premium";
 
 const MOODS = ["😣", "😕", "😐", "🙂", "😄"];
 const MOOD_BG = ["rgba(224,104,92,0.18)", "rgba(232,162,76,0.18)", "rgba(180,160,140,0.18)", "rgba(127,179,137,0.18)", "rgba(95,173,114,0.24)"];
@@ -41,7 +42,9 @@ export default function DiaryPage() {
 
   const save = () => {
     const entry: Entry = { date: new Date().toISOString(), mood, water, tags };
-    const next = [entry, ...entries].slice(0, 30);
+    // Free members keep only the last 7 entries; Premium keeps up to 365
+    const cap = isPremium() ? 365 : 7;
+    const next = [entry, ...entries].slice(0, cap);
     setEntries(next);
     localStorage.setItem("velmora_diary_entries", JSON.stringify(next));
     localStorage.setItem("velmora_diary", JSON.stringify(entry));
@@ -117,7 +120,14 @@ export default function DiaryPage() {
       {/* recent entries with delete */}
       {entries.length > 0 && (
         <div style={{ marginTop: 24 }}>
-          <div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text, marginBottom: 12 }}>Recent entries</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+            <span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text }}>Recent entries</span>
+            {!isPremium() && (
+              <button onClick={() => router.push("/premium")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 11.5, fontWeight: 700, color: T.accentText, display: "inline-flex", alignItems: "center", gap: 4 }}>
+                <Icon name="crown" size={12} color={T.accentText} fill /> 7 saved · unlimited in Premium
+              </button>
+            )}
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {entries.slice(0, 10).map((en, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 2px 10px rgba(60,30,20,0.05)" }}>

@@ -2,6 +2,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, SANS, rgba, Icon } from "@/glow/ui";
+import { canChat, recordChat, chatsLeft } from "@/glow/premium";
+import { PremiumGate } from "@/glow/PremiumLock";
 
 // quick-action chips — always available for follow-ups
 const ACTIONS = [
@@ -34,8 +36,12 @@ export default function CoachPage() {
   const [msgs, setMsgs] = useState<Msg[]>([{ who: "ai", text: "Hi, I'm Aura ✦ your personal skin coach. I've loaded your latest scan. Ask me anything — about your skin, a product, a diet, or a condition — and I'll keep it short and clear.", actions: true }]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [gate, setGate] = useState(false);
+  const [left, setChatsLeft] = useState<number>(Infinity);
   const scroller = useRef<HTMLDivElement>(null);
   const camRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setChatsLeft(chatsLeft()); }, []);
 
   useEffect(() => { if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight; }, [msgs]);
 
@@ -64,8 +70,12 @@ export default function CoachPage() {
   const send = async (q?: string) => {
     const question = (q ?? text).trim();
     if (!question || busy) return;
+    // Free members get 3 chats/day
+    if (!canChat()) { setGate(true); return; }
     setBusy(true);
     setText("");
+    recordChat();
+    setChatsLeft(chatsLeft());
     setMsgs(m => [...m, { who: "me", text: question }, { who: "typing" }]);
     try {
       const r = await fetch("/api/ai/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message: question, context: scanContext() }) });
@@ -82,9 +92,10 @@ export default function CoachPage() {
     } finally { setBusy(false); }
   };
 
-  // ── scan a product photo right inside the chat ──
+  // ── scan a product photo right inside the chat (Premium only) ──
   const scanProduct = async (file: File) => {
     if (busy) return;
+    if (localStorage.getItem("velmora_is_premium") !== "true") { setGate(true); return; }
     setBusy(true);
     setMsgs(m => [...m, { who: "me", text: "📷 Scanned a product label" }, { who: "typing" }]);
     try {
@@ -148,6 +159,15 @@ export default function CoachPage() {
         })}
       </div>
 
+      {/* free chats remaining hint */}
+      {left !== Infinity && (
+        <div style={{ textAlign: "center", padding: "0 16px", position: "relative", zIndex: 2 }}>
+          <span style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 600, color: left > 0 ? T.textMute : "#E0685C" }}>
+            {left > 0 ? `${left} free chat${left === 1 ? "" : "s"} left today` : "Daily free chats used — go Premium for unlimited"}
+          </span>
+        </div>
+      )}
+
       {/* input */}
       <div style={{ padding: "8px 16px 30px", background: T.bg, position: "relative", zIndex: 2 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 6px 6px 16px", borderRadius: 26, background: T.surface, border: `1px solid ${T.borderHi}`, boxShadow: "0 4px 16px rgba(60,30,20,0.06)" }}>
@@ -157,6 +177,16 @@ export default function CoachPage() {
           <button onClick={() => send()} disabled={busy} style={{ width: 40, height: 40, borderRadius: 99, flexShrink: 0, border: "none", cursor: "pointer", background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", opacity: busy ? 0.6 : 1 }}><Icon name="send" size={20} color="#241712" /></button>
         </div>
       </div>
+
+      {/* Premium gate */}
+      {gate && (
+        <div onClick={() => setGate(false)} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.5)", backdropFilter: "blur(5px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, animation: "fadeUp .3s ease" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 99, background: T.borderHi, margin: "12px auto 0" }} />
+            <PremiumGate title="You've used today's free chats" sub="Free members get 3 Aura chats a day. Go Premium for unlimited chats with your AI skin coach + product scanning in chat." onClose={() => setGate(false)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

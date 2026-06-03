@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Badge, SectionTitle } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
+import { PremiumGate } from "@/glow/PremiumLock";
 
 const RANGES: Record<string, number> = { "1W": 7, "1M": 10, "3M": 16, "All": 999 };
 const LABELS: Record<string, string> = { "1W": "last 7 days", "1M": "last 30 days", "3M": "last 90 days", "All": "all time" };
@@ -12,14 +13,18 @@ type Milestone = { ic: any; label: string; earned: boolean; desc: string };
 export default function ProgressPage() {
   const router = useRouter();
   const [all, setAll] = useState<number[]>([58, 61, 60, 64, 68, 66, 70, 72, 71, 74]);
-  const [range, setRange] = useState("1M");
+  const [range, setRange] = useState("1W");
   const [scans, setScans] = useState(0);
   const [streak, setStreak] = useState(0);
   const [selM, setSelM] = useState<Milestone | null>(null);
+  const [pro, setPro] = useState(false);
+  const [gate, setGate] = useState(false);
   useEffect(() => {
     const h = localStorage.getItem("velmora_history");
     if (h) { try { const arr = JSON.parse(h); setScans(arr.length); const s = arr.map((x: any) => x.score).reverse(); if (s.length >= 2) setAll(s); } catch {} }
     setStreak(parseInt(localStorage.getItem("velmora_streak") || "0") || 0);
+    const p = localStorage.getItem("velmora_is_premium") === "true"; setPro(p);
+    if (!p) setRange("1W"); // free = weekly only
   }, []);
 
   const MILESTONES: Milestone[] = [
@@ -43,9 +48,14 @@ export default function ProgressPage() {
       <div className="glow-scroll" style={{ minHeight: "100vh", overflowY: "auto", padding: "100px 20px 130px" }}>
         <h1 style={{ fontFamily: SERIF, fontSize: 30, color: T.text, margin: "0 0 16px" }}>Your Progress</h1>
         <div style={{ display: "flex", gap: 6, background: T.surface2, padding: 4, borderRadius: 12, marginBottom: 16, width: "fit-content" }}>
-          {["1W", "1M", "3M", "All"].map((x) => (
-            <button key={x} onClick={() => setRange(x)} style={{ padding: "6px 16px", borderRadius: 9, border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 13, fontWeight: 650, background: range === x ? T.surface : "transparent", color: range === x ? T.text : T.textMute, boxShadow: range === x ? "0 2px 8px rgba(60,30,20,0.08)" : "none" }}>{x}</button>
-          ))}
+          {["1W", "1M", "3M", "All"].map((x) => {
+            const locked = !pro && x !== "1W";
+            return (
+              <button key={x} onClick={() => locked ? setGate(true) : setRange(x)} style={{ position: "relative", padding: "6px 16px", borderRadius: 9, border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 13, fontWeight: 650, background: range === x ? T.surface : "transparent", color: locked ? T.textFaint : range === x ? T.text : T.textMute, boxShadow: range === x ? "0 2px 8px rgba(60,30,20,0.08)" : "none", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                {x}{locked && <Icon name="lock" size={11} color={T.textFaint} />}
+              </button>
+            );
+          })}
         </div>
         <Card style={{ marginBottom: 18 }}>
           <div style={{ fontFamily: SANS, fontSize: 13, color: T.textMute, marginBottom: 4 }}>Skin Score · {LABELS[range]}</div>
@@ -81,6 +91,15 @@ export default function ProgressPage() {
             <h3 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 6px" }}>{selM.label}</h3>
             <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 18px", lineHeight: 1.5 }}>{selM.desc} {selM.earned ? "✓ Earned!" : "Keep going to unlock it."}</p>
             <button onClick={() => setSelM(null)} style={{ width: "100%", height: 50, borderRadius: 14, border: "none", cursor: "pointer", background: T.accent, color: "#241712", fontFamily: SANS, fontSize: 15, fontWeight: 700 }}>Got it</button>
+          </div>
+        </div>
+      )}
+
+      {gate && (
+        <div onClick={() => setGate(false)} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.5)", backdropFilter: "blur(5px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, animation: "fadeUp .3s ease" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 99, background: T.borderHi, margin: "12px auto 0" }} />
+            <PremiumGate title="See your full history" sub="Free members see the last 7 days. Go Premium to view your 1-month, 3-month and all-time skin progress." onClose={() => setGate(false)} />
           </div>
         </div>
       )}

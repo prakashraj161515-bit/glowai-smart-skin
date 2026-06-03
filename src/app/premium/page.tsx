@@ -4,7 +4,16 @@ import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Badge, PrimaryBtn } from "@/glow/ui";
 import { pricing, Plan } from "@/glow/diet";
 
-const FEATS = ["Unlimited AI skin scans", "Full AI routine builder", "Ask Aura — unlimited", "Trend analysis & diary insights", "PDF skin reports"];
+// each feature: [premium benefit, what free gets]
+const FEATS: [string, string][] = [
+  ["Unlimited daily face scans", "Free: 1 scan / day"],
+  ["Unlimited Aura AI chats", "Free: 3 chats / day"],
+  ["Product Scanner", "Premium only"],
+  ["Ingredient Checker", "Premium only"],
+  ["Full progress history (all-time)", "Free: weekly only"],
+  ["Unlimited Skin Diary", "Free: last 7 entries"],
+  ["Ad-free experience", "Free: shows ads"],
+];
 
 export default function PremiumPage() {
   const router = useRouter();
@@ -59,11 +68,14 @@ export default function PremiumPage() {
 
       {/* 2 — PREMIUM FEATURES */}
       <Card style={{ marginBottom: 18 }}>
-        <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>What you get</div>
-        {FEATS.map((f, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "7px 0" }}>
-            <Icon name="check" size={20} color={T.accentText} sw={2.4} />
-            <span style={{ fontFamily: SANS, fontSize: 15, color: T.text }}>{f}</span>
+        <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.accentText, textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>Free vs Premium</div>
+        {FEATS.map(([benefit, free], i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderTop: i ? `1px solid ${T.border}` : "none" }}>
+            <div style={{ width: 24, height: 24, borderRadius: 99, background: "rgba(127,179,137,0.16)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><Icon name="check" size={15} color="#5FA572" sw={2.6} /></div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: SANS, fontSize: 14.5, fontWeight: 650, color: T.text, lineHeight: 1.2 }}>{benefit}</div>
+              <div style={{ fontFamily: SANS, fontSize: 11.5, color: T.textFaint, marginTop: 1 }}>{free}</div>
+            </div>
           </div>
         ))}
       </Card>

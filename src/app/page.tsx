@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import CameraScanner from "@/components/CameraScanner";
@@ -11,6 +11,8 @@ import {
 import { productImg, ALL_PRODUCTS } from "@/glow/affiliate";
 import { LivePrice, fmtCount } from "@/glow/store-ui";
 import { tickLoyalty } from "@/glow/loyalty";
+import { canFaceScan, recordFaceScan, faceScansLeft } from "@/glow/premium";
+import { PremiumGate } from "@/glow/PremiumLock";
 
 type HistoryEntry = { date: string; score: number; acne: number; oil: number; pigmentation: number; image?: string };
 
@@ -39,6 +41,8 @@ export default function Home() {
   const [userPic, setUserPic] = useState<string | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [scanCount, setScanCount] = useState(0);
+  const [gate, setGate] = useState<{ title: string; sub: string } | null>(null);
+  const onboardingScanRef = useRef(false);
   const [streak, setStreak] = useState(1);
   const [cat, setCat] = useState("All");
   const [liked, setLiked] = useState<number[]>([]);
@@ -138,7 +142,19 @@ export default function Home() {
     saveToCloud({ onboardingComplete: true, userName, gender, country, skinType });
   };
 
-  const resetScanner = (m: "face" | "product") => { setAi(""); setData((d: any) => d); setScanMode(m); setView("scanner"); };
+  const resetScanner = (m: "face" | "product") => {
+    // Product scanner = Premium only
+    if (m === "product" && !isPremium) {
+      setGate({ title: "Product Scanner is Premium", sub: "Scan any skincare product to instantly check if it suits your skin. Upgrade to unlock unlimited product scans." });
+      return;
+    }
+    // Free face scans are limited per day (onboarding scan not counted)
+    if (m === "face" && !isPremium && !canFaceScan()) {
+      setGate({ title: "Daily free scan used", sub: "Free members get 1 face scan per day. Come back tomorrow, or go Premium for unlimited scans." });
+      return;
+    }
+    setAi(""); setData((d: any) => d); setScanMode(m); setView("scanner");
+  };
 
   const formatMarkdown = (text: string) => text.split("\n").map((line, i) => {
     const trimmed = line.trim();
@@ -175,7 +191,8 @@ export default function Home() {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
     setView("results"); setLoading(true);
-    if (!isPremium) { const c = scanCount + 1; setScanCount(c); localStorage.setItem("velmora_scan_count", c.toString()); }
+    recordFaceScan(onboardingScanRef.current); // onboarding scan not counted; daily limit for the rest
+    onboardingScanRef.current = false;
     setData({ image: res.image, score: 0, acne: 0, oil: 0, pigmentation: 0 }); setAi("");
     try {
       const prev = history[0];
@@ -235,7 +252,7 @@ export default function Home() {
 
   // ════════════════════════ ONBOARDING ════════════════════════
   if (status === "authenticated" && showOnboarding) {
-    return <OnboardingScreen slide={obSlide} setSlide={setObSlide} onScan={() => { completeOnboarding(); resetScanner("face"); }} onDone={completeOnboarding} />;
+    return <OnboardingScreen slide={obSlide} setSlide={setObSlide} onScan={() => { completeOnboarding(); onboardingScanRef.current = true; setAi(""); setScanMode("face"); setView("scanner"); }} onDone={completeOnboarding} />;
   }
 
   // ════════════════════════ MAIN APP ════════════════════════
@@ -304,15 +321,13 @@ export default function Home() {
 
           {/* category pills */}
           <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-            {["All", "Skincare", "Makeup"].map(c => (
+            {["All", "Skincare"].map(c => (
               <button key={c} onClick={() => setCat(c)} style={{ padding: "8px 18px", borderRadius: 99, cursor: "pointer", fontFamily: SANS, fontSize: 14, fontWeight: 700, border: "none", background: cat === c ? T.accent : T.surface2, color: cat === c ? "#fff" : T.textMute, boxShadow: cat === c ? `0 4px 12px ${rgba(T.accent, 0.30)}` : "none" }}>{c}</button>
             ))}
           </div>
 
           {/* product grid — top bestsellers */}
-          {cat === "Makeup" ? (
-            <div style={{ padding: "40px 0", textAlign: "center", color: T.textFaint, fontFamily: SANS, fontSize: 14 }}>No makeup products yet</div>
-          ) : (
+          {(
             <>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                 <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 0.8 }}>🔥 Bestsellers</span>
@@ -385,6 +400,16 @@ export default function Home() {
       {/* TAB BAR (only on home/results) */}
       {(view === "home" || view === "results" || view === "product_results") && (
         <TabBar active={view === "home" ? "home" : ""} onChange={handleTab} />
+      )}
+
+      {/* Premium gate modal */}
+      {gate && (
+        <div onClick={() => setGate(null)} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.5)", backdropFilter: "blur(5px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, animation: "fadeUp .3s ease" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 99, background: T.borderHi, margin: "12px auto 0" }} />
+            <PremiumGate title={gate.title} sub={gate.sub} onClose={() => setGate(null)} />
+          </div>
+        </div>
       )}
     </div>
   );

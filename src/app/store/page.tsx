@@ -5,6 +5,8 @@ import AppTabBar from "@/glow/AppTabBar";
 import { ALL_PRODUCTS, AffProduct, productImg } from "@/glow/affiliate";
 import { Stars, LivePrice, RateStars, fmtCount, blendedRating, fetchGlobalRatings, ensurePrice, priceNum, GAgg } from "@/glow/store-ui";
 import { searchProducts } from "@/glow/search";
+import { isPremium } from "@/glow/premium";
+import { PremiumGate, PremiumBadge } from "@/glow/PremiumLock";
 
 // internal category value -> friendly label
 const CAT_LABEL: Record<string, string> = { Cleanser: "Facewash" };
@@ -48,6 +50,9 @@ export default function StorePage() {
   const [sort, setSort] = useState<Sort>("popular");
   const [conflict, setConflict] = useState(false);
   const [checker, setChecker] = useState(false);
+  const [gate, setGate] = useState(false);
+  const [pro, setPro] = useState(false);
+  useEffect(() => { setPro(isPremium()); }, []);
   const [ingQ, setIngQ] = useState("");
   const [global, setGlobal] = useState<GAgg>({});
   const [tick, setTick] = useState(0);
@@ -170,7 +175,8 @@ export default function StorePage() {
               <div style={{ width: 36, height: 36, borderRadius: 11, flexShrink: 0, background: "linear-gradient(135deg,#EAE4FB,#D9CFF4)", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="bolt" size={18} color="#7C6CE0" fill /></div>
               <div><div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 750, color: T.text, lineHeight: 1.1 }}>Conflict check</div><div style={{ fontFamily: SANS, fontSize: 10.5, color: T.textMute, marginTop: 1 }}>What not to mix</div></div>
             </button>
-            <button onClick={() => setChecker(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "12px 13px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 4px 14px rgba(60,30,20,0.06)", cursor: "pointer", textAlign: "left" }}>
+            <button onClick={() => pro ? setChecker(true) : setGate(true)} style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, padding: "12px 13px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 4px 14px rgba(60,30,20,0.06)", cursor: "pointer", textAlign: "left", position: "relative" }}>
+              {!pro && <div style={{ position: "absolute", top: -7, right: -4 }}><PremiumBadge small /></div>}
               <div style={{ width: 36, height: 36, borderRadius: 11, flexShrink: 0, background: "linear-gradient(135deg,#D8F0E0,#BEE6CC)", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="leaf" size={18} color="#5FA572" /></div>
               <div><div style={{ fontFamily: SANS, fontSize: 13, fontWeight: 750, color: T.text, lineHeight: 1.1 }}>Ingredient check</div><div style={{ fontFamily: SANS, fontSize: 10.5, color: T.textMute, marginTop: 1 }}>Right for you?</div></div>
             </button>
@@ -278,6 +284,16 @@ export default function StorePage() {
             </div>
           )}
         </Sheet>
+      )}
+
+      {/* Premium gate (ingredient checker) */}
+      {gate && (
+        <div onClick={() => setGate(false)} style={{ position: "fixed", inset: 0, zIndex: 96, background: "rgba(20,12,8,0.5)", backdropFilter: "blur(5px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderTopLeftRadius: 28, borderTopRightRadius: 28, animation: "fadeUp .3s ease" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 99, background: T.borderHi, margin: "12px auto 0" }} />
+            <PremiumGate title="Ingredient Checker is Premium" sub="Check any ingredient or cream name to know if it's right for your skin. Upgrade to unlock it." onClose={() => setGate(false)} />
+          </div>
+        </div>
       )}
 
       <AppTabBar active="products" />
