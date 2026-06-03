@@ -1,22 +1,16 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { getSecureKey } from "@/lib/api-key-manager";
+import { getGenAI, aiRequestOptions } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { context, isPremium } = body;
 
-    const apiKey = getSecureKey();
-    if (!apiKey) {
-      return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
+    const genAI = getGenAI();
+    const model = genAI.getGenerativeModel({
       model: "gemini-3.1-flash-lite",
       generationConfig: { maxOutputTokens: 1500, temperature: 0.7 }
-    });
+    }, aiRequestOptions());
 
     const premiumInstruction = isPremium 
       ? "Generate a FULL, highly detailed 7-day skincare diet plan including specific timings." 

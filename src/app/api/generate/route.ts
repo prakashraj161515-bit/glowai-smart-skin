@@ -1,16 +1,13 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
-import { getSecureKey } from "@/lib/api-key-manager";
+import { HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { getGenAI, aiRequestOptions } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const apiKey = getSecureKey();
 
-    if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
+    const genAI = getGenAI();
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    
     let prompt = "";
     let imagePart: any = null;
 
@@ -108,7 +105,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
         ...((isFaceScan || isProductScan) ? { responseMimeType: "application/json" } : {})
       },
       safetySettings,
-    });
+    }, aiRequestOptions());
 
     const result = await model.generateContent(content);
     const text = result.response.text();

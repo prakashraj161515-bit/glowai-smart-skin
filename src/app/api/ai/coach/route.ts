@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getSecureKey } from "@/lib/api-key-manager";
+import { getGenAI, aiRequestOptions } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const { metrics, skinType } = await req.json();
 
-    const apiKey = getSecureKey();
-    if (!apiKey) {
-      return NextResponse.json({ error: "API key missing" }, { status: 500 });
-    }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
+    const genAI = getGenAI();
+    const model = genAI.getGenerativeModel({
       model: "gemini-3.1-flash-lite",
       generationConfig: { responseMimeType: "application/json" }
-    });
+    }, aiRequestOptions());
 
     const prompt = `
 You are the Velmora Smart Skin Coach. Analyze these metrics and provide a comprehensive skin report:

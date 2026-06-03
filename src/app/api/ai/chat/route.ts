@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getSecureKey } from "@/lib/api-key-manager";
+import { getGenAI, aiRequestOptions } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const apiKey = getSecureKey();
 
-    if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ 
+    const genAI = getGenAI();
+    const model = genAI.getGenerativeModel({
       model: "gemini-3.1-flash-lite",
       systemInstruction: `You are Aura, a warm, friendly AI skin coach inside the Cream app.
 
@@ -26,7 +22,7 @@ ANSWER STYLE (STRICT):
 
 ${body.context ? `\nUSER'S LATEST FACE SCAN: ${body.context}` : ""}`,
       generationConfig: { maxOutputTokens: 320, temperature: 0.6 }
-    });
+    }, aiRequestOptions());
 
     const chat = model.startChat({
       history: body.history || [],

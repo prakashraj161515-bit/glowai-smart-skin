@@ -2,8 +2,7 @@
 // Returns a clean verdict so the Ingredient Checker can tell the user whether
 // it's right or wrong for their skin, even for products not in our catalog.
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getSecureKey } from "@/lib/api-key-manager";
+import { getGenAI, aiRequestOptions } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
@@ -11,14 +10,12 @@ export async function POST(req: Request) {
     if (!query || !query.trim()) {
       return NextResponse.json({ error: "empty" }, { status: 400 });
     }
-    const apiKey = getSecureKey();
-    if (!apiKey) return NextResponse.json({ error: "API key missing" }, { status: 500 });
 
-    const genAI = new GoogleGenerativeAI(apiKey);
+    const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
       model: "gemini-3.1-flash-lite",
       generationConfig: { maxOutputTokens: 500, temperature: 0.3, responseMimeType: "application/json" },
-    });
+    }, aiRequestOptions());
 
     const prompt = `You are Cream's ingredient & product expert. The user typed: "${query}".
 This may be a single skincare INGREDIENT (e.g. niacinamide) OR a full CREAM / PRODUCT name
