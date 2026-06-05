@@ -31,7 +31,12 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [country, setCountry] = useState("India");
   const [waterIntake, setWaterIntake] = useState(0);
-  const showLanding = status === "unauthenticated";
+  // Local "did the user actually sign in on THIS install" marker. After a logout
+  // or an app delete/reinstall, localStorage is cleared so this is gone → we force
+  // the Google login screen again even if a stale session cookie still exists.
+  const [localAuthed, setLocalAuthed] = useState<boolean | null>(null);
+  useEffect(() => { setLocalAuthed(localStorage.getItem("velmora_authed") === "true"); }, []);
+  const showLanding = status === "unauthenticated" || (status === "authenticated" && localAuthed === false);
   const [authView, setAuthView] = useState<"welcome" | "auth">("welcome");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [obSlide, setObSlide] = useState(0);
@@ -118,6 +123,14 @@ export default function Home() {
   useEffect(() => {
     if (status === "loading") return;
     if (status === "authenticated" && session?.user) {
+      // Only treat this as a real, kept session if the user actually signed in on
+      // this install (login intent) or was already marked. A stale cookie on a
+      // fresh install has neither → we leave the marker off so the login screen shows.
+      if (sessionStorage.getItem("velmora_login_intent") === "1" || localStorage.getItem("velmora_authed") === "true") {
+        localStorage.setItem("velmora_authed", "true");
+        sessionStorage.removeItem("velmora_login_intent");
+        setLocalAuthed(true);
+      }
       setUserName(session.user.name || "User");
       setUserPic(session.user.image || null);
       const done = localStorage.getItem("velmora_onboarding_complete") === "true";
@@ -154,7 +167,8 @@ export default function Home() {
 
   // Login: Google is the only sign-in method (real OAuth account-chooser)
   const handleLogin = async (_provider: "google") => {
-    if (status === "authenticated") return;
+    // mark that THIS login is an explicit user action, so the session is kept
+    try { sessionStorage.setItem("velmora_login_intent", "1"); } catch {}
     signIn("google", { callbackUrl: "/" });
   };
 
@@ -262,7 +276,7 @@ export default function Home() {
   };
 
   // ════════════════════════ SPLASH ════════════════════════
-  if (status === "loading") {
+  if (status === "loading" || localAuthed === null) {
     return (
       <div style={{ minHeight: "100vh", background: T.bg, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20 }}>
         <div style={{ width: 80, height: 80, borderRadius: 22, background: T.accentSoft, display: "flex", alignItems: "center", justifyContent: "center" }} className="animate-spinpulse">
