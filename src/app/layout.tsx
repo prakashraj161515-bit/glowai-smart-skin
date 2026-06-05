@@ -14,8 +14,12 @@ export const metadata: Metadata = {
   description: "AI-powered personalized skin analysis, routine & product scanner.",
   themeColor: "#FAF8F6",
   icons: {
-    icon: "/logo.png?v=6",
-    apple: "/logo.png?v=6",
+    icon: [
+      { url: "/favicon-32.png?v=7", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png?v=7", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png?v=7", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png?v=7",
   },
 };
 
