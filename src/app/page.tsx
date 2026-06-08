@@ -169,6 +169,25 @@ export default function Home() {
   const handleLogin = async (_provider: "google") => {
     // mark that THIS login is an explicit user action, so the session is kept
     try { sessionStorage.setItem("velmora_login_intent", "1"); } catch {}
+    // Inside the native shell, Google blocks OAuth in a WebView. Use the native
+    // Google Sign-In bridge instead and verify the ID token server-side.
+    const native: any = typeof window !== "undefined" ? (window as any).CreamNative : null;
+    if (native?.isNative) {
+      try {
+        const res = await native.call("auth.googleSignIn");
+        if (res?.idToken) {
+          const out = await signIn("native-google", { idToken: res.idToken, redirect: false });
+          if (out?.ok) {
+            localStorage.setItem("velmora_authed", "true");
+            window.location.href = "/";
+            return;
+          }
+        }
+        return; // user cancelled or token missing — stay on login screen
+      } catch (_) {
+        // native bridge failed → fall back to the normal web OAuth flow
+      }
+    }
     signIn("google", { callbackUrl: "/" });
   };
 
