@@ -80,6 +80,9 @@ export const authOptions: AuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || "velmora-fallback-secret-key-2024",
   pages: {
-    error: "/", 
+    // Always use our own screen — never the default NextAuth signin page
+    // (which exposes the raw idToken / email credential forms).
+    signIn: "/",
+    error: "/",
   },
 };
