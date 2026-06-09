@@ -173,21 +173,31 @@ export default function Home() {
     // Google Sign-In bridge instead and verify the ID token server-side.
     const native: any = typeof window !== "undefined" ? (window as any).CreamNative : null;
     if (native?.isNative) {
+      // Inside the app NEVER fall back to web OAuth (Google blocks it in WebView).
       try {
         const res = await native.call("auth.googleSignIn");
-        if (res?.idToken) {
-          const out = await signIn("native-google", { idToken: res.idToken, redirect: false });
-          if (out?.ok) {
-            localStorage.setItem("velmora_authed", "true");
-            window.location.href = "/";
-            return;
+        if (!res || !res.idToken) {
+          // null = user cancelled the chooser; otherwise no token came back
+          if (res !== null && res !== undefined) {
+            alert("Google sign-in didn't return a token. Please try again.");
           }
+          return;
         }
-        return; // user cancelled or token missing — stay on login screen
-      } catch (_) {
-        // native bridge failed → fall back to the normal web OAuth flow
+        const out = await signIn("native-google", { idToken: res.idToken, redirect: false });
+        if (out?.ok) {
+          localStorage.setItem("velmora_authed", "true");
+          window.location.href = "/";
+          return;
+        }
+        alert("Sign-in failed on the server: " + (out?.error || "unknown") + ". Email: " + (res.email || "?"));
+        return;
+      } catch (e: any) {
+        // surface the native error so we can see exactly what's wrong (e.g. DEVELOPER_ERROR)
+        alert("Native Google sign-in error: " + (e?.message || String(e)));
+        return;
       }
     }
+    // Browser (not the app): normal web OAuth
     signIn("google", { callbackUrl: "/" });
   };
 

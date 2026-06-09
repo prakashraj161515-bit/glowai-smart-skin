@@ -30,6 +30,9 @@ export const authOptions: AuthOptions = {
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_IOS_CLIENT_ID,
             process.env.GOOGLE_ANDROID_CLIENT_ID,
+            // known web client (serverClientId used by the Flutter app) — explicit
+            // so a Vercel env mismatch can't block native login
+            "431193765034-9n84jkvsaguui308rev5krslu07ddad7.apps.googleusercontent.com",
           ].filter(Boolean);
           if (allowed.length > 0 && !allowed.includes(p.aud)) return null;
           if (p.email_verified !== true && p.email_verified !== "true") return null;
