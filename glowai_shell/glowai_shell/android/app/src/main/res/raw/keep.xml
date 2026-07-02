@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- These are referenced only at runtime by name (the ringtones via
-     RawResourceAndroidNotificationSound('ring_N'); the notification icon via
-     AndroidNotificationDetails(icon: 'ic_water_notification')), so the resource
-     shrinker can't see the usage and would strip them. Force-keep all. Without
-     the icon kept, EVERY reminder notification throws invalid_icon and fails. -->
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@raw/ring_1,@raw/ring_2,@raw/ring_3,@raw/ring_4,@raw/ring_5,@raw/ring_6,@raw/ring_7,@raw/ring_8,@raw/ring_9,@raw/ring_10,@raw/ring_11,@raw/ring_12,@raw/ring_13,@raw/ring_14,@raw/ring_15,@drawable/ic_water_notification" />
