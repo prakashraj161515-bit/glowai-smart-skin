@@ -66,7 +66,27 @@ export default function Home() {
       localStorage.setItem("velmora_premium_reset_v1", "done");
       fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: false }) }).catch(() => {});
     }
-    setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
+
+    // Sync with native shell if available
+    const syncNativeEntitlements = async () => {
+      if (typeof window !== "undefined" && window.CreamNative?.isNative) {
+        try {
+          const ents = await window.CreamNative.call("purchases.entitlements");
+          const active = Object.values(ents?.entitlements || {}).some((e: any) => e.active === true);
+          localStorage.setItem("velmora_is_premium", active ? "true" : "false");
+          setIsPremium(active);
+          // Sync with database if needed
+          fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: active }) }).catch(() => {});
+        } catch (e) {
+          console.error("Failed to sync native entitlements:", e);
+          setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
+        }
+      } else {
+        setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
+      }
+    };
+
+    syncNativeEntitlements();
   }, []);
 
   // ── Android/browser BACK button: close an open in-app view or modal instead of

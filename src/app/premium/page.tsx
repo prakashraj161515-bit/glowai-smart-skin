@@ -1,5 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
+
+declare global {
+  interface Window {
+    CreamNative?: {
+      isNative: boolean;
+      call: (action: string, payload?: any) => Promise<any>;
+    };
+  }
+}
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Badge, PrimaryBtn } from "@/glow/ui";
 import { pricing, Plan } from "@/glow/diet";
@@ -23,14 +32,51 @@ export default function PremiumPage() {
 
   const price = pricing();
 
-  useEffect(() => { setAlready(localStorage.getItem("velmora_is_premium") === "true"); }, []);
+  useEffect(() => {
+    const checkPremiumStatus = async () => {
+      if (typeof window !== "undefined" && window.CreamNative?.isNative) {
+        try {
+          const ents = await window.CreamNative.call("purchases.entitlements");
+          const active = Object.values(ents?.entitlements || {}).some((e: any) => e.active === true);
+          localStorage.setItem("velmora_is_premium", active ? "true" : "false");
+          setAlready(active);
+        } catch (e) {
+          console.error("Error fetching entitlements:", e);
+          setAlready(localStorage.getItem("velmora_is_premium") === "true");
+        }
+      } else {
+        setAlready(localStorage.getItem("velmora_is_premium") === "true");
+      }
+    };
+    checkPremiumStatus();
+  }, []);
 
-  const buy = () => {
-    localStorage.setItem("velmora_is_premium", "true");
-    // best-effort cloud persist (works once KV is connected)
-    fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
-    setDone(true);
-    setTimeout(() => router.push("/"), 1200);
+  const buy = async () => {
+    if (typeof window !== "undefined" && window.CreamNative?.isNative) {
+      try {
+        const productId = sel === "yearly" ? "premium_yearly" : "premium_monthly";
+        const result = await window.CreamNative.call("purchases.purchase", { productId });
+        const ents = result?.entitlements || {};
+        const active = Object.values(ents).some((e: any) => e.active === true);
+
+        if (active) {
+          localStorage.setItem("velmora_is_premium", "true");
+          fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
+          setDone(true);
+          setTimeout(() => router.push("/"), 1200);
+        } else {
+          alert("Purchase failed or was cancelled.");
+        }
+      } catch (e) {
+        console.error("Native purchase error:", e);
+        alert("Purchase failed: " + e);
+      }
+    } else {
+      localStorage.setItem("velmora_is_premium", "true");
+      fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
+      setDone(true);
+      setTimeout(() => router.push("/"), 1200);
+    }
   };
 
   const switchToFree = () => {
@@ -38,6 +84,30 @@ export default function PremiumPage() {
     fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: false }) }).catch(() => {});
     setAlready(false);
     router.push("/");
+  };
+
+  const restore = async () => {
+    if (typeof window !== "undefined" && window.CreamNative?.isNative) {
+      try {
+        const result = await window.CreamNative.call("purchases.restore");
+        const ents = result?.entitlements || {};
+        const active = Object.values(ents).some((e: any) => e.active === true);
+
+        if (active) {
+          localStorage.setItem("velmora_is_premium", "true");
+          fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
+          setAlready(true);
+          alert("Purchases restored successfully!");
+        } else {
+          alert("No active subscriptions found to restore.");
+        }
+      } catch (e) {
+        console.error("Native restore error:", e);
+        alert("Restore failed: " + e);
+      }
+    } else {
+      alert("Restore is only supported on mobile devices.");
+    }
   };
 
   const PlanList = (
@@ -106,7 +176,9 @@ export default function PremiumPage() {
           {done ? "Welcome to Pro ✓" : "Get Premium"}
         </PrimaryBtn>
       )}
-      <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}>Restore Purchases · Terms · Privacy</div>
+      <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}>
+        <span onClick={restore} style={{ cursor: "pointer", textDecoration: "underline" }}>Restore Purchases</span> · Terms · Privacy
+      </div>
     </div>
   );
 }
