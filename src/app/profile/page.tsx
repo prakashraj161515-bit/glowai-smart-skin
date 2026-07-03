@@ -237,7 +237,14 @@ export default function ProfilePage() {
             <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 20px" }}>You&apos;ll need to sign in again to use Creame.</p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmOut(false)} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.borderHi}`, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }}>Cancel</button>
-              <button onClick={() => { localStorage.removeItem("velmora_onboarding_complete"); localStorage.removeItem("velmora_authed"); signOut({ callbackUrl: "/" }); }} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: "#E0685C", border: "none", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff" }}>Sign Out</button>
+              <button onClick={() => {
+                localStorage.removeItem("velmora_onboarding_complete");
+                localStorage.removeItem("velmora_authed");
+                localStorage.removeItem("velmora_is_premium");
+                localStorage.removeItem("velmora_premium_until");
+                localStorage.removeItem("velmora_premium_plan");
+                signOut({ callbackUrl: "/" });
+              }} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: "#E0685C", border: "none", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff" }}>Sign Out</button>
             </div>
           </div>
         </div>

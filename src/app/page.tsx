@@ -185,10 +185,19 @@ export default function Home() {
           if (data.gender) setGender(data.gender);
           if (data.country) setCountry(data.country);
           if (data.skinType) setSkinType(data.skinType);
-          if (data.isPremium) { setIsPremium(true); localStorage.setItem("velmora_is_premium", "true"); }
+          if (data.isPremium) {
+            setIsPremium(true);
+            localStorage.setItem("velmora_is_premium", "true");
+          } else {
+            setIsPremium(false);
+            localStorage.setItem("velmora_is_premium", "false");
+          }
           // NOTE: we intentionally do NOT hide onboarding based on the cloud
           // record — a reinstall should always re-show onboarding. The user's
           // data (history/profile/premium) is still restored above.
+        } else {
+          setIsPremium(false);
+          localStorage.setItem("velmora_is_premium", "false");
         }
       }).catch(() => {});
     }
