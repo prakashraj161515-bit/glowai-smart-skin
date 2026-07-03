@@ -1,7 +1,7 @@
 name: glowai_shell
 description: "Cream — AI Skin Care & Scanner. Native shell hosting the Next.js web app inside a WebView with a 2-way native bridge."
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
