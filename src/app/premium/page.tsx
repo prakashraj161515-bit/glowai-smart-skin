@@ -50,9 +50,10 @@ export default function PremiumPage() {
     try {
       // Real Google Play Billing via Qonversion — opens the store payment sheet.
       res = await n.call("purchases.purchase", { productId: PRODUCT_IDS[sel] });
-    } catch (e) {
+    } catch (e: any) {
       // User cancelled or the payment failed → DO NOT unlock Premium.
       setBusy(false);
+      alert("Billing Error: " + (e?.message || String(e)));
       return;
     }
     setBusy(false);
