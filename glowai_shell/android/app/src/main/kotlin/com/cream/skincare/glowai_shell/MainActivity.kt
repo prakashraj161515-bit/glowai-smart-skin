@@ -36,13 +36,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun stopAlarmSound() {
-        val i = Intent(this, AlarmService::class.java).apply {
-            action = AlarmService.ACTION_STOP
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(i)
-        } else {
-            startService(i)
-        }
+        val i = Intent(this, AlarmService::class.java)
+        stopService(i)
     }
 }
