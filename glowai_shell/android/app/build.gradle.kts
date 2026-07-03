@@ -31,11 +31,18 @@ android {
         multiDexEnabled = true
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = "upload"
+            keyPassword = "creame123"
+            storeFile = file("upload-keystore.jks")
+            storePassword = "creame123"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
             // R8/minify keeps the APK small but was stripping MainActivity +
             // flutter_local_notifications/Gson, so the app crashed on launch and
             // SCHEDULED water reminders never fired in release. proguard-rules.pro
