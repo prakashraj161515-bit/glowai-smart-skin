@@ -126,17 +126,17 @@ function pick(bank: Food[], dayIdx: number, n: number): Food[] {
 // ── State / region local veg dishes (so all ingredients are easy to find) ──
 // Keyed by a normalised region/state name. All 100% vegetarian.
 const STATE_DISHES: Record<string, Food[]> = {
-  // India — states
-  maharashtra: [{ name: "Veg Thalipeeth", emoji: "🫓", why: "Multigrain, local & filling" }, { name: "Sprouts Misal (less oil)", emoji: "🫘", why: "Protein, gut-friendly" }],
-  gujarat:     [{ name: "Veg Handvo", emoji: "🟡", why: "Fermented, gut-friendly" }, { name: "Dhokla", emoji: "🟨", why: "Steamed, low-oil protein" }],
-  punjab:      [{ name: "Sarson ka saag + roti", emoji: "🥬", why: "Iron for glow" }, { name: "Rajma chawal", emoji: "🍛", why: "Protein + fibre" }],
-  delhi:       [{ name: "Chana + roti", emoji: "🫘", why: "Zinc for healing" }, { name: "Veg dalia", emoji: "🥣", why: "Light, fibre-rich" }],
-  "uttar pradesh": [{ name: "Veg tehri", emoji: "🍚", why: "Spiced rice + veggies" }, { name: "Arhar dal + rice", emoji: "🍛", why: "Clean protein" }],
-  "tamil nadu": [{ name: "Idli + sambar", emoji: "🍚", why: "Fermented, gut-friendly" }, { name: "Veg pongal", emoji: "🍲", why: "Light, easy-digest" }],
-  karnataka:   [{ name: "Ragi mudde + saaru", emoji: "🟤", why: "Calcium, calms skin" }, { name: "Bisi bele bath", emoji: "🍛", why: "Lentils + veggies" }],
-  "west bengal": [{ name: "Veg ghugni", emoji: "🫘", why: "Protein, low-oil" }, { name: "Shukto (veg)", emoji: "🥬", why: "Mixed veg, light" }],
-  kerala:      [{ name: "Veg avial", emoji: "🥥", why: "Coconut + veggies" }, { name: "Kerala red rice + sambar", emoji: "🍚", why: "Fibre + minerals" }],
-  rajasthan:   [{ name: "Gatte ki sabzi + roti", emoji: "🟡", why: "Besan protein" }, { name: "Bajra roti + veg", emoji: "🫓", why: "Iron, warming" }],
+  // India — states (simple, healthy, easy-to-find local dishes)
+  maharashtra: [{ name: "Veg Thalipeeth", emoji: "🫓", why: "Multigrain, local & filling" }, { name: "Sprouts Misal (less oil)", emoji: "🫘", why: "Protein, gut-friendly" }, { name: "Bhakri + bhaji", emoji: "🫓", why: "Whole grain, light" }, { name: "Varan bhaat", emoji: "🍛", why: "Dal + rice, easy-digest" }],
+  gujarat:     [{ name: "Veg Handvo", emoji: "🟡", why: "Fermented, gut-friendly" }, { name: "Dhokla", emoji: "🟨", why: "Steamed, low-oil protein" }, { name: "Khichdi + kadhi", emoji: "🍲", why: "Light, soothing" }, { name: "Thepla + curd", emoji: "🫓", why: "Fibre, travel-friendly" }],
+  punjab:      [{ name: "Sarson ka saag + roti", emoji: "🥬", why: "Iron for glow" }, { name: "Rajma chawal", emoji: "🍛", why: "Protein + fibre" }, { name: "Chana masala + roti", emoji: "🫘", why: "Zinc, clean protein" }, { name: "Dal + jeera rice", emoji: "🍛", why: "Light, balanced" }, { name: "Veg pulao + raita", emoji: "🍚", why: "Easy, gut-friendly" }],
+  delhi:       [{ name: "Chana + roti", emoji: "🫘", why: "Zinc for healing" }, { name: "Veg dalia", emoji: "🥣", why: "Light, fibre-rich" }, { name: "Rajma + rice", emoji: "🍛", why: "Protein + fibre" }, { name: "Mixed veg + roti", emoji: "🥗", why: "Antioxidants" }],
+  "uttar pradesh": [{ name: "Veg tehri", emoji: "🍚", why: "Spiced rice + veggies" }, { name: "Arhar dal + rice", emoji: "🍛", why: "Clean protein" }, { name: "Lauki sabzi + roti", emoji: "🥒", why: "Light, hydrating" }, { name: "Baingan bharta + roti", emoji: "🍆", why: "Fibre, low-oil" }],
+  "tamil nadu": [{ name: "Idli + sambar", emoji: "🍚", why: "Fermented, gut-friendly" }, { name: "Veg pongal", emoji: "🍲", why: "Light, easy-digest" }, { name: "Curd rice", emoji: "🍚", why: "Cooling, probiotic" }, { name: "Rasam + rice", emoji: "🍲", why: "Light, soothing" }],
+  karnataka:   [{ name: "Ragi mudde + saaru", emoji: "🟤", why: "Calcium, calms skin" }, { name: "Bisi bele bath", emoji: "🍛", why: "Lentils + veggies" }, { name: "Akki rotti + veg", emoji: "🫓", why: "Rice flour, light" }, { name: "Curd rice", emoji: "🍚", why: "Cooling, probiotic" }],
+  "west bengal": [{ name: "Veg ghugni", emoji: "🫘", why: "Protein, low-oil" }, { name: "Shukto", emoji: "🥬", why: "Mixed veg, light" }, { name: "Dal + bhaat", emoji: "🍛", why: "Simple, balanced" }, { name: "Aloo posto + rice", emoji: "🥔", why: "Light, local" }],
+  kerala:      [{ name: "Veg avial", emoji: "🥥", why: "Coconut + veggies" }, { name: "Red rice + sambar", emoji: "🍚", why: "Fibre + minerals" }, { name: "Kerala veg stew + appam", emoji: "🍲", why: "Light, soothing" }, { name: "Thoran + rice", emoji: "🥬", why: "Veg + coconut" }],
+  rajasthan:   [{ name: "Gatte ki sabzi + roti", emoji: "🟡", why: "Besan protein" }, { name: "Bajra roti + veg", emoji: "🫓", why: "Iron, warming" }, { name: "Dal baati (less ghee)", emoji: "🟤", why: "Filling, protein" }, { name: "Kadhi + rice", emoji: "🍲", why: "Light, probiotic" }],
 };
 
 // Build a 7-day plan personalised to the scan + region (+ optional state/area)
@@ -153,12 +153,13 @@ export function buildWeekPlan(country: string, scan: Scan, area?: string) {
   }
 
   const days: DayPlan[] = Array.from({ length: 7 }).map((_, d) => {
-    // mix a local regional dish into lunch/dinner so ingredients are easy to find
+    // Put the user's LOCAL area dish into BOTH lunch and dinner each day (rotating
+    // through the list) so the plan is simple, healthy and truly area-specific.
     const lunchItems = pick(bank.lunch, d, 2);
     const dinnerItems = pick(bank.dinner, d, 2);
     if (localDishes.length) {
-      if (d % 2 === 0) lunchItems[1] = localDishes[d % localDishes.length];
-      else dinnerItems[1] = localDishes[d % localDishes.length];
+      lunchItems[0] = localDishes[d % localDishes.length];
+      dinnerItems[0] = localDishes[(d + 1) % localDishes.length];
     }
     const meals: Meal[] = [
       { meal: "Breakfast", icon: "🌅", time: "8:00 AM", items: pick(bank.breakfast, d, 2) },
@@ -173,6 +174,41 @@ export function buildWeekPlan(country: string, scan: Scan, area?: string) {
     avoid: ["Fried / oily snacks", "Excess sugar & sweets", "Too much dairy (if acne-prone)", "Sugary sodas"],
     region: area || (region === "india" ? country : "Global"),
     veg: true,
+    focus: topFocus(scan),
+  };
+}
+
+// Build a 7-day plan from an AI-provided, CITY-specific food bank (simple,
+// healthy, locally-available dishes). Falls back to the static banks if empty.
+export function buildWeekFromBank(
+  bank: { breakfast?: Food[]; lunch?: Food[]; dinner?: Food[]; snack?: Food[] },
+  scan: Scan,
+  area: string,
+  avoid?: string[],
+) {
+  const region: "india" | "global" =
+    /india|pakistan|bangladesh|nepal|sri ?lanka/i.test(area) ? "india" : "global";
+  const fb = region === "india" ? BANK_INDIA : BANK_GLOBAL;
+  const ok = (a?: Food[]) => Array.isArray(a) && a.length >= 2;
+  const bf = ok(bank.breakfast) ? bank.breakfast! : fb.breakfast;
+  const ln = ok(bank.lunch) ? bank.lunch! : fb.lunch;
+  const dn = ok(bank.dinner) ? bank.dinner! : fb.dinner;
+  const sn = ok(bank.snack) ? bank.snack! : fb.snack;
+  const boosts = concernBoosts(scan, region);
+  const days: DayPlan[] = Array.from({ length: 7 }).map((_, d) => {
+    const meals: Meal[] = [
+      { meal: "Breakfast", icon: "🌅", time: "8:00 AM", items: pick(bf, d, 2) },
+      { meal: "Lunch", icon: "☀️", time: "1:00 PM", items: pick(ln, d, 2) },
+      { meal: "Dinner", icon: "🌙", time: "8:00 PM", items: pick(dn, d, 2) },
+      { meal: "Snacks", icon: "🍵", time: "Anytime", items: [...pick(sn, d, 1), ...(boosts.length ? [boosts[d % boosts.length]] : [])] },
+    ];
+    return { meals, focus: topFocus(scan) };
+  });
+  return {
+    days,
+    avoid: avoid && avoid.length ? avoid : ["Fried / oily snacks", "Excess sugar & sweets", "Sugary sodas"],
+    region: area,
+    veg: false,
     focus: topFocus(scan),
   };
 }

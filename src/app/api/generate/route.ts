@@ -7,6 +7,13 @@ import { generateWithGateway } from "@/lib/ai";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
+// Lightweight warm-up ping (used by the cron + any uptime pinger). It returns
+// instantly WITHOUT calling Gemini, just to keep this serverless function warm
+// so a real face/product scan hits a hot function instead of a cold start.
+export async function GET() {
+  return NextResponse.json({ ok: true, warm: true });
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -86,6 +93,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
   "redness": <integer 0-100, visible redness/irritation>,
   "poreSize": <integer 0-100, visible pore size, higher = larger pores>,
   "radiance": <integer 0-100, natural glow/radiance, higher = more radiant>,
+  "skinType": "<judge the skin type from the photo, EXACTLY one of: Oily | Dry | Combination | Normal | Sensitive | Acne-Prone. Rules: lots of shine/large pores = Oily; flaky/tight/dull = Dry; oily T-zone but normal cheeks = Combination; visible redness/irritation/reactive look = Sensitive; many active breakouts = Acne-Prone; balanced, clear, even = Normal>",
   "topConcern": "<the single biggest skin concern in 1-3 words, e.g. 'Excess oil' or 'Dark spots'>",
   "summary": "<ONE warm, encouraging sentence (max 18 words) for ${userName} summarising their skin today in plain simple language a beginner understands. No jargon.>",
   "report": "<a SHORT, easy-to-read markdown report for ${userName} (${gender}). Use EXACTLY these 3 sections with simple words a non-expert understands: **WHAT WE SEE** (2-3 short bullets), **WHY** (2 short bullets on likely causes), **YOUR PLAN** (3 short actionable bullets — what to do + 1 food to eat available in ${country}). Keep every bullet under 14 words. Be friendly and motivating. No medical jargon.>"
@@ -128,6 +136,7 @@ Return ONLY a valid JSON object, no extra text, in this exact format:
           redness: parsed.redness,
           poreSize: parsed.poreSize,
           radiance: parsed.radiance,
+          skinType: parsed.skinType || "",
           topConcern: parsed.topConcern || "",
           summary: parsed.summary || "",
           report: parsed.report,

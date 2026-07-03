@@ -36,6 +36,13 @@ export default function Home() {
   // the Google login screen again even if a stale session cookie still exists.
   const [localAuthed, setLocalAuthed] = useState<boolean | null>(null);
   useEffect(() => { setLocalAuthed(localStorage.getItem("velmora_authed") === "true"); }, []);
+
+  // Pre-load the other pages in the background as soon as home opens, so tapping
+  // a tab/button navigates near-instantly instead of loading the route fresh.
+  useEffect(() => {
+    ["/routine", "/store", "/coach", "/diet", "/progress", "/profile", "/premium"]
+      .forEach((p) => { try { router.prefetch(p); } catch {} });
+  }, [router]);
   const showLanding = status === "unauthenticated" || (status === "authenticated" && localAuthed === false);
   const [authView, setAuthView] = useState<"welcome" | "auth">("welcome");
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -61,32 +68,12 @@ export default function Home() {
     // One-time global reset: revoke any previously-set premium (no real payments
     // existed yet, so everyone starts fresh on the Free plan). Bump the version
     // suffix to run this again in the future.
-    if (localStorage.getItem("velmora_premium_reset_v2") !== "done") {
+    if (localStorage.getItem("velmora_premium_reset_v1") !== "done") {
       localStorage.setItem("velmora_is_premium", "false");
-      localStorage.setItem("velmora_premium_reset_v2", "done");
+      localStorage.setItem("velmora_premium_reset_v1", "done");
       fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: false }) }).catch(() => {});
     }
-
-    // Sync with native shell if available
-    const syncNativeEntitlements = async () => {
-      if (typeof window !== "undefined" && window.CreamNative?.isNative) {
-        try {
-          const ents = await window.CreamNative.call("purchases.entitlements");
-          const active = Object.values(ents?.entitlements || {}).some((e: any) => e.active === true);
-          localStorage.setItem("velmora_is_premium", active ? "true" : "false");
-          setIsPremium(active);
-          // Sync with database if needed
-          fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: active }) }).catch(() => {});
-        } catch (e) {
-          console.error("Failed to sync native entitlements:", e);
-          setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
-        }
-      } else {
-        setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
-      }
-    };
-
-    syncNativeEntitlements();
+    setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
   }, []);
 
   // ── Android/browser BACK button: close an open in-app view or modal instead of
@@ -153,6 +140,35 @@ export default function Home() {
       }
       setUserName(session.user.name || "User");
       setUserPic(session.user.image || null);
+      // Link this account to Qonversion and sync the REAL subscription state, so
+      // Premium reflects actual renewals / expiry / a purchase made on another
+      // device. We only ever UPGRADE here (grant if an entitlement is active);
+      // we never revoke based on this, to avoid false downgrades when the store
+      // isn't configured. No-ops in a plain browser (CreamNative absent).
+      (async () => {
+        try {
+          const n: any = (window as any).CreamNative;
+          if (!n?.isNative) return;
+          const email = session.user?.email;
+          if (email) { try { await n.call("purchases.identify", { userId: email }); } catch {} }
+          const res: any = await n.call("purchases.entitlements", {});
+          const ents = res?.entitlements || {};
+          let end = 0, active = false;
+          for (const k in ents) {
+            const e = ents[k];
+            if (e?.active) { active = true; if (e?.expiresAt) { const t = Date.parse(e.expiresAt); if (t) end = Math.max(end, t); } }
+          }
+          if (active) {
+            localStorage.setItem("velmora_is_premium", "true");
+            if (end) localStorage.setItem("velmora_premium_until", String(end));
+            setIsPremium(true);
+            fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true, ...(end ? { premiumUntil: end } : {}) }) }).catch(() => {});
+          }
+        } catch {}
+      })();
+      // Onboarding is gated ONLY on the local flag. A fresh install (or
+      // uninstall + reinstall) wipes it, so onboarding shows again — even for
+      // returning users. A normal app reopen keeps the flag, so it won't show.
       const done = localStorage.getItem("velmora_onboarding_complete") === "true";
       setShowOnboarding(!done);
       const h = localStorage.getItem("velmora_history");
@@ -170,7 +186,9 @@ export default function Home() {
           if (data.country) setCountry(data.country);
           if (data.skinType) setSkinType(data.skinType);
           if (data.isPremium) { setIsPremium(true); localStorage.setItem("velmora_is_premium", "true"); }
-          if (data.onboardingComplete) { localStorage.setItem("velmora_onboarding_complete", "true"); setShowOnboarding(false); }
+          // NOTE: we intentionally do NOT hide onboarding based on the cloud
+          // record — a reinstall should always re-show onboarding. The user's
+          // data (history/profile/premium) is still restored above.
         }
       }).catch(() => {});
     }
@@ -270,19 +288,18 @@ export default function Home() {
       if (d.error) throw new Error(d.error);
       if (d.product) setProduct(d.product);
       else setAi(d.text || "Scanning complete.");
-    } catch (e: any) { setAi(`⚠️ Analysis failed: ${e.message}`); } finally { setLoading(false); }
+    } catch (e: any) { setAi("⚠️ Server is busy, please try again."); } finally { setLoading(false); }
   }
 
   async function handleResult(res: any) {
     if (res.error) { alert(res.error); setView("home"); return; }
     if (scanMode === "product") { handleProductResult(res); return; }
     setView("results"); setLoading(true);
-    recordFaceScan(onboardingScanRef.current); // onboarding scan not counted; daily limit for the rest
-    onboardingScanRef.current = false;
     setData({ image: res.image, score: 0, acne: 0, oil: 0, pigmentation: 0 }); setAi("");
     try {
       const prev = history[0];
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mode: "face_scan", image: res.image, gender, userName, country, prevScan: prev || null }) });
+      if (!r.ok) throw new Error("busy"); // server overloaded (429/500/503) → not a real result
       const d = await r.json();
       if (d.error) throw new Error(d.error);
       // AI couldn't read the face (blurry / no clear face) → ask for a retry instead of a blank 0 result
@@ -306,14 +323,32 @@ export default function Home() {
         summary: d.summary || "", gender, date: new Date().toLocaleDateString(), ts: Date.now(),
       };
       setData(analysisData); setAi(d.report || d.text || "Analysis complete."); setSummary(d.summary || "");
+      // ✅ Scan SUCCEEDED → only NOW count it against the free daily limit (a
+      // server-busy / failed scan above throws and is never counted).
+      recordFaceScan(onboardingScanRef.current); // onboarding scan not counted
+      onboardingScanRef.current = false;
       const nh = [analysisData, ...history].slice(0, 30);
       setHistory(nh); localStorage.setItem("velmora_history", JSON.stringify(nh)); localStorage.setItem("velmora_analysis", JSON.stringify(analysisData));
       localStorage.setItem("velmora_ai_report", d.report || d.text || "");
-      let dt = "Combination"; if (analysisData.oil > 60) dt = "Oily"; else if (analysisData.oil < 25) dt = "Dry"; else if (analysisData.acne > 40) dt = "Acne-Prone";
+      // Prefer the AI's own skin-type call (covers Normal & Sensitive too);
+      // fall back to a simple oil/acne rule only if the AI didn't return one.
+      const valid = ["Oily", "Dry", "Combination", "Normal", "Sensitive", "Acne-Prone"];
+      let dt: string = valid.includes(d.skinType) ? d.skinType
+        : analysisData.oil > 60 ? "Oily"
+        : analysisData.oil < 25 ? "Dry"
+        : analysisData.acne > 40 ? "Acne-Prone"
+        : "Combination";
       setSkinType(dt);
       saveToCloud({ history: nh, gender, country, skinType: dt, onboardingComplete: true, isPremium });
       if (!isPremium) localStorage.setItem("velmora_last_scan_date", new Date().toLocaleDateString());
-    } catch (e: any) { setAi(`⚠️ Could not generate AI report: ${e.message}`); } finally { setLoading(false); }
+    } catch (e: any) {
+      // Server busy / failed → DON'T show a fake (all-zero) result and DON'T burn
+      // a free scan. Just tell the user and let them try again.
+      setLoading(false);
+      alert("⚠️ Server is busy, please try again.");
+      resetScanner("face");
+      return;
+    } finally { setLoading(false); }
   }
 
   const handleTab = (id: string) => {
@@ -408,7 +443,7 @@ export default function Home() {
 
           {/* AI chat banner */}
           <div onClick={() => router.push("/coach")} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 18px", borderRadius: 18, marginBottom: 20, cursor: "pointer", background: "linear-gradient(120deg, #F9DDD0 0%, #F5C9B5 100%)", border: "1px solid rgba(196,78,40,0.15)", boxShadow: "0 4px 16px rgba(196,78,40,0.10)" }}>
-            <div style={{ width: 42, height: 42, borderRadius: 13, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 4px 14px ${rgba(T.accent, 0.4)}` }}><Icon name="spark" size={22} color="#fff" fill /></div>
+            <div style={{ width: 42, height: 42, borderRadius: 13, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: `0 4px 14px ${rgba(T.accent, 0.4)}` }}><Icon name="chat" size={22} color="#fff" /></div>
             <div style={{ flex: 1 }}><div style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#2C1F1A" }}>Chat with Aura</div><div style={{ fontFamily: SANS, fontSize: 12.5, color: "rgba(44,31,26,0.55)" }}>Your AI skin coach, anytime</div></div>
             <Icon name="arrowR" size={20} color="rgba(44,31,26,0.35)" sw={2} />
           </div>
@@ -461,7 +496,9 @@ export default function Home() {
 
       {/* ─────────── SCANNER ─────────── */}
       {view === "scanner" && (
-        <div style={{ position: "fixed", inset: 0, maxWidth: 430, margin: "0 auto", background: "#0c0908", zIndex: 60, display: "flex", flexDirection: "column" }}>
+        <div style={{ position: "fixed", inset: 0, maxWidth: 430, margin: "0 auto", background: scanMode === "face"
+            ? "radial-gradient(120% 80% at 50% 28%, #5A352A 0%, #2A1A14 48%, #120B09 100%)"
+            : "radial-gradient(120% 80% at 50% 28%, #284258 0%, #16222E 48%, #0A1014 100%)", zIndex: 60, display: "flex", flexDirection: "column" }}>
           <button onClick={() => setView("home")} style={{ position: "absolute", top: 56, left: 14, zIndex: 70, width: 36, height: 36, borderRadius: 11, cursor: "pointer", background: "rgba(255,255,255,0.18)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <Icon name="chevL" size={18} color="#fff" sw={2.2} />
           </button>
@@ -530,10 +567,7 @@ function ProductResultView({ image, loading, product, ai, formatMarkdown, onBack
 
         <div style={{ padding: "0 20px", marginTop: -40, position: "relative", zIndex: 2 }}>
           {loading ? (
-            <div style={{ padding: "70px 0", textAlign: "center" }}>
-              <div className="animate-spinpulse" style={{ width: 64, height: 64, borderRadius: 99, background: T.accentSoft, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="spark" size={28} color={T.accent} fill /></div>
-              <div style={{ fontFamily: MONO, fontSize: 12, color: T.textFaint, textTransform: "uppercase", letterSpacing: 1 }}>Analysing product…</div>
-            </div>
+            <ProductLoader />
           ) : product ? (
             <>
               {/* verdict card */}
@@ -622,10 +656,8 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google") => Promise<void> }) {
 
       {/* ── top brand area ── */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "72px 28px 8px", textAlign: "center", position: "relative", zIndex: 1 }}>
-        <div className="animate-fadeup" style={{ width: 78, height: 78, borderRadius: 24, background: "linear-gradient(135deg, #F5A98D, #C44E28)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 14px 36px rgba(196,78,40,0.4)", marginBottom: 18 }}>
-          <Icon name="spark" size={38} color="#fff" fill />
-        </div>
-        <div className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>Cream · AI Skin Care &amp; Scanner</div>
+        <img className="animate-fadeup" src="/icon-192.png?v=19" alt="Cream" style={{ width: 78, height: 78, borderRadius: 22, objectFit: "cover", boxShadow: "0 14px 36px rgba(196,78,40,0.4)", marginBottom: 18 }} />
+        <div className="animate-fadeup" style={{ fontFamily: SANS, fontSize: 13, fontWeight: 800, color: "#C44E28", letterSpacing: 3, textTransform: "uppercase", marginBottom: 14 }}>Creame · AI Skin Care &amp; Scanner</div>
         <h1 className="animate-fadeup" style={{ fontFamily: SERIF, fontSize: 42, lineHeight: 1.02, color: "#2C1F1A", margin: "0 0 12px", fontWeight: 400, letterSpacing: -1 }}>
           Skin that <em>actually</em> improves.
         </h1>
@@ -657,11 +689,12 @@ function AuthScreen({ onLogin }: { onLogin: (p: "google") => Promise<void> }) {
 
 // ════════════════════════ ONBOARDING ════════════════════════
 const OB_SLIDES = [
-  { icon: "scan" as const, color: "#FEF0EB", accent: "#F0886A", title: "AI Skin Analysis", sub: "Scan your face in seconds. Cream detects 6 key metrics and gives you a personalised skin score.", label: "Smart · Accurate · Instant" },
-  { icon: "routine" as const, color: "#EFF0FD", accent: "#8B85E0", title: "Your Daily Routine", sub: "A step-by-step routine built exactly for your skin — right ingredients, right order, right timing.", label: "Personalised · Simple · Effective" },
-  { icon: "arrowUp" as const, color: "#EDF7EE", accent: "#5FAD72", title: "Track Real Progress", sub: "Watch your skin improve week by week. Compare scans, spot trends, and earn milestones.", label: "Visual · Motivating · Honest" },
-  { icon: "products" as const, color: "#FEF7EB", accent: "#D9A040", title: "Smart Ingredient Checker", sub: "Scan any product and instantly know if it's right for your skin — with zero guesswork.", label: "Safe · Curated · For You" },
-  { icon: "camera" as const, color: "#FDEDF0", accent: "#E06B8B", title: "Let's scan your skin", sub: "Your first AI skin scan takes just 3 seconds. Make sure you're in good lighting.", label: "Quick · Private · Accurate", cta: "Scan My Skin →" },
+  { icon: "scan" as const, emoji: "🤳", chips: ["✨", "🔬", "💯"], color: "#FEF0EB", accent: "#F0886A", title: "Know your skin", sub: "Just one selfie. Cream's AI reads your acne, oil, pigmentation, hydration and more — then scores your skin in seconds.", label: "AI Skin Analysis" },
+  { icon: "routine" as const, emoji: "🧴", chips: ["🌅", "🌙", "✅"], color: "#EFF0FD", accent: "#8B85E0", title: "A routine made for you", sub: "The right products, in the right order, at the right time — built around your scan, not guesswork.", label: "Daily Routine" },
+  { icon: "arrowUp" as const, emoji: "📈", chips: ["⭐", "🏆", "🔥"], color: "#EDF7EE", accent: "#5FAD72", title: "Watch your glow grow", sub: "Track your skin week by week. Compare scans, see real trends, and hit your glow-up milestones.", label: "Progress Tracking" },
+  { icon: "products" as const, emoji: "🔍", chips: ["🧪", "🧴", "✅"], color: "#FEF7EB", accent: "#D9A040", title: "Scan before you buy", sub: "Point at any product and instantly know if it suits your skin — ingredients decoded, zero guesswork.", label: "Ingredient Checker" },
+  { icon: "drop" as const, emoji: "💧", chips: ["🔔", "🌙", "🥤"], color: "#EAF6FB", accent: "#3FA9D6", title: "Stay hydrated, glow more", sub: "Gentle water reminders with your own ringtone and timing. Sleep Mode keeps your nights quiet.", label: "Water Reminders" },
+  { icon: "camera" as const, emoji: "📸", chips: ["✨", "🔒", "⚡"], color: "#FDEDF0", accent: "#E06B8B", title: "Ready for your first scan?", sub: "It takes just 3 seconds. Find good light, look straight at the camera, and let Cream do the rest.", label: "Let's Begin", cta: "Scan My Skin →" },
 ];
 function OnboardingScreen({ slide, setSlide, onScan, onDone }: { slide: number; setSlide: (n: number) => void; onScan: () => void; onDone: () => void }) {
   const [visible, setVisible] = useState(true);
@@ -670,25 +703,51 @@ function OnboardingScreen({ slide, setSlide, onScan, onDone }: { slide: number; 
   const go = (n: number) => { setVisible(false); setTimeout(() => { setSlide(n); setVisible(true); }, 200); };
   const cta = () => { if (s.cta) onScan(); else if (isLast) onDone(); else go(slide + 1); };
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: T.bg, overflow: "hidden" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", padding: "62px 22px 0" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: `radial-gradient(140% 80% at 50% -10%, ${rgba(s.accent, 0.18)} 0%, ${rgba(s.accent, 0.05)} 40%, ${T.bg} 72%)`, overflow: "hidden", transition: "background .5s ease" }}>
+      {/* top: segmented progress + page count + skip */}
+      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "60px 24px 0" }}>
+        <div style={{ flex: 1, display: "flex", gap: 6 }}>
+          {OB_SLIDES.map((_, i) => (
+            <div key={i} onClick={() => go(i)} style={{ flex: 1, height: 4, borderRadius: 99, cursor: "pointer", background: i <= slide ? s.accent : rgba(s.accent, 0.18), transition: "background .4s ease" }} />
+          ))}
+        </div>
+        <span style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 700, color: s.accent, letterSpacing: 0.5 }}>{slide + 1}<span style={{ color: T.textFaint, fontWeight: 600 }}>/{OB_SLIDES.length}</span></span>
         <button onClick={onDone} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: SANS, fontSize: 14, fontWeight: 600, color: T.textMute }}>Skip</button>
       </div>
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 28px 0", opacity: visible ? 1 : 0, transform: visible ? "scale(1)" : "scale(0.93)", transition: "opacity .22s ease, transform .22s ease" }}>
-        <div style={{ width: "100%", borderRadius: 32, background: s.color, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "44px 28px", boxShadow: `0 20px 60px ${rgba(s.accent, 0.16)}` }}>
-          <div className={isLast ? "animate-spinpulse" : ""} style={{ width: 96, height: 96, borderRadius: 99, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20, boxShadow: `0 12px 36px ${rgba(s.accent, 0.22)}` }}><Icon name={s.icon} size={44} color={s.accent} sw={1.6} /></div>
-          <div style={{ padding: "6px 14px", borderRadius: 99, background: rgba(s.accent, 0.14), fontFamily: SANS, fontSize: 11.5, fontWeight: 700, color: s.accent, letterSpacing: 0.3 }}>{s.label}</div>
+
+      {/* hero — open, cardless, glowing icon */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 28px", opacity: visible ? 1 : 0, transform: visible ? "scale(1)" : "scale(0.9)", transition: "opacity .3s ease, transform .3s ease" }}>
+        <div style={{ position: "relative" }}>
+          {/* soft brand glow */}
+          <div style={{ position: "absolute", inset: -40, borderRadius: 44, background: rgba(s.accent, 0.26), filter: "blur(38px)" }} />
+          {/* iOS-style app icon: squircle, vertical gloss gradient, hairline border */}
+          <div className={isLast ? "animate-spinpulse" : ""} style={{ position: "relative", width: 130, height: 130, borderRadius: 30, overflow: "hidden", background: `linear-gradient(180deg, ${s.accent} 0%, ${rgba(s.accent, 0.72)} 100%)`, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 18px 40px ${rgba(s.accent, 0.42)}`, border: "1px solid rgba(255,255,255,0.18)" }}>
+            {/* top sheen (iOS gloss) */}
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "52%", background: "linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.04))" }} />
+            {/* inner top highlight line */}
+            <div style={{ position: "absolute", top: 1, left: 10, right: 10, height: 1, background: "rgba(255,255,255,0.45)", borderRadius: 99 }} />
+            <Icon name={s.icon} size={60} color="#fff" sw={1.9} />
+          </div>
         </div>
       </div>
-      <div style={{ padding: "26px 28px 0", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(10px)", transition: "opacity .26s ease, transform .26s ease" }}>
-        <h2 style={{ fontFamily: SERIF, fontSize: 36, lineHeight: 1.05, color: T.text, margin: "0 0 10px", fontWeight: 400, letterSpacing: -0.3 }}>{s.title}</h2>
-        <p style={{ fontFamily: SANS, fontSize: 15, color: T.textMute, lineHeight: 1.6, margin: 0 }}>{s.sub}</p>
+
+      {/* copy */}
+      <div style={{ padding: "0 30px", textAlign: "center", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(14px)", transition: "opacity .34s ease, transform .34s ease" }}>
+        <div style={{ fontFamily: SANS, fontSize: 11.5, fontWeight: 800, color: s.accent, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 12 }}>{s.label}</div>
+        <h2 style={{ fontFamily: SERIF, fontSize: 38, lineHeight: 1.05, color: T.text, margin: "0 0 12px", fontWeight: 400, letterSpacing: -0.5 }}>{s.title}</h2>
+        <p style={{ fontFamily: SANS, fontSize: 15.5, color: T.textMute, lineHeight: 1.65, margin: "0 auto", maxWidth: 340 }}>{s.sub}</p>
       </div>
-      <div style={{ padding: "22px 28px 36px" }}>
-        <div style={{ display: "flex", justifyContent: "center", gap: 7, marginBottom: 20 }}>
-          {OB_SLIDES.map((_, i) => <div key={i} onClick={() => go(i)} style={{ cursor: "pointer", width: i === slide ? 22 : 7, height: 7, borderRadius: 99, background: i === slide ? s.accent : T.border, transition: "all .3s ease" }} />)}
+
+      {/* controls */}
+      <div style={{ padding: "30px 28px 40px", display: "flex", alignItems: "center", gap: 12 }}>
+        {slide > 0 && (
+          <button onClick={() => go(slide - 1)} style={{ width: 56, height: 56, flexShrink: 0, borderRadius: 18, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center" }} aria-label="Back">
+            <Icon name="chevL" size={20} color={T.text} sw={2.2} />
+          </button>
+        )}
+        <div style={{ flex: 1 }}>
+          <PrimaryBtn style={{ background: s.accent, boxShadow: `0 10px 28px ${rgba(s.accent, 0.40)}` }} onClick={cta}>{s.cta || (isLast ? "Get Started" : "Next")}</PrimaryBtn>
         </div>
-        <PrimaryBtn style={{ background: s.accent, boxShadow: `0 8px 22px ${rgba(s.accent, 0.35)}` }} onClick={cta}>{s.cta || (isLast ? "Get Started" : "Next")}</PrimaryBtn>
       </div>
     </div>
   );
@@ -718,6 +777,47 @@ function ProcessingScreen({ image }: { image?: string }) {
       </div>
     </div>
   );
+}
+
+// Staged loader for the product scan — cycles friendly steps so the wait feels
+// fast and intentional instead of a bare spinner.
+function ProductLoader() {
+  const stages = ["Reading the label…", "Identifying the product…", "Checking ingredients…", "Preparing your verdict…"];
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setI(x => Math.min(x + 1, stages.length - 1)), 1400);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div style={{ padding: "70px 0", textAlign: "center" }}>
+      <div className="animate-spinpulse" style={{ width: 64, height: 64, borderRadius: 99, background: T.accentSoft, margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="spark" size={28} color={T.accent} fill /></div>
+      <div style={{ fontFamily: SANS, fontSize: 15, color: T.textMute, height: 22, transition: "all .3s" }}>{stages[i]}</div>
+      <div style={{ display: "flex", gap: 7, marginTop: 16, justifyContent: "center" }}>
+        {stages.map((_, x) => <span key={x} style={{ width: x === i ? 22 : 7, height: 7, borderRadius: 99, background: x <= i ? T.accent : T.surface2, transition: "all .3s" }} />)}
+      </div>
+    </div>
+  );
+}
+
+// Pick up to 3 products from OUR store that match the scan's concerns. Soft,
+// helpful suggestions — never forced. Returns [] when nothing clearly matches.
+function recommendForScan(data: any): any[] {
+  const wants: string[] = [];
+  if ((data.acne || 0) >= 35) wants.push("acne", "pimple", "oil control");
+  if ((data.oil || 0) >= 55) wants.push("oil control", "pore", "blackhead");
+  if ((data.pigmentation || 0) >= 35) wants.push("dark spot", "brightening", "vitamin c", "pigment");
+  if ((data.redness || 0) >= 30 || data.skinType === "Sensitive") wants.push("sensitive", "gentle", "soothing", "aloe", "barrier");
+  if ((typeof data.hydration === "number" && data.hydration < 45) || data.skinType === "Dry") wants.push("hydrating", "dry skin", "hyaluronic", "ceramide", "barrier");
+  if (!wants.length) wants.push("daily", "gentle", "barrier", "all skin"); // healthy → maintenance
+  const scored = ALL_PRODUCTS.map((p: any) => {
+    let s = 0;
+    for (const t of p.tags) for (const w of wants) { if (t.includes(w) || w.includes(t)) { s++; break; } }
+    return { p, s: s + (p.bestseller ? 0.4 : 0) + (p.rating || 0) / 25 };
+  }).filter((x: any) => x.s >= 1).sort((a: any, b: any) => b.s - a.s);
+  const out: any[] = []; const cats = new Set<string>();
+  for (const { p } of scored) { if (out.length >= 3) break; if (cats.has(p.cat)) continue; cats.add(p.cat); out.push(p); }
+  for (const { p } of scored) { if (out.length >= 3) break; if (!out.includes(p)) out.push(p); }
+  return out.slice(0, 3);
 }
 
 // ════════════════════════ RESULTS ════════════════════════
@@ -822,9 +922,39 @@ function ResultsView({ data, ai, summary, history, formatMarkdown, openReport, s
         </div>
       )}
 
+      {/* Soft, scan-based suggestions from our store — optional, not pushy */}
+      {(() => {
+        const recs = recommendForScan(data);
+        if (!recs.length) return null;
+        return (
+          <div style={{ marginBottom: 20 }}>
+            <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 0.8 }}>Suggested for your skin</span>
+            <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, margin: "3px 0 12px" }}>Optional picks based on your scan — no pressure 🙂</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              {recs.map((p: any) => {
+                const img = productImg(p.name);
+                return (
+                  <a key={p.asin} href={p.link} target="_blank" rel="sponsored noopener noreferrer" style={{ textDecoration: "none", borderRadius: 16, overflow: "hidden", background: T.surface, boxShadow: T.shadow, display: "flex", flexDirection: "column" }}>
+                    <div style={{ height: 86, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", padding: 7 }}>
+                      {img && <img src={img} alt={p.name} loading="lazy" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />}
+                    </div>
+                    <div style={{ padding: "7px 8px 9px" }}>
+                      <div style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 700, color: T.text, lineHeight: 1.25, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{p.name}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 3, marginTop: 4 }}>
+                        <Icon name="star" size={10} color="#F0A52C" fill /><span style={{ fontFamily: SANS, fontSize: 10, fontWeight: 700, color: T.textMute }}>{p.rating}</span>
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* product recs */}
       <div style={{ display: "flex", gap: 10, marginBottom: 14 }}>
-        <GhostBtn onClick={onProducts}>Product Recs</GhostBtn>
+        <GhostBtn onClick={onProducts}>Browse Store</GhostBtn>
         <GhostBtn onClick={onBack}>Done</GhostBtn>
       </div>
 

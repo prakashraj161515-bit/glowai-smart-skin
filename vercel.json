@@ -2,16 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "next build",
   "outputDirectory": ".next",
-  "cleanUrls": true,
-  "experimentalServices": {
-    "frontend": {
-      "routePrefix": "/",
-      "framework": "nextjs"
-    },
-    "backend": {
-      "root": "backend",
-      "entrypoint": "main:app",
-      "routePrefix": "/_/backend"
-    }
-  }
+  "cleanUrls": true
 }

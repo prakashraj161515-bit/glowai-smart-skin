@@ -200,6 +200,14 @@ html, body {
 .draw-line { stroke-dasharray: 1; stroke-dashoffset: 1; animation: dashdraw 1.3s ease forwards; }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+/* onboarding floating elements */
+.ob-emoji { animation: float 4s ease-in-out infinite; }
+.ob-c1 { animation: float 3.2s ease-in-out infinite; }
+.ob-c2 { animation: float 3.9s ease-in-out infinite .5s; }
+.ob-c3 { animation: float 2.9s ease-in-out infinite .9s; }
+@keyframes obpop { 0% { transform: scale(.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.ob-pop { animation: obpop .45s cubic-bezier(.3,1.4,.5,1) both; }
+
 /* ── Desktop / wide-screen backdrop (mobile stays edge-to-edge) ── */
 .app-bg {
   min-height: 100vh;

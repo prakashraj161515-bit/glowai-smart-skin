@@ -119,18 +119,21 @@ export default function StorePage() {
   // AI lookup for anything not in our DB (any cream / product / ingredient)
   const [ingAI, setIngAI] = useState<any>(null);
   const [ingBusy, setIngBusy] = useState(false);
+  const [ingErr, setIngErr] = useState(false);
   useEffect(() => {
     const t = ingQ.trim();
-    setIngAI(null);
+    setIngAI(null); setIngErr(false);
     if (!t || ingLocal) { setIngBusy(false); return; }
     setIngBusy(true);
     const ctrl = new AbortController();
     const timer = setTimeout(async () => {
       try {
         const r = await fetch("/api/ingredient", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: t }), signal: ctrl.signal });
+        if (!r.ok) throw new Error("busy");
         const d = await r.json();
         if (d.result) setIngAI(d.result);
-      } catch {} finally { setIngBusy(false); }
+        else if (d.error) setIngErr(true);
+      } catch (e: any) { if (e?.name !== "AbortError") setIngErr(true); } finally { setIngBusy(false); }
     }, 650); // debounce while typing
     return () => { clearTimeout(timer); ctrl.abort(); };
   }, [ingQ, ingLocal]);
@@ -251,6 +254,13 @@ export default function StorePage() {
             <Icon name="info" size={18} color={T.textMute} />
             <input autoFocus value={ingQ} onChange={e => setIngQ(e.target.value)} placeholder="e.g. niacinamide, retinol, or a cream name" style={{ flex: 1, border: "none", outline: "none", background: "transparent", fontFamily: SANS, fontSize: 15, color: T.text }} />
           </div>
+          {/* server busy */}
+          {!ingResult && !ingBusy && ingErr && ingQ.trim() && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 16, background: "rgba(224,104,92,0.10)", border: "1px solid rgba(224,104,92,0.25)" }}>
+              <Icon name="warn" size={18} color="#E0685C" />
+              <span style={{ fontFamily: SANS, fontSize: 13.5, fontWeight: 600, color: "#C0524A" }}>Server is busy, please try again.</span>
+            </div>
+          )}
           {/* AI searching state */}
           {!ingResult && ingBusy && ingQ.trim() && (
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: 16, borderRadius: 16, background: T.surface2 }}>

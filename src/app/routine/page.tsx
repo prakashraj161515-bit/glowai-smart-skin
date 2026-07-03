@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, MiniRing, PrimaryBtn, WaterTracker, ProductThumb, BuyBtn } from "@/glow/ui";
 import AppTabBar from "@/glow/AppTabBar";
-import { getWeekPlan, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/diet";
+import { getWeekPlan, buildWeekFromBank, detectCountry, planAgeDays, foodImg, Meal } from "@/glow/diet";
 import { productImg } from "@/glow/affiliate";
 
 const DAY_LETTERS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
@@ -48,28 +48,32 @@ export default function RoutinePage() {
   const [country, setCountry] = useState("India");
   const [area, setArea] = useState("");
   const [scan, setScan] = useState<any>({ acne: 30, oil: 45, pigmentation: 25, hydration: 55, score: 74 });
-  const [reminders, setReminders] = useState<number[]>([]);
-  const [alarm, setAlarm] = useState<number | null>(null);
+  const [aiBank, setAiBank] = useState<any>(null); // city-specific food from AI
   const stripRef = useRef<HTMLDivElement>(null);
   const dayRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const audioRef = useRef<any>(null);
 
   // ── daily refresh: water + checks reset every new day ──
   useEffect(() => {
     const today = new Date().toDateString();
     const lastDay = localStorage.getItem("velmora_routine_day");
     const c = localStorage.getItem("velmora_country") || detectCountry(); setCountry(c);
-    setArea(localStorage.getItem("velmora_area") || "");
-    // detect real area (city, country) from IP via our edge geo endpoint
-    fetch("/api/geo").then(r => r.json()).then((g) => {
-      // build a rich area string incl. state so the diet can localise dishes
-      const full = [g.city, STATE_NAMES[`${g.countryCode}-${g.region}`] || "", g.country].filter(Boolean).join(", ");
-      const areaStr = full || g.area || "";
-      if (areaStr) { setArea(areaStr); localStorage.setItem("velmora_area", areaStr); }
-      if (g.country) { setCountry(g.country); localStorage.setItem("velmora_country", g.country); }
-    }).catch(() => {});
+    // ?area=City,Country overrides the detected location (handy for testing/demo).
+    const override = new URLSearchParams(window.location.search).get("area");
+    if (override) {
+      setArea(override); // temporary (not saved) — normal location returns next open
+      setTab("Diet Plan"); // land directly on the diet for the demo
+    } else {
+      setArea(localStorage.getItem("velmora_area") || "");
+      // detect real area (city, country) from IP via our edge geo endpoint
+      fetch("/api/geo").then(r => r.json()).then((g) => {
+        // build a rich area string incl. state so the diet can localise dishes
+        const full = [g.city, STATE_NAMES[`${g.countryCode}-${g.region}`] || "", g.country].filter(Boolean).join(", ");
+        const areaStr = full || g.area || "";
+        if (areaStr) { setArea(areaStr); localStorage.setItem("velmora_area", areaStr); }
+        if (g.country) { setCountry(g.country); localStorage.setItem("velmora_country", g.country); }
+      }).catch(() => {});
+    }
     const a = localStorage.getItem("velmora_analysis"); if (a) { try { setScan(JSON.parse(a)); } catch {} }
-    try { const r = JSON.parse(localStorage.getItem("velmora_reminders") || "[]"); setReminders(r); } catch {}
 
     if (lastDay !== today) {
       // new day → reset water + all checks
@@ -77,7 +81,6 @@ export default function RoutinePage() {
       setChecked(ITEMS.map(() => false));
       localStorage.setItem("velmora_routine_checks", JSON.stringify(ITEMS.map(() => false)));
       localStorage.setItem("velmora_routine_day", today);
-      localStorage.removeItem("velmora_alarm_fired");
     } else {
       const w = localStorage.getItem("velmora_water_intake"); if (w) setWater(parseInt(w));
       try { const ch = JSON.parse(localStorage.getItem("velmora_routine_checks") || "null"); if (ch) setChecked(ch); } catch {}
@@ -90,88 +93,29 @@ export default function RoutinePage() {
     if (el) el.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }, [selIdx]);
 
-  // ── alarm clock: ring when a reminder time arrives ──
+  // Fetch CITY/DISTRICT-specific simple healthy food from AI (cached per area
+  // for a week). Falls back to the built-in region plan if it fails.
   useEffect(() => {
-    const id = setInterval(() => {
-      const now = new Date();
-      const hhmm = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
-      let fired: string[] = [];
-      try { fired = JSON.parse(localStorage.getItem("velmora_alarm_fired") || "[]"); } catch {}
-      reminders.forEach(idx => {
-        const it = ITEMS[idx]; if (!it) return;
-        let [h, m] = it.time.split(":").map(Number);
-        if (it.period === "PM" && h !== 12) h += 12;
-        if (it.period === "AM" && h === 12) h = 0;
-        const key = `${idx}-${h}:${String(m).padStart(2, "0")}`;
-        if (`${h}:${String(m).padStart(2, "0")}` === hhmm && !fired.includes(key)) {
-          fired.push(key); localStorage.setItem("velmora_alarm_fired", JSON.stringify(fired));
-          ringAlarm(idx);
-        }
-      });
-    }, 15000);
-    return () => clearInterval(id);
-  }, [reminders]);
-
-  // a single loud, piercing "ring" — siren sweep + harmonic, square wave, high gain
-  const ringPulse = (ctx: AudioContext, t0: number) => {
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, t0);
-    master.gain.exponentialRampToValueAtTime(0.9, t0 + 0.02);   // loud attack
-    master.gain.setValueAtTime(0.9, t0 + 0.34);
-    master.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
-    master.connect(ctx.destination);
-    // siren tone that sweeps up — attention-grabbing
-    const o1 = ctx.createOscillator();
-    o1.type = "square"; o1.frequency.setValueAtTime(740, t0);
-    o1.frequency.exponentialRampToValueAtTime(1180, t0 + 0.3);
-    // bright harmonic on top
-    const o2 = ctx.createOscillator();
-    o2.type = "sawtooth"; o2.frequency.setValueAtTime(1480, t0);
-    o2.frequency.exponentialRampToValueAtTime(2360, t0 + 0.3);
-    const g2 = ctx.createGain(); g2.gain.value = 0.35; o2.connect(g2); g2.connect(master);
-    o1.connect(master);
-    o1.start(t0); o2.start(t0); o1.stop(t0 + 0.42); o2.stop(t0 + 0.42);
-  };
-
-  const ringAlarm = (idx: number) => {
-    setAlarm(idx);
+    if (!area) return;
+    const WEEK = 7 * 24 * 60 * 60 * 1000;
     try {
-      const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
-      const ctx = new Ctx(); audioRef.current = ctx;
-      if (ctx.state === "suspended") ctx.resume();
-      const beep = () => ringPulse(ctx, ctx.currentTime);
-      beep();
-      const loop = setInterval(beep, 520);   // rapid, urgent cadence
-      audioRef.current._loop = loop;
-      audioRef.current._timeout = setTimeout(() => stopAlarm(), 60000);
+      const raw = localStorage.getItem("velmora_localfoods_v2_veg");
+      if (raw) {
+        const c = JSON.parse(raw);
+        if (c.area === area && Date.now() - (c.at || 0) < WEEK && c.bank) { setAiBank(c.bank); return; }
+      }
     } catch {}
-    if (navigator.vibrate) navigator.vibrate([400, 150, 400, 150, 400, 150, 400]);
-  };
-  const stopAlarm = () => {
-    setAlarm(null);
-    const ctx = audioRef.current;
-    if (ctx) { clearInterval(ctx._loop); clearTimeout(ctx._timeout); try { ctx.close(); } catch {} audioRef.current = null; }
-  };
-
-  const previewBeep = () => {
-    try {
-      const Ctx = (window as any).AudioContext || (window as any).webkitAudioContext;
-      const ctx = new Ctx();
-      if (ctx.state === "suspended") ctx.resume();
-      ringPulse(ctx, ctx.currentTime);   // one loud preview ring
-      setTimeout(() => { try { ctx.close(); } catch {} }, 700);
-    } catch {}
-    if (navigator.vibrate) navigator.vibrate([200, 80, 200]);
-  };
-  const toggleReminder = (idx: number) => {
-    setReminders(r => {
-      const has = r.includes(idx);
-      const next = has ? r.filter(x => x !== idx) : [...r, idx];
-      localStorage.setItem("velmora_reminders", JSON.stringify(next));
-      if (!has) previewBeep(); // ring once when turning ON
-      return next;
-    });
-  };
+    let cancelled = false;
+    fetch("/api/ai/localfoods", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ area, focus: scan ? "" : "" }),
+    }).then(r => r.json()).then(({ bank }) => {
+      if (cancelled || !bank) return;
+      setAiBank(bank);
+      try { localStorage.setItem("velmora_localfoods_v2_veg", JSON.stringify({ area, bank, at: Date.now() })); } catch {}
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [area]);
 
   const setW = (v: number) => { setWater(v); localStorage.setItem("velmora_water_intake", String(v)); };
   const setCheckedSaved = (fn: (c: boolean[]) => boolean[]) => setChecked(c => { const n = fn(c); localStorage.setItem("velmora_routine_checks", JSON.stringify(n)); return n; });
@@ -179,7 +123,10 @@ export default function RoutinePage() {
   const doneCount = checked.filter(Boolean).length;
   const pct = Math.round((doneCount / ITEMS.length) * 100);
   const sections = [...new Set(ITEMS.map(i => i.section))];
-  const weekPlan = useMemo(() => getWeekPlan(country, scan, area), [country, scan, area]);
+  const weekPlan = useMemo(
+    () => (aiBank ? buildWeekFromBank(aiBank, scan, area || country, aiBank.avoid) : getWeekPlan(country, scan, area)),
+    [aiBank, country, scan, area]
+  );
   const dayPlan = weekPlan.days[selIdx % 7];
 
   return (
@@ -260,9 +207,6 @@ export default function RoutinePage() {
                           <div style={{ fontFamily: SANS, fontSize: 11, color: T.textMute, marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{brand}</div>
                         </div>
                         <BuyBtn name={name} variant="icon" style={{ width: 28, height: 28, borderRadius: 9 }} />
-                        <button onClick={e => { e.stopPropagation(); toggleReminder(idx); }} title="Set reminder" style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, cursor: "pointer", border: "none", background: reminders.includes(idx) ? rgba("#E8A24C", 0.16) : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Icon name={reminders.includes(idx) ? "bellRing" : "bell"} size={16} color={reminders.includes(idx) ? "#E8A24C" : T.textFaint} sw={1.8} fill={reminders.includes(idx)} />
-                        </button>
                         <button onClick={e => { e.stopPropagation(); setCheckedSaved(c => c.map((v, x) => x === idx ? !v : v)); }} style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, cursor: "pointer", border: "1.5px solid " + (checked[idx] ? T.accent : T.borderHi), background: checked[idx] ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .2s" }}>
                           {checked[idx] && <Icon name="check" size={14} color="#fff" sw={2.8} />}
                         </button>
@@ -279,21 +223,6 @@ export default function RoutinePage() {
         )}
       </div>
 
-      {/* ── ALARM overlay ── */}
-      {alarm !== null && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, maxWidth: 430, margin: "0 auto", background: "linear-gradient(160deg, #2C1F1A, #1a1310)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 22, padding: 30 }}>
-          <div className="animate-spinpulse" style={{ width: 110, height: 110, borderRadius: 99, background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 0 40px ${T.accent}` }}>
-            <Icon name="bellRing" size={52} color="#fff" sw={2} fill />
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <div style={{ fontFamily: MONO, fontSize: 38, fontWeight: 700, color: "#fff" }}>{ITEMS[alarm].time} {ITEMS[alarm].period}</div>
-            <div style={{ fontFamily: SERIF, fontSize: 26, color: "#fff", marginTop: 6 }}>{ITEMS[alarm].name}</div>
-            <div style={{ fontFamily: SANS, fontSize: 14, color: "rgba(255,255,255,0.6)", marginTop: 4 }}>Time for your skincare step ✦</div>
-          </div>
-          <button onClick={() => { setCheckedSaved(c => c.map((v, x) => x === alarm ? true : v)); stopAlarm(); }} style={{ width: "100%", maxWidth: 300, height: 56, borderRadius: 16, border: "none", cursor: "pointer", background: T.accent, color: "#241712", fontFamily: SANS, fontSize: 17, fontWeight: 700 }}>Done · Stop alarm</button>
-          <button onClick={stopAlarm} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.55)", fontFamily: SANS, fontSize: 14, fontWeight: 600 }}>Snooze / dismiss</button>
-        </div>
-      )}
 
       <AppTabBar active="routine" />
     </div>
@@ -303,19 +232,6 @@ export default function RoutinePage() {
 function DietPlan({ day, avoid, region, focus, area, dayName, onAsk }: { day: any; avoid: string[]; region: string; focus: string; area: string; dayName: string; onAsk: () => void }) {
   return (
     <div>
-      {/* healthy plan intro — now shows the detected area */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 15px", borderRadius: 16, marginBottom: 18, background: "linear-gradient(135deg, rgba(127,179,137,0.16), rgba(127,179,137,0.06))", border: "1px solid rgba(127,179,137,0.3)" }}>
-        <div style={{ width: 38, height: 38, borderRadius: 12, flexShrink: 0, background: "rgba(127,179,137,0.22)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🥗</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-            <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 800, color: "#3F7A52" }}>Veg, skin-friendly meals</div>
-            <span style={{ fontFamily: SANS, fontSize: 9.5, fontWeight: 800, color: "#fff", background: "#5FA572", padding: "2px 7px", borderRadius: 99, letterSpacing: 0.3 }}>🌱 100% VEG</span>
-          </div>
-          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>
-            {area ? <>📍 {area} · </> : null}local foods to help {focus}.
-          </div>
-        </div>
-      </div>
       {day?.meals.map((meal: Meal) => (
         <div key={meal.meal} style={{ marginBottom: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
@@ -341,6 +257,62 @@ function DietPlan({ day, avoid, region, focus, area, dayName, onAsk }: { day: an
           </div>
         </div>
       ))}
+
+      {/* Fruits — skin-friendly fruits to add daily */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(240,136,106,0.16)", fontSize: 15 }}>🍓</div>
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 1 }}>Fruits</span>
+          <span style={{ fontFamily: SANS, fontSize: 11, color: T.textFaint }}>add 1–2 daily</span>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {[
+            { name: "Papaya", emoji: "🥭", why: "Vitamin A — brightens & clears skin" },
+            { name: "Orange", emoji: "🍊", why: "Vitamin C for collagen & glow" },
+            { name: "Pomegranate", emoji: "🍎", why: "Antioxidants, even skin tone" },
+            { name: "Banana", emoji: "🍌", why: "Potassium, keeps skin soft" },
+            { name: "Watermelon", emoji: "🍉", why: "Hydrating, light & cooling" },
+          ].map((f, k) => (
+            <div key={f.name + k} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 3px 12px rgba(60,30,20,0.06)" }}>
+              <div style={{ width: 50, height: 50, borderRadius: 14, flexShrink: 0, background: "rgba(240,136,106,0.14)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>{f.emoji}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: T.text }}>{f.name}</div>
+                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>{f.why}</div>
+              </div>
+              <Icon name="check" size={16} color="#7FB389" sw={2.4} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Dry fruits & nuts — great for skin */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(180,130,80,0.18)", fontSize: 15 }}>🌰</div>
+          <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 1 }}>Dry Fruits &amp; Nuts</span>
+          <span style={{ fontFamily: SANS, fontSize: 11, color: T.textFaint }}>a small handful daily</span>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {[
+            { name: "Almonds", emoji: "🌰", why: "Vitamin E — repairs & softens skin" },
+            { name: "Walnuts", emoji: "🌰", why: "Omega-3 — natural glow" },
+            { name: "Cashews", emoji: "🥜", why: "Zinc & copper — clearer skin" },
+            { name: "Pistachios", emoji: "🥜", why: "Antioxidants — fights dullness" },
+            { name: "Dates", emoji: "🌴", why: "Iron — bright, healthy skin" },
+          ].map((f, k) => (
+            <div key={f.name + k} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, boxShadow: "0 3px 12px rgba(60,30,20,0.06)" }}>
+              <div style={{ width: 50, height: 50, borderRadius: 14, flexShrink: 0, background: "rgba(180,130,80,0.14)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28 }}>{f.emoji}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontFamily: SANS, fontSize: 14.5, fontWeight: 700, color: T.text }}>{f.name}</div>
+                <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, marginTop: 2 }}>{f.why}</div>
+              </div>
+              <Icon name="check" size={16} color="#7FB389" sw={2.4} />
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Eat more — healthy skin-friendly staples */}
       <div style={{ marginBottom: 18 }}>

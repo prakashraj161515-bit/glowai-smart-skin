@@ -126,7 +126,7 @@ class NativeBridge {
         return true;
       case 'notifications.local':
         await NotificationService.instance.showLocal(
-          title: (p['title'] ?? 'Cream').toString(),
+          title: (p['title'] ?? 'Creame').toString(),
           body: (p['body'] ?? '').toString(),
           payload: p['payload']?.toString(),
         );

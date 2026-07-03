@@ -85,10 +85,7 @@ export default function CoachPage() {
       reply = reply.replace(/^[\-*]\s+/gm, "• ").trim(); // keep **bold** markers for highlighting
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: reply, actions: true }));
     } catch {
-      // graceful, still-helpful fallback that uses scan data locally
-      let s: any = {}; try { s = JSON.parse(localStorage.getItem("velmora_analysis") || "{}"); } catch {}
-      const top = s.topConcern || (s.oil > 50 ? "excess oil" : s.acne > 35 ? "breakouts" : s.pigmentation > 35 ? "dark spots" : "mild dehydration");
-      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: `Based on your scan, your main concern looks like ${top}. Keep a simple routine — gentle cleanser, a targeted serum, moisturizer and daily SPF — stay hydrated, and avoid fried/sugary foods. Want a product or diet tip for it?`, actions: true }));
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "⚠️ Server is busy, please try again." }));
     } finally { setBusy(false); }
   };
 
@@ -107,7 +104,7 @@ export default function CoachPage() {
       reply = reply.replace(/^[\-*]\s+/gm, "• ").trim();
       setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: reply, actions: true }));
     } catch {
-      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "I couldn't read that label clearly. Try a brighter, closer photo of the ingredients list — then I'll tell you if it suits your skin.", actions: true }));
+      setMsgs(m => m.filter(x => x.who !== "typing").concat({ who: "ai", text: "⚠️ Server is busy, please try again." }));
     } finally { setBusy(false); }
   };
 

@@ -45,7 +45,7 @@ export default function PrivacyPage() {
         <Card style={{ padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
           <section>
             <p style={{ fontFamily: SANS, fontSize: 14.5, color: T.text, lineHeight: 1.6, margin: 0 }}>
-              Welcome to <strong>Cream — AI Skin Care & Scanner</strong> ("we", "our", or "us"). 
+              Welcome to <strong>Creame — AI Skin Care & Scanner</strong> ("we", "our", or "us"). 
               We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and share information when you use our website, mobile application, and related services.
             </p>
           </section>

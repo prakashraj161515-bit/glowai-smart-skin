@@ -70,7 +70,7 @@ class CreamShellApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Cream — AI Skin Care & Scanner',
+      title: 'Creame — AI Skin Care & Scanner',
       debugShowCheckedModeBanner: false,
       navigatorKey: NotificationService.navigatorKey,
       theme: ThemeData(

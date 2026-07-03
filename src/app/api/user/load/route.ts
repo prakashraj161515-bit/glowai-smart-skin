@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { kv } from "@vercel/kv";
+import { d1Query } from "@/lib/d1";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
@@ -10,13 +12,14 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userKey = `velmora:user:${session.user.email}`;
     let userData: any = null;
-
-    try {
-      userData = await kv.get(userKey);
-    } catch (kvErr: any) {
-      console.warn("KV get failed (using localStorage fallback):", kvErr.message);
+    const rows = await d1Query("SELECT data FROM users WHERE email = ?", [
+      session.user.email,
+    ]);
+    if (rows && rows[0]?.data) {
+      try {
+        userData = JSON.parse(rows[0].data);
+      } catch {}
     }
 
     return NextResponse.json({ data: userData });

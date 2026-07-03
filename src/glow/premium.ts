@@ -18,7 +18,14 @@ export const FREE_DIARY_ENTRIES = 7;
 
 export function isPremium(): boolean {
   if (typeof window === "undefined") return false;
-  return localStorage.getItem("velmora_is_premium") === "true";
+  if (localStorage.getItem("velmora_is_premium") !== "true") return false;
+  // Subscription auto-ends only when the paid term is over (not mid-term).
+  const until = parseInt(localStorage.getItem("velmora_premium_until") || "0") || 0;
+  if (until && Date.now() > until) {
+    try { localStorage.setItem("velmora_is_premium", "false"); } catch {}
+    return false;
+  }
+  return true;
 }
 
 const today = () => new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD, stable

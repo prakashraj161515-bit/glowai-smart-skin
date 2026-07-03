@@ -13,12 +13,29 @@ const AVATARS = [
 ];
 
 const FAQS = [
-  ["How does the AI scan work?", "Cream analyses your selfie with on-device + cloud AI to score acne, oil, pigmentation, hydration and more — then builds advice from it."],
+  ["How does the AI scan work?", "Creame analyses your selfie with on-device + cloud AI to score acne, oil, pigmentation, hydration and more — then builds advice from it."],
   ["Is my photo stored?", "Your scan stays on your device. We only sync your scores so your progress follows you across devices."],
   ["How often should I scan?", "Once a week is ideal — your diet and routine refresh after each new scan."],
   ["What is Aura?", "Aura is your in-app AI skin coach. Ask it anything about your skin, products, or diet."],
   ["How do I cancel Premium?", "Manage or cancel anytime from Subscription & Billing — no questions asked."],
 ];
+
+// 10 bundled ringtones (match android/res/raw + assets/ringtones order)
+const RINGTONES = [
+  "Soft Chime", "Double Bell", "Rising Glow", "Marimba", "Gentle Pad",
+  "Bright Bell", "Tri-Tone", "Water Drop", "Harp", "Calm Loop",
+  // high-volume / alarm tones
+  "Loud Alarm 🔊", "Siren 🔊", "Big Bell 🔊", "Power Chime 🔊", "Digital Alarm 🔊",
+];
+// reminder interval options (minutes)
+const GAPS: [number, string][] = [
+  [30, "30 min"], [60, "1 hour"],
+  [90, "1.5 hours"], [120, "2 hours"], [180, "3 hours"], [240, "4 hours"],
+];
+const native = (action: string, payload?: any) => {
+  try { const n: any = (window as any).CreamNative; if (n?.isNative) return n.call(action, payload || {}); } catch {}
+  return null;
+};
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -30,20 +47,33 @@ export default function ProfilePage() {
   const [streak, setStreak] = useState(12);
   const [score, setScore] = useState(74);
   const [editing, setEditing] = useState(false);
-  const [notif, setNotif] = useState(true);
   const [help, setHelp] = useState(false);
   const [confirmOut, setConfirmOut] = useState(false);
   const [showAv, setShowAv] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // water reminder + ringtone
+  const [showRem, setShowRem] = useState(false);
+  const [waterOn, setWaterOn] = useState(false);
+  const [waterGap, setWaterGap] = useState(120);
+  const [ringtone, setRingtone] = useState(1);
+  const [sleepOn, setSleepOn] = useState(true);
+  const [sleepStart, setSleepStart] = useState("22:00");
+  const [sleepEnd, setSleepEnd] = useState("07:00");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const n = localStorage.getItem("velmora_user_name"); if (n) setUserName(n);
     const p = localStorage.getItem("velmora_user_pic"); if (p) setUserPic(p);
     setIsPremium(localStorage.getItem("velmora_is_premium") === "true");
-    setNotif(localStorage.getItem("velmora_notif") !== "off");
     const h = localStorage.getItem("velmora_history"); if (h) { try { setScanCount(JSON.parse(h).length); } catch {} }
     const a = localStorage.getItem("velmora_analysis"); if (a) { try { setScore(JSON.parse(a).score || 74); } catch {} }
     const s = localStorage.getItem("velmora_streak"); if (s) setStreak(parseInt(s) || 12);
+    setWaterOn(localStorage.getItem("velmora_water_on") === "true");
+    setWaterGap(parseInt(localStorage.getItem("velmora_water_gap") || "120") || 120);
+    setRingtone(parseInt(localStorage.getItem("velmora_ringtone") || "1") || 1);
+    setSleepOn(localStorage.getItem("velmora_sleep_on") !== "false");
+    setSleepStart(localStorage.getItem("velmora_sleep_start") || "22:00");
+    setSleepEnd(localStorage.getItem("velmora_sleep_end") || "07:00");
     if (status === "authenticated" && session?.user) { setUserName(session.user.name || "Maya"); if (session.user.image) setUserPic(session.user.image); }
     // guest with no picture → give a default anime avatar
     if (!localStorage.getItem("velmora_user_pic") && !session?.user?.image) {
@@ -54,10 +84,48 @@ export default function ProfilePage() {
   const pickAvatar = (url: string) => { setUserPic(url); localStorage.setItem("velmora_user_pic", url); setShowAv(false); };
 
   const saveName = () => { setEditing(false); localStorage.setItem("velmora_user_name", userName.trim() || "Maya"); };
-  const toggleNotif = () => { const v = !notif; setNotif(v); localStorage.setItem("velmora_notif", v ? "on" : "off"); };
   const onPic = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
     const r = new FileReader(); r.onloadend = () => { const b = r.result as string; setUserPic(b); localStorage.setItem("velmora_user_pic", b); }; r.readAsDataURL(f);
+  };
+
+  // Save reminder settings (incl. sleep window) and push them to native.
+  const toMin = (hhmm: string) => { const [h, m] = hhmm.split(":").map(Number); return (h || 0) * 60 + (m || 0); };
+  const pushReminder = (over: any = {}) => {
+    const c = { on: waterOn, gap: waterGap, ring: ringtone, sOn: sleepOn, sStart: sleepStart, sEnd: sleepEnd, ...over };
+    localStorage.setItem("velmora_water_on", c.on ? "true" : "false");
+    localStorage.setItem("velmora_water_gap", String(c.gap));
+    localStorage.setItem("velmora_ringtone", String(c.ring));
+    localStorage.setItem("velmora_sleep_on", c.sOn ? "true" : "false");
+    localStorage.setItem("velmora_sleep_start", c.sStart);
+    localStorage.setItem("velmora_sleep_end", c.sEnd);
+    native("reminders.setWater", {
+      enabled: c.on, intervalMinutes: c.gap, ringtone: c.ring,
+      sleepEnabled: c.sOn, sleepStartMin: toMin(c.sStart), sleepEndMin: toMin(c.sEnd),
+    });
+  };
+  const toggleWater = () => { const v = !waterOn; setWaterOn(v); pushReminder({ on: v }); };
+  const chooseGap = (g: number) => { setWaterGap(g); pushReminder({ gap: g }); };
+  const toggleSleep = () => { const v = !sleepOn; setSleepOn(v); pushReminder({ sOn: v }); };
+  const onSleepStart = (v: string) => { setSleepStart(v); pushReminder({ sStart: v }); };
+  const onSleepEnd = (v: string) => { setSleepEnd(v); pushReminder({ sEnd: v }); };
+  // Preview the tone via HTML5 audio so it plays in BOTH the browser and the
+  // app's WebView (the native bridge only exists inside the app).
+  const playPreview = (r: number) => {
+    try {
+      if (!audioRef.current) audioRef.current = new Audio();
+      audioRef.current.pause();
+      audioRef.current.src = `/ringtones/ring_${r}.wav`;
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(() => {});
+    } catch {}
+  };
+  const stopPreview = () => { try { audioRef.current?.pause(); } catch {} };
+  // Selecting a ringtone applies it everywhere (preview + save + reschedule).
+  const chooseRingtone = (r: number) => {
+    setRingtone(r);
+    playPreview(r);
+    pushReminder({ ring: r }); // ringtone applies only to the Water Reminder
   };
 
   const initial = (userName || "M")[0].toUpperCase();
@@ -90,13 +158,11 @@ export default function ProfilePage() {
         <div style={{ background: "linear-gradient(165deg, #F9DDD0 0%, #F5C7B4 55%, #FAF8F6 100%)", padding: "60px 20px 64px", position: "relative" }}>
           <button onClick={() => setEditing(true)} style={{ position: "absolute", top: 56, right: 20, width: 38, height: 38, borderRadius: 12, background: "rgba(255,255,255,0.65)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.8)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="edit" size={18} color="#2C1F1A" /></button>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div onClick={() => setShowAv(true)} style={{ width: 78, height: 78, borderRadius: 99, background: "#fff", padding: 3, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, cursor: "pointer", position: "relative", boxShadow: "0 8px 22px rgba(196,78,40,0.25)" }}>
+            <div style={{ width: 78, height: 78, borderRadius: 99, background: "#fff", padding: 3, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0, position: "relative", boxShadow: "0 8px 22px rgba(196,78,40,0.25)" }}>
               <div style={{ width: "100%", height: "100%", borderRadius: 99, overflow: "hidden", background: T.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {userPic ? <img src={userPic} style={{ width: "100%", height: "100%", objectFit: "cover" }} alt="" /> : <span style={{ fontFamily: SERIF, fontSize: 30, color: "#241712" }}>{initial}</span>}
               </div>
-              <div style={{ position: "absolute", bottom: 3, left: 3, right: 3, background: "rgba(0,0,0,0.4)", textAlign: "center", fontSize: 9, color: "#fff", padding: "2px 0", fontFamily: SANS, fontWeight: 600, borderRadius: "0 0 99px 99px" }}>edit</div>
             </div>
-            <input ref={fileRef} type="file" accept="image/*" onChange={onPic} style={{ display: "none" }} />
             <div style={{ flex: 1, minWidth: 0 }}>
               {editing ? (
                 <input autoFocus value={userName} onChange={e => setUserName(e.target.value)} onBlur={saveName} onKeyDown={e => e.key === "Enter" && saveName()} style={{ fontFamily: SERIF, fontSize: 28, color: "#2C1F1A", background: "transparent", border: "none", borderBottom: "2px solid #C44E28", outline: "none", width: "100%" }} />
@@ -138,12 +204,10 @@ export default function ProfilePage() {
                 </div>
               );
             })}
-            <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 12px", borderTop: `1px solid ${T.border}` }}>
-              <div style={{ width: 36, height: 36, borderRadius: 11, background: "#FEF7EB", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="bell" size={18} color="#E8A24C" /></div>
-              <span style={{ flex: 1, fontFamily: SANS, fontSize: 15.5, fontWeight: 550, color: T.text }}>Notifications</span>
-              <button onClick={toggleNotif} style={{ width: 46, height: 27, borderRadius: 99, border: "none", cursor: "pointer", background: notif ? T.accent : T.borderHi, position: "relative", transition: "background .2s" }}>
-                <span style={{ position: "absolute", top: 3, left: notif ? 22 : 3, width: 21, height: 21, borderRadius: 99, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
-              </button>
+            <div onClick={() => setShowRem(true)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 12px", cursor: "pointer", borderTop: `1px solid ${T.border}` }}>
+              <div style={{ width: 36, height: 36, borderRadius: 11, background: "#EAF6FB", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="drop" size={18} color="#3FA9D6" /></div>
+              <span style={{ flex: 1, fontFamily: SANS, fontSize: 15.5, fontWeight: 550, color: T.text }}>Water Reminder & Ringtone</span>
+              <Icon name="chev" size={16} color={T.textFaint} />
             </div>
             {rows.slice(3).map(([ic, label, fn], i) => {
               const [bg, col] = ICONC[label] || [T.surface2, T.textMute];
@@ -170,11 +234,86 @@ export default function ProfilePage() {
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", background: T.bg, borderRadius: 24, padding: 24, textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.3)", animation: "fadeUp .25s ease" }}>
             <div style={{ width: 56, height: 56, borderRadius: 99, background: "rgba(224,104,92,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 14px" }}><Icon name="arrowR" size={26} color="#E0685C" sw={2} /></div>
             <h3 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 6px" }}>Sign out?</h3>
-            <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 20px" }}>You&apos;ll need to sign in again to use Cream.</p>
+            <p style={{ fontFamily: SANS, fontSize: 14, color: T.textMute, margin: "0 0 20px" }}>You&apos;ll need to sign in again to use Creame.</p>
             <div style={{ display: "flex", gap: 10 }}>
               <button onClick={() => setConfirmOut(false)} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.borderHi}`, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }}>Cancel</button>
               <button onClick={() => { localStorage.removeItem("velmora_onboarding_complete"); localStorage.removeItem("velmora_authed"); signOut({ callbackUrl: "/" }); }} style={{ flex: 1, height: 50, borderRadius: 14, cursor: "pointer", background: "#E0685C", border: "none", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#fff" }}>Sign Out</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Water reminder + ringtone sheet */}
+      {showRem && (
+        <div onClick={() => { stopPreview(); setShowRem(false); }} style={{ position: "fixed", inset: 0, zIndex: 95, background: "rgba(20,12,8,0.45)", backdropFilter: "blur(4px)", display: "flex", alignItems: "flex-end", justifyContent: "center", maxWidth: 430, margin: "0 auto" }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxHeight: "86vh", overflowY: "auto", background: T.bg, borderTopLeftRadius: 26, borderTopRightRadius: 26, padding: "20px 20px 36px", animation: "fadeUp .3s ease" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 99, background: T.borderHi, margin: "0 auto 16px" }} />
+            <h2 style={{ fontFamily: SERIF, fontSize: 24, color: T.text, margin: "0 0 4px" }}>Water Reminder</h2>
+            <p style={{ fontFamily: SANS, fontSize: 13, color: T.textMute, margin: "0 0 18px" }}>Get a gentle ring to drink water through the day.</p>
+
+            {/* enable toggle */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 14px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}`, marginBottom: 14 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 11, background: "#EAF6FB", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="drop" size={19} color="#3FA9D6" /></div>
+              <span style={{ flex: 1, fontFamily: SANS, fontSize: 15, fontWeight: 600, color: T.text }}>Remind me to drink water</span>
+              <button onClick={toggleWater} style={{ width: 46, height: 27, borderRadius: 99, border: "none", cursor: "pointer", background: waterOn ? T.accent : T.borderHi, position: "relative", transition: "background .2s" }}>
+                <span style={{ position: "absolute", top: 3, left: waterOn ? 22 : 3, width: 21, height: 21, borderRadius: 99, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+              </button>
+            </div>
+
+            {/* interval picker */}
+            <div style={{ opacity: waterOn ? 1 : 0.45, pointerEvents: waterOn ? "auto" : "none", marginBottom: 20 }}>
+              <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 0.6, margin: "0 0 10px" }}>Ring every</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {GAPS.map(([g, label]) => (
+                  <button key={g} onClick={() => chooseGap(g)} style={{ padding: "9px 15px", borderRadius: 99, cursor: "pointer", fontFamily: SANS, fontSize: 13.5, fontWeight: 700, border: "none", background: waterGap === g ? T.accent : T.surface2, color: waterGap === g ? "#fff" : T.textMute }}>{label}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* sleep mode (quiet hours) */}
+            <div style={{ opacity: waterOn ? 1 : 0.45, pointerEvents: waterOn ? "auto" : "none", marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 14px", borderRadius: 16, background: T.surface, border: `1px solid ${T.border}` }}>
+                <div style={{ width: 36, height: 36, borderRadius: 11, background: "#ECE9FB", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="moon" size={18} color="#8B85E0" /></div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: SANS, fontSize: 15, fontWeight: 600, color: T.text }}>Sleep mode</div>
+                  <div style={{ fontFamily: SANS, fontSize: 12, color: T.textMute }}>No reminders at night</div>
+                </div>
+                <button onClick={toggleSleep} style={{ width: 46, height: 27, borderRadius: 99, border: "none", cursor: "pointer", background: sleepOn ? T.accent : T.borderHi, position: "relative", transition: "background .2s" }}>
+                  <span style={{ position: "absolute", top: 3, left: sleepOn ? 22 : 3, width: 21, height: 21, borderRadius: 99, background: "#fff", transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)" }} />
+                </button>
+              </div>
+              {sleepOn && (
+                <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                  <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+                    <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.textMute }}>Sleep from</span>
+                    <input type="time" value={sleepStart} onChange={e => onSleepStart(e.target.value)} style={{ padding: "10px 12px", borderRadius: 12, border: `1.5px solid ${T.borderHi}`, background: T.surface, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }} />
+                  </label>
+                  <label style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+                    <span style={{ fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.textMute }}>Wake at</span>
+                    <input type="time" value={sleepEnd} onChange={e => onSleepEnd(e.target.value)} style={{ padding: "10px 12px", borderRadius: 12, border: `1.5px solid ${T.borderHi}`, background: T.surface, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.text }} />
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {/* ringtone list */}
+            <div style={{ fontFamily: SANS, fontSize: 12, fontWeight: 800, color: T.text, textTransform: "uppercase", letterSpacing: 0.6, margin: "0 0 4px" }}>Ringtone</div>
+            <p style={{ fontFamily: SANS, fontSize: 12, color: T.textMute, margin: "0 0 12px" }}>Tap to preview &amp; select — applies to all reminders.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {RINGTONES.map((name, idx) => {
+                const r = idx + 1; const sel = ringtone === r;
+                return (
+                  <div key={r} onClick={() => chooseRingtone(r)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 14px", borderRadius: 14, cursor: "pointer", background: sel ? rgba(T.accent, 0.10) : T.surface, border: `1.5px solid ${sel ? T.accent : T.border}` }}>
+                    <div style={{ width: 34, height: 34, borderRadius: 99, background: sel ? T.accent : T.surface2, display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="spark" size={16} color={sel ? "#fff" : T.textMute} fill={sel} /></div>
+                    <span style={{ flex: 1, fontFamily: SANS, fontSize: 15, fontWeight: 600, color: T.text }}>{name}</span>
+                    <button onClick={(e) => { e.stopPropagation(); playPreview(r); }} style={{ padding: "6px 12px", borderRadius: 99, border: `1px solid ${T.borderHi}`, background: T.surface, cursor: "pointer", fontFamily: SANS, fontSize: 12, fontWeight: 700, color: T.accentText }}>▶ Play</button>
+                    {sel && <Icon name="check" size={18} color={T.accent} sw={2.5} />}
+                  </div>
+                );
+              })}
+            </div>
+
+            <button onClick={() => { stopPreview(); setShowRem(false); }} style={{ width: "100%", marginTop: 20, height: 52, borderRadius: 16, cursor: "pointer", background: T.accent, border: "none", fontFamily: SANS, fontSize: 16, fontWeight: 700, color: "#fff" }}>Done</button>
           </div>
         </div>
       )}

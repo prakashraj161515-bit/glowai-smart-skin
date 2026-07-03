@@ -13,7 +13,7 @@ class AppConfig {
   /// returned ID token's audience matches what the website verifies.
   ///   --dart-define=GOOGLE_WEB_CLIENT_ID=xxxxx.apps.googleusercontent.com
   static const String googleWebClientId =
-      String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: '');
+      String.fromEnvironment('GOOGLE_WEB_CLIENT_ID', defaultValue: '431193765034-9n84jkvsaguui308rev5krslu07ddad7.apps.googleusercontent.com');
 
   /// Hosts the WebView is allowed to load in-app. Anything else opens in the
   /// system browser (Google OAuth, external links, payment redirects, etc.).

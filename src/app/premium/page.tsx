@@ -1,14 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-
-declare global {
-  interface Window {
-    CreamNative?: {
-      isNative: boolean;
-      call: (action: string, payload?: any) => Promise<any>;
-    };
-  }
-}
 import { useRouter } from "next/navigation";
 import { T, SERIF, MONO, SANS, rgba, Icon, Card, Badge, PrimaryBtn } from "@/glow/ui";
 import { pricing, Plan } from "@/glow/diet";
@@ -16,12 +7,11 @@ import { pricing, Plan } from "@/glow/diet";
 // each feature: [premium benefit, what free gets]
 const FEATS: [string, string][] = [
   ["Unlimited daily face scans", "Free: 1 scan / day"],
-  ["Unlimited Aura AI chats", "Free: 3 chats / day"],
+  ["Unlimited chats", "Free: 3 chats / day"],
   ["Product Scanner", "Premium only"],
   ["Ingredient Checker", "Premium only"],
   ["Full progress history (all-time)", "Free: weekly only"],
   ["Unlimited Skin Diary", "Free: last 7 entries"],
-  ["Ad-free experience", "Free: shows ads"],
 ];
 
 export default function PremiumPage() {
@@ -29,86 +19,90 @@ export default function PremiumPage() {
   const [sel, setSel] = useState<"monthly" | "yearly">("yearly");
   const [done, setDone] = useState(false);
   const [already, setAlready] = useState(false);
+  const [until, setUntil] = useState<number>(0);
 
   const price = pricing();
 
   useEffect(() => {
-    const checkPremiumStatus = async () => {
-      if (typeof window !== "undefined" && window.CreamNative?.isNative) {
-        try {
-          const ents = await window.CreamNative.call("purchases.entitlements");
-          const active = Object.values(ents?.entitlements || {}).some((e: any) => e.active === true);
-          localStorage.setItem("velmora_is_premium", active ? "true" : "false");
-          setAlready(active);
-        } catch (e) {
-          console.error("Error fetching entitlements:", e);
-          setAlready(localStorage.getItem("velmora_is_premium") === "true");
-        }
-      } else {
-        setAlready(localStorage.getItem("velmora_is_premium") === "true");
-      }
-    };
-    checkPremiumStatus();
+    setAlready(localStorage.getItem("velmora_is_premium") === "true");
+    setUntil(parseInt(localStorage.getItem("velmora_premium_until") || "0") || 0);
   }, []);
 
+  // Qonversion product IDs — create these EXACT ids in Qonversion (mapped to the
+  // matching Google Play Console subscription products) for real payments.
+  const PRODUCT_IDS = { monthly: "cream_premium_monthly", yearly: "cream_premium_yearly" } as const;
+
+  const [busy, setBusy] = useState(false);
+
   const buy = async () => {
-    if (typeof window !== "undefined" && window.CreamNative?.isNative) {
-      try {
-        const productId = sel === "yearly" ? "premium_yearly" : "premium_monthly";
-        const result = await window.CreamNative.call("purchases.purchase", { productId });
-        const ents = result?.entitlements || {};
-        const active = Object.values(ents).some((e: any) => e.active === true);
+    if (busy) return;
+    const n: any = (typeof window !== "undefined") ? (window as any).CreamNative : null;
 
-        if (active) {
-          localStorage.setItem("velmora_is_premium", "true");
-          fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
-          setDone(true);
-          setTimeout(() => router.push("/"), 1200);
-        } else {
-          alert("Purchase failed or was cancelled.");
-        }
-      } catch (e) {
-        console.error("Native purchase error:", e);
-        alert("Purchase failed: " + e);
-      }
-    } else {
-      localStorage.setItem("velmora_is_premium", "true");
-      fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
-      setDone(true);
-      setTimeout(() => router.push("/"), 1200);
+    // Outside the app (plain browser) there is no Play Store to charge — never
+    // hand out Premium for free here; tell the user to use the app.
+    if (!n?.isNative) {
+      alert("Please open the Cream app to subscribe to Premium.");
+      return;
     }
+
+    setBusy(true);
+    let res: any = null;
+    try {
+      // Real Google Play Billing via Qonversion — opens the store payment sheet.
+      res = await n.call("purchases.purchase", { productId: PRODUCT_IDS[sel] });
+    } catch (e) {
+      // User cancelled or the payment failed → DO NOT unlock Premium.
+      setBusy(false);
+      return;
+    }
+    setBusy(false);
+    // Only a genuinely completed purchase unlocks Premium.
+    if (!res || res.success !== true) return;
+
+    // Prefer the real subscription expiry from the entitlement; fall back to plan length.
+    let end = 0;
+    try {
+      const ents = res.entitlements || {};
+      for (const k in ents) {
+        const e = ents[k];
+        if (e?.active && e?.expiresAt) { const t = Date.parse(e.expiresAt); if (t) end = Math.max(end, t); }
+      }
+    } catch {}
+    if (!end) end = Date.now() + (sel === "yearly" ? 365 : 30) * 24 * 60 * 60 * 1000;
+
+    localStorage.setItem("velmora_is_premium", "true");
+    localStorage.setItem("velmora_premium_plan", sel);
+    localStorage.setItem("velmora_premium_until", String(end));
+    fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true, premiumPlan: sel, premiumUntil: end }) }).catch(() => {});
+    setDone(true);
+    setTimeout(() => router.push("/"), 1200);
   };
 
-  const switchToFree = () => {
-    localStorage.setItem("velmora_is_premium", "false");
-    fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: false }) }).catch(() => {});
-    setAlready(false);
-    router.push("/");
-  };
-
+  // Restore a previous subscription (reinstall / new device). Google requires this.
   const restore = async () => {
-    if (typeof window !== "undefined" && window.CreamNative?.isNative) {
-      try {
-        const result = await window.CreamNative.call("purchases.restore");
-        const ents = result?.entitlements || {};
-        const active = Object.values(ents).some((e: any) => e.active === true);
-
-        if (active) {
-          localStorage.setItem("velmora_is_premium", "true");
-          fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true }) }).catch(() => {});
-          setAlready(true);
-          alert("Purchases restored successfully!");
-        } else {
-          alert("No active subscriptions found to restore.");
-        }
-      } catch (e) {
-        console.error("Native restore error:", e);
-        alert("Restore failed: " + e);
+    const n: any = (typeof window !== "undefined") ? (window as any).CreamNative : null;
+    if (!n?.isNative) { alert("Please open the Cream app to restore purchases."); return; }
+    try {
+      const res = await n.call("purchases.restore", {});
+      const ents = res?.entitlements || {};
+      let end = 0, active = false;
+      for (const k in ents) {
+        const e = ents[k];
+        if (e?.active) { active = true; if (e?.expiresAt) { const t = Date.parse(e.expiresAt); if (t) end = Math.max(end, t); } }
       }
-    } else {
-      alert("Restore is only supported on mobile devices.");
+      if (!active) { alert("No active subscription found to restore."); return; }
+      if (!end) end = Date.now() + 30 * 24 * 60 * 60 * 1000;
+      localStorage.setItem("velmora_is_premium", "true");
+      localStorage.setItem("velmora_premium_until", String(end));
+      fetch("/api/user/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPremium: true, premiumUntil: end }) }).catch(() => {});
+      alert("Premium restored ✅");
+      router.push("/");
+    } catch (e) {
+      alert("Couldn't restore right now. Please try again.");
     }
   };
+
+  const fmtDate = (ms: number) => ms ? new Date(ms).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
 
   const PlanList = (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -119,8 +113,8 @@ export default function PremiumPage() {
           <button key={p.id} onClick={() => setSel(p.id)} style={{ display: "flex", alignItems: "center", gap: 12, padding: 16, borderRadius: 16, cursor: "pointer", textAlign: "left", background: on ? T.accentSoft : T.surface, border: `1.5px solid ${on ? T.accent : T.border}`, position: "relative" }}>
             <div style={{ width: 22, height: 22, borderRadius: 99, border: `2px solid ${on ? T.accent : T.borderHi}`, background: on ? T.accent : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{on && <Icon name="check" size={13} color="#241712" sw={2.8} />}</div>
             <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text }}>{p.label}</span>{p.best && <Badge tone="accent">Best value</Badge>}</div>
-              <div style={{ fontFamily: SANS, fontSize: 13, color: T.textMute }}>{p.sub}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}><span style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: T.text }}>{p.label}</span>{p.best && <Badge tone="accent">Best value</Badge>}{p.id === "yearly" && <span style={{ fontFamily: SANS, fontSize: 10.5, fontWeight: 800, color: "#fff", background: "#5FA572", padding: "2px 8px", borderRadius: 99, letterSpacing: 0.3 }}>🎁 3-DAY FREE TRIAL</span>}</div>
+              <div style={{ fontFamily: SANS, fontSize: 13, color: T.textMute }}>{p.id === "yearly" ? "Free for 3 days, then billed yearly" : p.sub}</div>
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontFamily: MONO, fontSize: 16, fontWeight: 600, color: T.text }}>{original}<span style={{ fontSize: 11, color: T.textMute }}>{p.period}</span></div>
@@ -163,22 +157,24 @@ export default function PremiumPage() {
       </Card>
 
       {already ? (
-        <>
-          <div style={{ textAlign: "center", padding: "14px 0 4px", fontFamily: SANS, fontSize: 15, fontWeight: 700, color: "#5FA572" }}>
-            ✓ You're on Premium — everything is unlocked.
-          </div>
-          <button onClick={switchToFree} style={{ width: "100%", height: 52, marginTop: 8, borderRadius: 16, cursor: "pointer", background: T.surface, border: `1.5px solid ${T.border}`, fontFamily: SANS, fontSize: 15, fontWeight: 700, color: T.textMute }}>
-            Switch to Free plan
-          </button>
-        </>
+        <Card style={{ textAlign: "center", padding: "18px 16px" }}>
+          <div style={{ fontFamily: SANS, fontSize: 15.5, fontWeight: 800, color: "#5FA572", marginBottom: 4 }}>✓ You're on Premium</div>
+          {until > 0 && <div style={{ fontFamily: SANS, fontSize: 14, color: T.text, marginBottom: 6 }}>Active until <b>{fmtDate(until)}</b></div>}
+          <div style={{ fontFamily: SANS, fontSize: 12.5, color: T.textMute, lineHeight: 1.5 }}>Your plan stays active for the full term and can&apos;t be cancelled mid-term. To stop auto-renewal, manage your subscription in the Play Store before it ends.</div>
+        </Card>
       ) : (
-        <PrimaryBtn onClick={buy} style={done ? { background: "#7FB389" } : undefined}>
-          {done ? "Welcome to Pro ✓" : "Get Premium"}
-        </PrimaryBtn>
+        <>
+          <PrimaryBtn onClick={buy} style={done ? { background: "#7FB389" } : undefined}>
+            {done ? "Welcome to Pro ✓" : sel === "yearly" ? "Start 3-Day Free Trial" : "Get Premium"}
+          </PrimaryBtn>
+          {!done && sel === "yearly" && (
+            <div style={{ textAlign: "center", marginTop: 8, fontFamily: SANS, fontSize: 12.5, color: T.textMute }}>
+              Free for 3 days · then {price.fmt((price.plans.find((x: Plan) => x.id === "yearly")?.amount) || 0)}/yr · cancel anytime
+            </div>
+          )}
+        </>
       )}
-      <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}>
-        <span onClick={restore} style={{ cursor: "pointer", textDecoration: "underline" }}>Restore Purchases</span> · Terms · Privacy
-      </div>
+      <div style={{ textAlign: "center", marginTop: 14, fontFamily: SANS, fontSize: 13, color: T.textFaint }}><span onClick={restore} style={{ cursor: "pointer", textDecoration: "underline" }}>Restore Purchases</span> · Terms · Privacy</div>
     </div>
   );
 }

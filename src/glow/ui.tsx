@@ -71,7 +71,7 @@ export function Icon({ name, size = 24, color = "currentColor", sw = 1.7, fill =
     routine: <g {...p}><path d="M8 6h12M8 12h12M8 18h12" /><circle cx="4" cy="6" r="1.2" fill={color} /><circle cx="4" cy="12" r="1.2" fill={color} /><circle cx="4" cy="18" r="1.2" fill={color} /></g>,
     products: <g {...p}><path d="M9 3h6v3l1.5 2v11a2 2 0 01-2 2h-5a2 2 0 01-2-2V8L9 6z" /><path d="M8.5 12h7" /></g>,
     profile: <g {...p}><circle cx="12" cy="8" r="3.6" /><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5" /></g>,
-    chat: <path d="M4 5h16v11H9l-4 3.5V16H4z" {...p} />,
+    chat: <g {...p}><path d="M21 11.5a8.5 8 0 01-12.6 7L3.5 20l1.6-4.4A8 8 0 0112.5 4 8.4 8 0 0121 11.5z" /><circle cx="8.7" cy="11.6" r="1.05" fill={color} stroke="none" /><circle cx="12.3" cy="11.6" r="1.05" fill={color} stroke="none" /><circle cx="15.9" cy="11.6" r="1.05" fill={color} stroke="none" /></g>,
     chev: <path d="M9 5l7 7-7 7" {...p} />,
     chevL: <path d="M15 5l-7 7 7 7" {...p} />,
     chevDown: <path d="M5 9l7 7 7-7" {...p} />,

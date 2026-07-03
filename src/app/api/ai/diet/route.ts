@@ -19,6 +19,7 @@ USER CONTEXT: ${context}
 
 YOUR MISSION:
 Generate a comprehensive, scientifically-backed diet and lifestyle plan to improve the user's skin health.
+Keep the food SIMPLE, healthy and easy — use common, affordable dishes from the user's own area/region (based on their location in the context). Keep it STRICTLY 100% VEGETARIAN (no meat, chicken, fish or egg). Also recommend skin-friendly DRY FRUITS & nuts (almonds, walnuts, cashews) and fruits, explaining how each helps the face/skin.
 
 PLAN STRUCTURE (MANDATORY):
 1. **DAILY MEAL PLAN**:
