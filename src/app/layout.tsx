@@ -36,6 +36,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="app-bg">
             <div className="app-frame">
               <main>{children}</main>
+              <footer style={{ textAlign: "center", padding: "12px 16px", fontSize: "11px", color: "#999", fontFamily: "'DM Sans', sans-serif", borderTop: "1px solid #f0ede9" }}>
+                © {new Date().getFullYear()} Anrudh Studios. All rights reserved. &nbsp;·&nbsp;
+                <a href="/privacy" style={{ color: "#999", textDecoration: "none" }}>Privacy Policy</a>
+                &nbsp;·&nbsp;
+                <a href="/terms" style={{ color: "#999", textDecoration: "none" }}>Terms of Service</a>
+              </footer>
             </div>
           </div>
         </AuthProvider>
